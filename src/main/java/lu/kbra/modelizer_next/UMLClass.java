@@ -25,8 +25,8 @@ public class UMLClass {
 		position = new Point2D.Float();
 	}
 
-	public UMLClass(String conceptualName, String logicalPhysicalName, boolean conceptual, boolean logical,
-			boolean physical, Color textColor, Color backgroundColor, String comment, Point2D position) {
+	public UMLClass(String conceptualName, String logicalPhysicalName, boolean conceptual, boolean logical, boolean physical,
+			Color textColor, Color backgroundColor, String comment, Point2D position) {
 		this.conceptualName = conceptualName;
 		this.logicalPhysicalName = logicalPhysicalName;
 		this.conceptual = conceptual;
@@ -37,6 +37,13 @@ public class UMLClass {
 		this.comment = comment;
 		this.fields = new ArrayList<>();
 		this.position = position;
+	}
+
+	public UMLField createField() {
+		final UMLField f = new UMLField();
+		f.setName("Field_" + fields.size());
+		fields.add(f);
+		return f;
 	}
 
 	public ConceptualClassPanel asConceptualPanel() {
@@ -129,10 +136,10 @@ public class UMLClass {
 
 	@Override
 	public String toString() {
-		return "UMLClass@" + System.identityHashCode(this) + " [internalId=" + internalId + ", conceptualName="
-				+ conceptualName + ", logicalPhysicalName=" + logicalPhysicalName + ", conceptual=" + conceptual
-				+ ", logical=" + logical + ", physical=" + physical + ", textColor=" + textColor + ", backgroundColor="
-				+ backgroundColor + ", comment=" + comment + ", fields=" + fields + ", position=" + position + "]";
+		return "UMLClass@" + System.identityHashCode(this) + " [internalId=" + internalId + ", conceptualName=" + conceptualName
+				+ ", logicalPhysicalName=" + logicalPhysicalName + ", conceptual=" + conceptual + ", logical=" + logical + ", physical="
+				+ physical + ", textColor=" + textColor + ", backgroundColor=" + backgroundColor + ", comment=" + comment + ", fields="
+				+ fields + ", position=" + position + "]";
 	}
 
 }

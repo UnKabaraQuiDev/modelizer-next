@@ -1,5 +1,6 @@
 package lu.kbra.modelizer_next;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -19,6 +20,8 @@ public class ZoomPanPanel extends JPanel {
 	protected double translateX = 0;
 	protected double translateY = 0;
 
+	private final AffineTransform viewTransform = new AffineTransform();
+
 	public ZoomPanPanel() {
 		final ZoomPanDragListener drag = new ZoomPanDragListener();
 		super.addMouseListener(drag);
@@ -34,19 +37,41 @@ public class ZoomPanPanel extends JPanel {
 
 		final AffineTransform old = g2.getTransform();
 
-		g2.translate(translateX, translateY);
-		g2.scale(scale, scale);
+		viewTransform.setToIdentity();
+		viewTransform.translate(translateX, translateY);
+		viewTransform.scale(scale, scale);
+		g2.setTransform(viewTransform);
 
-		super.paint(g);
+		drawGrid(g2);
+
+		paintChildren(g);
 
 		g2.setTransform(old);
+	}
+
+	private void drawGrid(Graphics2D g2) {
+		int gridSize = 50;
+		int count = 100;
+
+		g2.setColor(new Color(220, 220, 220));
+
+		for (int i = -count; i <= count; i++) {
+			int p = i * gridSize;
+
+			g2.drawLine(p, -count * gridSize, p, count * gridSize);
+
+			g2.drawLine(-count * gridSize, p, count * gridSize, p);
+		}
+
+		g2.setColor(Color.GRAY);
+		g2.drawLine(-count * gridSize, 0, count * gridSize, 0);
+		g2.drawLine(0, -count * gridSize, 0, count * gridSize);
 	}
 
 	@Override
 	public Dimension getPreferredSize() {
 		final Dimension d = super.getPreferredSize();
-		return new Dimension((int) (d.width * scale + Math.abs(translateX)),
-				(int) (d.height * scale + Math.abs(translateY)));
+		return new Dimension((int) (d.width * scale + Math.abs(translateX)), (int) (d.height * scale + Math.abs(translateY)));
 	}
 
 	private class ZoomPanDragListener extends MouseAdapter {
@@ -67,6 +92,7 @@ public class ZoomPanPanel extends JPanel {
 				translateX += p.x - offset.x;
 				translateY += p.y - offset.y;
 				offset = null;
+				pan = false;
 				repaint();
 			}
 		}

@@ -24,16 +24,14 @@ public class MainFrame extends JFrame {
 		super.add(tabbedPane, BorderLayout.CENTER);
 
 		createClass();
-		
+
 		setSize(500, 400);
 	}
 
 	public UMLClass createClass() {
-		final UMLClass c = new UMLClass();
-		c.setConceptualName("Table_" + file.classes.size());
-		c.setPosition(new Point2D.Float());
-		file.classes.add(c);
+		final UMLClass c = file.createClass();
 		conceptualPanel.updateModel();
+		conceptualPanel.getUMLClassPanel(c).ifPresent(b -> b.requestFocusInWindow());
 		return c;
 	}
 

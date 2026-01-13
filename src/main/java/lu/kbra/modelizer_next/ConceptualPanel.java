@@ -1,10 +1,12 @@
 package lu.kbra.modelizer_next;
 
+import java.awt.Component;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
-public class ConceptualPanel extends ClassPanel {
+public class ConceptualPanel extends UMLClassContainerPanel {
 
 	protected WeakReference<UMLFile> file;
 
@@ -20,6 +22,10 @@ public class ConceptualPanel extends ClassPanel {
 		setLayout(null);
 	}
 
+	public Optional<ConceptualClassPanel> getUMLClassPanel(UMLClass c) {
+		return classes.stream().filter(b -> b.getModel() == c).findFirst();
+	}
+
 	public void updateModel() {
 		final UMLFile obj = file.get();
 
@@ -29,6 +35,7 @@ public class ConceptualPanel extends ClassPanel {
 				final ConceptualClassPanel panel = classes.get(i);
 				if (panel.getModel() != c) {
 					panel.setModel(c);
+					panel.updateModel();
 				}
 			} else {
 				final ConceptualClassPanel nPanel = c.asConceptualPanel();
@@ -37,17 +44,20 @@ public class ConceptualPanel extends ClassPanel {
 			}
 		}
 
-		while (obj.classes.size() > classes.size()) {
+		while (classes.size() > obj.classes.size()) {
 			this.remove(classes.remove(classes.size() - 1));
 		}
+
+		validate();
+		repaint();
 	}
 
-	public WeakReference<UMLFile> getFile() {
-		return file;
+	public UMLFile getFile() {
+		return file.get();
 	}
 
-	public void setFile(WeakReference<UMLFile> file) {
-		this.file = file;
+	public void setFile(UMLFile file) {
+		this.file = new WeakReference<>(file);
 	}
 
 	@Override

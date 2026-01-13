@@ -1,5 +1,6 @@
 package lu.kbra.modelizer_next;
 
+import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,6 +20,14 @@ public class UMLFile {
 		this.logicalLinks = logicalLinks;
 	}
 
+	public UMLClass createClass() {
+		final UMLClass c = new UMLClass();
+		c.setConceptualName("Table_" + classes.size());
+		c.setPosition(new Point2D.Float());
+		classes.add(c);
+		return c;
+	}
+
 	public List<UMLClass> getClasses() {
 		return classes;
 	}
@@ -33,8 +42,8 @@ public class UMLFile {
 
 	@Override
 	public String toString() {
-		return "UMLFile@" + System.identityHashCode(this) + " [classes=" + classes + ", conceptualLinks="
-				+ conceptualLinks + ", logicalLinks=" + logicalLinks + "]";
+		return "UMLFile@" + System.identityHashCode(this) + " [classes=" + classes + ", conceptualLinks=" + conceptualLinks
+				+ ", logicalLinks=" + logicalLinks + "]";
 	}
 
 }
