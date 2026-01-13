@@ -1,6 +1,5 @@
 package lu.kbra.modelizer_next;
 
-import java.awt.Component;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;

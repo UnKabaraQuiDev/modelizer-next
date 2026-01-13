@@ -7,7 +7,7 @@ public class UMLField {
 
 	protected String internalId;
 
-	protected String name;
+	protected String conceptualName;
 	protected Optional<String> logicalPhysicalName;
 	protected boolean synthetic;
 	protected String type;
@@ -21,7 +21,7 @@ public class UMLField {
 
 	public UMLField(String name, Optional<String> logicalPhysicalName, boolean synthetic, String comment,
 			Color textColor, Color backgroundColor) {
-		this.name = name;
+		this.conceptualName = name;
 		this.logicalPhysicalName = logicalPhysicalName;
 		this.synthetic = synthetic;
 		this.comment = comment;
@@ -41,8 +41,8 @@ public class UMLField {
 		this.internalId = internalId;
 	}
 
-	public String getName() {
-		return name;
+	public String getConceptualName() {
+		return conceptualName;
 	}
 
 	public boolean isSynthetic() {
@@ -77,8 +77,8 @@ public class UMLField {
 		this.showType = showType;
 	}
 
-	public void setName(String name) {
-		this.name = name;
+	public void setConceptualName(String name) {
+		this.conceptualName = name;
 	}
 
 	public Optional<String> getLogicalPhysicalName() {
@@ -107,7 +107,7 @@ public class UMLField {
 
 	@Override
 	public String toString() {
-		return "UMLField@" + System.identityHashCode(this) + " [internalId=" + internalId + ", name=" + name
+		return "UMLField@" + System.identityHashCode(this) + " [internalId=" + internalId + ", name=" + conceptualName
 				+ ", logicalPhysicalName=" + logicalPhysicalName + ", synthetic=" + synthetic + ", type=" + type
 				+ ", showType=" + showType + ", comment=" + comment + ", textColor=" + textColor + ", backgroundColor="
 				+ backgroundColor + "]";

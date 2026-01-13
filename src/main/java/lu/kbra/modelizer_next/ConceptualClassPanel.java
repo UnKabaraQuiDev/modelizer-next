@@ -1,14 +1,11 @@
 package lu.kbra.modelizer_next;
 
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,21 +17,23 @@ import javax.swing.BoxLayout;
 import javax.swing.InputMap;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 
-public class ConceptualClassPanel extends JPanel {
+public class ConceptualClassPanel extends JPanel implements UMLClassChild {
 
-	public class RenameFieldListener extends AbstractAction {
+	public class RenameClassListener extends AbstractAction {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			if (currentField == null) {
-				System.err.println("rename class");
-			} else {
-				currentField.getModel().setName("qsd");
-				currentField.updateModel();
-				getParent().repaint();
+			final String value = JOptionPane.showInputDialog(ConceptualClassPanel.this, "Enter name:",
+					model.get().getConceptualName());
+			if (value != null) {
+				System.out.println("User entered: " + value);
+				model.get().setConceptualName(value);
+				updateModel();
+				forceRedraw();
 			}
 		}
 
@@ -43,14 +42,14 @@ public class ConceptualClassPanel extends JPanel {
 	private class BorderFocusListener implements FocusListener {
 		@Override
 		public void focusGained(FocusEvent e) {
-			ConceptualClassPanel.this.setBorder(UMLClassContainerPanel.FOCUS_BORDER);
-			getParent().repaint();
+			ConceptualClassPanel.this.setBorder(UMLClassContainerPanel.FOCUS_CLASS_BORDER);
+			forceRedraw();
 		}
 
 		@Override
 		public void focusLost(FocusEvent e) {
-			ConceptualClassPanel.this.setBorder(UMLClassContainerPanel.NORMAL_BORDER);
-			getParent().repaint();
+			ConceptualClassPanel.this.setBorder(UMLClassContainerPanel.NORMAL_CLASS_BORDER);
+			forceRedraw();
 		}
 	}
 
@@ -58,11 +57,13 @@ public class ConceptualClassPanel extends JPanel {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			final UMLClass obj = model.get();
-			if (obj != null) {
-				final UMLField field = obj.createField();
-			}
-			updateModel();
+			final UMLField field = model.get().createField();
+			final ConceptualFieldLabel f = field.asConceptualLabel();
+			fieldLabels.add(f);
+			add(f);
+//			updateModel();
+			pack();
+			forceRedraw();
 		}
 
 	}
@@ -77,22 +78,13 @@ public class ConceptualClassPanel extends JPanel {
 
 		super.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 		super.setLocation((int) model.getPosition().getX(), (int) model.getPosition().getY());
-		super.setBorder(UMLClassContainerPanel.NORMAL_BORDER);
+		super.setBorder(UMLClassContainerPanel.NORMAL_CLASS_BORDER);
 		super.setFocusable(true);
+		super.addFocusListener(new BorderFocusListener());
 
 		title = new JLabel(model.getConceptualName());
 		title.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.GRAY));
 		super.add(title);
-
-		super.addFocusListener(new BorderFocusListener());
-
-		super.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				System.err.println(e);
-				System.err.println(e.getComponent());
-			}
-		});
 
 		final InputMap inputMap = getInputMap(JComponent.WHEN_FOCUSED);
 		final ActionMap actionMap = getActionMap();
@@ -101,7 +93,7 @@ public class ConceptualClassPanel extends JPanel {
 		inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_F2, 0), "F2");
 
 		actionMap.put("ctrlF", new NewFieldListener());
-		actionMap.put("F2", new RenameFieldListener());
+		actionMap.put("F2", new RenameClassListener());
 
 		for (UMLField field : model.getFields()) {
 			final ConceptualFieldLabel f = field.asConceptualLabel();
@@ -143,7 +135,7 @@ public class ConceptualClassPanel extends JPanel {
 		setLocation((int) obj.getPosition().getX(), (int) obj.getPosition().getY());
 		pack();
 
-		getParent().repaint();
+//		getParent().repaint();
 	}
 
 	public void pack() {
@@ -168,18 +160,18 @@ public class ConceptualClassPanel extends JPanel {
 		return "ConceptualPanel@" + System.identityHashCode(this) + " [model=" + model + "]";
 	}
 
-	protected ConceptualFieldLabel currentField;
+//	protected ConceptualFieldLabel currentField;
 
-	public void onClick(Component c) {
-		this.requestFocusInWindow();
-//		if (c == this || c == title) {
-//			return;
+//	public void onClick(Component c) {
+//		this.requestFocusInWindow();
+////		if (c == this || c == title) {
+////			return;
+////		}
+//		if (c instanceof ConceptualFieldLabel f) {
+//			currentField = f;
+////			c.requestFocusInWindow();
 //		}
-		if (c instanceof ConceptualFieldLabel f) {
-			currentField = f;
-//			c.requestFocusInWindow();
-		}
-	}
+//	}
 
 //	private static class DragListener extends MouseAdapter {
 //

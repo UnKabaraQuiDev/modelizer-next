@@ -41,7 +41,7 @@ public class UMLClass {
 
 	public UMLField createField() {
 		final UMLField f = new UMLField();
-		f.setName("Field_" + fields.size());
+		f.setConceptualName("Field_" + fields.size());
 		fields.add(f);
 		return f;
 	}
