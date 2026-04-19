@@ -52,8 +52,8 @@ public class NodeLayout {
 
 	@Override
 	public String toString() {
-		return "NodeLayout@" + System.identityHashCode(this) + " [objectType=" + this.objectType + ", objectId="
-				+ this.objectId + ", position=" + this.position + ", size=" + this.size + "]";
+		return "NodeLayout@" + System.identityHashCode(this) + " [objectType=" + this.objectType + ", objectId=" + this.objectId
+				+ ", position=" + this.position + ", size=" + this.size + "]";
 	}
 
 }

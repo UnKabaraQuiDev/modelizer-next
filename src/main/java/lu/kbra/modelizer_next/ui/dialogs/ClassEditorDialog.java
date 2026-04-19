@@ -42,8 +42,7 @@ public final class ClassEditorDialog {
 		commentArea.setWrapStyleWord(true);
 
 		final ColorButton textColorButton = new ColorButton("Text color", classModel.getStyle().getTextColor());
-		final ColorButton backgroundColorButton = new ColorButton("Background color",
-				classModel.getStyle().getBackgroundColor());
+		final ColorButton backgroundColorButton = new ColorButton("Background color", classModel.getStyle().getBackgroundColor());
 		final ColorButton borderColorButton = new ColorButton("Border color", classModel.getStyle().getBorderColor());
 
 		final Holder holder = new Holder();
@@ -66,8 +65,11 @@ public final class ClassEditorDialog {
 		final JButton cancelButton = new JButton("Cancel");
 
 		saveButton.addActionListener(event -> {
-			holder.result = new Result(conceptualNameField.getText(), technicalNameField.getText(),
-					commentArea.getText(), textColorButton.getSelectedColor(), backgroundColorButton.getSelectedColor(),
+			holder.result = new Result(conceptualNameField.getText(),
+					technicalNameField.getText(),
+					commentArea.getText(),
+					textColorButton.getSelectedColor(),
+					backgroundColorButton.getSelectedColor(),
 					borderColorButton.getSelectedColor());
 			dialog.dispose();
 		});
@@ -107,8 +109,8 @@ public final class ClassEditorDialog {
 		private Result result;
 	}
 
-	public record Result(String conceptualName, String technicalName, String comment, Color textColor,
-			Color backgroundColor, Color borderColor) {
+	public record Result(String conceptualName, String technicalName, String comment, Color textColor, Color backgroundColor,
+			Color borderColor) {
 	}
 
 }

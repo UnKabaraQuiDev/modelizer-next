@@ -42,8 +42,8 @@ public class ClassStyle {
 
 	@Override
 	public String toString() {
-		return "ClassStyle@" + System.identityHashCode(this) + " [textColor=" + this.textColor + ", backgroundColor="
-				+ this.backgroundColor + ", borderColor=" + this.borderColor + "]";
+		return "ClassStyle@" + System.identityHashCode(this) + " [textColor=" + this.textColor + ", backgroundColor=" + this.backgroundColor
+				+ ", borderColor=" + this.borderColor + "]";
 	}
 
 }

@@ -26,8 +26,10 @@ public final class SystemThemeDetector {
 	}
 
 	private static boolean isWindowsDark() throws Exception {
-		final Process process = new ProcessBuilder("reg", "query",
-				"HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize", "/v",
+		final Process process = new ProcessBuilder("reg",
+				"query",
+				"HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize",
+				"/v",
 				"AppsUseLightTheme").start();
 
 		try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {

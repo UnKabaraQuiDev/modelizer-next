@@ -36,7 +36,10 @@ public final class LinkEditorDialog {
 	private LinkEditorDialog() {
 	}
 
-	public static Result showDialog(final Component parent, final ModelDocument document, final LinkModel linkModel,
+	public static Result showDialog(
+			final Component parent,
+			final ModelDocument document,
+			final LinkModel linkModel,
 			final PanelType panelType) {
 		final Window owner = parent == null ? null : SwingUtilities.getWindowAncestor(parent);
 		final JDialog dialog = new JDialog(owner, "Edit relation", Dialog.ModalityType.APPLICATION_MODAL);
@@ -45,10 +48,8 @@ public final class LinkEditorDialog {
 		final JTextField commentField = new JTextField(linkModel.getComment(), 24);
 		final ColorButton colorButton = new ColorButton("Line color", linkModel.getLineColor());
 
-		final JComboBox<ClassModel> fromClassBox = new JComboBox<>(
-				document.getModel().getClasses().toArray(ClassModel[]::new));
-		final JComboBox<ClassModel> toClassBox = new JComboBox<>(
-				document.getModel().getClasses().toArray(ClassModel[]::new));
+		final JComboBox<ClassModel> fromClassBox = new JComboBox<>(document.getModel().getClasses().toArray(ClassModel[]::new));
+		final JComboBox<ClassModel> toClassBox = new JComboBox<>(document.getModel().getClasses().toArray(ClassModel[]::new));
 		fromClassBox.setRenderer(new ClassRenderer(panelType));
 		toClassBox.setRenderer(new ClassRenderer(panelType));
 
@@ -60,10 +61,8 @@ public final class LinkEditorDialog {
 		final JComboBox<Cardinality> fromCardinalityBox = new JComboBox<>(Cardinality.values());
 		final JComboBox<Cardinality> toCardinalityBox = new JComboBox<>(Cardinality.values());
 
-		fromClassBox.setSelectedItem(
-				LinkEditorDialog.findClass(document.getModel().getClasses(), linkModel.getFrom().getClassId()));
-		toClassBox.setSelectedItem(
-				LinkEditorDialog.findClass(document.getModel().getClasses(), linkModel.getTo().getClassId()));
+		fromClassBox.setSelectedItem(LinkEditorDialog.findClass(document.getModel().getClasses(), linkModel.getFrom().getClassId()));
+		toClassBox.setSelectedItem(LinkEditorDialog.findClass(document.getModel().getClasses(), linkModel.getTo().getClassId()));
 		fromCardinalityBox.setSelectedItem(linkModel.getCardinalityFrom());
 		toCardinalityBox.setSelectedItem(linkModel.getCardinalityTo());
 
@@ -93,8 +92,7 @@ public final class LinkEditorDialog {
 			}
 
 			if (toClass != null) {
-				final FieldModel currentTargetField = LinkEditorDialog.findField(toClass,
-						linkModel.getTo().getFieldId());
+				final FieldModel currentTargetField = LinkEditorDialog.findField(toClass, linkModel.getTo().getFieldId());
 				if (panelType == PanelType.CONCEPTUAL) {
 					toFieldBox.setSelectedItem(currentTargetField);
 				} else if (currentTargetField != null && currentTargetField.isPrimaryKey()) {
@@ -163,10 +161,17 @@ public final class LinkEditorDialog {
 				}
 			}
 
-			holder.result = new Result(nameField.getText(), commentField.getText(), colorButton.getSelectedColor(),
-					fromClass == null ? null : fromClass.getId(), toClass == null ? null : toClass.getId(),
-					panelType == PanelType.CONCEPTUAL ? null : fromField == null ? null : fromField.getId(),
-					panelType == PanelType.CONCEPTUAL ? null : toField == null ? null : toField.getId(),
+			holder.result = new Result(nameField.getText(),
+					commentField.getText(),
+					colorButton.getSelectedColor(),
+					fromClass == null ? null : fromClass.getId(),
+					toClass == null ? null : toClass.getId(),
+					panelType == PanelType.CONCEPTUAL ? null
+							: fromField == null ? null
+							: fromField.getId(),
+					panelType == PanelType.CONCEPTUAL ? null
+							: toField == null ? null
+							: toField.getId(),
 					panelType == PanelType.CONCEPTUAL ? (Cardinality) fromCardinalityBox.getSelectedItem() : null,
 					panelType == PanelType.CONCEPTUAL ? (Cardinality) toCardinalityBox.getSelectedItem() : null);
 			dialog.dispose();
@@ -232,8 +237,12 @@ public final class LinkEditorDialog {
 		}
 
 		@Override
-		public Component getListCellRendererComponent(final javax.swing.JList<?> list, final Object value,
-				final int index, final boolean isSelected, final boolean cellHasFocus) {
+		public Component getListCellRendererComponent(
+				final javax.swing.JList<?> list,
+				final Object value,
+				final int index,
+				final boolean isSelected,
+				final boolean cellHasFocus) {
 			super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
 			if (value instanceof final ClassModel classModel) {
 				this.setText(this.panelType == PanelType.CONCEPTUAL ? classModel.getNames().getConceptualName()
@@ -252,8 +261,12 @@ public final class LinkEditorDialog {
 		}
 
 		@Override
-		public Component getListCellRendererComponent(final javax.swing.JList<?> list, final Object value,
-				final int index, final boolean isSelected, final boolean cellHasFocus) {
+		public Component getListCellRendererComponent(
+				final javax.swing.JList<?> list,
+				final Object value,
+				final int index,
+				final boolean isSelected,
+				final boolean cellHasFocus) {
 			super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
 			if (value instanceof final FieldModel fieldModel) {
 				this.setText(this.panelType == PanelType.CONCEPTUAL ? fieldModel.getNames().getName()
@@ -267,8 +280,8 @@ public final class LinkEditorDialog {
 		private Result result;
 	}
 
-	public record Result(String name, String comment, Color lineColor, String fromClassId, String toClassId,
-			String fromFieldId, String toFieldId, Cardinality cardinalityFrom, Cardinality cardinalityTo) {
+	public record Result(String name, String comment, Color lineColor, String fromClassId, String toClassId, String fromFieldId,
+			String toFieldId, Cardinality cardinalityFrom, Cardinality cardinalityTo) {
 	}
 
 }

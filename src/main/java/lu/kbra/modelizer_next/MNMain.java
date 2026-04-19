@@ -34,7 +34,8 @@ public class MNMain {
 			JOptionPane.showMessageDialog(null,
 					"Uh uh ! It seems like this app's manifest is malformed, try\nrestarting it, redownloading it or updating it.\nIf nothing works,please report to: "
 							+ App.ISSUES_URL,
-					"Hmmmmmm", JOptionPane.ERROR_MESSAGE);
+					"Hmmmmmm",
+					JOptionPane.ERROR_MESSAGE);
 		}
 
 		SwingUtilities.invokeLater(() -> {
@@ -49,9 +50,10 @@ public class MNMain {
 	}
 
 	private static ObjectMapper createMapper() {
-		final ObjectMapper mapper = new ObjectMapper(
-				JsonFactory.builder().configure(StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION, true)
-						.configure(JsonReadFeature.ALLOW_JAVA_COMMENTS, true).build());
+		final ObjectMapper mapper = new ObjectMapper(JsonFactory.builder()
+				.configure(StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION, true)
+				.configure(JsonReadFeature.ALLOW_JAVA_COMMENTS, true)
+				.build());
 
 		mapper.registerModule(new JavaTimeModule());
 		mapper.registerModule(new ColorModule());
@@ -68,8 +70,7 @@ public class MNMain {
 	public static void applyConfiguredLookAndFeel() {
 		try {
 			final AppConfig config = App.loadConfig();
-			final ThemeMode themeMode = config == null || config.getThemeMode() == null ? ThemeMode.SYSTEM
-					: config.getThemeMode();
+			final ThemeMode themeMode = config == null || config.getThemeMode() == null ? ThemeMode.SYSTEM : config.getThemeMode();
 
 			switch (themeMode) {
 			case LIGHT -> FlatLightLaf.setup();

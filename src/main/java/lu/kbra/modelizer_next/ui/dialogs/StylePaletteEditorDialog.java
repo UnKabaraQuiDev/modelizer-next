@@ -45,67 +45,82 @@ public final class StylePaletteEditorDialog {
 	public static StylePalette showDialog(final Component parent, final StylePalette initialPalette) {
 		final Window owner = parent == null ? null : SwingUtilities.getWindowAncestor(parent);
 		final boolean editing = initialPalette != null;
-		final JDialog dialog = new JDialog(owner, editing ? "Edit style palette" : "New style palette",
+		final JDialog dialog = new JDialog(owner,
+				editing ? "Edit style palette" : "New style palette",
 				Dialog.ModalityType.APPLICATION_MODAL);
 
 		final StylePalettePreviewPanel previewPanel = new StylePalettePreviewPanel();
 
-		final JTextField nameField = new JTextField(initialPalette == null ? "New palette" : initialPalette.getName(),
-				24);
+		final JTextField nameField = new JTextField(initialPalette == null ? "New palette" : initialPalette.getName(), 24);
 
 		final ColorButton classTextColorButton = new ColorButton("Class text",
-				initialPalette == null ? Color.BLACK : initialPalette.getClassTextColor(), c -> {
+				initialPalette == null ? Color.BLACK : initialPalette.getClassTextColor(),
+				c -> {
 					previewPanel.palette.setClassTextColor(c);
 					previewPanel.repaint();
 				});
 		final ColorButton classBackgroundColorButton = new ColorButton("Class background",
-				initialPalette == null ? new Color(0xFFF59D) : initialPalette.getClassBackgroundColor(), c -> {
+				initialPalette == null ? new Color(0xFFF59D) : initialPalette.getClassBackgroundColor(),
+				c -> {
 					previewPanel.palette.setClassBackgroundColor(c);
 					previewPanel.repaint();
 				});
 		final ColorButton classBorderColorButton = new ColorButton("Class border",
-				initialPalette == null ? new Color(0x333333) : initialPalette.getClassBorderColor(), c -> {
+				initialPalette == null ? new Color(0x333333) : initialPalette.getClassBorderColor(),
+				c -> {
 					previewPanel.palette.setClassBorderColor(c);
 					previewPanel.repaint();
 				});
 
 		final ColorButton fieldTextColorButton = new ColorButton("Field text",
-				initialPalette == null ? Color.BLACK : initialPalette.getFieldTextColor(), c -> {
+				initialPalette == null ? Color.BLACK : initialPalette.getFieldTextColor(),
+				c -> {
 					previewPanel.palette.setFieldTextColor(c);
 					previewPanel.repaint();
 				});
 		final ColorButton fieldBackgroundColorButton = new ColorButton("Field background",
-				initialPalette == null ? Color.WHITE : initialPalette.getFieldBackgroundColor(), c -> {
+				initialPalette == null ? Color.WHITE : initialPalette.getFieldBackgroundColor(),
+				c -> {
 					previewPanel.palette.setFieldBackgroundColor(c);
 					previewPanel.repaint();
 				});
 
 		final ColorButton commentTextColorButton = new ColorButton("Comment text",
-				initialPalette == null ? new Color(0x333333) : initialPalette.getCommentTextColor(), c -> {
+				initialPalette == null ? new Color(0x333333) : initialPalette.getCommentTextColor(),
+				c -> {
 					previewPanel.palette.setCommentTextColor(c);
 					previewPanel.repaint();
 				});
 		final ColorButton commentBackgroundColorButton = new ColorButton("Comment background",
-				initialPalette == null ? new Color(0xFFF8CC) : initialPalette.getCommentBackgroundColor(), c -> {
+				initialPalette == null ? new Color(0xFFF8CC) : initialPalette.getCommentBackgroundColor(),
+				c -> {
 					previewPanel.palette.setCommentBackgroundColor(c);
 					previewPanel.repaint();
 				});
 		final ColorButton commentBorderColorButton = new ColorButton("Comment border",
-				initialPalette == null ? new Color(0x444444) : initialPalette.getCommentBorderColor(), c -> {
+				initialPalette == null ? new Color(0x444444) : initialPalette.getCommentBorderColor(),
+				c -> {
 					previewPanel.palette.setClassBorderColor(c);
 					previewPanel.repaint();
 				});
 
 		final ColorButton linkColorButton = new ColorButton("Link color",
-				initialPalette == null ? new Color(0x555555) : initialPalette.getLinkColor(), c -> {
+				initialPalette == null ? new Color(0x555555) : initialPalette.getLinkColor(),
+				c -> {
 					previewPanel.palette.setLinkColor(c);
 					previewPanel.repaint();
 				});
 
-		final Runnable refreshPreview = () -> previewPanel.setPalette(StylePaletteEditorDialog.buildPalette(
-				nameField.getText(), classTextColorButton, classBackgroundColorButton, classBorderColorButton,
-				fieldTextColorButton, fieldBackgroundColorButton, commentTextColorButton, commentBackgroundColorButton,
-				commentBorderColorButton, linkColorButton));
+		final Runnable refreshPreview = () -> previewPanel.setPalette(StylePaletteEditorDialog.buildPalette(nameField.getText(),
+				classTextColorButton,
+				classBackgroundColorButton,
+				classBorderColorButton,
+				fieldTextColorButton,
+				fieldBackgroundColorButton,
+				commentTextColorButton,
+				commentBackgroundColorButton,
+				commentBorderColorButton,
+				linkColorButton));
 
 		final java.awt.event.ActionListener previewListener = event -> refreshPreview.run();
 
@@ -124,12 +139,11 @@ public final class StylePaletteEditorDialog {
 		form.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
 		form.add(StylePaletteEditorDialog.row("Name", nameField));
-		form.add(StylePaletteEditorDialog.row("Class", StylePaletteEditorDialog.flow(classTextColorButton,
-				classBackgroundColorButton, classBorderColorButton)));
-		form.add(StylePaletteEditorDialog.row("Field",
-				StylePaletteEditorDialog.flow(fieldTextColorButton, fieldBackgroundColorButton)));
-		form.add(StylePaletteEditorDialog.row("Comment", StylePaletteEditorDialog.flow(commentTextColorButton,
-				commentBackgroundColorButton, commentBorderColorButton)));
+		form.add(StylePaletteEditorDialog.row("Class",
+				StylePaletteEditorDialog.flow(classTextColorButton, classBackgroundColorButton, classBorderColorButton)));
+		form.add(StylePaletteEditorDialog.row("Field", StylePaletteEditorDialog.flow(fieldTextColorButton, fieldBackgroundColorButton)));
+		form.add(StylePaletteEditorDialog.row("Comment",
+				StylePaletteEditorDialog.flow(commentTextColorButton, commentBackgroundColorButton, commentBorderColorButton)));
 		form.add(StylePaletteEditorDialog.row("Link", StylePaletteEditorDialog.flow(linkColorButton)));
 
 		final JPanel centerPanel = new JPanel(new BorderLayout(10, 10));
@@ -142,10 +156,16 @@ public final class StylePaletteEditorDialog {
 		final JButton cancelButton = new JButton("Cancel");
 
 		saveButton.addActionListener(event -> {
-			holder.palette = StylePaletteEditorDialog.buildPalette(nameField.getText(), classTextColorButton,
-					classBackgroundColorButton, classBorderColorButton, fieldTextColorButton,
-					fieldBackgroundColorButton, commentTextColorButton, commentBackgroundColorButton,
-					commentBorderColorButton, linkColorButton);
+			holder.palette = StylePaletteEditorDialog.buildPalette(nameField.getText(),
+					classTextColorButton,
+					classBackgroundColorButton,
+					classBorderColorButton,
+					fieldTextColorButton,
+					fieldBackgroundColorButton,
+					commentTextColorButton,
+					commentBackgroundColorButton,
+					commentBorderColorButton,
+					linkColorButton);
 			dialog.dispose();
 		});
 		cancelButton.addActionListener(event -> dialog.dispose());
@@ -155,8 +175,7 @@ public final class StylePaletteEditorDialog {
 		buttonPanel.add(cancelButton);
 
 		dialog.getRootPane().setDefaultButton(saveButton);
-		dialog.getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
-				.put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "cancel");
+		dialog.getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "cancel");
 		dialog.getRootPane().getActionMap().put("cancel", new AbstractAction() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
@@ -179,11 +198,17 @@ public final class StylePaletteEditorDialog {
 		return holder.palette;
 	}
 
-	private static StylePalette buildPalette(final String name, final ColorButton classTextColorButton,
-			final ColorButton classBackgroundColorButton, final ColorButton classBorderColorButton,
-			final ColorButton fieldTextColorButton, final ColorButton fieldBackgroundColorButton,
-			final ColorButton commentTextColorButton, final ColorButton commentBackgroundColorButton,
-			final ColorButton commentBorderColorButton, final ColorButton linkColorButton) {
+	private static StylePalette buildPalette(
+			final String name,
+			final ColorButton classTextColorButton,
+			final ColorButton classBackgroundColorButton,
+			final ColorButton classBorderColorButton,
+			final ColorButton fieldTextColorButton,
+			final ColorButton fieldBackgroundColorButton,
+			final ColorButton commentTextColorButton,
+			final ColorButton commentBackgroundColorButton,
+			final ColorButton commentBorderColorButton,
+			final ColorButton linkColorButton) {
 		final StylePalette palette = new StylePalette();
 		palette.setName(name == null || name.isBlank() ? "Unnamed palette" : name);
 		palette.setClassTextColor(classTextColorButton.getSelectedColor());
@@ -255,7 +280,9 @@ public final class StylePaletteEditorDialog {
 
 				g2.setColor(this.palette.getLinkColor());
 				g2.setStroke(new BasicStroke(1.2f));
-				g2.draw(new Line2D.Double(classBounds.getMaxX(), classBounds.getCenterY(), commentBounds.getX(),
+				g2.draw(new Line2D.Double(classBounds.getMaxX(),
+						classBounds.getCenterY(),
+						commentBounds.getX(),
 						commentBounds.getCenterY()));
 
 				g2.setColor(this.palette.getClassBackgroundColor());
@@ -266,20 +293,14 @@ public final class StylePaletteEditorDialog {
 				g2.drawString("Example table", 48, 60);
 
 				g2.setColor(this.palette.getFieldBackgroundColor());
-				g2.fill(new Rectangle2D.Double(classBounds.getX(), classBounds.getY() + 28, classBounds.getWidth(),
-						22));
-				g2.fill(new Rectangle2D.Double(classBounds.getX(), classBounds.getY() + 50, classBounds.getWidth(),
-						22));
-				g2.fill(new Rectangle2D.Double(classBounds.getX(), classBounds.getY() + 72, classBounds.getWidth(),
-						22));
+				g2.fill(new Rectangle2D.Double(classBounds.getX(), classBounds.getY() + 28, classBounds.getWidth(), 22));
+				g2.fill(new Rectangle2D.Double(classBounds.getX(), classBounds.getY() + 50, classBounds.getWidth(), 22));
+				g2.fill(new Rectangle2D.Double(classBounds.getX(), classBounds.getY() + 72, classBounds.getWidth(), 22));
 
 				g2.setColor(this.palette.getClassBorderColor());
-				g2.draw(new Line2D.Double(classBounds.getX(), classBounds.getY() + 50, classBounds.getMaxX(),
-						classBounds.getY() + 50));
-				g2.draw(new Line2D.Double(classBounds.getX(), classBounds.getY() + 72, classBounds.getMaxX(),
-						classBounds.getY() + 72));
-				g2.draw(new Line2D.Double(classBounds.getX(), classBounds.getY() + 94, classBounds.getMaxX(),
-						classBounds.getY() + 94));
+				g2.draw(new Line2D.Double(classBounds.getX(), classBounds.getY() + 50, classBounds.getMaxX(), classBounds.getY() + 50));
+				g2.draw(new Line2D.Double(classBounds.getX(), classBounds.getY() + 72, classBounds.getMaxX(), classBounds.getY() + 72));
+				g2.draw(new Line2D.Double(classBounds.getX(), classBounds.getY() + 94, classBounds.getMaxX(), classBounds.getY() + 94));
 
 				g2.setFont(StylePalettePreviewPanel.BODY_FONT);
 				g2.setColor(this.palette.getFieldTextColor());
@@ -289,8 +310,7 @@ public final class StylePaletteEditorDialog {
 
 				g2.setColor(this.palette.getClassBorderColor());
 				g2.draw(classBounds);
-				g2.draw(new Line2D.Double(classBounds.getX(), classBounds.getY() + 28, classBounds.getMaxX(),
-						classBounds.getY() + 28));
+				g2.draw(new Line2D.Double(classBounds.getX(), classBounds.getY() + 28, classBounds.getMaxX(), classBounds.getY() + 28));
 
 				g2.setColor(this.palette.getCommentBackgroundColor());
 				g2.fill(commentBounds);

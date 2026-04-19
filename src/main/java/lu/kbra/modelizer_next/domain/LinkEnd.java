@@ -33,8 +33,7 @@ public class LinkEnd {
 
 	@Override
 	public String toString() {
-		return "LinkEnd@" + System.identityHashCode(this) + " [classId=" + this.classId + ", fieldId=" + this.fieldId
-				+ "]";
+		return "LinkEnd@" + System.identityHashCode(this) + " [classId=" + this.classId + ", fieldId=" + this.fieldId + "]";
 	}
 
 }

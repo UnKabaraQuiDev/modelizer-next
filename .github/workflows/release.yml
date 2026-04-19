@@ -1,0 +1,127 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Tag to build"
+        required: true
+
+jobs:
+  prepare:
+    runs-on: self-hosted
+
+    outputs:
+      should_format: ${{ steps.decide.outputs.should_format }}
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.tag || github.ref }}
+          fetch-depth: 0
+
+      - name: Ensure NOT a SNAPSHOT version
+        run: |
+          VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+          echo "Detected version: $VERSION"
+
+          if [[ "$VERSION" == *"-SNAPSHOT" ]]; then
+            echo "Snapshot version detected. Releases must NOT be snapshots."
+            exit 1
+          fi
+
+      - name: Decide if formatting should run
+        id: decide
+        run: |
+          SHOULD_FORMAT=false
+
+          if [ "${{ github.event_name }}" = "push" ]; then
+            TAG_COMMIT=$(git rev-list -n 1 ${{ github.ref }})
+            HEAD_COMMIT=$(git rev-parse HEAD)
+
+            echo "Tag commit: $TAG_COMMIT"
+            echo "HEAD commit: $HEAD_COMMIT"
+
+            if [ "$TAG_COMMIT" = "$HEAD_COMMIT" ]; then
+              SHOULD_FORMAT=true
+            fi
+          fi
+
+          echo "should_format=$SHOULD_FORMAT" >> $GITHUB_OUTPUT
+
+  format:
+    needs: prepare
+    runs-on: self-hosted
+
+    if: needs.prepare.outputs.should_format == 'true'
+
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.tag || github.ref }}
+          fetch-depth: 0
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Apply formatting
+        run: mvn -B spotless:apply
+
+      - name: Commit & push if needed
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+
+          git add .
+          git diff --cached --quiet || git commit -m "[NIGHTLY] Apply code formatting"
+
+          git push || echo "Push failed, continuing..."
+
+  release:
+    needs: [prepare, format]
+    runs-on: self-hosted
+
+    if: always()
+
+    permissions:
+      contents: write
+
+    env:
+      MAVEN_USERNAME: ${{ secrets.MAVEN_USERNAME }}
+      MAVEN_PASSWORD: ${{ secrets.MAVEN_PASSWORD }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.tag || github.ref }}
+          fetch-depth: 0
+
+      - name: Set up Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 17
+          server-id: nexus.kbra.lu-releases
+          server-username: MAVEN_USERNAME
+          server-password: MAVEN_PASSWORD
+
+      - name: Build project
+        run: mvn -B clean package deploy
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: Release ${{ github.event.inputs.tag || github.ref_name }}
+          tag_name: ${{ github.event.inputs.tag || github.ref_name }}
+          files: "**/*/target/*.jar"
+          make_latest: true
+          prerelease: false

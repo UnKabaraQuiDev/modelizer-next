@@ -31,8 +31,7 @@ public final class SampleDocumentFactory {
 		customer.getNames().setTechnicalName("T_CUSTOMER");
 		customer.setComment("Stores the master customer record.");
 		customer.getFields().add(SampleDocumentFactory.field("Customer ID", "CUSTOMER_ID", false, true, true, true));
-		customer.getFields()
-				.add(SampleDocumentFactory.field("Display name", "DISPLAY_NAME", false, false, false, true));
+		customer.getFields().add(SampleDocumentFactory.field("Display name", "DISPLAY_NAME", false, false, false, true));
 		customer.getFields().add(SampleDocumentFactory.field("Email", "EMAIL", false, false, true, false));
 
 		final ClassModel order = new ClassModel();
@@ -79,40 +78,33 @@ public final class SampleDocumentFactory {
 		document.getModel().getComments().add(customerComment);
 		document.getModel().getComments().add(conceptualLinkComment);
 
-		SampleDocumentFactory.seedClass(document.getWorkspace().getPanels().get(PanelType.CONCEPTUAL), customer, 120,
-				120, 220, 0);
-		SampleDocumentFactory.seedClass(document.getWorkspace().getPanels().get(PanelType.CONCEPTUAL), order, 450, 170,
-				220, 0);
-		SampleDocumentFactory.seedComment(document.getWorkspace().getPanels().get(PanelType.CONCEPTUAL), note, 120, 320,
-				280, 90);
-		SampleDocumentFactory.seedComment(document.getWorkspace().getPanels().get(PanelType.CONCEPTUAL),
-				customerComment, 410, 70, 250, 80);
-		SampleDocumentFactory.seedComment(document.getWorkspace().getPanels().get(PanelType.CONCEPTUAL),
-				conceptualLinkComment, 300, 210, 260, 80);
+		SampleDocumentFactory.seedClass(document.getWorkspace().getPanels().get(PanelType.CONCEPTUAL), customer, 120, 120, 220, 0);
+		SampleDocumentFactory.seedClass(document.getWorkspace().getPanels().get(PanelType.CONCEPTUAL), order, 450, 170, 220, 0);
+		SampleDocumentFactory.seedComment(document.getWorkspace().getPanels().get(PanelType.CONCEPTUAL), note, 120, 320, 280, 90);
+		SampleDocumentFactory.seedComment(document.getWorkspace().getPanels().get(PanelType.CONCEPTUAL), customerComment, 410, 70, 250, 80);
+		SampleDocumentFactory
+				.seedComment(document.getWorkspace().getPanels().get(PanelType.CONCEPTUAL), conceptualLinkComment, 300, 210, 260, 80);
 
-		SampleDocumentFactory.seedClass(document.getWorkspace().getPanels().get(PanelType.LOGICAL), customer, 120, 120,
-				220, 0);
-		SampleDocumentFactory.seedClass(document.getWorkspace().getPanels().get(PanelType.LOGICAL), order, 450, 170,
-				220, 0);
-		SampleDocumentFactory.seedComment(document.getWorkspace().getPanels().get(PanelType.LOGICAL), note, 120, 340,
-				280, 90);
-		SampleDocumentFactory.seedComment(document.getWorkspace().getPanels().get(PanelType.LOGICAL), customerComment,
-				410, 70, 250, 80);
+		SampleDocumentFactory.seedClass(document.getWorkspace().getPanels().get(PanelType.LOGICAL), customer, 120, 120, 220, 0);
+		SampleDocumentFactory.seedClass(document.getWorkspace().getPanels().get(PanelType.LOGICAL), order, 450, 170, 220, 0);
+		SampleDocumentFactory.seedComment(document.getWorkspace().getPanels().get(PanelType.LOGICAL), note, 120, 340, 280, 90);
+		SampleDocumentFactory.seedComment(document.getWorkspace().getPanels().get(PanelType.LOGICAL), customerComment, 410, 70, 250, 80);
 
-		SampleDocumentFactory.seedClass(document.getWorkspace().getPanels().get(PanelType.PHYSICAL), customer, 120, 120,
-				220, 0);
-		SampleDocumentFactory.seedClass(document.getWorkspace().getPanels().get(PanelType.PHYSICAL), order, 450, 170,
-				220, 0);
-		SampleDocumentFactory.seedComment(document.getWorkspace().getPanels().get(PanelType.PHYSICAL), note, 120, 340,
-				280, 90);
-		SampleDocumentFactory.seedComment(document.getWorkspace().getPanels().get(PanelType.PHYSICAL), customerComment,
-				410, 70, 250, 80);
+		SampleDocumentFactory.seedClass(document.getWorkspace().getPanels().get(PanelType.PHYSICAL), customer, 120, 120, 220, 0);
+		SampleDocumentFactory.seedClass(document.getWorkspace().getPanels().get(PanelType.PHYSICAL), order, 450, 170, 220, 0);
+		SampleDocumentFactory.seedComment(document.getWorkspace().getPanels().get(PanelType.PHYSICAL), note, 120, 340, 280, 90);
+		SampleDocumentFactory.seedComment(document.getWorkspace().getPanels().get(PanelType.PHYSICAL), customerComment, 410, 70, 250, 80);
 
 		return document;
 	}
 
-	private static FieldModel field(final String conceptualName, final String technicalName,
-			final boolean notConceptual, final boolean primaryKey, final boolean unique, final boolean notNull) {
+	private static FieldModel field(
+			final String conceptualName,
+			final String technicalName,
+			final boolean notConceptual,
+			final boolean primaryKey,
+			final boolean unique,
+			final boolean notNull) {
 		final FieldModel field = new FieldModel();
 		field.getNames().setName(conceptualName);
 		field.getNames().setTechnicalName(technicalName);
@@ -123,8 +115,13 @@ public final class SampleDocumentFactory {
 		return field;
 	}
 
-	private static void seedClass(final PanelState panelState, final ClassModel classModel, final double x,
-			final double y, final double width, final double height) {
+	private static void seedClass(
+			final PanelState panelState,
+			final ClassModel classModel,
+			final double x,
+			final double y,
+			final double width,
+			final double height) {
 		final NodeLayout layout = new NodeLayout();
 		layout.setObjectType(LayoutObjectType.CLASS);
 		layout.setObjectId(classModel.getId());
@@ -133,8 +130,13 @@ public final class SampleDocumentFactory {
 		panelState.getNodeLayouts().add(layout);
 	}
 
-	private static void seedComment(final PanelState panelState, final CommentModel commentModel, final double x,
-			final double y, final double width, final double height) {
+	private static void seedComment(
+			final PanelState panelState,
+			final CommentModel commentModel,
+			final double x,
+			final double y,
+			final double width,
+			final double height) {
 		final NodeLayout layout = new NodeLayout();
 		layout.setObjectType(LayoutObjectType.COMMENT);
 		layout.setObjectId(commentModel.getId());

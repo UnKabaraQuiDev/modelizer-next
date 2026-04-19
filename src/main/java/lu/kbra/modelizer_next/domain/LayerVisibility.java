@@ -38,8 +38,8 @@ public class LayerVisibility {
 
 	@Override
 	public String toString() {
-		return "LayerVisibility@" + System.identityHashCode(this) + " [conceptual=" + this.conceptual + ", logical="
-				+ this.logical + ", physical=" + this.physical + "]";
+		return "LayerVisibility@" + System.identityHashCode(this) + " [conceptual=" + this.conceptual + ", logical=" + this.logical
+				+ ", physical=" + this.physical + "]";
 	}
 
 }

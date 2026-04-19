@@ -122,10 +122,9 @@ public class CommentModel {
 	@Override
 	public String toString() {
 		return "CommentModel@" + System.identityHashCode(this) + " [textColor=" + this.textColor + ", backgroundColor="
-				+ this.backgroundColor + ", borderColor=" + this.borderColor + ", id=" + this.id + ", kind=" + this.kind
-				+ ", text=" + this.text + ", binding=" + this.binding + ", visibleInConceptual="
-				+ this.visibleInConceptual + ", visibleInLogical=" + this.visibleInLogical + ", visibleInPhysical="
-				+ this.visibleInPhysical + "]";
+				+ this.backgroundColor + ", borderColor=" + this.borderColor + ", id=" + this.id + ", kind=" + this.kind + ", text="
+				+ this.text + ", binding=" + this.binding + ", visibleInConceptual=" + this.visibleInConceptual + ", visibleInLogical="
+				+ this.visibleInLogical + ", visibleInPhysical=" + this.visibleInPhysical + "]";
 	}
 
 }

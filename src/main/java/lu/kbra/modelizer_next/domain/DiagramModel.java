@@ -43,9 +43,8 @@ public class DiagramModel {
 
 	@Override
 	public String toString() {
-		return "DiagramModel@" + System.identityHashCode(this) + " [classes=" + this.classes + ", conceptualLinks="
-				+ this.conceptualLinks + ", technicalLinks=" + this.technicalLinks + ", comments=" + this.comments
-				+ "]";
+		return "DiagramModel@" + System.identityHashCode(this) + " [classes=" + this.classes + ", conceptualLinks=" + this.conceptualLinks
+				+ ", technicalLinks=" + this.technicalLinks + ", comments=" + this.comments + "]";
 	}
 
 }

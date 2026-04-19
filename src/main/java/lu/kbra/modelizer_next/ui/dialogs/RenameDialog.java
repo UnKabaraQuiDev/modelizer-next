@@ -60,8 +60,7 @@ public final class RenameDialog {
 			}
 		};
 
-		dialog.getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
-				.put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "cancel");
+		dialog.getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "cancel");
 		dialog.getRootPane().getActionMap().put("cancel", cancelAction);
 
 		textField.getInputMap(JComponent.WHEN_FOCUSED).put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "cancel");

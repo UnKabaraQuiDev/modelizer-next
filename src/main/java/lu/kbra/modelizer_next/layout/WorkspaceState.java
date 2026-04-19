@@ -38,8 +38,7 @@ public class WorkspaceState {
 
 	@Override
 	public String toString() {
-		return "WorkspaceState@" + System.identityHashCode(this) + " [dockLayout=" + this.dockLayout + ", panels="
-				+ this.panels + "]";
+		return "WorkspaceState@" + System.identityHashCode(this) + " [dockLayout=" + this.dockLayout + ", panels=" + this.panels + "]";
 	}
 
 }

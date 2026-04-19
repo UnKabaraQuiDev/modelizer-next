@@ -1,0 +1,51 @@
+name: Maven PR Tests
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  format:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Apply formatting
+        run: mvn -B spotless:apply
+
+      - name: Fail if formatting changes detected
+        run: |
+          if ! git diff --quiet; then
+            echo "Code is not properly formatted."
+            echo "Run: mvn spotless:apply"
+            echo ""
+            git --no-pager diff
+            exit 1
+          fi
+
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Build and test with Maven
+        run: mvn -B clean test

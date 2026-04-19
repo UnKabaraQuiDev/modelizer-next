@@ -20,8 +20,7 @@ public final class StylePaletteService {
 			return;
 		}
 
-		final File file = new File(App.getStylesDirectory(),
-				StylePaletteService.sanitizeFileName(paletteName) + ".json");
+		final File file = new File(App.getStylesDirectory(), StylePaletteService.sanitizeFileName(paletteName) + ".json");
 		if (file.isFile()) {
 			file.delete();
 		}

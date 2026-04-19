@@ -23,8 +23,7 @@ public class ColorModule extends SimpleModule {
 	public class AwtColorSerializer extends JsonSerializer<Color> {
 
 		@Override
-		public void serialize(final Color value, final JsonGenerator gen, final SerializerProvider serializers)
-				throws IOException {
+		public void serialize(final Color value, final JsonGenerator gen, final SerializerProvider serializers) throws IOException {
 			if (value == null) {
 				gen.writeNull();
 				return;
@@ -35,8 +34,7 @@ public class ColorModule extends SimpleModule {
 				return;
 			}
 
-			gen.writeString(String.format("#%02X%02X%02X%02X", value.getRed(), value.getGreen(), value.getBlue(),
-					value.getAlpha()));
+			gen.writeString(String.format("#%02X%02X%02X%02X", value.getRed(), value.getGreen(), value.getBlue(), value.getAlpha()));
 		}
 
 		@Override
@@ -60,12 +58,13 @@ public class ColorModule extends SimpleModule {
 			try {
 				return switch (value.length()) {
 				case 6 -> new Color(Integer.parseInt(value.substring(0, 2), 16),
-						Integer.parseInt(value.substring(2, 4), 16), Integer.parseInt(value.substring(4, 6), 16));
-				case 8 ->
-					new Color(Integer.parseInt(value.substring(0, 2), 16), Integer.parseInt(value.substring(2, 4), 16),
-							Integer.parseInt(value.substring(4, 6), 16), Integer.parseInt(value.substring(6, 8), 16));
-				default ->
-					throw ctxt.weirdStringException(raw, Color.class, "Expected color in format #RRGGBB or #RRGGBBAA");
+						Integer.parseInt(value.substring(2, 4), 16),
+						Integer.parseInt(value.substring(4, 6), 16));
+				case 8 -> new Color(Integer.parseInt(value.substring(0, 2), 16),
+						Integer.parseInt(value.substring(2, 4), 16),
+						Integer.parseInt(value.substring(4, 6), 16),
+						Integer.parseInt(value.substring(6, 8), 16));
+				default -> throw ctxt.weirdStringException(raw, Color.class, "Expected color in format #RRGGBB or #RRGGBBAA");
 				};
 			} catch (final NumberFormatException ex) {
 				throw ctxt.weirdStringException(raw, Color.class, "Invalid hex color");

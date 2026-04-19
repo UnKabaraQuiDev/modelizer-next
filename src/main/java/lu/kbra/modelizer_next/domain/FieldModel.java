@@ -90,8 +90,8 @@ public class FieldModel {
 
 	@Override
 	public String toString() {
-		return "FieldModel@" + System.identityHashCode(this) + " [id=" + this.id + ", names=" + this.names
-				+ ", notConceptual=" + this.notConceptual + ", comment=" + this.comment + ", style=" + this.style + "]";
+		return "FieldModel@" + System.identityHashCode(this) + " [id=" + this.id + ", names=" + this.names + ", notConceptual="
+				+ this.notConceptual + ", comment=" + this.comment + ", style=" + this.style + "]";
 	}
 
 }

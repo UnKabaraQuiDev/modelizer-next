@@ -41,8 +41,7 @@ public class FieldNames {
 
 	@Override
 	public String toString() {
-		return "FieldNames@" + System.identityHashCode(this) + " [name=" + this.name + ", technicalName="
-				+ this.technicalName + "]";
+		return "FieldNames@" + System.identityHashCode(this) + " [name=" + this.name + ", technicalName=" + this.technicalName + "]";
 	}
 
 }

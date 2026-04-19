@@ -70,8 +70,7 @@ public class MainFrame extends JFrame {
 		this.appConfig = App.loadConfig();
 		this.palettes = StylePaletteService.loadAll();
 
-		this.statusLabel = new JLabel(
-				"Left drag: move object   |   Middle drag: pan   |   Mouse wheel: zoom   |   Right drag: create link",
+		this.statusLabel = new JLabel("Left drag: move object   |   Middle drag: pan   |   Mouse wheel: zoom   |   Right drag: create link",
 				SwingConstants.LEFT);
 		this.selectionPathLabel = new JLabel("No selection", SwingConstants.RIGHT);
 
@@ -163,25 +162,21 @@ public class MainFrame extends JFrame {
 		final JMenuBar menuBar = new JMenuBar();
 
 		final JMenu fileMenu = new JMenu("File");
-		fileMenu.add(this.createFileMenuItem("New", KeyStroke.getKeyStroke(KeyEvent.VK_N, InputEvent.CTRL_DOWN_MASK),
-				this::newDocument));
-		fileMenu.add(this.createFileMenuItem("Load", KeyStroke.getKeyStroke(KeyEvent.VK_O, InputEvent.CTRL_DOWN_MASK),
-				this::loadDocument));
-		fileMenu.add(this.createFileMenuItem("Save", KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK),
-				this::saveDocument));
+		fileMenu.add(this.createFileMenuItem("New", KeyStroke.getKeyStroke(KeyEvent.VK_N, InputEvent.CTRL_DOWN_MASK), this::newDocument));
+		fileMenu.add(this.createFileMenuItem("Load", KeyStroke.getKeyStroke(KeyEvent.VK_O, InputEvent.CTRL_DOWN_MASK), this::loadDocument));
+		fileMenu.add(this.createFileMenuItem("Save", KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK), this::saveDocument));
 		fileMenu.add(this.createFileMenuItem("Save As...",
 				KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK),
 				this::saveDocumentAs));
 
 		final JMenu insertMenu = new JMenu("Insert");
-		insertMenu.add(this.createCanvasMenuItem("New table", "addTable",
-				KeyStroke.getKeyStroke(KeyEvent.VK_T, InputEvent.CTRL_DOWN_MASK)));
-		insertMenu.add(this.createCanvasMenuItem("New field", "addField",
-				KeyStroke.getKeyStroke(KeyEvent.VK_F, InputEvent.CTRL_DOWN_MASK)));
-		insertMenu.add(this.createCanvasMenuItem("New comment", "addComment",
-				KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK)));
-		insertMenu.add(this.createCanvasMenuItem("New link", "addLink",
-				KeyStroke.getKeyStroke(KeyEvent.VK_L, InputEvent.CTRL_DOWN_MASK)));
+		insertMenu
+				.add(this.createCanvasMenuItem("New table", "addTable", KeyStroke.getKeyStroke(KeyEvent.VK_T, InputEvent.CTRL_DOWN_MASK)));
+		insertMenu
+				.add(this.createCanvasMenuItem("New field", "addField", KeyStroke.getKeyStroke(KeyEvent.VK_F, InputEvent.CTRL_DOWN_MASK)));
+		insertMenu.add(
+				this.createCanvasMenuItem("New comment", "addComment", KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK)));
+		insertMenu.add(this.createCanvasMenuItem("New link", "addLink", KeyStroke.getKeyStroke(KeyEvent.VK_L, InputEvent.CTRL_DOWN_MASK)));
 
 		final JMenu appearanceMenu = new JMenu("Appearance");
 		final ButtonGroup group = new ButtonGroup();
@@ -288,8 +283,7 @@ public class MainFrame extends JFrame {
 		final ButtonGroup defaultGroup = new ButtonGroup();
 
 		final JRadioButtonMenuItem noneItem = new JRadioButtonMenuItem("None");
-		noneItem.setSelected(
-				this.appConfig.getDefaultPaletteName() == null || this.appConfig.getDefaultPaletteName().isBlank());
+		noneItem.setSelected(this.appConfig.getDefaultPaletteName() == null || this.appConfig.getDefaultPaletteName().isBlank());
 		noneItem.addActionListener(event -> {
 			this.appConfig.setDefaultPaletteName(null);
 			App.saveConfig(this.appConfig);
@@ -335,8 +329,10 @@ public class MainFrame extends JFrame {
 		App.saveConfig(this.appConfig);
 
 		final int choice = JOptionPane.showConfirmDialog(this,
-				"Theme change requires restarting the window.\nReopen now with the current document?", "Apply theme",
-				JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+				"Theme change requires restarting the window.\nReopen now with the current document?",
+				"Apply theme",
+				JOptionPane.YES_NO_OPTION,
+				JOptionPane.QUESTION_MESSAGE);
 
 		if (choice != JOptionPane.YES_OPTION) {
 			return;
@@ -393,15 +389,15 @@ public class MainFrame extends JFrame {
 		try {
 			final ModelDocument loadedDocument = MNMain.OBJECT_MAPPER.readValue(selectedFile, ModelDocument.class);
 			loadedDocument.setSource(selectedFile.getPath());
-			final String fileVersion = loadedDocument.getMeta() == null ? null
-					: loadedDocument.getMeta().getApplicationVersion();
+			final String fileVersion = loadedDocument.getMeta() == null ? null : loadedDocument.getMeta().getApplicationVersion();
 
-			if (fileVersion != null && !fileVersion.isBlank()
-					&& VersionComparator.COMPARATOR.compare(fileVersion, App.VERSION) > 0) {
+			if (fileVersion != null && !fileVersion.isBlank() && VersionComparator.COMPARATOR.compare(fileVersion, App.VERSION) > 0) {
 				final int choice = JOptionPane.showConfirmDialog(this,
 						"This file was created with a newer version of the application (" + fileVersion
 								+ ").\nDo you want to try to load the file anyways ?",
-						"Newer file version", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+						"Newer file version",
+						JOptionPane.YES_NO_OPTION,
+						JOptionPane.WARNING_MESSAGE);
 				if (choice != JOptionPane.YES_OPTION) {
 					return;
 				}
@@ -409,8 +405,7 @@ public class MainFrame extends JFrame {
 
 			this.openInNewFrame(loadedDocument, selectedFile);
 		} catch (final IOException ex) {
-			JOptionPane.showMessageDialog(this, "Failed to load file:\n" + ex.getMessage(), "Load error",
-					JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(this, "Failed to load file:\n" + ex.getMessage(), "Load error", JOptionPane.ERROR_MESSAGE);
 		}
 	}
 
@@ -450,8 +445,7 @@ public class MainFrame extends JFrame {
 			this.currentFile = file;
 			this.setTitle(App.title(this.document.getSource()));
 		} catch (final IOException ex) {
-			JOptionPane.showMessageDialog(this, "Failed to save file:\n" + ex.getMessage(), "Save error",
-					JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(this, "Failed to save file:\n" + ex.getMessage(), "Save error", JOptionPane.ERROR_MESSAGE);
 		}
 	}
 
@@ -546,8 +540,7 @@ public class MainFrame extends JFrame {
 	}
 
 	private void updateSelectionLabel(final SelectionInfo selectionInfo) {
-		final String path = selectionInfo == null || selectionInfo.path() == null || selectionInfo.path().isBlank()
-				? "No selection"
+		final String path = selectionInfo == null || selectionInfo.path() == null || selectionInfo.path().isBlank() ? "No selection"
 				: selectionInfo.path();
 		this.selectionPathLabel.setText(path);
 	}

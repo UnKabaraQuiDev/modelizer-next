@@ -63,9 +63,8 @@ public class ModelDocument {
 
 	@Override
 	public String toString() {
-		return "ModelDocument@" + System.identityHashCode(this) + " [schemaVersion=" + this.schemaVersion + ", meta="
-				+ this.meta + ", model=" + this.model + ", workspace=" + this.workspace + ", source=" + this.source
-				+ "]";
+		return "ModelDocument@" + System.identityHashCode(this) + " [schemaVersion=" + this.schemaVersion + ", meta=" + this.meta
+				+ ", model=" + this.model + ", workspace=" + this.workspace + ", source=" + this.source + "]";
 	}
 
 }

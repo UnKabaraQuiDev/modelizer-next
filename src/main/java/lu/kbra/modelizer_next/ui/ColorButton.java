@@ -64,8 +64,7 @@ public class ColorButton extends JButton {
 
 	private void refreshStyle() {
 		this.setBackground(this.selectedColor);
-		final int brightness = (this.selectedColor.getRed() + this.selectedColor.getGreen()
-				+ this.selectedColor.getBlue()) / 3;
+		final int brightness = (this.selectedColor.getRed() + this.selectedColor.getGreen() + this.selectedColor.getBlue()) / 3;
 		this.setForeground(brightness < 128 ? Color.WHITE : Color.BLACK);
 	}
 

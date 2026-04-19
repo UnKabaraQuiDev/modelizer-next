@@ -33,8 +33,7 @@ public class CommentBinding {
 
 	@Override
 	public String toString() {
-		return "CommentBinding@" + System.identityHashCode(this) + " [targetType=" + this.targetType + ", targetId="
-				+ this.targetId + "]";
+		return "CommentBinding@" + System.identityHashCode(this) + " [targetType=" + this.targetType + ", targetId=" + this.targetId + "]";
 	}
 
 }

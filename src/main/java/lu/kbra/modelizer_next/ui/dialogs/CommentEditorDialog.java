@@ -41,13 +41,11 @@ public final class CommentEditorDialog {
 	private CommentEditorDialog() {
 	}
 
-	public static Result showDialog(final Component parent, final ModelDocument document,
-			final CommentModel initialComment) {
+	public static Result showDialog(final Component parent, final ModelDocument document, final CommentModel initialComment) {
 		final Window owner = parent == null ? null : SwingUtilities.getWindowAncestor(parent);
 		final JDialog dialog = new JDialog(owner, "Edit comment", Dialog.ModalityType.APPLICATION_MODAL);
 
-		final JTextArea textArea = new JTextArea(
-				initialComment == null ? "" : CommentEditorDialog.safe(initialComment.getText()), 10, 32);
+		final JTextArea textArea = new JTextArea(initialComment == null ? "" : CommentEditorDialog.safe(initialComment.getText()), 10, 32);
 		textArea.setLineWrap(true);
 		textArea.setWrapStyleWord(true);
 
@@ -58,12 +56,9 @@ public final class CommentEditorDialog {
 		final ColorButton borderColorButton = new ColorButton("Border color",
 				initialComment == null ? new Color(0x444444) : initialComment.getBorderColor());
 
-		final JCheckBox conceptualBox = new JCheckBox("Conceptual",
-				initialComment == null || initialComment.isVisibleInConceptual());
-		final JCheckBox logicalBox = new JCheckBox("Logical",
-				initialComment == null || initialComment.isVisibleInLogical());
-		final JCheckBox physicalBox = new JCheckBox("Physical",
-				initialComment == null || initialComment.isVisibleInPhysical());
+		final JCheckBox conceptualBox = new JCheckBox("Conceptual", initialComment == null || initialComment.isVisibleInConceptual());
+		final JCheckBox logicalBox = new JCheckBox("Logical", initialComment == null || initialComment.isVisibleInLogical());
+		final JCheckBox physicalBox = new JCheckBox("Physical", initialComment == null || initialComment.isVisibleInPhysical());
 
 		final JComboBox<AssociationTarget> associationBox = new JComboBox<>();
 		associationBox.addItem(AssociationTarget.standalone());
@@ -84,8 +79,12 @@ public final class CommentEditorDialog {
 			private static final long serialVersionUID = 1L;
 
 			@Override
-			public Component getListCellRendererComponent(final JList<?> list, final Object value, final int index,
-					final boolean isSelected, final boolean cellHasFocus) {
+			public Component getListCellRendererComponent(
+					final JList<?> list,
+					final Object value,
+					final int index,
+					final boolean isSelected,
+					final boolean cellHasFocus) {
 				super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
 				if (value instanceof final AssociationTarget target) {
 					this.setText(target.label());
@@ -126,10 +125,15 @@ public final class CommentEditorDialog {
 		saveButton.addActionListener(event -> {
 			final AssociationTarget target = (AssociationTarget) associationBox.getSelectedItem();
 
-			holder.result = new Result(textArea.getText(), textColorButton.getSelectedColor(),
-					backgroundColorButton.getSelectedColor(), borderColorButton.getSelectedColor(),
-					target == null ? CommentKind.STANDALONE : target.kind(), target == null ? null : target.binding(),
-					conceptualBox.isSelected(), logicalBox.isSelected(), physicalBox.isSelected());
+			holder.result = new Result(textArea.getText(),
+					textColorButton.getSelectedColor(),
+					backgroundColorButton.getSelectedColor(),
+					borderColorButton.getSelectedColor(),
+					target == null ? CommentKind.STANDALONE : target.kind(),
+					target == null ? null : target.binding(),
+					conceptualBox.isSelected(),
+					logicalBox.isSelected(),
+					physicalBox.isSelected());
 			dialog.dispose();
 		});
 		cancelButton.addActionListener(event -> dialog.dispose());
@@ -138,8 +142,7 @@ public final class CommentEditorDialog {
 		buttons.add(cancelButton);
 
 		dialog.getRootPane().setDefaultButton(saveButton);
-		dialog.getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
-				.put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "cancel");
+		dialog.getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "cancel");
 		dialog.getRootPane().getActionMap().put("cancel", new AbstractAction() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
@@ -158,10 +161,8 @@ public final class CommentEditorDialog {
 		return holder.result;
 	}
 
-	private static AssociationTarget resolveInitialAssociation(final ModelDocument document,
-			final CommentModel initialComment) {
-		if (initialComment == null || initialComment.getKind() == CommentKind.STANDALONE
-				|| initialComment.getBinding() == null) {
+	private static AssociationTarget resolveInitialAssociation(final ModelDocument document, final CommentModel initialComment) {
+		if (initialComment == null || initialComment.getKind() == CommentKind.STANDALONE || initialComment.getBinding() == null) {
 			return AssociationTarget.standalone();
 		}
 
@@ -209,24 +210,23 @@ public final class CommentEditorDialog {
 		}
 
 		private static AssociationTarget forClass(final ClassModel classModel) {
-			final String name = classModel.getNames().getConceptualName() != null
-					&& !classModel.getNames().getConceptualName().isBlank() ? classModel.getNames().getConceptualName()
-							: classModel.getNames().getTechnicalName();
-			return new AssociationTarget("Class: " + name, CommentKind.BOUND,
+			final String name = classModel.getNames().getConceptualName() != null && !classModel.getNames().getConceptualName().isBlank()
+					? classModel.getNames().getConceptualName()
+					: classModel.getNames().getTechnicalName();
+			return new AssociationTarget("Class: " + name,
+					CommentKind.BOUND,
 					new CommentBinding(BoundTargetType.CLASS, classModel.getId()));
 		}
 
 		private static AssociationTarget forLink(final LinkModel linkModel, final boolean conceptual) {
 			final String label = (conceptual ? "Conceptual link: " : "Technical link: ")
-					+ (linkModel.getName() == null || linkModel.getName().isBlank() ? linkModel.getId()
-							: linkModel.getName());
-			return new AssociationTarget(label, CommentKind.BOUND,
-					new CommentBinding(BoundTargetType.LINK, linkModel.getId()));
+					+ (linkModel.getName() == null || linkModel.getName().isBlank() ? linkModel.getId() : linkModel.getName());
+			return new AssociationTarget(label, CommentKind.BOUND, new CommentBinding(BoundTargetType.LINK, linkModel.getId()));
 		}
 	}
 
-	public record Result(String text, Color textColor, Color backgroundColor, Color borderColor, CommentKind kind,
-			CommentBinding binding, boolean visibleInConceptual, boolean visibleInLogical, boolean visibleInPhysical) {
+	public record Result(String text, Color textColor, Color backgroundColor, Color borderColor, CommentKind kind, CommentBinding binding,
+			boolean visibleInConceptual, boolean visibleInLogical, boolean visibleInPhysical) {
 	}
 
 }
