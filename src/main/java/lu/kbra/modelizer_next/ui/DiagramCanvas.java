@@ -97,6 +97,14 @@ public class DiagramCanvas extends JPanel {
 	private boolean pendingModifierSelection;
 	private boolean dragOccurred;
 
+	private BufferedImage staticDragLayer;
+	private BufferedImage movingDragLayer;
+	private Point2D.Double currentDragOffset = new Point2D.Double();
+
+	private Set<String> movingClassIds = new HashSet<>();
+	private Set<String> movingCommentIds = new HashSet<>();
+	private Set<String> movingLinkIds = new HashSet<>();
+
 	private final Comparator<ClassModel> comparator = (a, b) -> {
 		if (this.selectedElement == null || this.selectedElement.type() != SelectedType.CLASS) {
 			return 0;
@@ -166,8 +174,31 @@ public class DiagramCanvas extends JPanel {
 		this.ensureLayouts();
 
 		final Graphics2D g2 = (Graphics2D) graphics.create();
-		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-		g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+		this.configureGraphics(g2);
+
+		if (this.isDragRenderingActive()) {
+			g2.drawImage(this.staticDragLayer, 0, 0, null);
+
+			final Graphics2D translated = (Graphics2D) g2.create();
+			try {
+				translated.translate(this.currentDragOffset.getX(), this.currentDragOffset.getY());
+				translated.drawImage(this.movingDragLayer, 0, 0, null);
+			} finally {
+				translated.dispose();
+			}
+
+			final AffineTransform oldTransform = g2.getTransform();
+			final PanelState state = this.getPanelState();
+			g2.translate(state.getPanX(), state.getPanY());
+			g2.scale(state.getZoom(), state.getZoom());
+
+			this.drawLinks(g2, RenderPass.TRANSITION);
+			this.drawLinkPreview(g2);
+
+			g2.setTransform(oldTransform);
+			g2.dispose();
+			return;
+		}
 
 		this.drawGrid(g2);
 
@@ -176,9 +207,9 @@ public class DiagramCanvas extends JPanel {
 		g2.translate(state.getPanX(), state.getPanY());
 		g2.scale(state.getZoom(), state.getZoom());
 
-		this.drawComments(g2);
-		this.drawClasses(g2);
-		this.drawLinks(g2);
+		this.drawComments(g2, RenderPass.FULL);
+		this.drawClasses(g2, RenderPass.FULL);
+		this.drawLinks(g2, RenderPass.FULL);
 		this.drawLinkPreview(g2);
 
 		g2.setTransform(oldTransform);
@@ -996,6 +1027,17 @@ public class DiagramCanvas extends JPanel {
 			this.finishLinkCreation(this.screenToWorld(event.getPoint()));
 		}
 
+		if (SwingUtilities.isLeftMouseButton(event) && this.draggedSelection != null && this.dragOccurred) {
+			final double zoom = this.getPanelState().getZoom();
+			final double deltaX = this.currentDragOffset.getX() / zoom;
+			final double deltaY = this.currentDragOffset.getY() / zoom;
+
+			for (final DraggedLayout draggedLayout : this.draggedSelection.layouts()) {
+				draggedLayout.layout().getPosition().setLocation(draggedLayout.startX() + deltaX,
+						draggedLayout.startY() + deltaY);
+			}
+		}
+
 		if (SwingUtilities.isLeftMouseButton(event) && this.pendingModifierSelection && !this.dragOccurred) {
 			this.updateSelectionFromMouse(this.pendingClickSelection, event);
 		}
@@ -1011,6 +1053,13 @@ public class DiagramCanvas extends JPanel {
 		this.pendingClickSelection = null;
 		this.pendingModifierSelection = false;
 		this.dragOccurred = false;
+
+		this.staticDragLayer = null;
+		this.movingDragLayer = null;
+		this.currentDragOffset = new Point2D.Double();
+		this.movingClassIds.clear();
+		this.movingCommentIds.clear();
+		this.movingLinkIds.clear();
 
 		this.setCursor(Cursor.getDefaultCursor());
 		this.repaint();
@@ -1061,10 +1110,8 @@ public class DiagramCanvas extends JPanel {
 		final double deltaX = anchorX - this.draggedSelection.anchorStartX();
 		final double deltaY = anchorY - this.draggedSelection.anchorStartY();
 
-		for (final DraggedLayout draggedLayout : this.draggedSelection.layouts()) {
-			draggedLayout.layout().getPosition().setLocation(draggedLayout.startX() + deltaX,
-					draggedLayout.startY() + deltaY);
-		}
+		final double zoom = this.getPanelState().getZoom();
+		this.currentDragOffset = new Point2D.Double(deltaX * zoom, deltaY * zoom);
 
 		this.repaint();
 	}
@@ -1089,9 +1136,12 @@ public class DiagramCanvas extends JPanel {
 				this.addDraggedLayout(layouts, seen, hitSelection, hitLayout);
 			}
 		}
-		System.err.println(selectedElements + "\n   " + layouts);
-		return new DraggedSelection(layouts, worldPoint.getX() - hitBounds.getX(), worldPoint.getY() - hitBounds.getY(),
-				hitLayout.getPosition().getX(), hitLayout.getPosition().getY());
+
+		final DraggedSelection selection = new DraggedSelection(layouts, worldPoint.getX() - hitBounds.getX(),
+				worldPoint.getY() - hitBounds.getY(), hitLayout.getPosition().getX(), hitLayout.getPosition().getY());
+
+		this.buildDragRenderLayers(selection);
+		return selection;
 	}
 
 	private void addDraggedLayout(final List<DraggedLayout> layouts, final Set<String> seen,
@@ -1224,9 +1274,14 @@ public class DiagramCanvas extends JPanel {
 		}
 	}
 
-	private void drawClasses(final Graphics2D g2) {
+	private void drawClasses(final Graphics2D g2, final RenderPass pass) {
 		for (final ClassModel classModel : this.document.getModel().getClasses()) {
 			if (!this.isVisible(classModel)) {
+				continue;
+			}
+			final boolean moving = this.isMovingClass(classModel.getId());
+			if ((pass == RenderPass.STATIC && moving) || (pass == RenderPass.MOVING && !moving)
+					|| (pass == RenderPass.TRANSITION)) {
 				continue;
 			}
 
@@ -1291,10 +1346,15 @@ public class DiagramCanvas extends JPanel {
 		}
 	}
 
-	private void drawComments(final Graphics2D g2) {
+	private void drawComments(final Graphics2D g2, final RenderPass pass) {
 		for (final CommentModel commentModel : this.document.getModel().getComments()) {
 			final String commentText = this.resolveCommentText(commentModel);
 			if (commentText == null || commentText.isBlank() || !this.isCommentVisible(commentModel)) {
+				continue;
+			}
+			final boolean moving = this.isMovingComment(commentModel.getId());
+			if ((pass == RenderPass.STATIC && moving) || (pass == RenderPass.MOVING && !moving)
+					|| (pass == RenderPass.TRANSITION)) {
 				continue;
 			}
 
@@ -1338,10 +1398,17 @@ public class DiagramCanvas extends JPanel {
 		}
 	}
 
-	private void drawLinks(final Graphics2D g2) {
+	private void drawLinks(final Graphics2D g2, final RenderPass pass) {
 		g2.setFont(DiagramCanvas.BODY_FONT);
 
 		for (final LinkModel linkModel : this.getActiveLinks()) {
+			final boolean moving = this.isMovingLink(linkModel.getId());
+			final boolean transition = this.isLinkAttachedToMovingObject(linkModel) && !moving;
+
+			if ((pass == RenderPass.STATIC && (moving || transition)) || (pass == RenderPass.MOVING && !moving)
+					|| (pass == RenderPass.TRANSITION && !transition)) {
+				continue;
+			}
 			final LinkGeometry geometry = this.resolveLinkGeometry(g2, linkModel);
 			if (geometry == null) {
 				continue;
@@ -2186,23 +2253,27 @@ public class DiagramCanvas extends JPanel {
 					linkModel.getTo().getFieldId(), linkModel.getFrom().getClassId(), linkModel.getFrom().getFieldId());
 		}
 
-		if (fromPoint == null || toPoint == null) {
+		final Point2D adjustedFromPoint = this.applyCurrentDragOffsetIfNeeded(fromPoint,
+				linkModel.getFrom().getClassId());
+		final Point2D adjustedToPoint = this.applyCurrentDragOffsetIfNeeded(toPoint, linkModel.getTo().getClassId());
+
+		if (adjustedFromPoint == null || adjustedToPoint == null) {
 			return null;
 		}
 
 		final List<Point2D> points;
 		if (this.isSelfLink(linkModel)) {
-			points = this.buildSelfLinkPoints(g2, linkModel, fromPoint, toPoint);
+			points = this.buildSelfLinkPoints(g2, linkModel, adjustedFromPoint, adjustedToPoint);
 		} else {
 			points = new ArrayList<>();
-			points.add(fromPoint);
+			points.add(adjustedFromPoint);
 
 			final LinkLayout linkLayout = this.findOrCreateLinkLayout(linkModel.getId());
 			for (final Point2D.Double bendPoint : linkLayout.getBendPoints()) {
 				points.add(new Point2D.Double(bendPoint.getX(), bendPoint.getY()));
 			}
 
-			points.add(toPoint);
+			points.add(adjustedToPoint);
 		}
 
 		final Point2D middlePoint = this.computePolylineMiddlePoint(points);
@@ -2217,7 +2288,7 @@ public class DiagramCanvas extends JPanel {
 			labelPoint = middlePoint;
 		}
 
-		return new LinkGeometry(fromPoint, toPoint, labelPoint, middlePoint, labelAngle, points);
+		return new LinkGeometry(adjustedFromPoint, adjustedToPoint, labelPoint, middlePoint, labelAngle, points);
 	}
 
 	private boolean isSelfLink(final LinkModel linkModel) {
@@ -2600,6 +2671,7 @@ public class DiagramCanvas extends JPanel {
 		if (element != null) {
 			this.selectedElements.add(element);
 		}
+		document.getModel().getClasses().sort(comparator);
 		this.selectedElement = element;
 		this.notifySelectionChanged();
 		this.repaint();
@@ -2610,6 +2682,7 @@ public class DiagramCanvas extends JPanel {
 			return;
 		}
 
+		document.getModel().getClasses().sort(comparator);
 		this.selectedElements.add(element);
 		this.selectedElement = element;
 		this.notifySelectionChanged();
@@ -2847,6 +2920,126 @@ public class DiagramCanvas extends JPanel {
 		}
 
 		linkModel.setLineColor(this.defaultPalette.getLinkColor());
+	}
+
+	private boolean isDragRenderingActive() {
+		return this.draggedSelection != null && this.staticDragLayer != null && this.movingDragLayer != null;
+	}
+
+	private boolean isMovingClass(final String classId) {
+		return this.movingClassIds.contains(classId);
+	}
+
+	private boolean isMovingComment(final String commentId) {
+		return this.movingCommentIds.contains(commentId);
+	}
+
+	private boolean isMovingLink(final String linkId) {
+		return this.movingLinkIds.contains(linkId);
+	}
+
+	private boolean isLinkAttachedToMovingObject(final LinkModel linkModel) {
+		if (linkModel == null || linkModel.getFrom() == null || linkModel.getTo() == null) {
+			return false;
+		}
+
+		if (this.panelType == PanelType.CONCEPTUAL) {
+			return this.movingClassIds.contains(linkModel.getFrom().getClassId())
+					|| this.movingClassIds.contains(linkModel.getTo().getClassId());
+		}
+
+		return this.movingClassIds.contains(linkModel.getFrom().getClassId())
+				|| this.movingClassIds.contains(linkModel.getTo().getClassId());
+	}
+
+	private boolean isLinkBetweenMovingObjects(final LinkModel linkModel) {
+		if (linkModel == null || linkModel.getFrom() == null || linkModel.getTo() == null) {
+			return false;
+		}
+
+		return this.movingClassIds.contains(linkModel.getFrom().getClassId())
+				&& this.movingClassIds.contains(linkModel.getTo().getClassId());
+	}
+
+	private void buildDragRenderLayers(final DraggedSelection selection) {
+		this.movingClassIds.clear();
+		this.movingCommentIds.clear();
+		this.movingLinkIds.clear();
+		this.currentDragOffset = new Point2D.Double();
+
+		if (selection == null || this.getWidth() <= 0 || this.getHeight() <= 0) {
+			this.staticDragLayer = null;
+			this.movingDragLayer = null;
+			return;
+		}
+
+		for (final DraggedLayout draggedLayout : selection.layouts()) {
+			if (draggedLayout.layout().getObjectType() == LayoutObjectType.CLASS) {
+				this.movingClassIds.add(draggedLayout.layout().getObjectId());
+			} else if (draggedLayout.layout().getObjectType() == LayoutObjectType.COMMENT) {
+				this.movingCommentIds.add(draggedLayout.layout().getObjectId());
+			}
+		}
+
+		for (final LinkModel linkModel : this.getActiveLinks()) {
+			if (this.isLinkBetweenMovingObjects(linkModel)) {
+				this.movingLinkIds.add(linkModel.getId());
+			}
+		}
+
+		this.staticDragLayer = new BufferedImage(this.getWidth(), this.getHeight(), BufferedImage.TYPE_INT_ARGB);
+		this.movingDragLayer = new BufferedImage(this.getWidth(), this.getHeight(), BufferedImage.TYPE_INT_ARGB);
+
+		final Graphics2D staticGraphics = this.staticDragLayer.createGraphics();
+		final Graphics2D movingGraphics = this.movingDragLayer.createGraphics();
+
+		try {
+			this.configureGraphics(staticGraphics);
+			this.configureGraphics(movingGraphics);
+
+			this.drawGrid(staticGraphics);
+
+			final PanelState state = this.getPanelState();
+
+			staticGraphics.translate(state.getPanX(), state.getPanY());
+			staticGraphics.scale(state.getZoom(), state.getZoom());
+
+			movingGraphics.translate(state.getPanX(), state.getPanY());
+			movingGraphics.scale(state.getZoom(), state.getZoom());
+
+			this.drawComments(staticGraphics, RenderPass.STATIC);
+			this.drawClasses(staticGraphics, RenderPass.STATIC);
+			this.drawLinks(staticGraphics, RenderPass.STATIC);
+
+			this.drawComments(movingGraphics, RenderPass.MOVING);
+			this.drawClasses(movingGraphics, RenderPass.MOVING);
+			this.drawLinks(movingGraphics, RenderPass.MOVING);
+		} finally {
+			staticGraphics.dispose();
+			movingGraphics.dispose();
+		}
+	}
+
+	private void configureGraphics(final Graphics2D g2) {
+		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+		g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+	}
+
+	private Point2D applyCurrentDragOffsetIfNeeded(final Point2D point, final String classId) {
+		if (point == null || classId == null || !this.isDragRenderingActive()
+				|| !this.movingClassIds.contains(classId)) {
+			return point;
+		}
+
+		final double zoom = this.getPanelState().getZoom();
+		final double dx = this.currentDragOffset.getX() / zoom;
+		final double dy = this.currentDragOffset.getY() / zoom;
+
+		return new Point2D.Double(point.getX() + dx, point.getY() + dy);
+	}
+
+	private enum RenderPass {
+		FULL, STATIC, MOVING, TRANSITION
 	}
 
 	private record DraggedLayout(NodeLayout layout, double startX, double startY) {
