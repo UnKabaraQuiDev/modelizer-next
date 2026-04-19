@@ -2,7 +2,6 @@ package lu.kbra.modelizer_next;
 
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
@@ -12,6 +11,9 @@ import com.fasterxml.jackson.core.StreamReadFeature;
 import com.fasterxml.jackson.core.json.JsonReadFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.formdev.flatlaf.FlatDarkLaf;
+import com.formdev.flatlaf.FlatLightLaf;
 
 import lu.kbra.modelizer_next.document.ModelDocument;
 import lu.kbra.modelizer_next.ui.MainFrame;
@@ -24,26 +26,25 @@ public class MNMain {
 	public static void main(String[] args) {
 		try {
 			App.init();
+			System.out.println(App.NAME + " / " + App.VERSION + " (" + App.REVISION + ")");
+			System.err.println(App.getAppDirectory());
 		} catch (JsonProcessingException e) {
 			e.printStackTrace();
 			JOptionPane.showMessageDialog(null,
-					"Uh uh ! It seems like this app is malformed, try restarting it, redownloading it or updating it. If nothing works, please report to: "
+					"Uh uh ! It seems like this app's manifest is malformed, try\nrestarting it, redownloading it or updating it.\nIf nothing works,please report to: "
 							+ App.ISSUES_URL,
 					"Hmmmmmm", JOptionPane.ERROR_MESSAGE);
 		}
 
 		SwingUtilities.invokeLater(() -> {
-			try {
-				UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-			} catch (final Exception ignored) {
-				// keep default look and feel
-			}
+			applyConfiguredLookAndFeel();
 
 			final ModelDocument document = SampleDocumentFactory.create();
 			final MainFrame frame = new MainFrame(document);
-			frame.setTitle(App.title( document.getMeta().getName()));
+			frame.setTitle(App.title(document.getMeta().getName()));
 			frame.setVisible(true);
 		});
+
 	}
 
 	private static ObjectMapper createMapper() {
@@ -51,12 +52,38 @@ public class MNMain {
 				JsonFactory.builder().configure(StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION, true)
 						.configure(JsonReadFeature.ALLOW_JAVA_COMMENTS, true).build());
 
+		mapper.registerModule(new JavaTimeModule());
+		mapper.registerModule(new ColorModule());
+
+		mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 		mapper.enable(SerializationFeature.INDENT_OUTPUT);
 
 		mapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.NONE);
 		mapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
 
 		return mapper;
+	}
+
+	public static void applyConfiguredLookAndFeel() {
+		try {
+			final AppConfig config = App.loadConfig();
+			final ThemeMode themeMode = config == null || config.getThemeMode() == null ? ThemeMode.SYSTEM
+					: config.getThemeMode();
+
+			switch (themeMode) {
+			case LIGHT -> FlatLightLaf.setup();
+			case DARK -> FlatDarkLaf.setup();
+			case SYSTEM -> {
+				if (SystemThemeDetector.isDark()) {
+					FlatDarkLaf.setup();
+				} else {
+					FlatLightLaf.setup();
+				}
+			}
+			}
+		} catch (final Exception ignored) {
+			ignored.printStackTrace();
+		}
 	}
 
 }

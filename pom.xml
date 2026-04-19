@@ -16,6 +16,7 @@
 		<maven.compiler.target>${java.version}</maven.compiler.target>
 		<app.version>${revision}</app.version>
 		<app.mainClass>lu.kbra.modelizer_next.MNMain</app.mainClass>
+		<distributor></distributor>
 	</properties>
 
 	<repositories>
@@ -57,10 +58,22 @@
 			<groupId>lu.kbra</groupId>
 			<artifactId>pclib-common</artifactId>
 		</dependency>
+
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-databind</artifactId>
 			<version>2.21.0</version>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.datatype</groupId>
+			<artifactId>jackson-datatype-jsr310</artifactId>
+			<version>2.20.2</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.formdev</groupId>
+			<artifactId>flatlaf</artifactId>
+			<version>3.6.2</version>
 		</dependency>
 	</dependencies>
 

@@ -21,15 +21,18 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 
 import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 
+import lu.kbra.modelizer_next.StylePalette;
 import lu.kbra.modelizer_next.common.Size2;
 import lu.kbra.modelizer_next.document.ModelDocument;
 import lu.kbra.modelizer_next.domain.BoundTargetType;
@@ -80,6 +83,23 @@ public class DiagramCanvas extends JPanel {
 
 	private SelectedElement selectedElement;
 	private ResizingComment resizingComment;
+	private StylePalette defaultPalette;
+
+	private final Comparator<ClassModel> comparator = (a, b) -> {
+		if (this.selectedElement == null || this.selectedElement.type() != SelectedType.CLASS) {
+			return 0;
+		}
+
+		final String selectedId = this.selectedElement.classId();
+
+		final boolean aSelected = selectedId.equals(a.getId());
+		final boolean bSelected = selectedId.equals(b.getId());
+
+		if (aSelected == bSelected) {
+			return 0;
+		}
+		return aSelected ? -1 : 1;
+	};
 
 	public DiagramCanvas(final ModelDocument document, final PanelType panelType,
 			final CanvasStatusListener statusListener) {
@@ -247,6 +267,66 @@ public class DiagramCanvas extends JPanel {
 				DiagramCanvas.this.clearSelection();
 			}
 		});
+
+		this.getInputMap(JComponent.WHEN_FOCUSED).put(KeyStroke.getKeyStroke(KeyEvent.VK_L, InputEvent.CTRL_DOWN_MASK),
+				"addLink");
+		this.getActionMap().put("addLink", new AbstractAction() {
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				DiagramCanvas.this.addLink();
+			}
+		});
+	}
+
+	private void addLink() {
+		final LinkModel linkModel = new LinkModel();
+		if (selectedElement != null && selectedElement.type == SelectedType.CLASS) {
+			linkModel.setFrom(new LinkEnd(selectedElement.classId, null));
+		} else {
+			linkModel.setFrom(new LinkEnd(null, null));
+		}
+		linkModel.setTo(new LinkEnd(null, null));
+
+		if (this.panelType == PanelType.CONCEPTUAL) {
+			linkModel.setName("new relation");
+			linkModel.setCardinalityFrom(Cardinality.ONE);
+			linkModel.setCardinalityTo(Cardinality.ZERO_OR_MANY);
+		} else {
+			linkModel.setName("NEW_LINK");
+			linkModel.setCardinalityFrom(null);
+			linkModel.setCardinalityTo(null);
+		}
+
+		final LinkEditorDialog.Result result = LinkEditorDialog.showDialog(this, this.document, linkModel,
+				this.panelType);
+		if (result == null || result.fromClassId() == null || result.toClassId() == null) {
+			return;
+		}
+
+		final LinkModel createdLink = new LinkModel();
+		createdLink.setName(result.name());
+		createdLink.setComment(result.comment());
+		createdLink.setLineColor(result.lineColor());
+		createdLink.setFrom(new LinkEnd(result.fromClassId(), result.fromFieldId()));
+		createdLink.setTo(new LinkEnd(result.toClassId(), result.toFieldId()));
+
+		if (this.panelType == PanelType.CONCEPTUAL) {
+			createdLink
+					.setCardinalityFrom(result.cardinalityFrom() == null ? Cardinality.ONE : result.cardinalityFrom());
+			createdLink.setCardinalityTo(
+					result.cardinalityTo() == null ? Cardinality.ZERO_OR_MANY : result.cardinalityTo());
+			this.document.getModel().getConceptualLinks().add(createdLink);
+		} else {
+			createdLink.setCardinalityFrom(null);
+			createdLink.setCardinalityTo(null);
+			this.document.getModel().getTechnicalLinks().add(createdLink);
+		}
+		this.applyDefaultPaletteToLink(linkModel);
+
+		this.findOrCreateLinkLayout(createdLink.getId());
+		this.select(SelectedElement.forLink(createdLink.getId()));
+		this.notifySelectionChanged();
+		this.repaint();
 	}
 
 	private void duplicateSelection() {
@@ -469,7 +549,7 @@ public class DiagramCanvas extends JPanel {
 	private void addTable() {
 		final ClassModel classModel = new ClassModel();
 		classModel.getNames().setConceptualName("New table");
-		classModel.getNames().setTechnicalName("NEW_TABLE");
+		this.applyDefaultPaletteToClass(classModel);
 
 		this.document.getModel().getClasses().add(classModel);
 
@@ -500,7 +580,7 @@ public class DiagramCanvas extends JPanel {
 
 		final FieldModel fieldModel = new FieldModel();
 		fieldModel.getNames().setName("New field");
-		fieldModel.getNames().setTechnicalName("NEW_FIELD");
+		this.applyDefaultPaletteToField(fieldModel);
 		targetClass.getFields().add(fieldModel);
 
 		this.select(SelectedElement.forField(targetClass.getId(), fieldModel.getId()));
@@ -512,6 +592,7 @@ public class DiagramCanvas extends JPanel {
 		final CommentModel commentModel = new CommentModel();
 		commentModel.setKind(CommentKind.STANDALONE);
 		commentModel.setText("New comment");
+		this.applyDefaultPaletteToComment(commentModel);
 
 		this.document.getModel().getComments().add(commentModel);
 
@@ -622,6 +703,10 @@ public class DiagramCanvas extends JPanel {
 
 		final Point2D.Double worldPoint = this.screenToWorld(event.getPoint());
 		final HitResult hitResult = this.findTopmostHit(worldPoint);
+
+		if (hitResult != null && hitResult.layout().getObjectType() == LayoutObjectType.CLASS) {
+			document.getModel().getClasses().sort(comparator);
+		}
 
 		if (SwingUtilities.isRightMouseButton(event)) {
 			if (hitResult == null) {
@@ -1821,20 +1906,26 @@ public class DiagramCanvas extends JPanel {
 			return null;
 		}
 
-		final List<Point2D> points = new ArrayList<>();
-		points.add(fromPoint);
+		final List<Point2D> points;
+		if (this.isSelfLink(linkModel)) {
+			points = this.buildSelfLinkPoints(g2, linkModel, fromPoint, toPoint);
+		} else {
+			points = new ArrayList<>();
+			points.add(fromPoint);
 
-		final LinkLayout linkLayout = this.findOrCreateLinkLayout(linkModel.getId());
-		for (final Point2D.Double bendPoint : linkLayout.getBendPoints()) {
-			points.add(new Point2D.Double(bendPoint.getX(), bendPoint.getY()));
+			final LinkLayout linkLayout = this.findOrCreateLinkLayout(linkModel.getId());
+			for (final Point2D.Double bendPoint : linkLayout.getBendPoints()) {
+				points.add(new Point2D.Double(bendPoint.getX(), bendPoint.getY()));
+			}
+
+			points.add(toPoint);
 		}
-
-		points.add(toPoint);
 
 		final Point2D middlePoint = this.computePolylineMiddlePoint(points);
 		final double labelAngle = this.computeUprightAngleAtMiddle(points);
 
 		final Point2D labelPoint;
+		final LinkLayout linkLayout = this.findOrCreateLinkLayout(linkModel.getId());
 		if (linkLayout.getNameLabelPosition() != null) {
 			labelPoint = new Point2D.Double(linkLayout.getNameLabelPosition().getX(),
 					linkLayout.getNameLabelPosition().getY());
@@ -1843,6 +1934,37 @@ public class DiagramCanvas extends JPanel {
 		}
 
 		return new LinkGeometry(fromPoint, toPoint, labelPoint, middlePoint, labelAngle, points);
+	}
+
+	private boolean isSelfLink(final LinkModel linkModel) {
+		return linkModel.getFrom() != null && linkModel.getTo() != null
+				&& Objects.equals(linkModel.getFrom().getClassId(), linkModel.getTo().getClassId());
+	}
+
+	private List<Point2D> buildSelfLinkPoints(final Graphics2D g2, final LinkModel linkModel, final Point2D fromPoint,
+			final Point2D toPoint) {
+		final List<Point2D> points = new ArrayList<>();
+		points.add(fromPoint);
+
+		final ClassModel classModel = this.findClassById(linkModel.getFrom().getClassId());
+		if (classModel == null) {
+			points.add(toPoint);
+			return points;
+		}
+
+		final NodeLayout layout = this.findOrCreateNodeLayout(LayoutObjectType.CLASS, classModel.getId());
+		final Rectangle2D bounds = this.computeClassBounds(g2, classModel, layout);
+
+		final boolean useRightSide = fromPoint.getX() >= bounds.getCenterX() || toPoint.getX() >= bounds.getCenterX();
+		final double horizontalOffset = 40.0;
+
+		final double outsideX = useRightSide ? bounds.getMaxX() + horizontalOffset : bounds.getX() - horizontalOffset;
+
+		points.add(new Point2D.Double(outsideX, fromPoint.getY()));
+		points.add(new Point2D.Double(outsideX, toPoint.getY()));
+		points.add(toPoint);
+
+		return points;
 	}
 
 	private Point2D computePolylineMiddlePoint(final List<Point2D> points) {
@@ -2331,6 +2453,95 @@ public class DiagramCanvas extends JPanel {
 	private List<LinkModel> getActiveLinks() {
 		return this.panelType == PanelType.CONCEPTUAL ? this.document.getModel().getConceptualLinks()
 				: this.document.getModel().getTechnicalLinks();
+	}
+
+	public Action getCanvasAction(final String actionKey) {
+		return this.getActionMap().get(actionKey);
+	}
+
+	public void applyPalette(final StylePalette palette) {
+		if (palette == null || this.selectedElement == null) {
+			return;
+		}
+
+		switch (this.selectedElement.type()) {
+		case CLASS -> {
+			final ClassModel classModel = this.findClassById(this.selectedElement.classId());
+			if (classModel != null) {
+				classModel.getStyle().setTextColor(palette.getClassTextColor());
+				classModel.getStyle().setBackgroundColor(palette.getClassBackgroundColor());
+				classModel.getStyle().setBorderColor(palette.getClassBorderColor());
+			}
+		}
+		case FIELD -> {
+			final FieldModel fieldModel = this.findFieldById(this.selectedElement.classId(),
+					this.selectedElement.fieldId());
+			if (fieldModel != null) {
+				fieldModel.getStyle().setTextColor(palette.getFieldTextColor());
+				fieldModel.getStyle().setBackgroundColor(palette.getFieldBackgroundColor());
+			}
+		}
+		case COMMENT -> {
+			final CommentModel commentModel = this.findCommentById(this.selectedElement.commentId());
+			if (commentModel != null) {
+				commentModel.setTextColor(palette.getCommentTextColor());
+				commentModel.setBackgroundColor(palette.getCommentBackgroundColor());
+				commentModel.setBorderColor(palette.getCommentBorderColor());
+			}
+		}
+		case LINK -> {
+			final LinkModel linkModel = this.findLinkById(this.selectedElement.linkId());
+			if (linkModel != null) {
+				linkModel.setLineColor(palette.getLinkColor());
+			}
+		}
+		default -> {
+			return;
+		}
+		}
+
+		this.repaint();
+	}
+
+	public void setDefaultPalette(final StylePalette defaultPalette) {
+		this.defaultPalette = defaultPalette;
+	}
+
+	private void applyDefaultPaletteToClass(final ClassModel classModel) {
+		if (this.defaultPalette == null || classModel == null) {
+			return;
+		}
+
+		classModel.getStyle().setTextColor(this.defaultPalette.getClassTextColor());
+		classModel.getStyle().setBackgroundColor(this.defaultPalette.getClassBackgroundColor());
+		classModel.getStyle().setBorderColor(this.defaultPalette.getClassBorderColor());
+	}
+
+	private void applyDefaultPaletteToField(final FieldModel fieldModel) {
+		if (this.defaultPalette == null || fieldModel == null) {
+			return;
+		}
+
+		fieldModel.getStyle().setTextColor(this.defaultPalette.getFieldTextColor());
+		fieldModel.getStyle().setBackgroundColor(this.defaultPalette.getFieldBackgroundColor());
+	}
+
+	private void applyDefaultPaletteToComment(final CommentModel commentModel) {
+		if (this.defaultPalette == null || commentModel == null) {
+			return;
+		}
+
+		commentModel.setTextColor(this.defaultPalette.getCommentTextColor());
+		commentModel.setBackgroundColor(this.defaultPalette.getCommentBackgroundColor());
+		commentModel.setBorderColor(this.defaultPalette.getCommentBorderColor());
+	}
+
+	private void applyDefaultPaletteToLink(final LinkModel linkModel) {
+		if (this.defaultPalette == null || linkModel == null) {
+			return;
+		}
+
+		linkModel.setLineColor(this.defaultPalette.getLinkColor());
 	}
 
 	private record DraggedNode(NodeLayout layout, double offsetX, double offsetY) {

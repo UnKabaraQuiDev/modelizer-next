@@ -6,6 +6,8 @@ import java.util.List;
 
 public class VersionComparator implements Comparator<String> {
 
+	public static final VersionComparator COMPARATOR = new VersionComparator();
+
 	@Override
 	public int compare(final String v1, final String v2) {
 		final Version a = this.parse(v1);
@@ -33,42 +35,45 @@ public class VersionComparator implements Comparator<String> {
 	private Version parse(final String v) {
 		final String[] mainAndSuffix = v.split("-", 2);
 
-		// parse numeric version
 		final String[] numParts = mainAndSuffix[0].split("\\.");
 		List<Integer> numbers = new ArrayList<>();
 		for (final String p : numParts) {
 			numbers.add(Integer.parseInt(p));
 		}
 
-		int type;
-		int date;
+		int type = 0;
+		int date = 0;
 
 		if (mainAndSuffix.length == 2) {
-			// format: NIGHTLY20250419
 			final String suffix = mainAndSuffix[1];
 
 			if (suffix.startsWith("NIGHTLY")) {
-				type = 'N'; // 78
-				date = Integer.parseInt(suffix.substring(7));
+				type = 'N';
+				date = this.parseOptionalDate(suffix.substring(7));
 			} else if (suffix.startsWith("SNAPSHOT")) {
-				type = 'S'; // 83
-				date = Integer.parseInt(suffix.substring(8));
+				type = 'S';
+				date = this.parseOptionalDate(suffix.substring(8));
 			} else if (suffix.startsWith("RELEASE")) {
-				type = 'R'; // 82
-				date = Integer.parseInt(suffix.substring(7));
+				type = 'R';
+				date = this.parseOptionalDate(suffix.substring(7));
 			} else {
 				throw new IllegalArgumentException("Unknown suffix: " + suffix);
 			}
-		} else {
-			// fallback: last two parts = type + date
-			final int size = numbers.size();
-			type = numbers.get(size - 2);
-			date = numbers.get(size - 1);
-
-			numbers = numbers.subList(0, size - 2);
 		}
 
 		return new Version(numbers, type, date);
+	}
+
+	private int parseOptionalDate(final String raw) {
+		if (raw == null || raw.isBlank()) {
+			return 0;
+		}
+
+		try {
+			return Integer.parseInt(raw);
+		} catch (final NumberFormatException e) {
+			throw new IllegalArgumentException("Invalid version date: '" + raw + "'.", e);
+		}
 	}
 
 	private static class Version {
