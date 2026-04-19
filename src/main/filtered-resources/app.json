@@ -1,0 +1,6 @@
+{
+	"name": "@project.name@",
+	"description": "@project.description@",
+	"version": "@app.version@",
+	"revision": "@revision@"
+}
