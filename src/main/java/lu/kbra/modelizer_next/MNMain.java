@@ -27,7 +27,7 @@ public class MNMain {
 		try {
 			App.init();
 			System.out.println(App.NAME + " / " + App.VERSION + " (" + App.REVISION + ")");
-			System.err.println(App.getAppDirectory());
+			System.out.println("App dir: " + App.getAppDirectory());
 		} catch (JsonProcessingException e) {
 			e.printStackTrace();
 			JOptionPane.showMessageDialog(null,

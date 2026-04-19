@@ -3,18 +3,21 @@ package lu.kbra.modelizer_next.domain;
 import java.awt.Color;
 import java.util.UUID;
 
-import lu.kbra.modelizer_next.common.ColorUtils;
+import lu.kbra.modelizer_next.layout.PanelType;
 
 public class CommentModel {
 
-	private Color textColor = ColorUtils.ofHex("#333333");
-	private Color backgroundColor = ColorUtils.ofHex("#FFF8CC");
-	private Color borderColor = ColorUtils.ofHex("#444444");
+	private Color textColor;
+	private Color backgroundColor;
+	private Color borderColor;
 
 	private String id;
 	private CommentKind kind;
 	private String text;
 	private CommentBinding binding;
+	private boolean visibleInConceptual = true;
+	private boolean visibleInLogical = true;
+	private boolean visibleInPhysical = true;
 
 	public CommentModel() {
 		this.id = UUID.randomUUID().toString();
@@ -79,10 +82,49 @@ public class CommentModel {
 		this.borderColor = borderColor;
 	}
 
+	public boolean isVisibleInConceptual() {
+		return this.visibleInConceptual;
+	}
+
+	public void setVisibleInConceptual(final boolean visibleInConceptual) {
+		this.visibleInConceptual = visibleInConceptual;
+	}
+
+	public boolean isVisibleInLogical() {
+		return this.visibleInLogical;
+	}
+
+	public void setVisibleInLogical(final boolean visibleInLogical) {
+		this.visibleInLogical = visibleInLogical;
+	}
+
+	public boolean isVisibleInPhysical() {
+		return this.visibleInPhysical;
+	}
+
+	public void setVisibleInPhysical(final boolean visibleInPhysical) {
+		this.visibleInPhysical = visibleInPhysical;
+	}
+
+	public void setVisibility(PanelType... pts) {
+		visibleInConceptual = false;
+		visibleInLogical = false;
+		visibleInPhysical = false;
+		for (PanelType pt : pts) {
+			switch (pt) {
+			case CONCEPTUAL -> visibleInConceptual = true;
+			case LOGICAL -> visibleInLogical = true;
+			case PHYSICAL -> visibleInPhysical = true;
+			}
+		}
+	}
+
 	@Override
 	public String toString() {
-		return "CommentModel@" + System.identityHashCode(this) + " [id=" + id + ", kind=" + kind + ", text=" + text
-				+ ", binding=" + binding + "]";
+		return "CommentModel@" + System.identityHashCode(this) + " [textColor=" + textColor + ", backgroundColor="
+				+ backgroundColor + ", borderColor=" + borderColor + ", id=" + id + ", kind=" + kind + ", text=" + text
+				+ ", binding=" + binding + ", visibleInConceptual=" + visibleInConceptual + ", visibleInLogical="
+				+ visibleInLogical + ", visibleInPhysical=" + visibleInPhysical + "]";
 	}
 
 }

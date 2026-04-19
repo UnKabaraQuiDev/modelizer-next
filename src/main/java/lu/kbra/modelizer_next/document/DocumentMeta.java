@@ -8,6 +8,7 @@ import lu.kbra.modelizer_next.App;
 public class DocumentMeta {
 
 	private String id;
+	@Deprecated
 	private String name;
 	private Instant createdAt;
 	private Instant updatedAt;
@@ -29,10 +30,12 @@ public class DocumentMeta {
 		this.id = id;
 	}
 
+	@Deprecated
 	public String getName() {
 		return this.name;
 	}
 
+	@Deprecated
 	public void setName(final String name) {
 		this.name = name;
 	}

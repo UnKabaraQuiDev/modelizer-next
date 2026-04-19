@@ -21,9 +21,15 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -74,16 +80,22 @@ public class DiagramCanvas extends JPanel {
 	private final PanelType panelType;
 	private final CanvasStatusListener statusListener;
 
-	private DraggedNode draggedNode;
+	private DraggedSelection draggedSelection;
 	private Point lastScreenPoint;
 	private boolean panning;
 
 	private LinkCreationState linkCreationState;
-	private Point2D.Double currentLinkPreviewPoint;
+	private SelectedElement linkPreviewTarget;
+	private Point2D.Double linkPreviewMousePoint;
 
 	private SelectedElement selectedElement;
+	private final LinkedHashSet<SelectedElement> selectedElements = new LinkedHashSet<>();
 	private ResizingComment resizingComment;
 	private StylePalette defaultPalette;
+
+	private SelectedElement pendingClickSelection;
+	private boolean pendingModifierSelection;
+	private boolean dragOccurred;
 
 	private final Comparator<ClassModel> comparator = (a, b) -> {
 		if (this.selectedElement == null || this.selectedElement.type() != SelectedType.CLASS) {
@@ -330,170 +342,249 @@ public class DiagramCanvas extends JPanel {
 	}
 
 	private void duplicateSelection() {
-		if (this.selectedElement == null) {
+		if (this.selectedElements.isEmpty()) {
 			return;
 		}
 
-		switch (this.selectedElement.type()) {
-		case CLASS -> this.duplicateClass(this.selectedElement.classId());
-		case FIELD -> this.duplicateField(this.selectedElement.classId(), this.selectedElement.fieldId());
-		case COMMENT -> this.duplicateComment(this.selectedElement.commentId());
-		case LINK -> this.duplicateLink(this.selectedElement.linkId());
-		default -> {
-			return;
+		final List<SelectedElement> snapshot = new ArrayList<>(this.selectedElements);
+
+		final Set<String> selectedClassIds = new HashSet<>();
+		final Set<String> selectedFieldIds = new HashSet<>();
+		final Set<String> selectedCommentIds = new HashSet<>();
+		final Set<String> selectedLinkIds = new HashSet<>();
+
+		for (final SelectedElement element : snapshot) {
+			switch (element.type()) {
+			case CLASS -> selectedClassIds.add(element.classId());
+			case FIELD -> {
+				if (!selectedClassIds.contains(element.classId())) {
+					selectedFieldIds.add(element.fieldId());
+				}
+			}
+			case COMMENT -> selectedCommentIds.add(element.commentId());
+			case LINK -> selectedLinkIds.add(element.linkId());
+			default -> {
+			}
+			}
 		}
+
+		final Map<String, String> duplicatedClassIds = new HashMap<>();
+		final Map<String, String> duplicatedFieldIds = new HashMap<>();
+		final Map<String, String> duplicatedCommentIds = new HashMap<>();
+		final Map<String, String> duplicatedLinkIds = new HashMap<>();
+
+		final LinkedHashSet<SelectedElement> newSelection = new LinkedHashSet<>();
+
+		for (final String classId : selectedClassIds) {
+			final ClassModel source = this.findClassById(classId);
+			if (source == null) {
+				continue;
+			}
+
+			final ClassModel copy = new ClassModel();
+			copy.getNames().setConceptualName(source.getNames().getConceptualName() + " Copy");
+			copy.getNames().setTechnicalName(source.getNames().getTechnicalName() + "_COPY");
+			copy.setComment(source.getComment());
+			copy.setGroup(source.getGroup());
+			copy.getVisibility().setConceptual(source.getVisibility().isConceptual());
+			copy.getVisibility().setLogical(source.getVisibility().isLogical());
+			copy.getVisibility().setPhysical(source.getVisibility().isPhysical());
+			copy.getStyle().setTextColor(source.getStyle().getTextColor());
+			copy.getStyle().setBackgroundColor(source.getStyle().getBackgroundColor());
+			copy.getStyle().setBorderColor(source.getStyle().getBorderColor());
+
+			for (final FieldModel sourceField : source.getFields()) {
+				final FieldModel fieldCopy = new FieldModel();
+				fieldCopy.getNames().setName(sourceField.getNames().getName());
+				fieldCopy.getNames().setTechnicalName(sourceField.getNames().getTechnicalName());
+				fieldCopy.setNotConceptual(sourceField.isNotConceptual());
+				fieldCopy.setComment(sourceField.getComment());
+				fieldCopy.setPrimaryKey(sourceField.isPrimaryKey());
+				fieldCopy.setUnique(sourceField.isUnique());
+				fieldCopy.setNotNull(sourceField.isNotNull());
+				fieldCopy.getStyle().setTextColor(sourceField.getStyle().getTextColor());
+				fieldCopy.getStyle().setBackgroundColor(sourceField.getStyle().getBackgroundColor());
+				copy.getFields().add(fieldCopy);
+
+				duplicatedFieldIds.put(sourceField.getId(), fieldCopy.getId());
+			}
+
+			this.document.getModel().getClasses().add(copy);
+			duplicatedClassIds.put(source.getId(), copy.getId());
+
+			final NodeLayout sourceLayout = this.findOrCreateNodeLayout(LayoutObjectType.CLASS, source.getId());
+			final NodeLayout copyLayout = this.findOrCreateNodeLayout(LayoutObjectType.CLASS, copy.getId());
+			copyLayout.setPosition(
+					new Point2D.Double(sourceLayout.getPosition().getX() + 30, sourceLayout.getPosition().getY() + 30));
+			copyLayout.setSize(new Size2(sourceLayout.getSize().getWidth(), sourceLayout.getSize().getHeight()));
+
+			newSelection.add(SelectedElement.forClass(copy.getId()));
 		}
+
+		for (final String fieldId : selectedFieldIds) {
+			final ClassModel owner = this.findOwnerClassOfField(fieldId);
+			if (owner == null || duplicatedClassIds.containsKey(owner.getId())) {
+				continue;
+			}
+
+			final FieldModel source = this.findFieldById(owner.getId(), fieldId);
+			if (source == null) {
+				continue;
+			}
+
+			final FieldModel copy = new FieldModel();
+			copy.getNames().setName(source.getNames().getName() + " Copy");
+			copy.getNames().setTechnicalName(source.getNames().getTechnicalName() + "_COPY");
+			copy.setNotConceptual(source.isNotConceptual());
+			copy.setComment(source.getComment());
+			copy.setPrimaryKey(source.isPrimaryKey());
+			copy.setUnique(source.isUnique());
+			copy.setNotNull(source.isNotNull());
+			copy.getStyle().setTextColor(source.getStyle().getTextColor());
+			copy.getStyle().setBackgroundColor(source.getStyle().getBackgroundColor());
+
+			final int insertIndex = owner.getFields().indexOf(source);
+			if (insertIndex < 0) {
+				owner.getFields().add(copy);
+			} else {
+				owner.getFields().add(insertIndex + 1, copy);
+			}
+
+			duplicatedFieldIds.put(source.getId(), copy.getId());
+			newSelection.add(SelectedElement.forField(owner.getId(), copy.getId()));
+		}
+
+		for (final String commentId : selectedCommentIds) {
+			final CommentModel source = this.findCommentById(commentId);
+			if (source == null) {
+				continue;
+			}
+
+			final CommentModel copy = new CommentModel();
+			copy.setKind(source.getKind());
+			copy.setText(source.getText());
+			copy.setTextColor(source.getTextColor());
+			copy.setBackgroundColor(source.getBackgroundColor());
+			copy.setBorderColor(source.getBorderColor());
+
+			if (source.getBinding() != null) {
+				String targetId = source.getBinding().getTargetId();
+
+				if (source.getBinding().getTargetType() == BoundTargetType.CLASS
+						&& duplicatedClassIds.containsKey(targetId)) {
+					targetId = duplicatedClassIds.get(targetId);
+				} else if (source.getBinding().getTargetType() == BoundTargetType.LINK
+						&& duplicatedLinkIds.containsKey(targetId)) {
+					targetId = duplicatedLinkIds.get(targetId);
+				}
+
+				copy.setBinding(new CommentBinding(source.getBinding().getTargetType(), targetId));
+			}
+
+			this.document.getModel().getComments().add(copy);
+			duplicatedCommentIds.put(source.getId(), copy.getId());
+
+			final NodeLayout sourceLayout = this.findOrCreateNodeLayout(LayoutObjectType.COMMENT, source.getId());
+			final NodeLayout copyLayout = this.findOrCreateNodeLayout(LayoutObjectType.COMMENT, copy.getId());
+			copyLayout.setPosition(
+					new Point2D.Double(sourceLayout.getPosition().getX() + 30, sourceLayout.getPosition().getY() + 30));
+			copyLayout.setSize(new Size2(sourceLayout.getSize().getWidth(), sourceLayout.getSize().getHeight()));
+
+			newSelection.add(SelectedElement.forComment(copy.getId()));
+		}
+
+		final Set<String> linksToDuplicate = new LinkedHashSet<>(selectedLinkIds);
+		for (final LinkModel link : this.getActiveLinks()) {
+			final boolean fromClassDuplicated = duplicatedClassIds.containsKey(link.getFrom().getClassId());
+			final boolean toClassDuplicated = duplicatedClassIds.containsKey(link.getTo().getClassId());
+			final boolean fromFieldDuplicated = link.getFrom().getFieldId() != null
+					&& duplicatedFieldIds.containsKey(link.getFrom().getFieldId());
+			final boolean toFieldDuplicated = link.getTo().getFieldId() != null
+					&& duplicatedFieldIds.containsKey(link.getTo().getFieldId());
+
+			if (fromClassDuplicated || toClassDuplicated || fromFieldDuplicated || toFieldDuplicated) {
+				linksToDuplicate.add(link.getId());
+			}
+		}
+
+		for (final String linkId : linksToDuplicate) {
+			final LinkModel source = this.findLinkById(linkId);
+			if (source == null) {
+				continue;
+			}
+
+			final String newFromClassId = duplicatedClassIds.getOrDefault(source.getFrom().getClassId(),
+					source.getFrom().getClassId());
+			final String newToClassId = duplicatedClassIds.getOrDefault(source.getTo().getClassId(),
+					source.getTo().getClassId());
+			final String newFromFieldId = source.getFrom().getFieldId() == null ? null
+					: duplicatedFieldIds.getOrDefault(source.getFrom().getFieldId(), source.getFrom().getFieldId());
+			final String newToFieldId = source.getTo().getFieldId() == null ? null
+					: duplicatedFieldIds.getOrDefault(source.getTo().getFieldId(), source.getTo().getFieldId());
+
+			final LinkModel copy = new LinkModel();
+			copy.setName(source.getName());
+			copy.setComment(source.getComment());
+			copy.setLineColor(source.getLineColor());
+			copy.setAssociationClassId(source.getAssociationClassId() == null ? null
+					: duplicatedClassIds.getOrDefault(source.getAssociationClassId(), source.getAssociationClassId()));
+			copy.setFrom(new LinkEnd(newFromClassId, newFromFieldId));
+			copy.setTo(new LinkEnd(newToClassId, newToFieldId));
+			copy.setCardinalityFrom(source.getCardinalityFrom());
+			copy.setCardinalityTo(source.getCardinalityTo());
+
+			this.getActiveLinks().add(copy);
+			duplicatedLinkIds.put(source.getId(), copy.getId());
+
+			final LinkLayout sourceLayout = this.findOrCreateLinkLayout(source.getId());
+			final LinkLayout copyLayout = this.findOrCreateLinkLayout(copy.getId());
+			copyLayout.getBendPoints().clear();
+			for (final Point2D.Double bendPoint : sourceLayout.getBendPoints()) {
+				copyLayout.getBendPoints().add(new Point2D.Double(bendPoint.getX() + 20, bendPoint.getY() + 20));
+			}
+			if (sourceLayout.getNameLabelPosition() != null) {
+				copyLayout.setNameLabelPosition(new Point2D.Double(sourceLayout.getNameLabelPosition().getX() + 20,
+						sourceLayout.getNameLabelPosition().getY() + 20));
+			}
+
+			newSelection.add(SelectedElement.forLink(copy.getId()));
+		}
+
+		this.selectedElements.clear();
+		this.selectedElements.addAll(newSelection);
+		this.selectedElement = this.selectedElements.isEmpty() ? null : this.selectedElements.getLast();
 
 		this.notifySelectionChanged();
 		this.repaint();
 	}
 
-	private void duplicateClass(final String classId) {
-		final ClassModel source = this.findClassById(classId);
-		if (source == null) {
-			return;
+	private ClassModel findOwnerClassOfField(final String fieldId) {
+		for (final ClassModel classModel : this.document.getModel().getClasses()) {
+			for (final FieldModel fieldModel : classModel.getFields()) {
+				if (fieldModel.getId().equals(fieldId)) {
+					return classModel;
+				}
+			}
 		}
-
-		final ClassModel copy = new ClassModel();
-		copy.getNames().setConceptualName(source.getNames().getConceptualName() + " Copy");
-		copy.getNames().setTechnicalName(source.getNames().getTechnicalName() + "_COPY");
-		copy.setComment(source.getComment());
-		copy.setGroup(source.getGroup());
-		copy.getVisibility().setConceptual(source.getVisibility().isConceptual());
-		copy.getVisibility().setLogical(source.getVisibility().isLogical());
-		copy.getVisibility().setPhysical(source.getVisibility().isPhysical());
-		copy.getStyle().setTextColor(source.getStyle().getTextColor());
-		copy.getStyle().setBackgroundColor(source.getStyle().getBackgroundColor());
-		copy.getStyle().setBorderColor(source.getStyle().getBorderColor());
-
-		for (final FieldModel sourceField : source.getFields()) {
-			final FieldModel fieldCopy = new FieldModel();
-			fieldCopy.getNames().setName(sourceField.getNames().getName());
-			fieldCopy.getNames().setTechnicalName(sourceField.getNames().getTechnicalName());
-			fieldCopy.setNotConceptual(sourceField.isNotConceptual());
-			fieldCopy.setComment(sourceField.getComment());
-			fieldCopy.setPrimaryKey(sourceField.isPrimaryKey());
-			fieldCopy.setUnique(sourceField.isUnique());
-			fieldCopy.setNotNull(sourceField.isNotNull());
-			fieldCopy.getStyle().setTextColor(sourceField.getStyle().getTextColor());
-			fieldCopy.getStyle().setBackgroundColor(sourceField.getStyle().getBackgroundColor());
-			copy.getFields().add(fieldCopy);
-		}
-
-		this.document.getModel().getClasses().add(copy);
-
-		final NodeLayout sourceLayout = this.findOrCreateNodeLayout(LayoutObjectType.CLASS, source.getId());
-		final NodeLayout copyLayout = this.findOrCreateNodeLayout(LayoutObjectType.CLASS, copy.getId());
-		copyLayout.setPosition(
-				new Point2D.Double(sourceLayout.getPosition().getX() + 30, sourceLayout.getPosition().getY() + 30));
-		copyLayout.setSize(new Size2(sourceLayout.getSize().getWidth(), sourceLayout.getSize().getHeight()));
-
-		this.select(SelectedElement.forClass(copy.getId()));
-	}
-
-	private void duplicateField(final String classId, final String fieldId) {
-		final ClassModel classModel = this.findClassById(classId);
-		final FieldModel source = this.findFieldById(classId, fieldId);
-		if (classModel == null || source == null) {
-			return;
-		}
-
-		final FieldModel copy = new FieldModel();
-		copy.getNames().setName(source.getNames().getName() + " Copy");
-		copy.getNames().setTechnicalName(source.getNames().getTechnicalName() + "_COPY");
-		copy.setNotConceptual(source.isNotConceptual());
-		copy.setComment(source.getComment());
-		copy.setPrimaryKey(source.isPrimaryKey());
-		copy.setUnique(source.isUnique());
-		copy.setNotNull(source.isNotNull());
-		copy.getStyle().setTextColor(source.getStyle().getTextColor());
-		copy.getStyle().setBackgroundColor(source.getStyle().getBackgroundColor());
-
-		int insertIndex = classModel.getFields().indexOf(source);
-		if (insertIndex < 0) {
-			classModel.getFields().add(copy);
-		} else {
-			classModel.getFields().add(insertIndex + 1, copy);
-		}
-
-		this.select(SelectedElement.forField(classId, copy.getId()));
-	}
-
-	private void duplicateComment(final String commentId) {
-		final CommentModel source = this.findCommentById(commentId);
-		if (source == null) {
-			return;
-		}
-
-		final CommentModel copy = new CommentModel();
-		copy.setKind(source.getKind());
-		copy.setText(source.getText());
-		copy.setBinding(source.getBinding() == null ? null
-				: new CommentBinding(source.getBinding().getTargetType(), source.getBinding().getTargetId()));
-		copy.setTextColor(source.getTextColor());
-		copy.setBackgroundColor(source.getBackgroundColor());
-		copy.setBorderColor(source.getBorderColor());
-
-		this.document.getModel().getComments().add(copy);
-
-		final NodeLayout sourceLayout = this.findOrCreateNodeLayout(LayoutObjectType.COMMENT, source.getId());
-		final NodeLayout copyLayout = this.findOrCreateNodeLayout(LayoutObjectType.COMMENT, copy.getId());
-		copyLayout.setPosition(
-				new Point2D.Double(sourceLayout.getPosition().getX() + 30, sourceLayout.getPosition().getY() + 30));
-		copyLayout.setSize(new Size2(sourceLayout.getSize().getWidth(), sourceLayout.getSize().getHeight()));
-
-		this.select(SelectedElement.forComment(copy.getId()));
-	}
-
-	private void duplicateLink(final String linkId) {
-		final LinkModel source = this.findLinkById(linkId);
-		if (source == null) {
-			return;
-		}
-
-		final LinkModel copy = new LinkModel();
-		copy.setName(source.getName());
-		copy.setComment(source.getComment());
-		copy.setLineColor(source.getLineColor());
-		copy.setAssociationClassId(source.getAssociationClassId());
-		copy.setFrom(new LinkEnd(source.getFrom().getClassId(), source.getFrom().getFieldId()));
-		copy.setTo(new LinkEnd(source.getTo().getClassId(), source.getTo().getFieldId()));
-		copy.setCardinalityFrom(source.getCardinalityFrom());
-		copy.setCardinalityTo(source.getCardinalityTo());
-
-		if (panelType == PanelType.CONCEPTUAL) {
-			document.getModel().getConceptualLinks().add(copy);
-		} else {
-			document.getModel().getTechnicalLinks().add(copy);
-		}
-
-		final LinkLayout sourceLayout = this.findOrCreateLinkLayout(source.getId());
-		final LinkLayout copyLayout = this.findOrCreateLinkLayout(copy.getId());
-		copyLayout.getBendPoints().clear();
-		for (final Point2D.Double bendPoint : sourceLayout.getBendPoints()) {
-			copyLayout.getBendPoints().add(new Point2D.Double(bendPoint.getX() + 20, bendPoint.getY() + 20));
-		}
-		if (sourceLayout.getNameLabelPosition() != null) {
-			copyLayout.setNameLabelPosition(new Point2D.Double(sourceLayout.getNameLabelPosition().getX() + 20,
-					sourceLayout.getNameLabelPosition().getY() + 20));
-		}
-
-		this.select(SelectedElement.forLink(copy.getId()));
+		return null;
 	}
 
 	private void deleteSelection() {
-		if (this.selectedElement == null) {
+		if (this.selectedElements.isEmpty()) {
 			return;
 		}
 
-		switch (this.selectedElement.type()) {
-		case CLASS -> this.deleteClass(this.selectedElement.classId());
-		case FIELD -> this.deleteField(this.selectedElement.classId(), this.selectedElement.fieldId());
-		case COMMENT -> this.deleteComment(this.selectedElement.commentId());
-		case LINK -> this.deleteLink(this.selectedElement.linkId());
-		default -> {
-			return;
-		}
+		final List<SelectedElement> snapshot = new ArrayList<>(this.selectedElements);
+
+		for (final SelectedElement element : snapshot) {
+			switch (element.type()) {
+			case LINK -> this.deleteLink(element.linkId());
+			case COMMENT -> this.deleteComment(element.commentId());
+			case FIELD -> this.deleteField(element.classId(), element.fieldId());
+			case CLASS -> this.deleteClass(element.classId());
+			default -> {
+			}
+			}
 		}
 
 		this.clearSelection();
@@ -592,6 +683,7 @@ public class DiagramCanvas extends JPanel {
 		final CommentModel commentModel = new CommentModel();
 		commentModel.setKind(CommentKind.STANDALONE);
 		commentModel.setText("New comment");
+		commentModel.setVisibility(PanelType.CONCEPTUAL, PanelType.LOGICAL, PanelType.LOGICAL);
 		this.applyDefaultPaletteToComment(commentModel);
 
 		this.document.getModel().getComments().add(commentModel);
@@ -704,32 +796,28 @@ public class DiagramCanvas extends JPanel {
 		final Point2D.Double worldPoint = this.screenToWorld(event.getPoint());
 		final HitResult hitResult = this.findTopmostHit(worldPoint);
 
-		if (hitResult != null && hitResult.layout().getObjectType() == LayoutObjectType.CLASS) {
-			document.getModel().getClasses().sort(comparator);
-		}
-
 		if (SwingUtilities.isRightMouseButton(event)) {
 			if (hitResult == null) {
 				return;
 			}
 
-			if (this.panelType == PanelType.CONCEPTUAL && hitResult.selection().type() == SelectedType.CLASS) {
-				this.select(hitResult.selection());
-				this.linkCreationState = new LinkCreationState(hitResult.selection().classId(), null);
-				this.currentLinkPreviewPoint = worldPoint;
-				this.setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
-				this.repaint();
+			final SelectedElement source = this.normalizeLinkEndpointSelection(hitResult.selection());
+			if (source == null) {
 				return;
 			}
 
-			if (this.panelType != PanelType.CONCEPTUAL && hitResult.selection().type() == SelectedType.FIELD) {
-				this.select(hitResult.selection());
-				this.linkCreationState = new LinkCreationState(hitResult.selection().classId(),
-						hitResult.selection().fieldId());
-				this.currentLinkPreviewPoint = worldPoint;
-				this.setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
-				this.repaint();
+			if (!this.selectedElements.contains(source)) {
+				this.select(source);
+			} else {
+				this.selectedElement = source;
+				this.notifySelectionChanged();
 			}
+
+			this.linkCreationState = new LinkCreationState(source.classId(), source.fieldId());
+			this.linkPreviewTarget = null;
+			this.linkPreviewMousePoint = worldPoint;
+			this.setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
+			this.repaint();
 			return;
 		}
 
@@ -737,20 +825,30 @@ public class DiagramCanvas extends JPanel {
 			return;
 		}
 
+		this.pendingClickSelection = hitResult == null ? null : hitResult.selection();
+		this.pendingModifierSelection = event.isShiftDown() || event.isControlDown();
+		this.dragOccurred = false;
+
 		if (hitResult == null) {
-			this.clearSelection();
+			if (!this.pendingModifierSelection) {
+				this.clearSelection();
+			}
 			return;
 		}
 
-		this.select(hitResult.selection());
+		final SelectedElement clickedElement = hitResult.selection();
 
-		if (event.getClickCount() == 2) {
+		if (!this.pendingModifierSelection) {
+			this.select(clickedElement);
+		}
+
+		if (!this.pendingModifierSelection && event.getClickCount() == 2) {
 			this.openEditDialogForSelection();
 			return;
 		}
 
-		if (hitResult.selection().type() == SelectedType.COMMENT && hitResult.bounds() != null
-				&& this.isInCommentResizeHandle(hitResult.bounds(), worldPoint)) {
+		if (!this.pendingModifierSelection && hitResult.selection().type() == SelectedType.COMMENT
+				&& hitResult.bounds() != null && this.isInCommentResizeHandle(hitResult.bounds(), worldPoint)) {
 			this.resizingComment = new ResizingComment(hitResult.layout(), hitResult.bounds().getWidth(),
 					hitResult.bounds().getHeight(), worldPoint.getX(), worldPoint.getY());
 			this.setCursor(Cursor.getPredefinedCursor(Cursor.SE_RESIZE_CURSOR));
@@ -758,8 +856,12 @@ public class DiagramCanvas extends JPanel {
 		}
 
 		if (hitResult.layout() != null) {
-			this.draggedNode = new DraggedNode(hitResult.layout(), worldPoint.getX() - hitResult.bounds().getX(),
-					worldPoint.getY() - hitResult.bounds().getY());
+			if (this.pendingModifierSelection && !this.isElementSelected(clickedElement)) {
+				return;
+			}
+
+			this.draggedSelection = this.createDraggedSelection(clickedElement, hitResult.layout(), worldPoint,
+					hitResult.bounds());
 			this.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		}
 	}
@@ -817,17 +919,20 @@ public class DiagramCanvas extends JPanel {
 			return;
 		}
 
-		final CommentEditorDialog.Result result = CommentEditorDialog.showDialog(this,
-				this.getEditableCommentText(commentId), commentModel.getTextColor(), commentModel.getBackgroundColor(),
-				commentModel.getBorderColor());
+		final CommentEditorDialog.Result result = CommentEditorDialog.showDialog(this, this.document, commentModel);
 		if (result == null) {
 			return;
 		}
 
-		this.setEditableCommentText(commentId, result.text());
+		commentModel.setText(result.text());
 		commentModel.setTextColor(result.textColor());
 		commentModel.setBackgroundColor(result.backgroundColor());
 		commentModel.setBorderColor(result.borderColor());
+		commentModel.setKind(result.kind());
+		commentModel.setBinding(result.binding());
+		commentModel.setVisibleInConceptual(result.visibleInConceptual());
+		commentModel.setVisibleInLogical(result.visibleInLogical());
+		commentModel.setVisibleInPhysical(result.visibleInPhysical());
 
 		this.notifySelectionChanged();
 		this.repaint();
@@ -891,14 +996,23 @@ public class DiagramCanvas extends JPanel {
 			this.finishLinkCreation(this.screenToWorld(event.getPoint()));
 		}
 
-		this.draggedNode = null;
+		if (SwingUtilities.isLeftMouseButton(event) && this.pendingModifierSelection && !this.dragOccurred) {
+			this.updateSelectionFromMouse(this.pendingClickSelection, event);
+		}
+
+		this.draggedSelection = null;
 		this.resizingComment = null;
 		this.panning = false;
 		this.lastScreenPoint = null;
 		this.linkCreationState = null;
-		this.currentLinkPreviewPoint = null;
-		this.setCursor(Cursor.getDefaultCursor());
+		this.linkPreviewTarget = null;
+		this.linkPreviewMousePoint = null;
 
+		this.pendingClickSelection = null;
+		this.pendingModifierSelection = false;
+		this.dragOccurred = false;
+
+		this.setCursor(Cursor.getDefaultCursor());
 		this.repaint();
 	}
 
@@ -913,7 +1027,13 @@ public class DiagramCanvas extends JPanel {
 		}
 
 		if (this.linkCreationState != null) {
-			this.currentLinkPreviewPoint = this.screenToWorld(event.getPoint());
+			final Point2D.Double worldPoint = this.screenToWorld(event.getPoint());
+			this.linkPreviewMousePoint = worldPoint;
+
+			final HitResult hitResult = this.findTopmostHit(worldPoint);
+			this.linkPreviewTarget = hitResult == null ? null
+					: this.normalizeLinkEndpointSelection(hitResult.selection());
+
 			this.repaint();
 			return;
 		}
@@ -928,14 +1048,91 @@ public class DiagramCanvas extends JPanel {
 			return;
 		}
 
-		if (this.draggedNode == null) {
+		if (this.draggedSelection == null) {
 			return;
 		}
 
+		this.dragOccurred = true;
+
 		final Point2D.Double worldPoint = this.screenToWorld(event.getPoint());
-		this.draggedNode.layout().getPosition().setLocation(worldPoint.getX() - this.draggedNode.offsetX(),
-				worldPoint.getY() - this.draggedNode.offsetY());
+		final double anchorX = worldPoint.getX() - this.draggedSelection.offsetX();
+		final double anchorY = worldPoint.getY() - this.draggedSelection.offsetY();
+
+		final double deltaX = anchorX - this.draggedSelection.anchorStartX();
+		final double deltaY = anchorY - this.draggedSelection.anchorStartY();
+
+		for (final DraggedLayout draggedLayout : this.draggedSelection.layouts()) {
+			draggedLayout.layout().getPosition().setLocation(draggedLayout.startX() + deltaX,
+					draggedLayout.startY() + deltaY);
+		}
+
 		this.repaint();
+	}
+
+	private boolean isElementSelected(final SelectedElement element) {
+		return element != null && this.selectedElements.contains(element);
+	}
+
+	private DraggedSelection createDraggedSelection(final SelectedElement hitSelection, final NodeLayout hitLayout,
+			final Point2D.Double worldPoint, final Rectangle2D hitBounds) {
+		final List<DraggedLayout> layouts = new ArrayList<>();
+		final Set<String> seen = new HashSet<>();
+
+		if (this.selectedElements.isEmpty() || !this.isElementSelected(hitSelection)) {
+			this.addDraggedLayout(layouts, seen, hitSelection, hitLayout);
+		} else {
+			for (final SelectedElement element : this.selectedElements) {
+				this.addDraggedLayout(layouts, seen, element, null);
+			}
+
+			if (layouts.isEmpty()) {
+				this.addDraggedLayout(layouts, seen, hitSelection, hitLayout);
+			}
+		}
+		System.err.println(selectedElements + "\n   " + layouts);
+		return new DraggedSelection(layouts, worldPoint.getX() - hitBounds.getX(), worldPoint.getY() - hitBounds.getY(),
+				hitLayout.getPosition().getX(), hitLayout.getPosition().getY());
+	}
+
+	private void addDraggedLayout(final List<DraggedLayout> layouts, final Set<String> seen,
+			final SelectedElement element, final NodeLayout fallbackLayout) {
+		final NodeLayout layout = this.resolveNodeLayoutForSelection(element, fallbackLayout);
+		if (layout == null) {
+			return;
+		}
+
+		final String key = layout.getObjectType() + ":" + layout.getObjectId();
+		if (!seen.add(key)) {
+			return;
+		}
+
+		layouts.add(new DraggedLayout(layout, layout.getPosition().getX(), layout.getPosition().getY()));
+	}
+
+	private NodeLayout resolveNodeLayoutForSelection(final SelectedElement element, final NodeLayout fallbackLayout) {
+		if (element == null) {
+			return fallbackLayout;
+		}
+
+		return switch (element.type()) {
+		case CLASS, FIELD -> this.findNodeLayout(LayoutObjectType.CLASS, element.classId());
+		case COMMENT -> this.findNodeLayout(LayoutObjectType.COMMENT, element.commentId());
+		default -> fallbackLayout;
+		};
+	}
+
+	private NodeLayout findNodeLayout(final LayoutObjectType objectType, final String objectId) {
+		if (objectId == null) {
+			return null;
+		}
+
+		for (final NodeLayout layout : this.getPanelState().getNodeLayouts()) {
+			if (layout.getObjectType() == objectType && objectId.equals(layout.getObjectId())) {
+				return layout;
+			}
+		}
+
+		return null;
 	}
 
 	private void handleMouseWheelMoved(final MouseWheelEvent event) {
@@ -1239,51 +1436,38 @@ public class DiagramCanvas extends JPanel {
 	}
 
 	private void drawLinkPreview(final Graphics2D g2) {
-		if (this.linkCreationState == null || this.currentLinkPreviewPoint == null) {
+		if (this.linkCreationState == null) {
 			return;
 		}
 
-		final Point2D fromAnchor;
-		if (this.panelType == PanelType.CONCEPTUAL) {
-			final ClassModel classModel = this.findClassById(this.linkCreationState.classId());
-			if (classModel == null || !this.isVisible(classModel)) {
-				return;
-			}
-
-			final NodeLayout layout = this.findOrCreateNodeLayout(LayoutObjectType.CLASS, classModel.getId());
-			final Rectangle2D bounds = this.computeClassBounds(g2, classModel, layout);
-
-			AnchorCandidate bestCandidate = null;
-			double bestDistance = Double.POSITIVE_INFINITY;
-
-			for (final AnchorCandidate candidate : this.computeConceptualCandidates(g2, new LinkModel(),
-					classModel.getId(), bounds)) {
-				final double distance = candidate.point().distance(this.currentLinkPreviewPoint);
-				if (distance < bestDistance) {
-					bestDistance = distance;
-					bestCandidate = candidate;
-				}
-			}
-
-			if (bestCandidate == null) {
-				return;
-			}
-
-			fromAnchor = bestCandidate.point();
-		} else {
-			fromAnchor = this.resolveTechnicalFieldAnchor(g2, this.linkCreationState.classId(),
-					this.linkCreationState.fieldId(), null, null);
-		}
-
+		final Point2D fromAnchor = this.resolvePreviewSourceAnchor(g2);
 		if (fromAnchor == null) {
 			return;
 		}
 
-		g2.setColor(DiagramCanvas.SELECTION_COLOR);
-		g2.setStroke(new BasicStroke(1.5f));
-		g2.draw(new Line2D.Double(fromAnchor.getX(), fromAnchor.getY(), this.currentLinkPreviewPoint.getX(),
-				this.currentLinkPreviewPoint.getY()));
-		g2.setStroke(new BasicStroke(1.0f));
+		final SelectedElement target = this.linkPreviewTarget;
+		final boolean valid = this.isValidPreviewTarget(target);
+
+		final Point2D toAnchor;
+		if (target != null) {
+			toAnchor = this.resolvePreviewTargetAnchor(g2, target);
+		} else {
+			toAnchor = this.linkPreviewMousePoint;
+		}
+
+		if (toAnchor == null) {
+			return;
+		}
+
+		final Graphics2D previewGraphics = (Graphics2D) g2.create();
+		try {
+			previewGraphics.setColor(valid ? DiagramCanvas.SELECTION_COLOR : Color.RED);
+			previewGraphics.setStroke(new BasicStroke(1.5f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10.0f,
+					new float[] { 6.0f, 6.0f }, 0.0f));
+			previewGraphics.draw(new Line2D.Double(fromAnchor, toAnchor));
+		} finally {
+			previewGraphics.dispose();
+		}
 	}
 
 	private Point2D findBoundTargetAnchor(final Graphics2D g2, final CommentModel commentModel) {
@@ -1308,86 +1492,174 @@ public class DiagramCanvas extends JPanel {
 	}
 
 	private void finishLinkCreation(final Point2D.Double worldPoint) {
-		final HitResult hitResult = this.findTopmostHit(worldPoint);
-		if (hitResult == null || this.linkCreationState == null) {
+		if (this.linkCreationState == null) {
 			return;
 		}
 
-		if (this.panelType == PanelType.CONCEPTUAL) {
-			if (hitResult.selection().type() != SelectedType.FIELD) {
-				return;
-			}
-
-			if (this.linkCreationState.classId().equals(hitResult.selection().classId())
-					&& Objects.equals(this.linkCreationState.fieldId(), hitResult.selection().fieldId())) {
-				return;
-			}
-
-			final FieldModel sourceField = this.findFieldById(this.linkCreationState.classId(),
-					this.linkCreationState.fieldId());
-			final FieldModel targetField = this.findFieldById(hitResult.selection().classId(),
-					hitResult.selection().fieldId());
-
-			if (sourceField == null || targetField == null) {
-				return;
-			}
-
-			if (!targetField.isPrimaryKey()) {
-				return;
-			}
-
-			if (this.hasOutgoingTechnicalLink(this.linkCreationState.classId(), this.linkCreationState.fieldId())) {
-				return;
-			}
-
-			final LinkModel linkModel = new LinkModel();
-			linkModel.setFrom(new LinkEnd(this.linkCreationState.classId(), this.linkCreationState.fieldId()));
-			linkModel.setTo(new LinkEnd(hitResult.selection().classId(), hitResult.selection().fieldId()));
-			linkModel.setCardinalityFrom(null);
-			linkModel.setCardinalityTo(null);
-
-			this.document.getModel().getConceptualLinks().add(linkModel);
-			this.findOrCreateLinkLayout(linkModel.getId());
-			this.select(SelectedElement.forLink(linkModel.getId()));
-		} else if (panelType != PanelType.CONCEPTUAL) {
-
-			if (hitResult.selection().type() != SelectedType.FIELD) {
-				return;
-			}
-
-			if (this.linkCreationState.classId().equals(hitResult.selection().classId())
-					&& Objects.equals(this.linkCreationState.fieldId(), hitResult.selection().fieldId())) {
-				return;
-			}
-
-			final LinkModel linkModel = new LinkModel();
-			linkModel.setFrom(new LinkEnd(this.linkCreationState.classId(), this.linkCreationState.fieldId()));
-			linkModel.setTo(new LinkEnd(hitResult.selection().classId(), hitResult.selection().fieldId()));
-			linkModel.setCardinalityFrom(null);
-			linkModel.setCardinalityTo(null);
-
-			this.document.getModel().getTechnicalLinks().add(linkModel);
-			this.findOrCreateLinkLayout(linkModel.getId());
-			this.select(SelectedElement.forLink(linkModel.getId()));
+		SelectedElement target = this.linkPreviewTarget;
+		if (target == null) {
+			final HitResult hitResult = this.findTopmostHit(worldPoint);
+			target = hitResult == null ? null : this.normalizeLinkEndpointSelection(hitResult.selection());
 		}
+
+		if (!this.isValidPreviewTarget(target)) {
+			return;
+		}
+
+		final LinkModel linkModel = new LinkModel();
+		linkModel.setFrom(new LinkEnd(this.linkCreationState.classId(), this.linkCreationState.fieldId()));
+		linkModel.setTo(new LinkEnd(target.classId(), target.fieldId()));
+		this.applyDefaultPaletteToLink(linkModel);
+
+		if (this.panelType == PanelType.CONCEPTUAL) {
+			linkModel.setCardinalityFrom(Cardinality.ONE);
+			linkModel.setCardinalityTo(Cardinality.ZERO_OR_MANY);
+			this.document.getModel().getConceptualLinks().add(linkModel);
+		} else {
+			linkModel.setCardinalityFrom(null);
+			linkModel.setCardinalityTo(null);
+			this.document.getModel().getTechnicalLinks().add(linkModel);
+		}
+
+		this.findOrCreateLinkLayout(linkModel.getId());
+		this.select(SelectedElement.forLink(linkModel.getId()));
 	}
 
-	private boolean hasOutgoingTechnicalLink(final String classId, final String fieldId) {
-		for (final LinkModel linkModel : this.document.getModel().getTechnicalLinks()) {
-			if (linkModel.getFrom() == null || linkModel.getTo() == null) {
-				continue;
+	private SelectedElement normalizeLinkEndpointSelection(final SelectedElement selection) {
+		if (selection == null) {
+			return null;
+		}
+
+		if (this.panelType == PanelType.CONCEPTUAL) {
+			return switch (selection.type()) {
+			case CLASS -> SelectedElement.forClass(selection.classId());
+			case FIELD -> SelectedElement.forClass(selection.classId());
+			default -> null;
+			};
+		}
+
+		return selection.type() == SelectedType.FIELD ? selection : null;
+	}
+
+	private boolean isValidPreviewTarget(final SelectedElement target) {
+		if (target == null || this.linkCreationState == null) {
+			return false;
+		}
+
+		if (this.panelType == PanelType.CONCEPTUAL) {
+			return target.type() == SelectedType.CLASS
+					&& !Objects.equals(target.classId(), this.linkCreationState.classId());
+		}
+
+		if (target.type() != SelectedType.FIELD) {
+			return false;
+		}
+
+		if (Objects.equals(target.classId(), this.linkCreationState.classId())
+				&& Objects.equals(target.fieldId(), this.linkCreationState.fieldId())) {
+			return false;
+		}
+
+		final FieldModel targetField = this.findFieldById(target.classId(), target.fieldId());
+		if (targetField == null || !targetField.isPrimaryKey()) {
+			return false;
+		}
+
+		return !this.hasOutgoingTechnicalLink(this.linkCreationState.classId(), this.linkCreationState.fieldId());
+	}
+
+	private Point2D resolvePreviewSourceAnchor(final Graphics2D g2) {
+		if (this.linkCreationState == null) {
+			return null;
+		}
+
+		if (this.panelType == PanelType.CONCEPTUAL) {
+			final Point2D reference = this.linkPreviewTarget != null
+					? this.resolvePreviewTargetAnchor(g2, this.linkPreviewTarget)
+					: this.linkPreviewMousePoint;
+			return this.resolveConceptualPreviewAnchor(g2, this.linkCreationState.classId(), reference);
+		}
+
+		final Point2D reference = this.linkPreviewTarget != null
+				? this.resolvePreviewTargetAnchor(g2, this.linkPreviewTarget)
+				: this.linkPreviewMousePoint;
+
+		final String oppositeClassId = this.linkPreviewTarget == null ? null : this.linkPreviewTarget.classId();
+		final String oppositeFieldId = this.linkPreviewTarget == null ? null : this.linkPreviewTarget.fieldId();
+
+		if (oppositeClassId != null) {
+			return this.resolveTechnicalFieldAnchor(g2, this.linkCreationState.classId(),
+					this.linkCreationState.fieldId(), oppositeClassId, oppositeFieldId);
+		}
+
+		return this.resolveTechnicalFieldAnchor(g2, this.linkCreationState.classId(), this.linkCreationState.fieldId(),
+				reference);
+	}
+
+	private Point2D resolvePreviewTargetAnchor(final Graphics2D g2, final SelectedElement target) {
+		if (target == null) {
+			return null;
+		}
+
+		if (this.panelType == PanelType.CONCEPTUAL) {
+			final Point2D reference = this.resolvePreviewSourceAnchorReference(g2);
+			return this.resolveConceptualPreviewAnchor(g2, target.classId(), reference);
+		}
+
+		return this.resolveTechnicalFieldAnchor(g2, target.classId(), target.fieldId(),
+				this.linkCreationState.classId(), this.linkCreationState.fieldId());
+	}
+
+	private Point2D resolvePreviewSourceAnchorReference(final Graphics2D g2) {
+		if (this.linkCreationState == null) {
+			return this.linkPreviewMousePoint;
+		}
+
+		if (this.panelType == PanelType.CONCEPTUAL) {
+			final ClassModel classModel = this.findClassById(this.linkCreationState.classId());
+			if (classModel == null || !this.isVisible(classModel)) {
+				return this.linkPreviewMousePoint;
 			}
 
-			if (linkModel.getFrom().getFieldId() == null || linkModel.getTo().getFieldId() == null) {
-				continue;
-			}
+			final NodeLayout layout = this.findOrCreateNodeLayout(LayoutObjectType.CLASS, classModel.getId());
+			final Rectangle2D bounds = this.computeClassBounds(g2, classModel, layout);
+			return new Point2D.Double(bounds.getCenterX(), bounds.getCenterY());
+		}
 
-			if (Objects.equals(linkModel.getFrom().getClassId(), classId)
-					&& Objects.equals(linkModel.getFrom().getFieldId(), fieldId)) {
-				return true;
+		return this.resolveOppositeReferencePoint(g2, this.linkCreationState.classId(),
+				this.linkCreationState.fieldId());
+	}
+
+	private Point2D resolveConceptualPreviewAnchor(final Graphics2D g2, final String classId, final Point2D reference) {
+		final ClassModel classModel = this.findClassById(classId);
+		if (classModel == null || !this.isVisible(classModel)) {
+			return null;
+		}
+
+		final NodeLayout layout = this.findOrCreateNodeLayout(LayoutObjectType.CLASS, classId);
+		final Rectangle2D bounds = this.computeClassBounds(g2, classModel, layout);
+
+		final Point2D effectiveReference = reference == null
+				? new Point2D.Double(bounds.getCenterX(), bounds.getCenterY())
+				: reference;
+
+		final List<Point2D> candidates = Arrays.asList(new Point2D.Double(bounds.getCenterX(), bounds.getY()),
+				new Point2D.Double(bounds.getCenterX(), bounds.getMaxY()),
+				new Point2D.Double(bounds.getX(), bounds.getCenterY()),
+				new Point2D.Double(bounds.getMaxX(), bounds.getCenterY()));
+
+		Point2D best = null;
+		double bestDistance = Double.POSITIVE_INFINITY;
+
+		for (final Point2D candidate : candidates) {
+			final double distance = candidate.distance(effectiveReference);
+			if (distance < bestDistance) {
+				bestDistance = distance;
+				best = candidate;
 			}
 		}
-		return false;
+
+		return best;
 	}
 
 	private HitResult findTopmostHit(final Point2D.Double worldPoint) {
@@ -1397,6 +1669,16 @@ public class DiagramCanvas extends JPanel {
 		g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 
 		try {
+			for (int i = this.getActiveLinks().size() - 1; i >= 0; i--) {
+				final LinkModel linkModel = this.getActiveLinks().get(i);
+				final LinkGeometry geometry = this.resolveLinkGeometry(g2, linkModel);
+
+				if (geometry != null && this.isPointNearGeometry(worldPoint, geometry)) {
+					return new HitResult(null, new Rectangle2D.Double(worldPoint.getX(), worldPoint.getY(), 1, 1),
+							SelectedElement.forLink(linkModel.getId()));
+				}
+			}
+
 			for (int i = this.document.getModel().getComments().size() - 1; i >= 0; i--) {
 				final CommentModel commentModel = this.document.getModel().getComments().get(i);
 				final String text = this.resolveCommentText(commentModel);
@@ -1434,21 +1716,29 @@ public class DiagramCanvas extends JPanel {
 
 				return new HitResult(layout, bounds, SelectedElement.forClass(classModel.getId()));
 			}
-
-			for (int i = this.getActiveLinks().size() - 1; i >= 0; i--) {
-				final LinkModel linkModel = this.getActiveLinks().get(i);
-				final LinkGeometry geometry = this.resolveLinkGeometry(g2, linkModel);
-
-				if (geometry != null && this.isPointNearGeometry(worldPoint, geometry)) {
-					return new HitResult(null, new Rectangle2D.Double(worldPoint.getX(), worldPoint.getY(), 1, 1),
-							SelectedElement.forLink(linkModel.getId()));
-				}
-			}
 		} finally {
 			g2.dispose();
 		}
 
 		return null;
+	}
+
+	private boolean hasOutgoingTechnicalLink(final String classId, final String fieldId) {
+		for (final LinkModel linkModel : this.document.getModel().getTechnicalLinks()) {
+			if (linkModel.getFrom() == null || linkModel.getTo() == null) {
+				continue;
+			}
+
+			if (linkModel.getFrom().getFieldId() == null || linkModel.getTo().getFieldId() == null) {
+				continue;
+			}
+
+			if (Objects.equals(linkModel.getFrom().getClassId(), classId)
+					&& Objects.equals(linkModel.getFrom().getFieldId(), fieldId)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	private FieldHitResult findFieldHit(final ClassModel classModel, final Rectangle2D classBounds,
@@ -1517,8 +1807,6 @@ public class DiagramCanvas extends JPanel {
 		final List<String> wrappedLines = this.wrapText(text, metrics,
 				(int) Math.max(40, width - DiagramCanvas.PADDING * 2));
 		final int contentHeight = wrappedLines.size() * (metrics.getHeight() + 2) + DiagramCanvas.PADDING * 2;
-		final double height = layout.getSize().getHeight() > 0.0 ? layout.getSize().getHeight()
-				: Math.max(DiagramCanvas.COMMENT_MIN_HEIGHT, contentHeight);
 
 		if (layout.getSize().getWidth() <= 0.0) {
 			layout.getSize().setWidth(Math.max(DiagramCanvas.COMMENT_MIN_WIDTH, width));
@@ -1677,24 +1965,20 @@ public class DiagramCanvas extends JPanel {
 	}
 
 	private String resolveCommentText(final CommentModel commentModel) {
-		if (commentModel.getKind() == CommentKind.STANDALONE) {
-			return commentModel.getText();
-		}
-
-		if (commentModel.getBinding() == null) {
-			return "";
-		}
-
-		if (commentModel.getBinding().getTargetType() == BoundTargetType.CLASS) {
-			final ClassModel classModel = this.findClassById(commentModel.getBinding().getTargetId());
-			return classModel == null ? "" : classModel.getComment();
-		}
-
-		final LinkModel linkModel = this.findLinkById(commentModel.getBinding().getTargetId());
-		return linkModel == null ? "" : linkModel.getComment();
+		return commentModel == null ? "" : (commentModel.getText() == null ? "" : commentModel.getText());
 	}
 
 	private boolean isCommentVisible(final CommentModel commentModel) {
+		final boolean visibleInPanel = switch (this.panelType) {
+		case CONCEPTUAL -> commentModel.isVisibleInConceptual();
+		case LOGICAL -> commentModel.isVisibleInLogical();
+		case PHYSICAL -> commentModel.isVisibleInPhysical();
+		};
+
+		if (!visibleInPanel) {
+			return false;
+		}
+
 		if (commentModel.getKind() == CommentKind.STANDALONE) {
 			return true;
 		}
@@ -2295,63 +2579,84 @@ public class DiagramCanvas extends JPanel {
 		return bestSide;
 	}
 
-	private Point2D resolveFieldAnchor(final Graphics2D g2, final String classId, final String fieldId,
-			final boolean fromSide) {
-		final ClassModel classModel = this.findClassById(classId);
-		if (classModel == null || !this.isVisible(classModel)) {
-			return null;
-		}
-
-		final NodeLayout layout = this.findOrCreateNodeLayout(LayoutObjectType.CLASS, classId);
-		final Rectangle2D bounds = this.computeClassBounds(g2, classModel, layout);
-		final double x = fromSide ? bounds.getMaxX() : bounds.getX();
-
-		if (fieldId == null) {
-			return new Point2D.Double(x, bounds.getCenterY());
-		}
-
-		final List<FieldModel> visibleFields = this.getVisibleFields(classModel);
-		for (int i = 0; i < visibleFields.size(); i++) {
-			if (visibleFields.get(i).getId().equals(fieldId)) {
-				final double y = bounds.getY() + DiagramCanvas.HEADER_HEIGHT + i * DiagramCanvas.ROW_HEIGHT
-						+ DiagramCanvas.ROW_HEIGHT / 2.0;
-				return new Point2D.Double(x, y);
-			}
-		}
-
-		return new Point2D.Double(x, bounds.getCenterY());
-	}
-
 	private boolean isClassSelected(final String classId) {
-		return this.selectedElement != null && this.selectedElement.type() == SelectedType.CLASS
-				&& classId.equals(this.selectedElement.classId());
+		return this.selectedElements.contains(SelectedElement.forClass(classId));
 	}
 
 	private boolean isFieldSelected(final String classId, final String fieldId) {
-		return this.selectedElement != null && this.selectedElement.type() == SelectedType.FIELD
-				&& classId.equals(this.selectedElement.classId()) && fieldId.equals(this.selectedElement.fieldId());
+		return this.selectedElements.contains(SelectedElement.forField(classId, fieldId));
 	}
 
 	private boolean isCommentSelected(final String commentId) {
-		return this.selectedElement != null && this.selectedElement.type() == SelectedType.COMMENT
-				&& commentId.equals(this.selectedElement.commentId());
+		return this.selectedElements.contains(SelectedElement.forComment(commentId));
 	}
 
 	private boolean isLinkSelected(final String linkId) {
-		return this.selectedElement != null && this.selectedElement.type() == SelectedType.LINK
-				&& linkId.equals(this.selectedElement.linkId());
+		return this.selectedElements.contains(SelectedElement.forLink(linkId));
 	}
 
 	private void select(final SelectedElement element) {
+		this.selectedElements.clear();
+		if (element != null) {
+			this.selectedElements.add(element);
+		}
 		this.selectedElement = element;
 		this.notifySelectionChanged();
 		this.repaint();
 	}
 
+	private void addToSelection(final SelectedElement element) {
+		if (element == null) {
+			return;
+		}
+
+		this.selectedElements.add(element);
+		this.selectedElement = element;
+		this.notifySelectionChanged();
+		this.repaint();
+	}
+
+	private void removeFromSelection(final SelectedElement element) {
+		if (element == null) {
+			return;
+		}
+
+		this.selectedElements.remove(element);
+
+		if (Objects.equals(this.selectedElement, element)) {
+			this.selectedElement = this.selectedElements.isEmpty() ? null : this.selectedElements.getLast();
+		}
+
+		this.notifySelectionChanged();
+		this.repaint();
+	}
+
 	private void clearSelection() {
+		this.selectedElements.clear();
 		this.selectedElement = null;
 		this.notifySelectionChanged();
 		this.repaint();
+	}
+
+	private void updateSelectionFromMouse(final SelectedElement element, final MouseEvent event) {
+		if (element == null) {
+			if (!event.isShiftDown() && !event.isControlDown()) {
+				this.clearSelection();
+			}
+			return;
+		}
+
+		if (event.isShiftDown()) {
+			this.addToSelection(element);
+			return;
+		}
+
+		if (event.isControlDown()) {
+			this.removeFromSelection(element);
+			return;
+		}
+
+		this.select(element);
 	}
 
 	private void notifySelectionChanged() {
@@ -2460,44 +2765,44 @@ public class DiagramCanvas extends JPanel {
 	}
 
 	public void applyPalette(final StylePalette palette) {
-		if (palette == null || this.selectedElement == null) {
+		if (palette == null || this.selectedElements.isEmpty()) {
 			return;
 		}
 
-		switch (this.selectedElement.type()) {
-		case CLASS -> {
-			final ClassModel classModel = this.findClassById(this.selectedElement.classId());
-			if (classModel != null) {
-				classModel.getStyle().setTextColor(palette.getClassTextColor());
-				classModel.getStyle().setBackgroundColor(palette.getClassBackgroundColor());
-				classModel.getStyle().setBorderColor(palette.getClassBorderColor());
+		for (final SelectedElement element : this.selectedElements) {
+			switch (element.type()) {
+			case CLASS -> {
+				final ClassModel classModel = this.findClassById(element.classId());
+				if (classModel != null) {
+					classModel.getStyle().setTextColor(palette.getClassTextColor());
+					classModel.getStyle().setBackgroundColor(palette.getClassBackgroundColor());
+					classModel.getStyle().setBorderColor(palette.getClassBorderColor());
+				}
 			}
-		}
-		case FIELD -> {
-			final FieldModel fieldModel = this.findFieldById(this.selectedElement.classId(),
-					this.selectedElement.fieldId());
-			if (fieldModel != null) {
-				fieldModel.getStyle().setTextColor(palette.getFieldTextColor());
-				fieldModel.getStyle().setBackgroundColor(palette.getFieldBackgroundColor());
+			case FIELD -> {
+				final FieldModel fieldModel = this.findFieldById(element.classId(), element.fieldId());
+				if (fieldModel != null) {
+					fieldModel.getStyle().setTextColor(palette.getFieldTextColor());
+					fieldModel.getStyle().setBackgroundColor(palette.getFieldBackgroundColor());
+				}
 			}
-		}
-		case COMMENT -> {
-			final CommentModel commentModel = this.findCommentById(this.selectedElement.commentId());
-			if (commentModel != null) {
-				commentModel.setTextColor(palette.getCommentTextColor());
-				commentModel.setBackgroundColor(palette.getCommentBackgroundColor());
-				commentModel.setBorderColor(palette.getCommentBorderColor());
+			case COMMENT -> {
+				final CommentModel commentModel = this.findCommentById(element.commentId());
+				if (commentModel != null) {
+					commentModel.setTextColor(palette.getCommentTextColor());
+					commentModel.setBackgroundColor(palette.getCommentBackgroundColor());
+					commentModel.setBorderColor(palette.getCommentBorderColor());
+				}
 			}
-		}
-		case LINK -> {
-			final LinkModel linkModel = this.findLinkById(this.selectedElement.linkId());
-			if (linkModel != null) {
-				linkModel.setLineColor(palette.getLinkColor());
+			case LINK -> {
+				final LinkModel linkModel = this.findLinkById(element.linkId());
+				if (linkModel != null) {
+					linkModel.setLineColor(palette.getLinkColor());
+				}
 			}
-		}
-		default -> {
-			return;
-		}
+			default -> {
+			}
+			}
 		}
 
 		this.repaint();
@@ -2544,7 +2849,11 @@ public class DiagramCanvas extends JPanel {
 		linkModel.setLineColor(this.defaultPalette.getLinkColor());
 	}
 
-	private record DraggedNode(NodeLayout layout, double offsetX, double offsetY) {
+	private record DraggedLayout(NodeLayout layout, double startX, double startY) {
+	}
+
+	private record DraggedSelection(List<DraggedLayout> layouts, double offsetX, double offsetY, double anchorStartX,
+			double anchorStartY) {
 	}
 
 	private record HitResult(NodeLayout layout, Rectangle2D bounds, SelectedElement selection) {
@@ -2597,6 +2906,22 @@ public class DiagramCanvas extends JPanel {
 		private static SelectedElement forLink(final String linkId) {
 			return new SelectedElement(SelectedType.LINK, null, null, null, linkId);
 		}
+
+		public String getActualId() {
+			return switch (type) {
+			case CLASS -> classId;
+			case FIELD -> fieldId;
+			case COMMENT -> commentId;
+			case LINK -> linkId;
+			default -> throw new IllegalArgumentException("Unexpected value: " + type);
+			};
+		}
+
+		@Override
+		public final int hashCode() {
+			return Objects.hash(type, getActualId());
+		}
+
 	}
 
 }

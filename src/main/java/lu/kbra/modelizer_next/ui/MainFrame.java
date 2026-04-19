@@ -352,7 +352,7 @@ public class MainFrame extends JFrame {
 
 			final MainFrame frame = new MainFrame(this.document);
 			frame.currentFile = this.currentFile;
-			frame.setTitle(App.title(this.document.getMeta().getName()));
+			frame.setTitle(App.title(this.document.getSource()));
 			frame.setVisible(true);
 		});
 	}
@@ -378,6 +378,7 @@ public class MainFrame extends JFrame {
 
 	private void newDocument() {
 		final ModelDocument newDocument = new ModelDocument();
+		newDocument.setSource("New document");
 		this.openInNewFrame(newDocument, null);
 	}
 
@@ -390,6 +391,7 @@ public class MainFrame extends JFrame {
 		final File selectedFile = chooser.getSelectedFile();
 		try {
 			final ModelDocument loadedDocument = MNMain.OBJECT_MAPPER.readValue(selectedFile, ModelDocument.class);
+			loadedDocument.setSource(selectedFile.getPath());
 			final String fileVersion = loadedDocument.getMeta() == null ? null
 					: loadedDocument.getMeta().getApplicationVersion();
 
@@ -441,10 +443,11 @@ public class MainFrame extends JFrame {
 		try {
 			this.document.getMeta().setUpdatedAt(Instant.now());
 			this.document.getMeta().setApplicationVersion(App.VERSION);
+			this.document.setSource(file.getPath());
 
 			MNMain.OBJECT_MAPPER.writeValue(file, this.document);
 			this.currentFile = file;
-			this.setTitle(App.title(this.document.getMeta().getName()));
+			this.setTitle(App.title(this.document.getSource()));
 		} catch (final IOException ex) {
 			JOptionPane.showMessageDialog(this, "Failed to save file:\n" + ex.getMessage(), "Save error",
 					JOptionPane.ERROR_MESSAGE);
@@ -460,7 +463,7 @@ public class MainFrame extends JFrame {
 	private void openInNewFrame(final ModelDocument modelDocument, final File file) {
 		final MainFrame frame = new MainFrame(modelDocument);
 		frame.currentFile = file;
-		frame.setTitle(App.title(modelDocument.getMeta().getName()));
+		frame.setTitle(App.title(modelDocument.getSource()));
 		frame.setVisible(true);
 		this.dispose();
 	}
