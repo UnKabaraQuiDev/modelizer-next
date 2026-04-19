@@ -14,7 +14,7 @@ import java.awt.geom.AffineTransform;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
-public class ZoomPanPanel extends JPanel {
+public abstract class ZoomPanPanel extends JPanel {
 
 	protected double scale = 1.0;
 	protected double translateX = 0;
@@ -45,9 +45,12 @@ public class ZoomPanPanel extends JPanel {
 		drawGrid(g2);
 
 		paintChildren(g);
+//		paintOverlay(g);
 
 		g2.setTransform(old);
 	}
+
+//	protected abstract void paintOverlay(Graphics g);
 
 	private void drawGrid(Graphics2D g2) {
 		int gridSize = 50;
@@ -71,7 +74,8 @@ public class ZoomPanPanel extends JPanel {
 	@Override
 	public Dimension getPreferredSize() {
 		final Dimension d = super.getPreferredSize();
-		return new Dimension((int) (d.width * scale + Math.abs(translateX)), (int) (d.height * scale + Math.abs(translateY)));
+		return new Dimension((int) (d.width * scale + Math.abs(translateX)),
+				(int) (d.height * scale + Math.abs(translateY)));
 	}
 
 	private class ZoomPanDragListener extends MouseAdapter {

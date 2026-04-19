@@ -23,14 +23,13 @@ import javax.swing.KeyStroke;
 
 public class ConceptualClassPanel extends JPanel implements UMLClassChild {
 
-	public class RenameClassListener extends AbstractAction {
+	private class RenameClassListener extends AbstractAction {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			final String value = JOptionPane.showInputDialog(ConceptualClassPanel.this, "Enter name:",
 					model.get().getConceptualName());
-			if (value != null) {
-				System.out.println("User entered: " + value);
+			if (value != null && !value.trim().isEmpty()) {
 				model.get().setConceptualName(value);
 				updateModel();
 				forceRedraw();
@@ -61,7 +60,6 @@ public class ConceptualClassPanel extends JPanel implements UMLClassChild {
 			final ConceptualFieldLabel f = field.asConceptualLabel();
 			fieldLabels.add(f);
 			add(f);
-//			updateModel();
 			pack();
 			forceRedraw();
 		}
@@ -136,6 +134,11 @@ public class ConceptualClassPanel extends JPanel implements UMLClassChild {
 		pack();
 
 //		getParent().repaint();
+	}
+
+	@Override
+	public ConceptualPanel getParent() {
+		return (ConceptualPanel) super.getParent();
 	}
 
 	public void pack() {

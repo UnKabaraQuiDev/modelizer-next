@@ -12,7 +12,7 @@ import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.border.Border;
 
-public class UMLClassContainerPanel extends ZoomPanPanel {
+public abstract class UMLClassContainerPanel extends ZoomPanPanel {
 
 	public static final Border NORMAL_CLASS_BORDER = BorderFactory.createCompoundBorder(
 			BorderFactory.createLineBorder(Color.GRAY, 1), BorderFactory.createEmptyBorder(3, 3, 3, 3));

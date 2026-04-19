@@ -1,5 +1,6 @@
 package lu.kbra.modelizer_next;
 
+import java.awt.Graphics;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
@@ -10,6 +11,7 @@ public class ConceptualPanel extends UMLClassContainerPanel {
 	protected WeakReference<UMLFile> file;
 
 	protected List<ConceptualClassPanel> classes = new ArrayList<>();
+	protected List<ConceptualClassLink> links = new ArrayList<>();
 
 	public ConceptualPanel(UMLFile file) {
 		this.file = new WeakReference<>(file);
@@ -32,6 +34,25 @@ public class ConceptualPanel extends UMLClassContainerPanel {
 			final UMLClass c = obj.classes.get(i);
 			if (i < classes.size()) {
 				final ConceptualClassPanel panel = classes.get(i);
+				if (panel.getModel() != c) {
+					panel.setModel(c);
+					panel.updateModel();
+				}
+			} else {
+				final ConceptualClassPanel nPanel = c.asConceptualPanel();
+				classes.add(nPanel);
+				this.add(nPanel);
+			}
+		}
+
+		while (classes.size() > obj.classes.size()) {
+			this.remove(classes.remove(classes.size() - 1));
+		}
+		
+		for (int i = 0; i < obj.logicalLinks.size(); i++) {
+			final UMLLogicalLink c = obj.logicalLinks.get(i);
+			if (i < classes.size()) {
+				final UMLConceptualLink panel = classes.get(i);
 				if (panel.getModel() != c) {
 					panel.setModel(c);
 					panel.updateModel();
