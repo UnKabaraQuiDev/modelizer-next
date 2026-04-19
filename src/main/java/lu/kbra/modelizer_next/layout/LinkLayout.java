@@ -1,15 +1,14 @@
 package lu.kbra.modelizer_next.layout;
 
+import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
-
-import lu.kbra.modelizer_next.common.Point2;
 
 public class LinkLayout {
 
 	private String linkId;
-	private List<Point2> bendPoints;
-	private Point2 nameLabelPosition;
+	private List<Point2D.Double> bendPoints;
+	private Point2D.Double nameLabelPosition;
 
 	public LinkLayout() {
 		this.linkId = "";
@@ -25,19 +24,19 @@ public class LinkLayout {
 		this.linkId = linkId;
 	}
 
-	public List<Point2> getBendPoints() {
+	public List<Point2D.Double> getBendPoints() {
 		return this.bendPoints;
 	}
 
-	public void setBendPoints(final List<Point2> bendPoints) {
+	public void setBendPoints(final List<Point2D.Double> bendPoints) {
 		this.bendPoints = bendPoints;
 	}
 
-	public Point2 getNameLabelPosition() {
+	public Point2D.Double getNameLabelPosition() {
 		return this.nameLabelPosition;
 	}
 
-	public void setNameLabelPosition(final Point2 nameLabelPosition) {
+	public void setNameLabelPosition(final Point2D.Double nameLabelPosition) {
 		this.nameLabelPosition = nameLabelPosition;
 	}
 

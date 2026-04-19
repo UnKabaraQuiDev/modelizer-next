@@ -6,12 +6,14 @@ import java.util.List;
 public class DiagramModel {
 
 	private List<ClassModel> classes;
-	private List<LinkModel> links;
+	private final List<LinkModel> conceptualLinks;
+	private final List<LinkModel> technicalLinks;
 	private List<CommentModel> comments;
 
 	public DiagramModel() {
 		this.classes = new ArrayList<>();
-		this.links = new ArrayList<>();
+		this.conceptualLinks = new ArrayList<>();
+		this.technicalLinks = new ArrayList<>();
 		this.comments = new ArrayList<>();
 	}
 
@@ -23,12 +25,12 @@ public class DiagramModel {
 		this.classes = classes;
 	}
 
-	public List<LinkModel> getLinks() {
-		return this.links;
+	public List<LinkModel> getConceptualLinks() {
+		return conceptualLinks;
 	}
 
-	public void setLinks(final List<LinkModel> links) {
-		this.links = links;
+	public List<LinkModel> getTechnicalLinks() {
+		return technicalLinks;
 	}
 
 	public List<CommentModel> getComments() {
@@ -41,8 +43,8 @@ public class DiagramModel {
 
 	@Override
 	public String toString() {
-		return "DiagramModel@" + System.identityHashCode(this) + " [classes=" + classes + ", links=" + links
-				+ ", comments=" + comments + "]";
+		return "DiagramModel@" + System.identityHashCode(this) + " [classes=" + classes + ", conceptualLinks="
+				+ conceptualLinks + ", technicalLinks=" + technicalLinks + ", comments=" + comments + "]";
 	}
 
 }

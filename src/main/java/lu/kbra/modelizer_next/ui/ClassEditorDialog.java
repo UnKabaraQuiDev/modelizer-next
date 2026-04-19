@@ -6,7 +6,10 @@ import java.awt.Component;
 import java.awt.Dialog;
 import java.awt.GridLayout;
 import java.awt.Window;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 
+import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -16,10 +19,10 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 
 import lu.kbra.modelizer_next.domain.ClassModel;
-import lu.kbra.modelizer_next.ui.ClassEditorDialog.Result;
 
 public final class ClassEditorDialog {
 
@@ -75,6 +78,14 @@ public final class ClassEditorDialog {
 		dialog.add(form, BorderLayout.CENTER);
 		dialog.add(buttons, BorderLayout.SOUTH);
 		dialog.getRootPane().setDefaultButton(saveButton);
+		dialog.getRootPane().getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "cancel");
+		dialog.getRootPane().getActionMap().put("cancel", new AbstractAction() {
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				dialog.dispose();
+			}
+		});
+		dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 		dialog.pack();
 		dialog.setLocationRelativeTo(parent);
 		dialog.setVisible(true);

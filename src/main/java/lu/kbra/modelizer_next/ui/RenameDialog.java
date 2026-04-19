@@ -10,6 +10,7 @@ import java.awt.event.KeyEvent;
 
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -25,6 +26,7 @@ public final class RenameDialog {
 		final Window owner = parent == null ? null : SwingUtilities.getWindowAncestor(parent);
 		final JDialog dialog = owner instanceof Frame frame ? new JDialog(frame, title, true)
 				: new JDialog((Frame) null, title, true);
+		dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 
 		final JTextField textField = new JTextField(initialValue == null ? "" : initialValue, 30);
 		final ResultHolder resultHolder = new ResultHolder();
@@ -49,13 +51,22 @@ public final class RenameDialog {
 		buttonPanel.add(cancelButton);
 
 		dialog.getRootPane().setDefaultButton(okButton);
-		dialog.getRootPane().getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "cancel");
-		dialog.getRootPane().getActionMap().put("cancel", new AbstractAction() {
+
+		final AbstractAction cancelAction = new AbstractAction() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
 				cancelButton.doClick();
 			}
-		});
+		};
+
+		dialog.getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
+				.put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "cancel");
+		dialog.getRootPane().getActionMap().put("cancel", cancelAction);
+
+		textField.getInputMap(JComponent.WHEN_FOCUSED).put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "cancel");
+		textField.getActionMap().put("cancel", cancelAction);
+
+		dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 
 		dialog.setLayout(new BorderLayout(8, 8));
 		dialog.add(textField, BorderLayout.CENTER);

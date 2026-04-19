@@ -17,8 +17,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 
-import lu.kbra.modelizer_next.ui.CommentEditorDialog.Result;
-
 public final class CommentEditorDialog {
 
 	private CommentEditorDialog() {

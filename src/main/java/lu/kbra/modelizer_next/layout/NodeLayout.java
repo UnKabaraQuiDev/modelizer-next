@@ -1,19 +1,20 @@
 package lu.kbra.modelizer_next.layout;
 
-import lu.kbra.modelizer_next.common.Point2;
+import java.awt.geom.Point2D;
+
 import lu.kbra.modelizer_next.common.Size2;
 
 public class NodeLayout {
 
 	private LayoutObjectType objectType;
 	private String objectId;
-	private Point2 position;
+	private Point2D.Double position;
 	private Size2 size;
 
 	public NodeLayout() {
 		this.objectType = LayoutObjectType.CLASS;
 		this.objectId = "";
-		this.position = new Point2();
+		this.position = new Point2D.Double();
 		this.size = new Size2();
 	}
 
@@ -33,11 +34,11 @@ public class NodeLayout {
 		this.objectId = objectId;
 	}
 
-	public Point2 getPosition() {
+	public Point2D.Double getPosition() {
 		return this.position;
 	}
 
-	public void setPosition(final Point2 position) {
+	public void setPosition(final Point2D.Double position) {
 		this.position = position;
 	}
 

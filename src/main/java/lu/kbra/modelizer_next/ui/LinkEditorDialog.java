@@ -6,8 +6,11 @@ import java.awt.Component;
 import java.awt.Dialog;
 import java.awt.GridLayout;
 import java.awt.Window;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 import java.util.List;
 
+import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JButton;
@@ -16,6 +19,7 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 
 import lu.kbra.modelizer_next.document.ModelDocument;
@@ -71,17 +75,28 @@ public final class LinkEditorDialog {
 					fromFieldBox.addItem(field);
 				}
 			}
+
 			if (toClass != null) {
 				for (final FieldModel field : toClass.getFields()) {
-					toFieldBox.addItem(field);
+					if (panelType == PanelType.CONCEPTUAL || field.isPrimaryKey()) {
+						toFieldBox.addItem(field);
+					}
 				}
 			}
 
 			if (fromClass != null) {
 				fromFieldBox.setSelectedItem(findField(fromClass, linkModel.getFrom().getFieldId()));
 			}
+
 			if (toClass != null) {
-				toFieldBox.setSelectedItem(findField(toClass, linkModel.getTo().getFieldId()));
+				final FieldModel currentTargetField = findField(toClass, linkModel.getTo().getFieldId());
+				if (panelType == PanelType.CONCEPTUAL) {
+					toFieldBox.setSelectedItem(currentTargetField);
+				} else if (currentTargetField != null && currentTargetField.isPrimaryKey()) {
+					toFieldBox.setSelectedItem(currentTargetField);
+				} else if (toFieldBox.getItemCount() > 0) {
+					toFieldBox.setSelectedIndex(0);
+				}
 			}
 		};
 
@@ -99,16 +114,16 @@ public final class LinkEditorDialog {
 
 		if (panelType == PanelType.CONCEPTUAL) {
 			leftPanel.setBorder(BorderFactory.createTitledBorder("Table 1"));
-			rightPanel.setBorder(BorderFactory.createTitledBorder("Table 2"));
 			leftPanel.add(labeled("Cardinality", fromCardinalityBox));
 			leftPanel.add(labeled("Table", fromClassBox));
+			rightPanel.setBorder(BorderFactory.createTitledBorder("Table 2"));
 			rightPanel.add(labeled("Cardinality", toCardinalityBox));
 			rightPanel.add(labeled("Table", toClassBox));
 		} else {
-			leftPanel.setBorder(BorderFactory.createTitledBorder("Table 1"));
-			rightPanel.setBorder(BorderFactory.createTitledBorder("Table 2"));
+			leftPanel.setBorder(BorderFactory.createTitledBorder("From"));
 			leftPanel.add(labeled("Table", fromClassBox));
 			leftPanel.add(labeled("Field", fromFieldBox));
+			rightPanel.setBorder(BorderFactory.createTitledBorder("To"));
 			rightPanel.add(labeled("Table", toClassBox));
 			rightPanel.add(labeled("Field", toFieldBox));
 		}
@@ -134,6 +149,19 @@ public final class LinkEditorDialog {
 			final FieldModel fromField = (FieldModel) fromFieldBox.getSelectedItem();
 			final FieldModel toField = (FieldModel) toFieldBox.getSelectedItem();
 
+			if (panelType != PanelType.CONCEPTUAL) {
+				final FieldModel selectedToField = (FieldModel) toFieldBox.getSelectedItem();
+				final FieldModel selectedFromField = (FieldModel) fromFieldBox.getSelectedItem();
+
+				if (selectedToField == null || !selectedToField.isPrimaryKey()) {
+					return;
+				}
+
+				if (selectedFromField == null) {
+					return;
+				}
+			}
+
 			holder.result = new Result(nameField.getText(), commentField.getText(), colorButton.getSelectedColor(),
 					fromClass == null ? null : fromClass.getId(), toClass == null ? null : toClass.getId(),
 					panelType == PanelType.CONCEPTUAL ? null : fromField == null ? null : fromField.getId(),
@@ -151,6 +179,14 @@ public final class LinkEditorDialog {
 		dialog.add(content, BorderLayout.CENTER);
 		dialog.add(buttonPanel, BorderLayout.SOUTH);
 		dialog.getRootPane().setDefaultButton(saveButton);
+		dialog.getRootPane().getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "cancel");
+		dialog.getRootPane().getActionMap().put("cancel", new AbstractAction() {
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				dialog.dispose();
+			}
+		});
+		dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 		dialog.pack();
 		dialog.setLocationRelativeTo(parent);
 		dialog.setVisible(true);

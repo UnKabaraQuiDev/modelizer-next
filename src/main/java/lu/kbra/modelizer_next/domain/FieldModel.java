@@ -9,6 +9,9 @@ public class FieldModel {
 	private boolean notConceptual;
 	private String comment;
 	private FieldStyle style;
+	private boolean primaryKey;
+	private boolean unique;
+	private boolean notNull;
 
 	public FieldModel() {
 		this.id = UUID.randomUUID().toString();
@@ -16,6 +19,9 @@ public class FieldModel {
 		this.notConceptual = false;
 		this.comment = "";
 		this.style = new FieldStyle();
+		this.primaryKey = false;
+		this.unique = false;
+		this.notNull = false;
 	}
 
 	public String getId() {
@@ -56,6 +62,30 @@ public class FieldModel {
 
 	public void setStyle(final FieldStyle style) {
 		this.style = style;
+	}
+
+	public boolean isPrimaryKey() {
+		return this.primaryKey;
+	}
+
+	public void setPrimaryKey(final boolean primaryKey) {
+		this.primaryKey = primaryKey;
+	}
+
+	public boolean isUnique() {
+		return this.unique;
+	}
+
+	public void setUnique(final boolean unique) {
+		this.unique = unique;
+	}
+
+	public boolean isNotNull() {
+		return this.notNull;
+	}
+
+	public void setNotNull(final boolean notNull) {
+		this.notNull = notNull;
 	}
 
 	@Override

@@ -1,6 +1,7 @@
 package lu.kbra.modelizer_next.ui;
 
-import lu.kbra.modelizer_next.common.Point2;
+import java.awt.geom.Point2D;
+
 import lu.kbra.modelizer_next.common.Size2;
 import lu.kbra.modelizer_next.document.ModelDocument;
 import lu.kbra.modelizer_next.domain.BoundTargetType;
@@ -30,17 +31,17 @@ public final class SampleDocumentFactory {
 		customer.getNames().setConceptualName("Customer");
 		customer.getNames().setTechnicalName("T_CUSTOMER");
 		customer.setComment("Stores the master customer record.");
-		customer.getFields().add(field("Customer ID", "CUSTOMER_ID", false));
-		customer.getFields().add(field("Display name", "DISPLAY_NAME", false));
-		customer.getFields().add(field("Email", "EMAIL", false));
+		customer.getFields().add(field("Customer ID", "CUSTOMER_ID", false, true, true, true));
+		customer.getFields().add(field("Display name", "DISPLAY_NAME", false, false, false, true));
+		customer.getFields().add(field("Email", "EMAIL", false, false, true, false));
 
 		final ClassModel order = new ClassModel();
 		order.getNames().setConceptualName("Order");
 		order.getNames().setTechnicalName("T_ORDER");
 		order.setComment("A placed order.");
-		order.getFields().add(field("Order ID", "ORDER_ID", false));
-		order.getFields().add(field("Customer ID", "CUSTOMER_ID", true));
-		order.getFields().add(field("Created at", "CREATED_AT", true));
+		order.getFields().add(field("Order ID", "ORDER_ID", false, true, true, true));
+		order.getFields().add(field("Customer ID", "CUSTOMER_ID", true, false, false, true));
+		order.getFields().add(field("Created at", "CREATED_AT", true, false, false, true));
 
 		final LinkModel conceptualCustomerOrders = new LinkModel();
 		conceptualCustomerOrders.setName("places");
@@ -72,8 +73,8 @@ public final class SampleDocumentFactory {
 
 		document.getModel().getClasses().add(customer);
 		document.getModel().getClasses().add(order);
-		document.getModel().getLinks().add(conceptualCustomerOrders);
-		document.getModel().getLinks().add(logicalCustomerOrders);
+		document.getModel().getConceptualLinks().add(conceptualCustomerOrders);
+		document.getModel().getTechnicalLinks().add(logicalCustomerOrders);
 		document.getModel().getComments().add(note);
 		document.getModel().getComments().add(customerComment);
 		document.getModel().getComments().add(conceptualLinkComment);
@@ -99,11 +100,14 @@ public final class SampleDocumentFactory {
 	}
 
 	private static FieldModel field(final String conceptualName, final String technicalName,
-			final boolean notConceptual) {
+			final boolean notConceptual, final boolean primaryKey, final boolean unique, final boolean notNull) {
 		final FieldModel field = new FieldModel();
 		field.getNames().setName(conceptualName);
 		field.getNames().setTechnicalName(technicalName);
 		field.setNotConceptual(notConceptual);
+		field.setPrimaryKey(primaryKey);
+		field.setUnique(unique);
+		field.setNotNull(notNull);
 		return field;
 	}
 
@@ -112,7 +116,7 @@ public final class SampleDocumentFactory {
 		final NodeLayout layout = new NodeLayout();
 		layout.setObjectType(LayoutObjectType.CLASS);
 		layout.setObjectId(classModel.getId());
-		layout.setPosition(new Point2(x, y));
+		layout.setPosition(new Point2D.Double(x, y));
 		layout.setSize(new Size2(width, height));
 		panelState.getNodeLayouts().add(layout);
 	}
@@ -122,7 +126,7 @@ public final class SampleDocumentFactory {
 		final NodeLayout layout = new NodeLayout();
 		layout.setObjectType(LayoutObjectType.COMMENT);
 		layout.setObjectId(commentModel.getId());
-		layout.setPosition(new Point2(x, y));
+		layout.setPosition(new Point2D.Double(x, y));
 		layout.setSize(new Size2(width, height));
 		panelState.getNodeLayouts().add(layout);
 	}

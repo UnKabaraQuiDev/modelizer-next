@@ -24,6 +24,7 @@ public class LinkModel {
 		this.cardinalityTo = Cardinality.ZERO_OR_MANY;
 		this.associationClassId = null;
 		this.comment = "";
+		this.lineColor = Color.BLACK;
 	}
 
 	public String getId() {
