@@ -42,8 +42,8 @@ public class LinkLayout {
 
 	@Override
 	public String toString() {
-		return "LinkLayout@" + System.identityHashCode(this) + " [linkId=" + linkId + ", bendPoints=" + bendPoints
-				+ ", nameLabelPosition=" + nameLabelPosition + "]";
+		return "LinkLayout@" + System.identityHashCode(this) + " [linkId=" + this.linkId + ", bendPoints="
+				+ this.bendPoints + ", nameLabelPosition=" + this.nameLabelPosition + "]";
 	}
 
 }

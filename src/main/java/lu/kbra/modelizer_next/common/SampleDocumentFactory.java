@@ -1,8 +1,7 @@
-package lu.kbra.modelizer_next.ui;
+package lu.kbra.modelizer_next.common;
 
 import java.awt.geom.Point2D;
 
-import lu.kbra.modelizer_next.common.Size2;
 import lu.kbra.modelizer_next.document.ModelDocument;
 import lu.kbra.modelizer_next.domain.BoundTargetType;
 import lu.kbra.modelizer_next.domain.Cardinality;
@@ -31,17 +30,18 @@ public final class SampleDocumentFactory {
 		customer.getNames().setConceptualName("Customer");
 		customer.getNames().setTechnicalName("T_CUSTOMER");
 		customer.setComment("Stores the master customer record.");
-		customer.getFields().add(field("Customer ID", "CUSTOMER_ID", false, true, true, true));
-		customer.getFields().add(field("Display name", "DISPLAY_NAME", false, false, false, true));
-		customer.getFields().add(field("Email", "EMAIL", false, false, true, false));
+		customer.getFields().add(SampleDocumentFactory.field("Customer ID", "CUSTOMER_ID", false, true, true, true));
+		customer.getFields()
+				.add(SampleDocumentFactory.field("Display name", "DISPLAY_NAME", false, false, false, true));
+		customer.getFields().add(SampleDocumentFactory.field("Email", "EMAIL", false, false, true, false));
 
 		final ClassModel order = new ClassModel();
 		order.getNames().setConceptualName("Order");
 		order.getNames().setTechnicalName("T_ORDER");
 		order.setComment("A placed order.");
-		order.getFields().add(field("Order ID", "ORDER_ID", false, true, true, true));
-		order.getFields().add(field("Customer ID", "CUSTOMER_ID", true, false, false, true));
-		order.getFields().add(field("Created at", "CREATED_AT", true, false, false, true));
+		order.getFields().add(SampleDocumentFactory.field("Order ID", "ORDER_ID", false, true, true, true));
+		order.getFields().add(SampleDocumentFactory.field("Customer ID", "CUSTOMER_ID", true, false, false, true));
+		order.getFields().add(SampleDocumentFactory.field("Created at", "CREATED_AT", true, false, false, true));
 
 		final LinkModel conceptualCustomerOrders = new LinkModel();
 		conceptualCustomerOrders.setName("places");
@@ -79,22 +79,34 @@ public final class SampleDocumentFactory {
 		document.getModel().getComments().add(customerComment);
 		document.getModel().getComments().add(conceptualLinkComment);
 
-		seedClass(document.getWorkspace().getPanels().get(PanelType.CONCEPTUAL), customer, 120, 120, 220, 0);
-		seedClass(document.getWorkspace().getPanels().get(PanelType.CONCEPTUAL), order, 450, 170, 220, 0);
-		seedComment(document.getWorkspace().getPanels().get(PanelType.CONCEPTUAL), note, 120, 320, 280, 90);
-		seedComment(document.getWorkspace().getPanels().get(PanelType.CONCEPTUAL), customerComment, 410, 70, 250, 80);
-		seedComment(document.getWorkspace().getPanels().get(PanelType.CONCEPTUAL), conceptualLinkComment, 300, 210, 260,
-				80);
+		SampleDocumentFactory.seedClass(document.getWorkspace().getPanels().get(PanelType.CONCEPTUAL), customer, 120,
+				120, 220, 0);
+		SampleDocumentFactory.seedClass(document.getWorkspace().getPanels().get(PanelType.CONCEPTUAL), order, 450, 170,
+				220, 0);
+		SampleDocumentFactory.seedComment(document.getWorkspace().getPanels().get(PanelType.CONCEPTUAL), note, 120, 320,
+				280, 90);
+		SampleDocumentFactory.seedComment(document.getWorkspace().getPanels().get(PanelType.CONCEPTUAL),
+				customerComment, 410, 70, 250, 80);
+		SampleDocumentFactory.seedComment(document.getWorkspace().getPanels().get(PanelType.CONCEPTUAL),
+				conceptualLinkComment, 300, 210, 260, 80);
 
-		seedClass(document.getWorkspace().getPanels().get(PanelType.LOGICAL), customer, 120, 120, 220, 0);
-		seedClass(document.getWorkspace().getPanels().get(PanelType.LOGICAL), order, 450, 170, 220, 0);
-		seedComment(document.getWorkspace().getPanels().get(PanelType.LOGICAL), note, 120, 340, 280, 90);
-		seedComment(document.getWorkspace().getPanels().get(PanelType.LOGICAL), customerComment, 410, 70, 250, 80);
+		SampleDocumentFactory.seedClass(document.getWorkspace().getPanels().get(PanelType.LOGICAL), customer, 120, 120,
+				220, 0);
+		SampleDocumentFactory.seedClass(document.getWorkspace().getPanels().get(PanelType.LOGICAL), order, 450, 170,
+				220, 0);
+		SampleDocumentFactory.seedComment(document.getWorkspace().getPanels().get(PanelType.LOGICAL), note, 120, 340,
+				280, 90);
+		SampleDocumentFactory.seedComment(document.getWorkspace().getPanels().get(PanelType.LOGICAL), customerComment,
+				410, 70, 250, 80);
 
-		seedClass(document.getWorkspace().getPanels().get(PanelType.PHYSICAL), customer, 120, 120, 220, 0);
-		seedClass(document.getWorkspace().getPanels().get(PanelType.PHYSICAL), order, 450, 170, 220, 0);
-		seedComment(document.getWorkspace().getPanels().get(PanelType.PHYSICAL), note, 120, 340, 280, 90);
-		seedComment(document.getWorkspace().getPanels().get(PanelType.PHYSICAL), customerComment, 410, 70, 250, 80);
+		SampleDocumentFactory.seedClass(document.getWorkspace().getPanels().get(PanelType.PHYSICAL), customer, 120, 120,
+				220, 0);
+		SampleDocumentFactory.seedClass(document.getWorkspace().getPanels().get(PanelType.PHYSICAL), order, 450, 170,
+				220, 0);
+		SampleDocumentFactory.seedComment(document.getWorkspace().getPanels().get(PanelType.PHYSICAL), note, 120, 340,
+				280, 90);
+		SampleDocumentFactory.seedComment(document.getWorkspace().getPanels().get(PanelType.PHYSICAL), customerComment,
+				410, 70, 250, 80);
 
 		return document;
 	}
@@ -117,7 +129,7 @@ public final class SampleDocumentFactory {
 		layout.setObjectType(LayoutObjectType.CLASS);
 		layout.setObjectId(classModel.getId());
 		layout.setPosition(new Point2D.Double(x, y));
-		layout.setSize(new Size2(width, height));
+		layout.setSize(new Size2D(width, height));
 		panelState.getNodeLayouts().add(layout);
 	}
 
@@ -127,7 +139,7 @@ public final class SampleDocumentFactory {
 		layout.setObjectType(LayoutObjectType.COMMENT);
 		layout.setObjectId(commentModel.getId());
 		layout.setPosition(new Point2D.Double(x, y));
-		layout.setSize(new Size2(width, height));
+		layout.setSize(new Size2D(width, height));
 		panelState.getNodeLayouts().add(layout);
 	}
 

@@ -33,8 +33,8 @@ public class ClassNames {
 
 	@Override
 	public String toString() {
-		return "ClassNames@" + System.identityHashCode(this) + " [conceptualName=" + conceptualName + ", technicalName="
-				+ technicalName + "]";
+		return "ClassNames@" + System.identityHashCode(this) + " [conceptualName=" + this.conceptualName
+				+ ", technicalName=" + this.technicalName + "]";
 	}
 
 }

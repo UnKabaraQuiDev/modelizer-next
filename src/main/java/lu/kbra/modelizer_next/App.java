@@ -24,19 +24,19 @@ public class App {
 
 	public static void init() throws JsonProcessingException {
 		final String fileContent = PCUtils.readPackagedStringFile("/app.json");
-		JSON = MNMain.OBJECT_MAPPER.readTree(fileContent);
+		App.JSON = MNMain.OBJECT_MAPPER.readTree(fileContent);
 
-		NAME = JSON.path("name").asText();
-		DESCRIPTION = JSON.path("description").asText();
-		VERSION = JSON.path("version").asText();
-		REVISION = JSON.path("revision").asText();
-		ISSUES_URL = JSON.path("issues").asText(ISSUES_URL);
+		App.NAME = App.JSON.path("name").asText();
+		App.DESCRIPTION = App.JSON.path("description").asText();
+		App.VERSION = App.JSON.path("version").asText();
+		App.REVISION = App.JSON.path("revision").asText();
+		App.ISSUES_URL = App.JSON.path("issues").asText(App.ISSUES_URL);
 
-		ensureDirsExists();
+		App.ensureDirsExists();
 	}
 
 	public static File getAppDirectory() {
-		final String override = System.getProperty(APP_DIR_PROPERTY);
+		final String override = System.getProperty(App.APP_DIR_PROPERTY);
 		if (override != null && !override.isBlank()) {
 			return new File(override);
 		}
@@ -45,27 +45,27 @@ public class App {
 		if (os.contains("win")) {
 			final String appData = System.getenv("APPDATA");
 			if (appData != null && !appData.isBlank()) {
-				return new File(appData, APP_FOLDER_NAME);
+				return new File(appData, App.APP_FOLDER_NAME);
 			}
 		}
 
-		return new File(System.getProperty("user.home"), "." + APP_FOLDER_NAME);
+		return new File(System.getProperty("user.home"), "." + App.APP_FOLDER_NAME);
 	}
 
 	public static File getConfigFile() {
-		return new File(getAppDirectory(), "config.json");
+		return new File(App.getAppDirectory(), "config.json");
 	}
 
 	public static File getStylesDirectory() {
-		return new File(getAppDirectory(), "styles");
+		return new File(App.getAppDirectory(), "styles");
 	}
 
 	public static void ensureDirsExists() {
-		getAppDirectory().mkdirs();
-		getStylesDirectory().mkdirs();
+		App.getAppDirectory().mkdirs();
+		App.getStylesDirectory().mkdirs();
 	}
 
-	public static String title(String title) {
+	public static String title(final String title) {
 		return App.NAME + " " + App.VERSION + " - " + title;
 	}
 
@@ -75,7 +75,7 @@ public class App {
 		final File file = App.getConfigFile();
 		if (!file.isFile()) {
 			final AppConfig config = new AppConfig();
-			saveConfig(config);
+			App.saveConfig(config);
 			return config;
 		}
 

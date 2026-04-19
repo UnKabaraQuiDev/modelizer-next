@@ -54,17 +54,18 @@ public class ModelDocument {
 	}
 
 	public String getSource() {
-		return source;
+		return this.source;
 	}
 
-	public void setSource(String source) {
+	public void setSource(final String source) {
 		this.source = source;
 	}
 
 	@Override
 	public String toString() {
-		return "ModelDocument@" + System.identityHashCode(this) + " [schemaVersion=" + schemaVersion + ", meta=" + meta
-				+ ", model=" + model + ", workspace=" + workspace + ", source=" + source + "]";
+		return "ModelDocument@" + System.identityHashCode(this) + " [schemaVersion=" + this.schemaVersion + ", meta="
+				+ this.meta + ", model=" + this.model + ", workspace=" + this.workspace + ", source=" + this.source
+				+ "]";
 	}
 
 }

@@ -1,4 +1,4 @@
-package lu.kbra.modelizer_next.ui;
+package lu.kbra.modelizer_next.ui.dialogs;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -25,6 +25,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
+import javax.swing.WindowConstants;
 
 import lu.kbra.modelizer_next.document.ModelDocument;
 import lu.kbra.modelizer_next.domain.BoundTargetType;
@@ -33,6 +34,7 @@ import lu.kbra.modelizer_next.domain.CommentBinding;
 import lu.kbra.modelizer_next.domain.CommentKind;
 import lu.kbra.modelizer_next.domain.CommentModel;
 import lu.kbra.modelizer_next.domain.LinkModel;
+import lu.kbra.modelizer_next.ui.ColorButton;
 
 public final class CommentEditorDialog {
 
@@ -44,7 +46,8 @@ public final class CommentEditorDialog {
 		final Window owner = parent == null ? null : SwingUtilities.getWindowAncestor(parent);
 		final JDialog dialog = new JDialog(owner, "Edit comment", Dialog.ModalityType.APPLICATION_MODAL);
 
-		final JTextArea textArea = new JTextArea(initialComment == null ? "" : safe(initialComment.getText()), 10, 32);
+		final JTextArea textArea = new JTextArea(
+				initialComment == null ? "" : CommentEditorDialog.safe(initialComment.getText()), 10, 32);
 		textArea.setLineWrap(true);
 		textArea.setWrapStyleWord(true);
 
@@ -84,7 +87,7 @@ public final class CommentEditorDialog {
 			public Component getListCellRendererComponent(final JList<?> list, final Object value, final int index,
 					final boolean isSelected, final boolean cellHasFocus) {
 				super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-				if (value instanceof AssociationTarget target) {
+				if (value instanceof final AssociationTarget target) {
 					this.setText(target.label());
 				}
 				return this;
@@ -92,7 +95,7 @@ public final class CommentEditorDialog {
 		});
 
 		if (initialComment != null) {
-			associationBox.setSelectedItem(resolveInitialAssociation(document, initialComment));
+			associationBox.setSelectedItem(CommentEditorDialog.resolveInitialAssociation(document, initialComment));
 		}
 
 		final Holder holder = new Holder();
@@ -101,20 +104,20 @@ public final class CommentEditorDialog {
 		form.setLayout(new BoxLayout(form, BoxLayout.Y_AXIS));
 		form.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-		form.add(row("Association", associationBox));
-		form.add(row("Text", new JScrollPane(textArea)));
+		form.add(CommentEditorDialog.row("Association", associationBox));
+		form.add(CommentEditorDialog.row("Text", new JScrollPane(textArea)));
 
 		final JPanel visibilityRow = new JPanel(new GridLayout(1, 3, 8, 0));
 		visibilityRow.add(conceptualBox);
 		visibilityRow.add(logicalBox);
 		visibilityRow.add(physicalBox);
-		form.add(row("Visible in", visibilityRow));
+		form.add(CommentEditorDialog.row("Visible in", visibilityRow));
 
 		final JPanel colorRow = new JPanel(new GridLayout(1, 3, 8, 0));
 		colorRow.add(textColorButton);
 		colorRow.add(backgroundColorButton);
 		colorRow.add(borderColorButton);
-		form.add(row("Colors", colorRow));
+		form.add(CommentEditorDialog.row("Colors", colorRow));
 
 		final JPanel buttons = new JPanel(new GridLayout(1, 2, 8, 0));
 		final JButton saveButton = new JButton("Save");
@@ -143,7 +146,7 @@ public final class CommentEditorDialog {
 				dialog.dispose();
 			}
 		});
-		dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+		dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 
 		dialog.setLayout(new BorderLayout(8, 8));
 		dialog.add(form, BorderLayout.CENTER);

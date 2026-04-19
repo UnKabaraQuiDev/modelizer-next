@@ -11,10 +11,10 @@ public class ColorUtils {
 	}
 
 	public static Color ofRgb(final int rgb) {
-		return new Color(0xFF000000 | (rgb & 0x00FFFFFF));
+		return new Color(0xFF000000 | rgb & 0x00FFFFFF);
 	}
 
-	public static Color ofHex(String string) {
+	public static Color ofHex(final String string) {
 		return PCUtils.hexToColor(string);
 	}
 

@@ -15,20 +15,21 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.formdev.flatlaf.FlatDarkLaf;
 import com.formdev.flatlaf.FlatLightLaf;
 
+import lu.kbra.modelizer_next.common.SampleDocumentFactory;
 import lu.kbra.modelizer_next.document.ModelDocument;
+import lu.kbra.modelizer_next.json.ColorModule;
 import lu.kbra.modelizer_next.ui.MainFrame;
-import lu.kbra.modelizer_next.ui.SampleDocumentFactory;
 
 public class MNMain {
 
-	public static final ObjectMapper OBJECT_MAPPER = createMapper();
+	public static final ObjectMapper OBJECT_MAPPER = MNMain.createMapper();
 
-	public static void main(String[] args) {
+	public static void main(final String[] args) {
 		try {
 			App.init();
 			System.out.println(App.NAME + " / " + App.VERSION + " (" + App.REVISION + ")");
 			System.out.println("App dir: " + App.getAppDirectory());
-		} catch (JsonProcessingException e) {
+		} catch (final JsonProcessingException e) {
 			e.printStackTrace();
 			JOptionPane.showMessageDialog(null,
 					"Uh uh ! It seems like this app's manifest is malformed, try\nrestarting it, redownloading it or updating it.\nIf nothing works,please report to: "
@@ -37,7 +38,7 @@ public class MNMain {
 		}
 
 		SwingUtilities.invokeLater(() -> {
-			applyConfiguredLookAndFeel();
+			MNMain.applyConfiguredLookAndFeel();
 
 			final ModelDocument document = SampleDocumentFactory.create();
 			final MainFrame frame = new MainFrame(document);

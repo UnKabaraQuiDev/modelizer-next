@@ -1,4 +1,4 @@
-package lu.kbra.modelizer_next;
+package lu.kbra.modelizer_next.json;
 
 import java.awt.Color;
 import java.io.IOException;
@@ -13,9 +13,11 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 
 public class ColorModule extends SimpleModule {
 
+	private static final long serialVersionUID = -6363765641985882615L;
+
 	public ColorModule() {
-		addSerializer(new AwtColorSerializer());
-		addDeserializer(Color.class, new AwtColorDeserializer());
+		this.addSerializer(new AwtColorSerializer());
+		this.addDeserializer(Color.class, new AwtColorDeserializer());
 	}
 
 	public class AwtColorSerializer extends JsonSerializer<Color> {

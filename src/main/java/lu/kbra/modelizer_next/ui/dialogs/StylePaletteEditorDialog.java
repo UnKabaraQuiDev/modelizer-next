@@ -1,4 +1,4 @@
-package lu.kbra.modelizer_next.ui;
+package lu.kbra.modelizer_next.ui.dialogs;
 
 import java.awt.BasicStroke;
 import java.awt.BorderLayout;
@@ -28,8 +28,10 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
+import javax.swing.WindowConstants;
 
-import lu.kbra.modelizer_next.StylePalette;
+import lu.kbra.modelizer_next.style.StylePalette;
+import lu.kbra.modelizer_next.ui.ColorButton;
 
 public final class StylePaletteEditorDialog {
 
@@ -37,7 +39,7 @@ public final class StylePaletteEditorDialog {
 	}
 
 	public static StylePalette showDialog(final Component parent) {
-		return showDialog(parent, null);
+		return StylePaletteEditorDialog.showDialog(parent, null);
 	}
 
 	public static StylePalette showDialog(final Component parent, final StylePalette initialPalette) {
@@ -100,9 +102,9 @@ public final class StylePaletteEditorDialog {
 					previewPanel.repaint();
 				});
 
-		final Runnable refreshPreview = () -> previewPanel.setPalette(buildPalette(nameField.getText(),
-				classTextColorButton, classBackgroundColorButton, classBorderColorButton, fieldTextColorButton,
-				fieldBackgroundColorButton, commentTextColorButton, commentBackgroundColorButton,
+		final Runnable refreshPreview = () -> previewPanel.setPalette(StylePaletteEditorDialog.buildPalette(
+				nameField.getText(), classTextColorButton, classBackgroundColorButton, classBorderColorButton,
+				fieldTextColorButton, fieldBackgroundColorButton, commentTextColorButton, commentBackgroundColorButton,
 				commentBorderColorButton, linkColorButton));
 
 		final java.awt.event.ActionListener previewListener = event -> refreshPreview.run();
@@ -121,11 +123,14 @@ public final class StylePaletteEditorDialog {
 		form.setLayout(new BoxLayout(form, BoxLayout.Y_AXIS));
 		form.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-		form.add(row("Name", nameField));
-		form.add(row("Class", flow(classTextColorButton, classBackgroundColorButton, classBorderColorButton)));
-		form.add(row("Field", flow(fieldTextColorButton, fieldBackgroundColorButton)));
-		form.add(row("Comment", flow(commentTextColorButton, commentBackgroundColorButton, commentBorderColorButton)));
-		form.add(row("Link", flow(linkColorButton)));
+		form.add(StylePaletteEditorDialog.row("Name", nameField));
+		form.add(StylePaletteEditorDialog.row("Class", StylePaletteEditorDialog.flow(classTextColorButton,
+				classBackgroundColorButton, classBorderColorButton)));
+		form.add(StylePaletteEditorDialog.row("Field",
+				StylePaletteEditorDialog.flow(fieldTextColorButton, fieldBackgroundColorButton)));
+		form.add(StylePaletteEditorDialog.row("Comment", StylePaletteEditorDialog.flow(commentTextColorButton,
+				commentBackgroundColorButton, commentBorderColorButton)));
+		form.add(StylePaletteEditorDialog.row("Link", StylePaletteEditorDialog.flow(linkColorButton)));
 
 		final JPanel centerPanel = new JPanel(new BorderLayout(10, 10));
 		centerPanel.add(form, BorderLayout.NORTH);
@@ -137,9 +142,10 @@ public final class StylePaletteEditorDialog {
 		final JButton cancelButton = new JButton("Cancel");
 
 		saveButton.addActionListener(event -> {
-			holder.palette = buildPalette(nameField.getText(), classTextColorButton, classBackgroundColorButton,
-					classBorderColorButton, fieldTextColorButton, fieldBackgroundColorButton, commentTextColorButton,
-					commentBackgroundColorButton, commentBorderColorButton, linkColorButton);
+			holder.palette = StylePaletteEditorDialog.buildPalette(nameField.getText(), classTextColorButton,
+					classBackgroundColorButton, classBorderColorButton, fieldTextColorButton,
+					fieldBackgroundColorButton, commentTextColorButton, commentBackgroundColorButton,
+					commentBorderColorButton, linkColorButton);
 			dialog.dispose();
 		});
 		cancelButton.addActionListener(event -> dialog.dispose());
@@ -157,7 +163,7 @@ public final class StylePaletteEditorDialog {
 				dialog.dispose();
 			}
 		});
-		dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+		dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 
 		dialog.setLayout(new BorderLayout(8, 8));
 		dialog.add(centerPanel, BorderLayout.CENTER);
@@ -255,7 +261,7 @@ public final class StylePaletteEditorDialog {
 				g2.setColor(this.palette.getClassBackgroundColor());
 				g2.fill(classBounds);
 
-				g2.setFont(TITLE_FONT);
+				g2.setFont(StylePalettePreviewPanel.TITLE_FONT);
 				g2.setColor(this.palette.getClassTextColor());
 				g2.drawString("Example table", 48, 60);
 
@@ -275,7 +281,7 @@ public final class StylePaletteEditorDialog {
 				g2.draw(new Line2D.Double(classBounds.getX(), classBounds.getY() + 94, classBounds.getMaxX(),
 						classBounds.getY() + 94));
 
-				g2.setFont(BODY_FONT);
+				g2.setFont(StylePalettePreviewPanel.BODY_FONT);
 				g2.setColor(this.palette.getFieldTextColor());
 				g2.drawString("FIELD_ID [PK, NN]", 48, 88);
 				g2.drawString("DISPLAY_NAME", 48, 110);

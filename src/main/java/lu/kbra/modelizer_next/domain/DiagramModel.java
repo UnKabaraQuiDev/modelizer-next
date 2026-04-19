@@ -26,11 +26,11 @@ public class DiagramModel {
 	}
 
 	public List<LinkModel> getConceptualLinks() {
-		return conceptualLinks;
+		return this.conceptualLinks;
 	}
 
 	public List<LinkModel> getTechnicalLinks() {
-		return technicalLinks;
+		return this.technicalLinks;
 	}
 
 	public List<CommentModel> getComments() {
@@ -43,8 +43,9 @@ public class DiagramModel {
 
 	@Override
 	public String toString() {
-		return "DiagramModel@" + System.identityHashCode(this) + " [classes=" + classes + ", conceptualLinks="
-				+ conceptualLinks + ", technicalLinks=" + technicalLinks + ", comments=" + comments + "]";
+		return "DiagramModel@" + System.identityHashCode(this) + " [classes=" + this.classes + ", conceptualLinks="
+				+ this.conceptualLinks + ", technicalLinks=" + this.technicalLinks + ", comments=" + this.comments
+				+ "]";
 	}
 
 }

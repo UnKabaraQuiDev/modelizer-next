@@ -32,8 +32,8 @@ public class AppConfig {
 
 	@Override
 	public String toString() {
-		return "AppConfig@" + System.identityHashCode(this) + " [themeMode=" + themeMode + ", selectedPaletteName="
-				+ selectedPaletteName + ", defaultPaletteName=" + defaultPaletteName + "]";
+		return "AppConfig@" + System.identityHashCode(this) + " [themeMode=" + this.themeMode + ", selectedPaletteName="
+				+ this.selectedPaletteName + ", defaultPaletteName=" + this.defaultPaletteName + "]";
 	}
 
 }

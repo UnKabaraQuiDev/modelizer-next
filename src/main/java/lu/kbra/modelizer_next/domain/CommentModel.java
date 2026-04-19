@@ -59,26 +59,26 @@ public class CommentModel {
 	}
 
 	public Color getTextColor() {
-		return textColor;
+		return this.textColor;
 	}
 
-	public void setTextColor(Color textColor) {
+	public void setTextColor(final Color textColor) {
 		this.textColor = textColor;
 	}
 
 	public Color getBackgroundColor() {
-		return backgroundColor;
+		return this.backgroundColor;
 	}
 
-	public void setBackgroundColor(Color backgroundColor) {
+	public void setBackgroundColor(final Color backgroundColor) {
 		this.backgroundColor = backgroundColor;
 	}
 
 	public Color getBorderColor() {
-		return borderColor;
+		return this.borderColor;
 	}
 
-	public void setBorderColor(Color borderColor) {
+	public void setBorderColor(final Color borderColor) {
 		this.borderColor = borderColor;
 	}
 
@@ -106,25 +106,26 @@ public class CommentModel {
 		this.visibleInPhysical = visibleInPhysical;
 	}
 
-	public void setVisibility(PanelType... pts) {
-		visibleInConceptual = false;
-		visibleInLogical = false;
-		visibleInPhysical = false;
-		for (PanelType pt : pts) {
+	public void setVisibility(final PanelType... pts) {
+		this.visibleInConceptual = false;
+		this.visibleInLogical = false;
+		this.visibleInPhysical = false;
+		for (final PanelType pt : pts) {
 			switch (pt) {
-			case CONCEPTUAL -> visibleInConceptual = true;
-			case LOGICAL -> visibleInLogical = true;
-			case PHYSICAL -> visibleInPhysical = true;
+			case CONCEPTUAL -> this.visibleInConceptual = true;
+			case LOGICAL -> this.visibleInLogical = true;
+			case PHYSICAL -> this.visibleInPhysical = true;
 			}
 		}
 	}
 
 	@Override
 	public String toString() {
-		return "CommentModel@" + System.identityHashCode(this) + " [textColor=" + textColor + ", backgroundColor="
-				+ backgroundColor + ", borderColor=" + borderColor + ", id=" + id + ", kind=" + kind + ", text=" + text
-				+ ", binding=" + binding + ", visibleInConceptual=" + visibleInConceptual + ", visibleInLogical="
-				+ visibleInLogical + ", visibleInPhysical=" + visibleInPhysical + "]";
+		return "CommentModel@" + System.identityHashCode(this) + " [textColor=" + this.textColor + ", backgroundColor="
+				+ this.backgroundColor + ", borderColor=" + this.borderColor + ", id=" + this.id + ", kind=" + this.kind
+				+ ", text=" + this.text + ", binding=" + this.binding + ", visibleInConceptual="
+				+ this.visibleInConceptual + ", visibleInLogical=" + this.visibleInLogical + ", visibleInPhysical="
+				+ this.visibleInPhysical + "]";
 	}
 
 }

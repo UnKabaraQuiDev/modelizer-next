@@ -82,9 +82,9 @@ public class ClassModel {
 
 	@Override
 	public String toString() {
-		return "ClassModel@" + System.identityHashCode(this) + " [id=" + id + ", names=" + names + ", group=" + group
-				+ ", visibility=" + visibility + ", style=" + style + ", comment=" + comment + ", fields=" + fields
-				+ "]";
+		return "ClassModel@" + System.identityHashCode(this) + " [id=" + this.id + ", names=" + this.names + ", group="
+				+ this.group + ", visibility=" + this.visibility + ", style=" + this.style + ", comment=" + this.comment
+				+ ", fields=" + this.fields + "]";
 	}
 
 }

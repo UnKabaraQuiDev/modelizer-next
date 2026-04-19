@@ -1,4 +1,4 @@
-package lu.kbra.modelizer_next.ui;
+package lu.kbra.modelizer_next.ui.dialogs;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -21,8 +21,10 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
+import javax.swing.WindowConstants;
 
 import lu.kbra.modelizer_next.domain.FieldModel;
+import lu.kbra.modelizer_next.ui.ColorButton;
 
 public final class FieldEditorDialog {
 
@@ -50,19 +52,19 @@ public final class FieldEditorDialog {
 		final JPanel form = new JPanel();
 		form.setLayout(new BoxLayout(form, BoxLayout.Y_AXIS));
 		form.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-		form.add(row("Name", nameField));
-		form.add(row("Technical name", technicalNameField));
+		form.add(FieldEditorDialog.row("Name", nameField));
+		form.add(FieldEditorDialog.row("Technical name", technicalNameField));
 
 		final JPanel flagsRow = new JPanel(new GridLayout(1, 3, 8, 0));
 		flagsRow.add(primaryKeyBox);
 		flagsRow.add(uniqueBox);
 		flagsRow.add(notNullBox);
-		form.add(row("Flags", flagsRow));
+		form.add(FieldEditorDialog.row("Flags", flagsRow));
 
 		final JPanel colorRow = new JPanel(new GridLayout(1, 2, 8, 0));
 		colorRow.add(textColorButton);
 		colorRow.add(backgroundColorButton);
-		form.add(row("Colors", colorRow));
+		form.add(FieldEditorDialog.row("Colors", colorRow));
 
 		final JPanel buttons = new JPanel(new GridLayout(1, 4, 8, 0));
 		final JButton saveButton = new JButton("Save");
@@ -77,15 +79,15 @@ public final class FieldEditorDialog {
 			dialog.dispose();
 		});
 		upButton.addActionListener(event -> {
-			applyFieldValues(fieldModel, nameField, technicalNameField, primaryKeyBox, uniqueBox, notNullBox,
-					textColorButton, backgroundColorButton);
+			FieldEditorDialog.applyFieldValues(fieldModel, nameField, technicalNameField, primaryKeyBox, uniqueBox,
+					notNullBox, textColorButton, backgroundColorButton);
 			if (moveCallback != null) {
 				moveCallback.accept(-1);
 			}
 		});
 		downButton.addActionListener(event -> {
-			applyFieldValues(fieldModel, nameField, technicalNameField, primaryKeyBox, uniqueBox, notNullBox,
-					textColorButton, backgroundColorButton);
+			FieldEditorDialog.applyFieldValues(fieldModel, nameField, technicalNameField, primaryKeyBox, uniqueBox,
+					notNullBox, textColorButton, backgroundColorButton);
 			if (moveCallback != null) {
 				moveCallback.accept(1);
 			}
@@ -108,7 +110,7 @@ public final class FieldEditorDialog {
 				dialog.dispose();
 			}
 		});
-		dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+		dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		dialog.pack();
 		dialog.setLocationRelativeTo(parent);
 		dialog.setVisible(true);

@@ -13,10 +13,10 @@ public final class SystemThemeDetector {
 
 		try {
 			if (os.contains("win")) {
-				return isWindowsDark();
+				return SystemThemeDetector.isWindowsDark();
 			}
 			if (os.contains("mac")) {
-				return isMacDark();
+				return SystemThemeDetector.isMacDark();
 			}
 		} catch (final Exception ignored) {
 			// fall through

@@ -1,4 +1,4 @@
-package lu.kbra.modelizer_next.ui;
+package lu.kbra.modelizer_next.ui.dialogs;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -16,6 +16,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
+import javax.swing.WindowConstants;
 
 public final class RenameDialog {
 
@@ -24,9 +25,9 @@ public final class RenameDialog {
 
 	public static String showDialog(final Component parent, final String title, final String initialValue) {
 		final Window owner = parent == null ? null : SwingUtilities.getWindowAncestor(parent);
-		final JDialog dialog = owner instanceof Frame frame ? new JDialog(frame, title, true)
+		final JDialog dialog = owner instanceof final Frame frame ? new JDialog(frame, title, true)
 				: new JDialog((Frame) null, title, true);
-		dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+		dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 
 		final JTextField textField = new JTextField(initialValue == null ? "" : initialValue, 30);
 		final ResultHolder resultHolder = new ResultHolder();
@@ -66,7 +67,7 @@ public final class RenameDialog {
 		textField.getInputMap(JComponent.WHEN_FOCUSED).put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "cancel");
 		textField.getActionMap().put("cancel", cancelAction);
 
-		dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+		dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 
 		dialog.setLayout(new BorderLayout(8, 8));
 		dialog.add(textField, BorderLayout.CENTER);

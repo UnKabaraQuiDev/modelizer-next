@@ -36,7 +36,7 @@ public class VersionComparator implements Comparator<String> {
 		final String[] mainAndSuffix = v.split("-", 2);
 
 		final String[] numParts = mainAndSuffix[0].split("\\.");
-		List<Integer> numbers = new ArrayList<>();
+		final List<Integer> numbers = new ArrayList<>();
 		for (final String p : numParts) {
 			numbers.add(Integer.parseInt(p));
 		}

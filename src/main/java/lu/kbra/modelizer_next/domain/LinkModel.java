@@ -92,19 +92,19 @@ public class LinkModel {
 	}
 
 	public Color getLineColor() {
-		return lineColor;
+		return this.lineColor;
 	}
 
-	public void setLineColor(Color lineColor) {
+	public void setLineColor(final Color lineColor) {
 		this.lineColor = lineColor;
 	}
 
 	@Override
 	public String toString() {
-		return "LinkModel@" + System.identityHashCode(this) + " [id=" + id + ", name=" + name + ", from=" + from
-				+ ", to=" + to + ", cardinalityFrom=" + cardinalityFrom + ", cardinalityTo=" + cardinalityTo
-				+ ", associationClassId=" + associationClassId + ", comment=" + comment + ", lineColor=" + lineColor
-				+ "]";
+		return "LinkModel@" + System.identityHashCode(this) + " [id=" + this.id + ", name=" + this.name + ", from="
+				+ this.from + ", to=" + this.to + ", cardinalityFrom=" + this.cardinalityFrom + ", cardinalityTo="
+				+ this.cardinalityTo + ", associationClassId=" + this.associationClassId + ", comment=" + this.comment
+				+ ", lineColor=" + this.lineColor + "]";
 	}
 
 }

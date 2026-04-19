@@ -1,4 +1,4 @@
-package lu.kbra.modelizer_next;
+package lu.kbra.modelizer_next.style;
 
 import java.io.File;
 import java.io.IOException;
@@ -6,6 +6,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
+
+import lu.kbra.modelizer_next.App;
+import lu.kbra.modelizer_next.MNMain;
 
 public final class StylePaletteService {
 
@@ -17,7 +20,8 @@ public final class StylePaletteService {
 			return;
 		}
 
-		final File file = new File(App.getStylesDirectory(), sanitizeFileName(paletteName) + ".json");
+		final File file = new File(App.getStylesDirectory(),
+				StylePaletteService.sanitizeFileName(paletteName) + ".json");
 		if (file.isFile()) {
 			file.delete();
 		}
@@ -25,7 +29,7 @@ public final class StylePaletteService {
 
 	public static List<StylePalette> loadAll() {
 		App.ensureDirsExists();
-		ensureDefaultPalette();
+		StylePaletteService.ensureDefaultPalette();
 
 		final File[] files = App.getStylesDirectory().listFiles((dir, name) -> name.toLowerCase().endsWith(".json"));
 
@@ -50,7 +54,7 @@ public final class StylePaletteService {
 	public static void save(final StylePalette palette) {
 		App.ensureDirsExists();
 
-		final String safeName = sanitizeFileName(palette.getName());
+		final String safeName = StylePaletteService.sanitizeFileName(palette.getName());
 		final File file = new File(App.getStylesDirectory(), safeName + ".json");
 
 		try {
@@ -68,7 +72,7 @@ public final class StylePaletteService {
 
 		final StylePalette palette = new StylePalette();
 		palette.setName("Default");
-		save(palette);
+		StylePaletteService.save(palette);
 	}
 
 	private static String sanitizeFileName(final String name) {

@@ -1,4 +1,4 @@
-package lu.kbra.modelizer_next.ui;
+package lu.kbra.modelizer_next.ui.dialogs;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -21,6 +21,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
+import javax.swing.WindowConstants;
 
 import lu.kbra.modelizer_next.document.ModelDocument;
 import lu.kbra.modelizer_next.domain.Cardinality;
@@ -28,6 +29,7 @@ import lu.kbra.modelizer_next.domain.ClassModel;
 import lu.kbra.modelizer_next.domain.FieldModel;
 import lu.kbra.modelizer_next.domain.LinkModel;
 import lu.kbra.modelizer_next.layout.PanelType;
+import lu.kbra.modelizer_next.ui.ColorButton;
 
 public final class LinkEditorDialog {
 
@@ -58,8 +60,10 @@ public final class LinkEditorDialog {
 		final JComboBox<Cardinality> fromCardinalityBox = new JComboBox<>(Cardinality.values());
 		final JComboBox<Cardinality> toCardinalityBox = new JComboBox<>(Cardinality.values());
 
-		fromClassBox.setSelectedItem(findClass(document.getModel().getClasses(), linkModel.getFrom().getClassId()));
-		toClassBox.setSelectedItem(findClass(document.getModel().getClasses(), linkModel.getTo().getClassId()));
+		fromClassBox.setSelectedItem(
+				LinkEditorDialog.findClass(document.getModel().getClasses(), linkModel.getFrom().getClassId()));
+		toClassBox.setSelectedItem(
+				LinkEditorDialog.findClass(document.getModel().getClasses(), linkModel.getTo().getClassId()));
 		fromCardinalityBox.setSelectedItem(linkModel.getCardinalityFrom());
 		toCardinalityBox.setSelectedItem(linkModel.getCardinalityTo());
 
@@ -85,11 +89,12 @@ public final class LinkEditorDialog {
 			}
 
 			if (fromClass != null) {
-				fromFieldBox.setSelectedItem(findField(fromClass, linkModel.getFrom().getFieldId()));
+				fromFieldBox.setSelectedItem(LinkEditorDialog.findField(fromClass, linkModel.getFrom().getFieldId()));
 			}
 
 			if (toClass != null) {
-				final FieldModel currentTargetField = findField(toClass, linkModel.getTo().getFieldId());
+				final FieldModel currentTargetField = LinkEditorDialog.findField(toClass,
+						linkModel.getTo().getFieldId());
 				if (panelType == PanelType.CONCEPTUAL) {
 					toFieldBox.setSelectedItem(currentTargetField);
 				} else if (currentTargetField != null && currentTargetField.isPrimaryKey()) {
@@ -105,27 +110,27 @@ public final class LinkEditorDialog {
 		syncFields.run();
 
 		final JPanel topRow = new JPanel(new GridLayout(1, 3, 8, 0));
-		topRow.add(labeled("Name", nameField));
-		topRow.add(labeled("Comment", commentField));
-		topRow.add(labeled("Color", colorButton));
+		topRow.add(LinkEditorDialog.labeled("Name", nameField));
+		topRow.add(LinkEditorDialog.labeled("Comment", commentField));
+		topRow.add(LinkEditorDialog.labeled("Color", colorButton));
 
 		final JPanel leftPanel = new JPanel(new GridLayout(panelType == PanelType.CONCEPTUAL ? 2 : 2, 1, 6, 6));
 		final JPanel rightPanel = new JPanel(new GridLayout(panelType == PanelType.CONCEPTUAL ? 2 : 2, 1, 6, 6));
 
 		if (panelType == PanelType.CONCEPTUAL) {
 			leftPanel.setBorder(BorderFactory.createTitledBorder("Table 1"));
-			leftPanel.add(labeled("Cardinality", fromCardinalityBox));
-			leftPanel.add(labeled("Table", fromClassBox));
+			leftPanel.add(LinkEditorDialog.labeled("Cardinality", fromCardinalityBox));
+			leftPanel.add(LinkEditorDialog.labeled("Table", fromClassBox));
 			rightPanel.setBorder(BorderFactory.createTitledBorder("Table 2"));
-			rightPanel.add(labeled("Cardinality", toCardinalityBox));
-			rightPanel.add(labeled("Table", toClassBox));
+			rightPanel.add(LinkEditorDialog.labeled("Cardinality", toCardinalityBox));
+			rightPanel.add(LinkEditorDialog.labeled("Table", toClassBox));
 		} else {
 			leftPanel.setBorder(BorderFactory.createTitledBorder("From"));
-			leftPanel.add(labeled("Table", fromClassBox));
-			leftPanel.add(labeled("Field", fromFieldBox));
+			leftPanel.add(LinkEditorDialog.labeled("Table", fromClassBox));
+			leftPanel.add(LinkEditorDialog.labeled("Field", fromFieldBox));
 			rightPanel.setBorder(BorderFactory.createTitledBorder("To"));
-			rightPanel.add(labeled("Table", toClassBox));
-			rightPanel.add(labeled("Field", toFieldBox));
+			rightPanel.add(LinkEditorDialog.labeled("Table", toClassBox));
+			rightPanel.add(LinkEditorDialog.labeled("Field", toFieldBox));
 		}
 
 		final JPanel bottomRow = new JPanel(new GridLayout(1, 2, 8, 0));
@@ -153,11 +158,7 @@ public final class LinkEditorDialog {
 				final FieldModel selectedToField = (FieldModel) toFieldBox.getSelectedItem();
 				final FieldModel selectedFromField = (FieldModel) fromFieldBox.getSelectedItem();
 
-				if (selectedToField == null || !selectedToField.isPrimaryKey()) {
-					return;
-				}
-
-				if (selectedFromField == null) {
+				if (selectedToField == null || !selectedToField.isPrimaryKey() || (selectedFromField == null)) {
 					return;
 				}
 			}
@@ -186,7 +187,7 @@ public final class LinkEditorDialog {
 				dialog.dispose();
 			}
 		});
-		dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+		dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		dialog.pack();
 		dialog.setLocationRelativeTo(parent);
 		dialog.setVisible(true);
@@ -234,7 +235,7 @@ public final class LinkEditorDialog {
 		public Component getListCellRendererComponent(final javax.swing.JList<?> list, final Object value,
 				final int index, final boolean isSelected, final boolean cellHasFocus) {
 			super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-			if (value instanceof ClassModel classModel) {
+			if (value instanceof final ClassModel classModel) {
 				this.setText(this.panelType == PanelType.CONCEPTUAL ? classModel.getNames().getConceptualName()
 						: classModel.getNames().getTechnicalName());
 			}
@@ -254,7 +255,7 @@ public final class LinkEditorDialog {
 		public Component getListCellRendererComponent(final javax.swing.JList<?> list, final Object value,
 				final int index, final boolean isSelected, final boolean cellHasFocus) {
 			super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-			if (value instanceof FieldModel fieldModel) {
+			if (value instanceof final FieldModel fieldModel) {
 				this.setText(this.panelType == PanelType.CONCEPTUAL ? fieldModel.getNames().getName()
 						: fieldModel.getNames().getTechnicalName());
 			}

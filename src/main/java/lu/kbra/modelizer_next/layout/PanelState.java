@@ -61,8 +61,8 @@ public class PanelState {
 
 	@Override
 	public String toString() {
-		return "PanelState@" + System.identityHashCode(this) + " [zoom=" + zoom + ", panX=" + panX + ", panY=" + panY
-				+ ", nodeLayouts=" + nodeLayouts + ", linkLayouts=" + linkLayouts + "]";
+		return "PanelState@" + System.identityHashCode(this) + " [zoom=" + this.zoom + ", panX=" + this.panX + ", panY="
+				+ this.panY + ", nodeLayouts=" + this.nodeLayouts + ", linkLayouts=" + this.linkLayouts + "]";
 	}
 
 }

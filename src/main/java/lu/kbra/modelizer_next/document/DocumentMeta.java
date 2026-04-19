@@ -66,8 +66,9 @@ public class DocumentMeta {
 
 	@Override
 	public String toString() {
-		return "DocumentMeta@" + System.identityHashCode(this) + " [id=" + id + ", name=" + name + ", createdAt="
-				+ createdAt + ", updatedAt=" + updatedAt + ", applicationVersion=" + applicationVersion + "]";
+		return "DocumentMeta@" + System.identityHashCode(this) + " [id=" + this.id + ", name=" + this.name
+				+ ", createdAt=" + this.createdAt + ", updatedAt=" + this.updatedAt + ", applicationVersion="
+				+ this.applicationVersion + "]";
 	}
 
 }

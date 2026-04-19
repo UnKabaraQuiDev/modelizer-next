@@ -24,8 +24,8 @@ public class ColorButton extends JButton {
 		this.addActionListener(event -> {
 			final Color chosen = JColorChooser.showDialog(this, this.getText(), this.selectedColor);
 			if (chosen != null) {
-				if (callback != null) {
-					callback.accept(chosen);
+				if (this.callback != null) {
+					this.callback.accept(chosen);
 				}
 				this.selectedColor = chosen;
 				this.refreshStyle();
@@ -33,7 +33,7 @@ public class ColorButton extends JButton {
 		});
 	}
 
-	public ColorButton(final String text, final Color initialColor, Consumer<Color> cb) {
+	public ColorButton(final String text, final Color initialColor, final Consumer<Color> cb) {
 		super(text);
 		this.selectedColor = initialColor == null ? Color.WHITE : initialColor;
 		this.callback = cb;
@@ -44,8 +44,8 @@ public class ColorButton extends JButton {
 		this.addActionListener(event -> {
 			final Color chosen = JColorChooser.showDialog(this, this.getText(), this.selectedColor);
 			if (chosen != null) {
-				if (callback != null) {
-					callback.accept(chosen);
+				if (this.callback != null) {
+					this.callback.accept(chosen);
 				}
 				this.selectedColor = chosen;
 				this.refreshStyle();
@@ -71,7 +71,7 @@ public class ColorButton extends JButton {
 
 	@Override
 	public String toString() {
-		return "ColorButton@" + System.identityHashCode(this) + " [selectedColor=" + selectedColor + "]";
+		return "ColorButton@" + System.identityHashCode(this) + " [selectedColor=" + this.selectedColor + "]";
 	}
 
 }

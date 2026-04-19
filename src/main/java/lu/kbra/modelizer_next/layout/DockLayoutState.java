@@ -27,7 +27,7 @@ public class DockLayoutState {
 
 	@Override
 	public String toString() {
-		return "DockLayoutState@" + System.identityHashCode(this) + " [tabGroups=" + tabGroups + "]";
+		return "DockLayoutState@" + System.identityHashCode(this) + " [tabGroups=" + this.tabGroups + "]";
 	}
 
 }

@@ -32,8 +32,8 @@ public class FieldStyle {
 
 	@Override
 	public String toString() {
-		return "FieldStyle@" + System.identityHashCode(this) + " [textColor=" + textColor + ", backgroundColor="
-				+ backgroundColor + "]";
+		return "FieldStyle@" + System.identityHashCode(this) + " [textColor=" + this.textColor + ", backgroundColor="
+				+ this.backgroundColor + "]";
 	}
 
 }

@@ -36,12 +36,13 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import lu.kbra.modelizer_next.App;
 import lu.kbra.modelizer_next.AppConfig;
 import lu.kbra.modelizer_next.MNMain;
-import lu.kbra.modelizer_next.StylePalette;
-import lu.kbra.modelizer_next.StylePaletteService;
 import lu.kbra.modelizer_next.ThemeMode;
 import lu.kbra.modelizer_next.common.VersionComparator;
 import lu.kbra.modelizer_next.document.ModelDocument;
 import lu.kbra.modelizer_next.layout.PanelType;
+import lu.kbra.modelizer_next.style.StylePalette;
+import lu.kbra.modelizer_next.style.StylePaletteService;
+import lu.kbra.modelizer_next.ui.dialogs.StylePaletteEditorDialog;
 
 public class MainFrame extends JFrame {
 

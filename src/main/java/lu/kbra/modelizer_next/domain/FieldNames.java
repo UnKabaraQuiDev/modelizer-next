@@ -28,11 +28,11 @@ public class FieldNames {
 	}
 
 	public boolean hasTechnicalName() {
-		return technicalName != null;
+		return this.technicalName != null;
 	}
 
 	public String getTechnicalName() {
-		return technicalName == null ? name : this.technicalName;
+		return this.technicalName == null ? this.name : this.technicalName;
 	}
 
 	public void setTechnicalName(final String technicalName) {
@@ -41,8 +41,8 @@ public class FieldNames {
 
 	@Override
 	public String toString() {
-		return "FieldNames@" + System.identityHashCode(this) + " [name=" + name + ", technicalName=" + technicalName
-				+ "]";
+		return "FieldNames@" + System.identityHashCode(this) + " [name=" + this.name + ", technicalName="
+				+ this.technicalName + "]";
 	}
 
 }

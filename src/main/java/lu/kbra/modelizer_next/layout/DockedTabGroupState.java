@@ -91,8 +91,9 @@ public class DockedTabGroupState {
 
 	@Override
 	public String toString() {
-		return "DockedTabGroupState@" + System.identityHashCode(this) + " [id=" + id + ", x=" + x + ", y=" + y
-				+ ", width=" + width + ", height=" + height + ", tabs=" + tabs + ", selectedTab=" + selectedTab + "]";
+		return "DockedTabGroupState@" + System.identityHashCode(this) + " [id=" + this.id + ", x=" + this.x + ", y="
+				+ this.y + ", width=" + this.width + ", height=" + this.height + ", tabs=" + this.tabs
+				+ ", selectedTab=" + this.selectedTab + "]";
 	}
 
 }
