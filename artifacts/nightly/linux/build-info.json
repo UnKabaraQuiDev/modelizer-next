@@ -1,0 +1,9 @@
+{
+  "channel": "nightly",
+  "platform": "linux",
+  "baseVersion": "0.1",
+  "version": "0.1-NIGHTLY20260420",
+  "appVersion": "0.1.78.20260420",
+  "releaseTag": "nightly-0.1-NIGHTLY20260420",
+  "prerelease": true
+}

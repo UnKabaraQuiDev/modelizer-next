@@ -1,0 +1,12 @@
+{
+	"name": "@project.name@",
+	"description": "@project.description@",
+	"version": "@project.version@",
+	"revision": "@revision@",
+	"distributor": "@distributor@",
+	"repository": "@modelizer.repositoryUrl@",
+	"releases": "@modelizer.releasesUrl@",
+	"updatesManifest": "@modelizer.updatesManifestUrl@",
+	"issues": "@modelizer.issuesUrl@",
+	"entryPoint": "lu.kbra.modelizer_next.ModelizerAppEntryPoint"
+}

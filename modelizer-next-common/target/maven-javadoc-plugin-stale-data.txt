@@ -1,0 +1,55 @@
+-J-Duser.language=
+-J-Duser.country=
+@options
+@packages
+-classpath
+'/home/pcy113/.m2/repository/com/fasterxml/jackson/core/jackson-databind/2.21.0/jackson-databind-2.21.0.jar:/home/pcy113/.m2/repository/com/fasterxml/jackson/core/jackson-annotations/2.21/jackson-annotations-2.21.jar:/home/pcy113/.m2/repository/com/fasterxml/jackson/core/jackson-core/2.21.0/jackson-core-2.21.0.jar:/home/pcy113/.m2/repository/com/formdev/flatlaf/3.6.2/flatlaf-3.6.2.jar'
+-encoding
+'UTF-8'
+-protected
+-source
+'21'
+-sourcepath
+'/ssd2/workspaces/java2/modelizer-next/modelizer-next-bootstrap/src/main/java:/ssd2/workspaces/java2/modelizer-next/modelizer-next-bootstrap/target/generated-sources/annotations'
+-author
+-bottom
+'Copyright &#169; 2026. All rights reserved.'
+-charset
+'UTF-8'
+-d
+'/ssd2/workspaces/java2/modelizer-next/modelizer-next-bootstrap/target/apidocs'
+-docencoding
+'UTF-8'
+-Xdoclint:all,-reference,-missing,-accessibility
+-doctitle
+'Modelizer Next Bootstrap 0.1-NIGHTLY20260420 API'
+-use
+-version
+-windowtitle
+'Modelizer Next Bootstrap 0.1-NIGHTLY20260420 API'
+lu.kbra.modelizer_next.bootstrap
+/home/pcy113/.m2/repository/com/fasterxml/jackson/core/jackson-databind/2.21.0/jackson-databind-2.21.0.jar = 1768777589000
+/home/pcy113/.m2/repository/com/fasterxml/jackson/core/jackson-annotations/2.21/jackson-annotations-2.21.jar = 1768776434000
+/home/pcy113/.m2/repository/com/fasterxml/jackson/core/jackson-core/2.21.0/jackson-core-2.21.0.jar = 1768776893000
+/home/pcy113/.m2/repository/com/formdev/flatlaf/3.6.2/flatlaf-3.6.2.jar = 1760080844000
+/ssd2/workspaces/java2/modelizer-next/modelizer-next-bootstrap/src/main/java = 1776692451000
+/ssd2/workspaces/java2/modelizer-next/modelizer-next-bootstrap/target/generated-sources/annotations = 1776700454243
+/ssd2/workspaces/java2/modelizer-next/modelizer-next-bootstrap/target/apidocs/allclasses-index.html = 1776700456731
+/ssd2/workspaces/java2/modelizer-next/modelizer-next-bootstrap/target/apidocs/allpackages-index.html = 1776700456732
+/ssd2/workspaces/java2/modelizer-next/modelizer-next-bootstrap/target/apidocs/copy.svg = 1776700456757
+/ssd2/workspaces/java2/modelizer-next/modelizer-next-bootstrap/target/apidocs/element-list = 1776700456670
+/ssd2/workspaces/java2/modelizer-next/modelizer-next-bootstrap/target/apidocs/help-doc.html = 1776700456754
+/ssd2/workspaces/java2/modelizer-next/modelizer-next-bootstrap/target/apidocs/index-all.html = 1776700456748
+/ssd2/workspaces/java2/modelizer-next/modelizer-next-bootstrap/target/apidocs/index.html = 1776700456751
+/ssd2/workspaces/java2/modelizer-next/modelizer-next-bootstrap/target/apidocs/link.svg = 1776700456758
+/ssd2/workspaces/java2/modelizer-next/modelizer-next-bootstrap/target/apidocs/member-search-index.js = 1776700456735
+/ssd2/workspaces/java2/modelizer-next/modelizer-next-bootstrap/target/apidocs/module-search-index.js = 1776700456733
+/ssd2/workspaces/java2/modelizer-next/modelizer-next-bootstrap/target/apidocs/overview-tree.html = 1776700456718
+/ssd2/workspaces/java2/modelizer-next/modelizer-next-bootstrap/target/apidocs/package-search-index.js = 1776700456734
+/ssd2/workspaces/java2/modelizer-next/modelizer-next-bootstrap/target/apidocs/script.js = 1776700456757
+/ssd2/workspaces/java2/modelizer-next/modelizer-next-bootstrap/target/apidocs/search-page.js = 1776700456761
+/ssd2/workspaces/java2/modelizer-next/modelizer-next-bootstrap/target/apidocs/search.html = 1776700456750
+/ssd2/workspaces/java2/modelizer-next/modelizer-next-bootstrap/target/apidocs/search.js = 1776700456760
+/ssd2/workspaces/java2/modelizer-next/modelizer-next-bootstrap/target/apidocs/stylesheet.css = 1776700456756
+/ssd2/workspaces/java2/modelizer-next/modelizer-next-bootstrap/target/apidocs/tag-search-index.js = 1776700456735
+/ssd2/workspaces/java2/modelizer-next/modelizer-next-bootstrap/target/apidocs/type-search-index.js = 1776700456734

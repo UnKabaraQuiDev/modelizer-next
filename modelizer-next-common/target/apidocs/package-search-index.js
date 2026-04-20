@@ -1,0 +1,1 @@
+packageSearchIndex = [{"l":"All Packages","u":"allpackages-index.html"},{"l":"lu.kbra.modelizer_next.bootstrap"}];updateSearchResults();

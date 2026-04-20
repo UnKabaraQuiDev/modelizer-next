@@ -1,0 +1,7 @@
+<?xml version="1.0" ?>
+<jpackage-state version="21.0.10" platform="linux">
+  <app-version>0.1-NIGHTLY20260420</app-version>
+  <main-launcher>modelizer-next-app</main-launcher>
+  <main-class>lu.kbra.modelizer_next.MNMain</main-class>
+  <signed>false</signed>
+  <app-store>false</app-store></jpackage-state>

@@ -1,19 +1,20 @@
 {
-  "stable": {
-    "version": "0.2.0",
-    "tag": "v0.2.0",
-    "releaseUrl": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/tag/v0.2.0",
-    "notes": "Bug fixes and usability improvements.",
-    "assets": {
-      "windows": {
-        "name": "Modelizer Next-0.2.0.exe"
-      },
-      "linux": {
-        "name": "modelizer-next_0.2.0_amd64.deb"
-      },
-      "mac": {
-        "name": "Modelizer Next-0.2.0.dmg"
-      }
-    }
+  "release": {
+    "version": "0.1.0-RELEASE20260420",
+    "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/v0.1.0/modelizer-next-app-0.1.0-shaded.jar",
+    "releaseUrl": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/tag/v0.1.0",
+    "notes": "Latest stable release."
+  },
+  "snapshot": {
+    "version": "0.2.0-SNAPSHOT20260420",
+    "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/snapshot-2026-04-20/modelizer-next-app-0.2.0-SNAPSHOT-shaded.jar",
+    "releaseUrl": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/tag/snapshot-2026-04-20",
+    "notes": "Latest snapshot build."
+  },
+  "nightly": {
+    "version": "0.2.0-NIGHTLY20260420",
+    "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/nightly-2026-04-20/modelizer-next-app-0.2.0-NIGHTLY-shaded.jar",
+    "releaseUrl": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/tag/nightly-2026-04-20",
+    "notes": "Latest nightly build."
   }
 }

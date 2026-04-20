@@ -1,4 +1,4 @@
-name: Maven Package (Nightly)
+name: Nightly Build
 
 on:
   workflow_dispatch:
@@ -10,146 +10,131 @@ permissions:
 
 jobs:
   prepare:
-    runs-on: self-hosted
-
+    runs-on: ubuntu-latest
     outputs:
-      should_run: ${{ steps.decision.outputs.should_run }}
-      is_snapshot: ${{ steps.snapshot.outputs.is_snapshot }}
-      version: ${{ steps.snapshot.output.version }}
-      date: ${{ steps.prepare.outputs.date }}
-      tag: ${{ steps.decision.outputs.tag }}
-
+      should_run: ${{ steps.decide.outputs.should_run }}
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-
-      - name: Check for commits in last 26h
-        id: changes
+      - id: changes
         if: github.event_name == 'schedule'
         run: |
-          LOG_OUTPUT=$(git log \
-            --since='26 hours ago' \
-            --oneline \
-            -- . ':(exclude).github/**' \
-            | grep -v '\[bot\]' \
-            | grep -v 'github-actions' \
-            | grep -v '^\[NIGHTLY\]' \
-            || true)
-
-          echo "Git log output:"
-          echo "$LOG_OUTPUT"
-
+          LOG_OUTPUT=$(git log --since='26 hours ago' --oneline -- . ':(exclude).github/**' ':(exclude)registry/**' | grep -v '\[bot\]' || true)
           if echo "$LOG_OUTPUT" | grep -q .; then
-            echo "has_changes=true" >> $GITHUB_OUTPUT
+            echo "has_changes=true" >> "$GITHUB_OUTPUT"
           else
-            echo "has_changes=false" >> $GITHUB_OUTPUT
+            echo "has_changes=false" >> "$GITHUB_OUTPUT"
           fi
-
-      - name: Detect SNAPSHOT version
-        id: snapshot
+      - id: decide
         run: |
-          VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
-          echo "version=$VERSION"
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
-
-          if [[ "$VERSION" == *"-SNAPSHOT" ]]; then
-            echo "is_snapshot=true" >> $GITHUB_OUTPUT
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "should_run=true" >> "$GITHUB_OUTPUT"
+          elif [ "${{ steps.changes.outputs.has_changes }}" = "true" ]; then
+            echo "should_run=true" >> "$GITHUB_OUTPUT"
           else
-            echo "is_snapshot=false" >> $GITHUB_OUTPUT
+            echo "should_run=false" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Get current date
-        id: date
-        run: echo "date=$(date +'%Y-%m-%d_%H-%M-%S')" >> $GITHUB_OUTPUT
-
-      - name: Decide if pipeline should run
-        id: decision
-        run: |
-          HAS_CHANGES="${{ steps.changes.outputs.has_changes }}"
-          IS_SNAPSHOT="${{ steps.snapshot.outputs.is_snapshot }}"
-
-          echo "has_changes=$HAS_CHANGES"
-          echo "is_snapshot=$IS_SNAPSHOT"
-          echo "event=${{ github.event_name }}"
-
-          echo "tag=${{ steps.snapshot.outputs.version }}-NIGHTLY-${{ steps.date.outputs.date }}" >> $GITHUB_OUTPUT
-
-          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
-            echo "should_run=true" >> $GITHUB_OUTPUT
-          elif [[ "$IS_SNAPSHOT" == "true" && "$HAS_CHANGES" == "true" ]]; then
-            echo "should_run=true" >> $GITHUB_OUTPUT
-          else
-            echo "should_run=false" >> $GITHUB_OUTPUT
-          fi
-
-  format:
-    runs-on: self-hosted
+  build-linux:
     needs: prepare
-    if: github.event_name == 'workflow_dispatch' || needs.prepare.outputs.should_run == 'true'
+    if: needs.prepare.outputs.should_run == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 21
+          cache: maven
+      - name: Build Linux nightly artifacts
+        run: ./script/build-nightly-linux.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: nightly-linux
+          path: artifacts/nightly/linux/**
+          if-no-files-found: error
 
-    permissions:
-      contents: write
+  build-windows:
+    needs: prepare
+    if: needs.prepare.outputs.should_run == 'true'
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 21
+          cache: maven
+      - name: Install WiX Toolset 3
+        run: |
+          choco install wixtoolset --version 3.11.2 --no-progress -y
+          echo "/c/Program Files (x86)/WiX Toolset v3.11/bin" >> "$GITHUB_PATH"
+      - name: Build Windows nightly artifacts
+        run: ./script/build-nightly-windows.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: nightly-windows
+          path: artifacts/nightly/windows/**
+          if-no-files-found: error
 
+  publish:
+    needs: [prepare, build-linux, build-windows]
+    if: needs.prepare.outputs.should_run == 'true'
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-
-      - uses: actions/setup-java@v5
+      - uses: actions/download-artifact@v4
         with:
-          distribution: temurin
-          java-version: 21
-
-      - name: Apply formatting
-        run: mvn -B -Pformat initialize spotless:apply
-
-      - name: Commit & push if needed
+          path: collected
+      - id: meta
         run: |
-          git config user.name "github-actions"
-          git config user.email "github-actions@github.com"
-
-          git add .
-          git diff --cached --quiet || git commit -m "[NIGHTLY] Apply code formatting"
-
-          git push || echo "Push failed, continuing..."
-
-          TAG=${{ needs.prepare.outputs.tag }}
-
-          git tag "$TAG"
-          git push origin "$TAG"
-
-  build:
-    runs-on: self-hosted
-    needs: [prepare, format]
-    if: github.event_name == 'workflow_dispatch' || needs.prepare.outputs.should_run == 'true'
-
-    permissions:
-      contents: write
-
-    env:
-      MAVEN_USERNAME: ${{ secrets.MAVEN_USERNAME }}
-      MAVEN_PASSWORD: ${{ secrets.MAVEN_PASSWORD }}
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-java@v5
-        with:
-          distribution: temurin
-          java-version: 21
-          server-id: nexus.kbra.lu-snapshots
-          server-username: MAVEN_USERNAME
-          server-password: MAVEN_PASSWORD
-
-      - name: Build and deploy
-        run: mvn -B -Pall clean compile package install deploy -Ddistributor="Automated build ${{ needs.prepare.outputs.date }}"
-
-      - name: Create GitHub Release
+          RELEASE_TAG=$(cat collected/nightly-linux/release-tag.txt)
+          VERSION=$(cat collected/nightly-linux/version.txt)
+          APP_VERSION=$(cat collected/nightly-linux/app-version.txt)
+          echo "release_tag=${RELEASE_TAG}" >> "$GITHUB_OUTPUT"
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+          echo "app_version=${APP_VERSION}" >> "$GITHUB_OUTPUT"
+      - name: Create or update nightly release
         uses: softprops/action-gh-release@v2
         with:
-          name: ${{ needs.prepare.outputs.tag }}
-          tag_name: ${{ needs.prepare.outputs.tag }}
-          files: "target/*.jar"
-          make_latest: false
+          tag_name: ${{ steps.meta.outputs.release_tag }}
+          name: Nightly ${{ steps.meta.outputs.version }}
           prerelease: true
+          make_latest: false
+          generate_release_notes: true
+          files: |
+            collected/nightly-linux/*
+            collected/nightly-windows/*
+      - name: Update nightly registry branch
+        env:
+          RELEASE_TAG: ${{ steps.meta.outputs.release_tag }}
+          VERSION: ${{ steps.meta.outputs.version }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          SCRIPT_PATH="$RUNNER_TEMP/update-channel-registry.sh"
+          cp script/update-channel-registry.sh "$SCRIPT_PATH"
+          chmod +x "$SCRIPT_PATH"
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
+          if git ls-remote --heads origin update-registry | grep -q update-registry; then
+            git fetch origin update-registry:update-registry
+            git checkout update-registry
+          else
+            git checkout --orphan update-registry
+            git rm -rf . >/dev/null 2>&1 || true
+          fi
+          mkdir -p registry
+          "$SCRIPT_PATH" registry/nightly.json nightly "$VERSION" "$RELEASE_TAG" \
+            "https://github.com/${{ github.repository }}/releases/tag/$RELEASE_TAG" \
+            "https://github.com/${{ github.repository }}/releases/download/$RELEASE_TAG/modelizer-next-app-$VERSION.jar" \
+            '["linux","windows"]' \
+            "Latest nightly build."
+          git add registry/nightly.json
+          git commit -m "[skip ci] Update nightly registry to $VERSION" || exit 0
+          git push origin update-registry

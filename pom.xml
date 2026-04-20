@@ -6,49 +6,33 @@
 	<groupId>lu.kbra</groupId>
 	<artifactId>modelizer-next</artifactId>
 	<version>${revision}</version>
-	<name>Modelizer Next</name>
-	<description>A compatible replacement for Modelizer</description>
+	<packaging>pom</packaging>
+	<name>Modelizer Next Parent</name>
+	<description>Bootstrap and application build for Modelizer Next</description>
+
+	<modules>
+		<module>modelizer-next-bootstrap</module>
+		<module>modelizer-next-app</module>
+		<module>modelizer-next-common</module>
+	</modules>
 
 	<properties>
 		<revision>0.1-SNAPSHOT</revision>
 		<java.version>21</java.version>
 		<maven.compiler.source>${java.version}</maven.compiler.source>
 		<maven.compiler.target>${java.version}</maven.compiler.target>
-		<app.version>${revision}</app.version>
-		<app.mainClass>lu.kbra.modelizer_next.MNMain</app.mainClass>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<distributor>Manual build</distributor>
-		<app.repositoryUrl>https://github.com/UnKabaraQuiDev/modelizer-next</app.repositoryUrl>
-		<app.releasesUrl>
-			https://github.com/UnKabaraQuiDev/modelizer-next/releases</app.releasesUrl>
-		<app.updatedManifestUrl>
-			https://raw.githubusercontent.com/UnKabaraQuiDev/modelizer-next/main/versions.json</app.updatedManifestUrl>
-		<app.issuesUrl>
-			https://github.com/UnKabaraQuiDev/modelizer-next/issues</app.issuesUrl>
+		<modelizer.repositoryUrl>
+			https://github.com/UnKabaraQuiDev/modelizer-next</modelizer.repositoryUrl>
+		<modelizer.releasesUrl>${modelizer.repositoryUrl}/releases</modelizer.releasesUrl>
+		<modelizer.updatesManifestUrl>
+			https://raw.githubusercontent.com/UnKabaraQuiDev/modelizer-next/main/versions.json</modelizer.updatesManifestUrl>
+		<modelizer.issuesUrl>${modelizer.repositoryUrl}/issues</modelizer.issuesUrl>
+		<jpackage.addModules>
+			java.base,java.desktop,java.logging,java.net.http,jdk.unsupported</jpackage.addModules>
+		<app.mainClass>filled in by modules</app.mainClass>
 	</properties>
-
-	<contributors>
-		<contributor>
-			<name>UnKabaraQuiDev</name>
-			<url>https://github.com/UnKabaraQuiDev/</url>
-			<timezone>UTC+2</timezone>
-		</contributor>
-	</contributors>
-
-	<licenses>
-		<license>
-			<name>GNU General Public License, Version 3</name>
-			<url>https://www.gnu.org/licenses/gpl-3.0.html</url>
-			<distribution>repo</distribution>
-		</license>
-	</licenses>
-
-	<scm>
-		<connection>scm:git:git@github.com:UnKabaraQuiDev/modelizer-next.git</connection>
-		<developerConnection>
-			scm:git:git@github.com:UnKabaraQuiDev/modelizer-next.git</developerConnection>
-		<url>https://github.com/UnKabaraQuiDev/modelizer-next</url>
-		<tag>HEAD</tag>
-	</scm>
 
 	<repositories>
 		<repository>
@@ -58,10 +42,6 @@
 	</repositories>
 
 	<distributionManagement>
-		<!-- <repository>
-			<id>nexus.kbra.lu-nightly</id>
-			<url>https://nexus.kbra.lu/repository/maven-nightly/</url>
-		</repository> -->
 		<repository>
 			<id>nexus.kbra.lu-releases</id>
 			<url>https://nexus.kbra.lu/repository/maven-releases/</url>
@@ -81,34 +61,105 @@
 				<scope>import</scope>
 				<type>pom</type>
 			</dependency>
+			<dependency>
+				<groupId>lu.kbra</groupId>
+				<artifactId>modelizer-next-bootstrap</artifactId>
+				<version>${revision}</version>
+			</dependency>
+			<dependency>
+				<groupId>lu.kbra</groupId>
+				<artifactId>modelizer-next-app</artifactId>
+				<version>${revision}</version>
+			</dependency>
+			<dependency>
+				<groupId>lu.kbra</groupId>
+				<artifactId>modelizer-next-common</artifactId>
+				<version>${revision}</version>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
 
-	<dependencies>
-		<dependency>
-			<groupId>lu.kbra</groupId>
-			<artifactId>pclib-common</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>com.fasterxml.jackson.core</groupId>
-			<artifactId>jackson-databind</artifactId>
-			<version>2.21.0</version>
-		</dependency>
-		<dependency>
-			<groupId>com.fasterxml.jackson.datatype</groupId>
-			<artifactId>jackson-datatype-jsr310</artifactId>
-			<version>2.20.2</version>
-		</dependency>
-
-		<dependency>
-			<groupId>com.formdev</groupId>
-			<artifactId>flatlaf</artifactId>
-			<version>3.6.2</version>
-		</dependency>
-	</dependencies>
-
 	<build>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-compiler-plugin</artifactId>
+					<version>3.13.0</version>
+					<configuration>
+						<release>${java.version}</release>
+					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-resources-plugin</artifactId>
+					<version>3.3.1</version>
+					<configuration>
+						<encoding>${project.build.sourceEncoding}</encoding>
+					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-shade-plugin</artifactId>
+					<version>3.5.3</version>
+				</plugin>
+				<plugin>
+					<groupId>org.codehaus.mojo</groupId>
+					<artifactId>exec-maven-plugin</artifactId>
+					<version>3.5.0</version>
+				</plugin>
+				<plugin>
+					<groupId>org.codehaus.mojo</groupId>
+					<artifactId>build-helper-maven-plugin</artifactId>
+					<version>3.6.0</version>
+				</plugin>
+				<plugin>
+					<groupId>org.codehaus.mojo</groupId>
+					<artifactId>flatten-maven-plugin</artifactId>
+					<version>1.7.3</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-source-plugin</artifactId>
+					<version>3.3.1</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-javadoc-plugin</artifactId>
+					<version>3.8.0</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-deploy-plugin</artifactId>
+					<version>3.1.2</version>
+				</plugin>
+				<plugin>
+					<groupId>com.diffplug.spotless</groupId>
+					<artifactId>spotless-maven-plugin</artifactId>
+					<version>2.43.0</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+				  	<artifactId>maven-antrun-plugin</artifactId>
+				  	<executions>
+					    <execution>
+					    	<id>copy-shaded-jar</id>
+					      	<phase>install</phase>
+					      	<configuration>
+						        <target>
+						          	<mkdir dir="${project.build.directory}/jpackage-input" />
+						          	<copy file="${project.build.directory}/${project.build.finalName}-with-dependencies.jar" tofile="${project.build.directory}/jpackage-input/${project.build.finalName}.jar" />
+						 	    </target>
+					 		</configuration>
+					      	<goals>
+					        	<goal>run</goal>
+					      	</goals>
+					 	</execution>
+					</executions>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+
 		<resources>
 			<resource>
 				<directory>src/main/resources</directory>
@@ -121,53 +172,52 @@
 
 		<plugins>
 			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>flatten-maven-plugin</artifactId>
-				<version>1.7.3</version>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-shade-plugin</artifactId>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>shade</goal>
+						</goals>
+						<configuration>
+							<createDependencyReducedPom>false</createDependencyReducedPom>
+							<shadedArtifactAttached>true</shadedArtifactAttached>
+                           	<shadedClassifierName>with-dependencies</shadedClassifierName>
+							<transformers>
+								<transformer
+									implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+									<mainClass>${app.mainClass}</mainClass>
+								</transformer>
+							</transformers>
+						</configuration>
+					</execution>
+				</executions>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-deploy-plugin</artifactId>
-				<version>3.1.2</version>
 				<configuration>
 					<skip>true</skip>
-				</configuration>
-			</plugin>
-			<plugin>
-				<artifactId>maven-resources-plugin</artifactId>
-				<version>3.3.1</version>
-				<configuration>
-					<encoding>UTF-8</encoding>
 				</configuration>
 			</plugin>
 		</plugins>
 	</build>
 
 	<profiles>
-		<!-- To build native: enable 'native-build' and native-[linux|windows]''
-		profiles for phase 'install" -->
-		<!-- for shade: profile 'shade-package' for phase 'package' -->
-		<!-- javadoc, source, shade and deploy: 'all' profile -->
-		<!-- format for format -->
 		<profile>
 			<id>format</id>
-			<activation>
-				<activeByDefault>false</activeByDefault>
-			</activation>
 			<build>
 				<plugins>
 					<plugin>
 						<artifactId>maven-antrun-plugin</artifactId>
 						<version>3.1.0</version>
-
 						<executions>
 							<execution>
 								<phase>initialize</phase>
-
 								<goals>
 									<goal>run</goal>
 								</goals>
-
 								<configuration>
 									<target>
 										<mkdir
@@ -181,24 +231,19 @@
 							</execution>
 						</executions>
 					</plugin>
-
 					<plugin>
 						<groupId>com.diffplug.spotless</groupId>
 						<artifactId>spotless-maven-plugin</artifactId>
-						<version>2.43.0</version>
-
 						<configuration>
 							<java>
 								<eclipse>
 									<file>
 										${maven.multiModuleProjectDirectory}/.local/eclipse-format.xml</file>
 								</eclipse>
-
 								<removeUnusedImports />
 								<importOrder>
 									<order>java,javax,org,com,lu</order>
 								</importOrder>
-
 								<trimTrailingWhitespace />
 								<endWithNewline />
 							</java>
@@ -207,180 +252,7 @@
 				</plugins>
 			</build>
 		</profile>
-		<profile>
-			<id>native-build</id>
-			<build>
-				<plugins>
-					<plugin>
-						<artifactId>maven-dependency-plugin</artifactId>
-						<version>3.6.0</version>
-						<executions>
-							<execution>
-								<id>copy-dependencies</id>
-								<phase>package</phase>
-								<goals>
-									<goal>copy-dependencies</goal>
-								</goals>
-								<configuration>
-									<outputDirectory>
-										${project.build.directory}/jpackage-input</outputDirectory>
-									<includeScope>runtime</includeScope>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-					<plugin>
-						<artifactId>maven-resources-plugin</artifactId>
-						<version>3.3.1</version>
-						<executions>
-							<execution>
-								<id>copy-jar</id>
-								<phase>package</phase>
-								<goals>
-									<goal>copy-resources</goal>
-								</goals>
-								<configuration>
-									<outputDirectory>
-										${project.build.directory}/jpackage-input</outputDirectory>
-									<resources>
-										<resource>
-											<directory>
-												${project.build.directory}</directory>
-											<includes>
-												<include>
-													${project.build.finalName}.jar</include>
-											</includes>
-										</resource>
-									</resources>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-		<profile>
-			<id>native-windows</id>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.codehaus.mojo</groupId>
-						<artifactId>exec-maven-plugin</artifactId>
-						<version>3.1.0</version>
-						<executions>
-							<execution>
-								<id>package-windows</id>
-								<phase>install</phase>
-								<goals>
-									<goal>exec</goal>
-								</goals>
-								<configuration>
-									<executable>jpackage</executable>
-									<arguments>
-										<argument>--type</argument>
-										<argument>app-image</argument>
-										<argument>--name</argument>
-										<argument>${project.artifactId}</argument>
-										<argument>--app-version</argument>
-										<argument>${app.version}</argument>
-										<argument>--input</argument>
-										<argument>
-											${project.build.directory}/jpackage-input</argument>
-										<argument>--main-jar</argument>
-										<argument>${project.build.finalName}.jar</argument>
-										<argument>--main-class</argument>
-										<argument>${app.mainClass}</argument>
-										<argument>--dest</argument>
-										<argument>
-											${project.build.directory}/dist/windows</argument>
-										<argument>--add-modules</argument>
-										<argument>
-											java.base,java.desktop,java.logging,jdk.unsupported</argument>
-									</arguments>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-		<profile>
-			<id>native-linux</id>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.codehaus.mojo</groupId>
-						<artifactId>exec-maven-plugin</artifactId>
-						<version>3.1.0</version>
-						<executions>
-							<execution>
-								<id>package-linux</id>
-								<phase>install</phase>
-								<goals>
-									<goal>exec</goal>
-								</goals>
-								<configuration>
-									<executable>jpackage</executable>
-									<arguments>
-										<argument>--type</argument>
-										<argument>app-image</argument>
-										<argument>--name</argument>
-										<argument>${project.artifactId}</argument>
-										<argument>--app-version</argument>
-										<argument>${app.version}</argument>
-										<argument>--input</argument>
-										<argument>
-											${project.build.directory}/jpackage-input/</argument>
-										<argument>--main-jar</argument>
-										<argument>${project.build.finalName}.jar</argument>
-										<argument>--main-class</argument>
-										<argument>${app.mainClass}</argument>
-										<argument>--dest</argument>
-										<argument>
-											${project.build.directory}/dist/linux</argument>
-										<argument>--add-modules</argument>
-										<argument>
-											java.base,java.desktop,java.logging,jdk.unsupported</argument>
-									</arguments>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-		<profile>
-			<id>shade-package</id>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-shade-plugin</artifactId>
-						<version>3.5.0</version>
-						<executions>
-							<execution>
-								<phase>package</phase>
-								<goals>
-									<goal>shade</goal>
-								</goals>
-								<configuration>
-									<transformers>
-										<transformer
-											implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-											<mainClass>${app.mainClass}</mainClass>
-										</transformer>
-										<transformer
-											implementation="org.apache.maven.plugins.shade.resource.ApacheLicenseResourceTransformer" />
-										<transformer
-											implementation="org.apache.maven.plugins.shade.resource.ApacheNoticeResourceTransformer" />
-									</transformers>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
+
 		<profile>
 			<id>all</id>
 			<build>
@@ -388,7 +260,6 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-source-plugin</artifactId>
-						<version>3.4.0</version>
 						<executions>
 							<execution>
 								<id>attach-sources</id>
@@ -401,7 +272,6 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-javadoc-plugin</artifactId>
-						<version>3.12.0</version>
 						<executions>
 							<execution>
 								<id>attach-javadocs</id>
@@ -417,35 +287,7 @@
 					</plugin>
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-shade-plugin</artifactId>
-						<version>3.5.0</version>
-						<executions>
-							<execution>
-								<phase>package</phase>
-								<goals>
-									<goal>shade</goal>
-								</goals>
-								<configuration>
-									<shadedArtifactAttached>true</shadedArtifactAttached>
-									<shadedClassifierName>with-dependencies</shadedClassifierName>
-									<transformers>
-										<transformer
-											implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-											<mainClass>${app.mainClass}</mainClass>
-										</transformer>
-										<transformer
-											implementation="org.apache.maven.plugins.shade.resource.ApacheLicenseResourceTransformer" />
-										<transformer
-											implementation="org.apache.maven.plugins.shade.resource.ApacheNoticeResourceTransformer" />
-									</transformers>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-deploy-plugin</artifactId>
-						<version>3.1.2</version>
 						<configuration>
 							<skip>false</skip>
 							<deployAtEnd>true</deployAtEnd>
@@ -455,5 +297,4 @@
 			</build>
 		</profile>
 	</profiles>
-
 </project>

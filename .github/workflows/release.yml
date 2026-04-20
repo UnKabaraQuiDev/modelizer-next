@@ -1,132 +1,139 @@
-name: Release
+name: Release Build
 
 on:
   push:
     tags:
       - "v*"
+      - "!v*-SNAPSHOT"
   workflow_dispatch:
     inputs:
       tag:
         description: "Tag to build"
         required: true
 
+permissions:
+  contents: write
+
 jobs:
-  prepare:
-    runs-on: self-hosted
-
+  verify:
+    runs-on: ubuntu-latest
     outputs:
-      should_format: ${{ steps.decide.outputs.should_format }}
-      date: ${{ steps.date.outputs.date }}
-
+      tag: ${{ steps.tag.outputs.tag }}
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.inputs.tag || github.ref }}
-          fetch-depth: 0
-
-      - name: Ensure NOT a SNAPSHOT version
-        run: |
-          VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
-          echo "Detected version: $VERSION"
-
-          if [[ "$VERSION" == *"-SNAPSHOT" ]]; then
-            echo "Snapshot version detected. Releases must NOT be snapshots."
-            exit 1
-          fi
-
-      - name: Get current date
-        id: date
-        run: echo "date=$(date +'%Y-%m-%d_%H-%M-%S')" >> $GITHUB_OUTPUT
-
-      - name: Decide if formatting should run
-        id: decide
-        run: |
-          SHOULD_FORMAT=false
-
-          if [ "${{ github.event_name }}" = "push" ]; then
-            TAG_COMMIT=$(git rev-list -n 1 ${{ github.ref }})
-            HEAD_COMMIT=$(git rev-parse HEAD)
-
-            echo "Tag commit: $TAG_COMMIT"
-            echo "HEAD commit: $HEAD_COMMIT"
-
-            if [ "$TAG_COMMIT" = "$HEAD_COMMIT" ]; then
-              SHOULD_FORMAT=true
-            fi
-          fi
-
-          echo "should_format=$SHOULD_FORMAT" >> $GITHUB_OUTPUT
-
-  format:
-    needs: prepare
-    runs-on: self-hosted
-
-    if: needs.prepare.outputs.should_format == 'true'
-
-    permissions:
-      contents: write
-
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.inputs.tag || github.ref }}
-          fetch-depth: 0
-
+          ref: ${{ github.event.release.tag_name }}
       - uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: 21
-
-      - name: Apply formatting
-        run: mvn -B -Pformat initialize spotless:apply
-
-      - name: Commit & push if needed
+          cache: maven
+      - name: Ensure NOT a SNAPSHOT version
         run: |
-          git config user.name "github-actions"
-          git config user.email "github-actions@github.com"
+          VERSION=$(mvn -B help:evaluate -Dexpression=project.version -q -DforceStdout)
+          echo "Detected version: $VERSION"
+          if [[ "$VERSION" == *"-SNAPSHOT"* ]]; then
+            echo "Snapshot version detected. Releases must NOT be snapshots."
+            exit 1
+          fi
+      - id: tag
+        run: echo "tag=${{ github.event.release.tag_name }}" >> "$GITHUB_OUTPUT"
 
-          git add .
-          git diff --cached --quiet || git commit -m "[NIGHTLY] Apply code formatting"
-
-          git push || echo "Push failed, continuing..."
-
-  release:
-    needs: [prepare, format]
-    runs-on: self-hosted
-
-    if: always()
-
-    permissions:
-      contents: write
-
-    env:
-      MAVEN_USERNAME: ${{ secrets.MAVEN_USERNAME }}
-      MAVEN_PASSWORD: ${{ secrets.MAVEN_PASSWORD }}
-
+  build-linux:
+    needs: verify
+    runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.inputs.tag || github.ref }}
-          fetch-depth: 0
-
-      - name: Set up Java
-        uses: actions/setup-java@v5
+          ref: ${{ needs.verify.outputs.tag }}
+      - uses: actions/setup-java@v5
         with:
           distribution: temurin
-          java-version: 17
-          server-id: nexus.kbra.lu-releases
-          server-username: MAVEN_USERNAME
-          server-password: MAVEN_PASSWORD
+          java-version: 21
+          cache: maven
+      - name: Build Linux release artifacts
+        run: ./script/build-release-linux.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: release-linux
+          path: artifacts/release/linux/**
+          if-no-files-found: error
 
-      - name: Build project
-        run: mvn -B -Pall clean package deploy -Ddistributor="Automated build ${{ needs.prepare.outputs.date }}"
+  build-windows:
+    needs: verify
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.verify.outputs.tag }}
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 21
+          cache: maven
+      - name: Install WiX Toolset 3
+        run: |
+          choco install wixtoolset --version 3.11.2 --no-progress -y
+          echo "/c/Program Files (x86)/WiX Toolset v3.11/bin" >> "$GITHUB_PATH"
+      - name: Build Windows release artifacts
+        run: ./script/build-release-windows.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: release-windows
+          path: artifacts/release/windows/**
+          if-no-files-found: error
 
-      - name: Create GitHub Release
+  publish:
+    needs: [verify, build-linux, build-windows]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          path: collected
+      - id: meta
+        run: |
+          VERSION=$(cat collected/release-linux/version.txt)
+          APP_VERSION=$(cat collected/release-linux/app-version.txt)
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+          echo "app_version=${APP_VERSION}" >> "$GITHUB_OUTPUT"
+      - name: Upload release assets
         uses: softprops/action-gh-release@v2
         with:
-          name: Release ${{ github.event.inputs.tag || github.ref_name }}
-          tag_name: ${{ github.event.inputs.tag || github.ref_name }}
-          files: "target/*.jar"
-          make_latest: true
+          tag_name: ${{ needs.verify.outputs.tag }}
+          name: ${{ github.event.release.name || needs.verify.outputs.tag }}
           prerelease: false
+          make_latest: true
+          files: |
+            collected/release-linux/*
+            collected/release-windows/*
+      - name: Update release registry branch
+        env:
+          RELEASE_TAG: ${{ needs.verify.outputs.tag }}
+          VERSION: ${{ steps.meta.outputs.version }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          SCRIPT_PATH="$RUNNER_TEMP/update-channel-registry.sh"
+          cp script/update-channel-registry.sh "$SCRIPT_PATH"
+          chmod +x "$SCRIPT_PATH"
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
+          if git ls-remote --heads origin update-registry | grep -q update-registry; then
+            git fetch origin update-registry:update-registry
+            git checkout update-registry
+          else
+            git checkout --orphan update-registry
+            git rm -rf . >/dev/null 2>&1 || true
+          fi
+          mkdir -p registry
+          "$SCRIPT_PATH" registry/release.json release "$VERSION" "$RELEASE_TAG" \
+            "https://github.com/${{ github.repository }}/releases/tag/$RELEASE_TAG" \
+            "https://github.com/${{ github.repository }}/releases/download/$RELEASE_TAG/modelizer-next-app-$VERSION.jar" \
+            '["linux","windows"]' \
+            "Latest stable release."
+          git add registry/release.json
+          git commit -m "[skip ci] Update release registry to $VERSION" || exit 0
+          git push origin update-registry
