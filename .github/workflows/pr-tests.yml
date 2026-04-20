@@ -19,10 +19,10 @@ jobs:
         uses: actions/setup-java@v5
         with:
           distribution: temurin
-          java-version: 17
+          java-version: 21
 
       - name: Apply formatting
-        run: mvn -B spotless:apply
+        run: mvn -B -Pformat initialize spotless:apply
 
       - name: Fail if formatting changes detected
         run: |
@@ -45,7 +45,7 @@ jobs:
         uses: actions/setup-java@v5
         with:
           distribution: temurin
-          java-version: 17
+          java-version: 21
 
       - name: Build and test with Maven
         run: mvn -B clean test
