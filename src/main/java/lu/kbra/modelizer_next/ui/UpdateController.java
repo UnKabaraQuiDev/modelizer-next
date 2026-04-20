@@ -40,6 +40,7 @@ final class UpdateController {
 
 	private void checkForUpdates(final boolean userInitiated) {
 		new SwingWorker<UpdateCheckResult, Void>() {
+
 			@Override
 			protected UpdateCheckResult doInBackground() throws Exception {
 				return UpdateController.this.updateService.checkForUpdates();
@@ -54,12 +55,12 @@ final class UpdateController {
 					if (userInitiated) {
 						final Throwable cause = ex.getCause() == null ? ex : ex.getCause();
 						JOptionPane.showMessageDialog(UpdateController.this.owner,
-								"Failed to check for updates:\n" + cause.getMessage(),
-								"Update check failed",
+								"Failed to check for updates:\n" + cause.getMessage(), "Update check failed",
 								JOptionPane.ERROR_MESSAGE);
 					}
 				}
 			}
+
 		}.execute();
 	}
 
@@ -72,8 +73,7 @@ final class UpdateController {
 			if (userInitiated) {
 				JOptionPane.showMessageDialog(this.owner,
 						"You are already using the latest version (" + result.currentVersion() + ").",
-						"No updates available",
-						JOptionPane.INFORMATION_MESSAGE);
+						"No updates available", JOptionPane.INFORMATION_MESSAGE);
 			}
 			return;
 		}
@@ -91,18 +91,11 @@ final class UpdateController {
 		}
 		message.append("\nThe installer package will be downloaded from GitHub Releases.");
 
-		final Object[] options = userInitiated
-				? new Object[] { "Download and install", "Later" }
+		final Object[] options = userInitiated ? new Object[] { "Download and install", "Later" }
 				: new Object[] { "Download and install", "Skip this version", "Later" };
 
-		final int choice = JOptionPane.showOptionDialog(this.owner,
-				message.toString(),
-				"Update available",
-				JOptionPane.DEFAULT_OPTION,
-				JOptionPane.INFORMATION_MESSAGE,
-				null,
-				options,
-				options[0]);
+		final int choice = JOptionPane.showOptionDialog(this.owner, message.toString(), "Update available",
+				JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE, null, options, options[0]);
 
 		if (choice == 0) {
 			this.downloadAndInstall(result);
@@ -134,11 +127,11 @@ final class UpdateController {
 					System.exit(0);
 				} catch (final Exception ex) {
 					final Throwable cause = ex.getCause() == null ? ex : ex.getCause();
-					final String message = cause instanceof final UncheckedIOException unchecked ? unchecked.getCause().getMessage()
+					final String message = cause instanceof final UncheckedIOException unchecked
+							? unchecked.getCause().getMessage()
 							: cause.getMessage();
 					JOptionPane.showMessageDialog(UpdateController.this.owner,
-							"Failed to download or launch the update:\n" + message,
-							"Update failed",
+							"Failed to download or launch the update:\n" + message, "Update failed",
 							JOptionPane.ERROR_MESSAGE);
 				}
 			}

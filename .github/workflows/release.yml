@@ -16,6 +16,7 @@ jobs:
 
     outputs:
       should_format: ${{ steps.decide.outputs.should_format }}
+      date: ${{ steps.date.outputs.date }}
 
     steps:
       - uses: actions/checkout@v4
@@ -32,6 +33,10 @@ jobs:
             echo "Snapshot version detected. Releases must NOT be snapshots."
             exit 1
           fi
+
+      - name: Get current date
+        id: date
+        run: echo "date=$(date +'%Y-%m-%d_%H-%M-%S')" >> $GITHUB_OUTPUT
 
       - name: Decide if formatting should run
         id: decide
@@ -115,7 +120,7 @@ jobs:
           server-password: MAVEN_PASSWORD
 
       - name: Build project
-        run: mvn -B -Pall clean package deploy
+        run: mvn -B -Pall clean package deploy -Ddistributor="Automated build ${{ needs.prepare.outputs.date }}"
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
