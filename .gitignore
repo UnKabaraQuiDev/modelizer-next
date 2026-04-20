@@ -100,5 +100,6 @@ build/*
 /config/*
 !config/main.properties
 .local/
+dependency-reduced-pom.xml
 
 # pom.xml
