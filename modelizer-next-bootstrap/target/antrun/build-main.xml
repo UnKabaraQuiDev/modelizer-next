@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project name="maven-antrun-" default="main">
-  <target name="main">
-    <mkdir dir="/ssd2/workspaces/java2/modelizer-next/modelizer-next-bootstrap/target/jpackage-input" />
-    <copy file="/ssd2/workspaces/java2/modelizer-next/modelizer-next-bootstrap/target/modelizer-next-bootstrap-0.1-SNAPSHOT-with-dependencies.jar" tofile="/ssd2/workspaces/java2/modelizer-next/modelizer-next-bootstrap/target/jpackage-input/modelizer-next-bootstrap-0.1-SNAPSHOT.jar" />
-  </target>
-</project>

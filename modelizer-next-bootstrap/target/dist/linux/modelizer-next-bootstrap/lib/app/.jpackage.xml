@@ -1,7 +1,0 @@
-<?xml version="1.0" ?>
-<jpackage-state version="21.0.10" platform="linux">
-  <app-version>0.1-SNAPSHOT</app-version>
-  <main-launcher>modelizer-next-bootstrap</main-launcher>
-  <main-class>filled in by modules</main-class>
-  <signed>false</signed>
-  <app-store>false</app-store></jpackage-state>

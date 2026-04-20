@@ -92,10 +92,9 @@ build/*
 
 # test/
 
-/bin/*
-/target/*
-/logs/*
-/target/
+bin/
+target/
+logs/
 
 /config/*
 !config/main.properties

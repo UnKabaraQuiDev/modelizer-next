@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project name="maven-antrun-" default="main">
-  <target name="main">
-    <mkdir dir="/ssd2/workspaces/java2/modelizer-next/modelizer-next-app/target/jpackage-input" />
-    <copy file="/ssd2/workspaces/java2/modelizer-next/modelizer-next-app/target/modelizer-next-app-0.1-SNAPSHOT-with-dependencies.jar" tofile="/ssd2/workspaces/java2/modelizer-next/modelizer-next-app/target/jpackage-input/modelizer-next-app-0.1-SNAPSHOT.jar" />
-  </target>
-</project>
