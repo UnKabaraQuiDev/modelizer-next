@@ -110,7 +110,7 @@
 										<argument>--name</argument>
 										<argument>${project.artifactId}</argument>
 										<argument>--app-version</argument>
-										<argument>${modelizer.version}</argument>
+										<argument>${appVersion}</argument>
 										<argument>--input</argument>
 										<argument>
 											${project.build.directory}/jpackage-input/</argument>
@@ -172,7 +172,7 @@
 										<argument>--name</argument>
 										<argument>${project.artifactId}</argument>
 										<argument>--app-version</argument>
-										<argument>${modelizer.version}</argument>
+										<argument>${appVersion}</argument>
 										<argument>--input</argument>
 										<argument>
 											${project.build.directory}/jpackage-input/</argument>

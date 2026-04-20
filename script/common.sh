@@ -87,10 +87,8 @@ stage_artifacts() {
   if [ ! -f "${app_src}" ]; then
     app_src="modelizer-next-app/target/modelizer-next-app-${VERSION}-shaded.jar"
   fi
-  if [ "${platform}" = "linux" ]; then
-    cp "${app_src}" "${out_dir}/modelizer-next-app-${VERSION}.jar"
-  fi
-
+  cp "${app_src}" "${out_dir}/modelizer-next-app-${platform}-${VERSION}.jar"
+  
   if [ "${platform}" = "windows" ]; then
     cp modelizer-next-bootstrap/target/dist/windows/*.exe "${out_dir}/"
     cp modelizer-next-app/target/dist/windows/*.exe "${out_dir}/"
