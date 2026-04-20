@@ -102,7 +102,7 @@ jobs:
           java-version: 17
 
       - name: Apply formatting
-        run: mvn -B spotless:apply
+        run: mvn -B -Pformat initialize spotless:apply
 
       - name: Commit & push if needed
         run: |
@@ -143,13 +143,13 @@ jobs:
           server-password: MAVEN_PASSWORD
 
       - name: Build and deploy
-        run: mvn -B clean compile package install deploy
+        run: mvn -B -Pall clean compile package install deploy
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           name: ${{ needs.prepare.outputs.tag }}
           tag_name: ${{ needs.prepare.outputs.tag }}
-          files: "**/*/target/*.jar"
+          files: "target/*.jar"
           make_latest: false
           prerelease: true
