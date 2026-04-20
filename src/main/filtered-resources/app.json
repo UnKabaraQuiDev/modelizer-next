@@ -3,5 +3,9 @@
 	"description": "@project.description@",
 	"version": "@app.version@",
 	"revision": "@revision@",
-	"distributor": "@distributor@"
+	"distributor": "@distributor@",
+	"repository": "@app.repositoryUrl@",
+	"releases": "@app.releasesUrl@",
+	"updatesManifest": "@app.updatesManifestUrl@",
+	"issues": "@app.issuesUrl@"
 }

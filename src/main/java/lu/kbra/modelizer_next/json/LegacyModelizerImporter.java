@@ -94,29 +94,33 @@ public class LegacyModelizerImporter {
 				fieldModel.getStyle().setBackgroundColor(LegacyModelizerImporter.parseColor(fieldNode.get("background"), Color.WHITE));
 
 				classModel.getFields().add(fieldModel);
-				LegacyModelizerImporter.putFieldMapping(fieldIdsByQualifiedName,
-						className,
-						technicalName,
-						fieldName,
-						fieldTechnicalName,
-						fieldModel.getId());
+				LegacyModelizerImporter
+						.putFieldMapping(fieldIdsByQualifiedName,
+								className,
+								technicalName,
+								fieldName,
+								fieldTechnicalName,
+								fieldModel.getId());
 			}
 
 			document.getModel().getClasses().add(classModel);
 			LegacyModelizerImporter.putClassMapping(classIdsByName, className, technicalName, classModel.getId());
 
-			LegacyModelizerImporter.addClassLayout(document.getWorkspace().getPanels().get(PanelType.CONCEPTUAL),
-					classModel.getId(),
-					tableNode.path("x0").asDouble(80.0),
-					tableNode.path("y0").asDouble(80.0));
-			LegacyModelizerImporter.addClassLayout(document.getWorkspace().getPanels().get(PanelType.LOGICAL),
-					classModel.getId(),
-					tableNode.path("x1").asDouble(tableNode.path("x0").asDouble(80.0)),
-					tableNode.path("y1").asDouble(tableNode.path("y0").asDouble(80.0)));
-			LegacyModelizerImporter.addClassLayout(document.getWorkspace().getPanels().get(PanelType.PHYSICAL),
-					classModel.getId(),
-					tableNode.path("x2").asDouble(tableNode.path("x1").asDouble(tableNode.path("x0").asDouble(80.0))),
-					tableNode.path("y2").asDouble(tableNode.path("y1").asDouble(tableNode.path("y0").asDouble(80.0))));
+			LegacyModelizerImporter
+					.addClassLayout(document.getWorkspace().getPanels().get(PanelType.CONCEPTUAL),
+							classModel.getId(),
+							tableNode.path("x0").asDouble(80.0),
+							tableNode.path("y0").asDouble(80.0));
+			LegacyModelizerImporter
+					.addClassLayout(document.getWorkspace().getPanels().get(PanelType.LOGICAL),
+							classModel.getId(),
+							tableNode.path("x1").asDouble(tableNode.path("x0").asDouble(80.0)),
+							tableNode.path("y1").asDouble(tableNode.path("y0").asDouble(80.0)));
+			LegacyModelizerImporter
+					.addClassLayout(document.getWorkspace().getPanels().get(PanelType.PHYSICAL),
+							classModel.getId(),
+							tableNode.path("x2").asDouble(tableNode.path("x1").asDouble(tableNode.path("x0").asDouble(80.0))),
+							tableNode.path("y2").asDouble(tableNode.path("y1").asDouble(tableNode.path("y0").asDouble(80.0))));
 		}
 
 		for (final JsonNode tableNode : root.path("tables")) {
@@ -157,18 +161,21 @@ public class LegacyModelizerImporter {
 			}
 
 			document.getModel().getComments().add(commentModel);
-			LegacyModelizerImporter.addCommentLayout(document.getWorkspace().getPanels().get(PanelType.CONCEPTUAL),
-					commentModel.getId(),
-					commentNode.path("x0").asDouble(80.0),
-					commentNode.path("y0").asDouble(80.0));
-			LegacyModelizerImporter.addCommentLayout(document.getWorkspace().getPanels().get(PanelType.LOGICAL),
-					commentModel.getId(),
-					commentNode.path("x1").asDouble(commentNode.path("x0").asDouble(80.0)),
-					commentNode.path("y1").asDouble(commentNode.path("y0").asDouble(80.0)));
-			LegacyModelizerImporter.addCommentLayout(document.getWorkspace().getPanels().get(PanelType.PHYSICAL),
-					commentModel.getId(),
-					commentNode.path("x2").asDouble(commentNode.path("x1").asDouble(commentNode.path("x0").asDouble(80.0))),
-					commentNode.path("y2").asDouble(commentNode.path("y1").asDouble(commentNode.path("y0").asDouble(80.0))));
+			LegacyModelizerImporter
+					.addCommentLayout(document.getWorkspace().getPanels().get(PanelType.CONCEPTUAL),
+							commentModel.getId(),
+							commentNode.path("x0").asDouble(80.0),
+							commentNode.path("y0").asDouble(80.0));
+			LegacyModelizerImporter
+					.addCommentLayout(document.getWorkspace().getPanels().get(PanelType.LOGICAL),
+							commentModel.getId(),
+							commentNode.path("x1").asDouble(commentNode.path("x0").asDouble(80.0)),
+							commentNode.path("y1").asDouble(commentNode.path("y0").asDouble(80.0)));
+			LegacyModelizerImporter
+					.addCommentLayout(document.getWorkspace().getPanels().get(PanelType.PHYSICAL),
+							commentModel.getId(),
+							commentNode.path("x2").asDouble(commentNode.path("x1").asDouble(commentNode.path("x0").asDouble(80.0))),
+							commentNode.path("y2").asDouble(commentNode.path("y1").asDouble(commentNode.path("y0").asDouble(80.0))));
 		}
 
 		return document;

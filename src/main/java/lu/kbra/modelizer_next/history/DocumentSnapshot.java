@@ -6,11 +6,11 @@ import java.io.UncheckedIOException;
 import lu.kbra.modelizer_next.MNMain;
 import lu.kbra.modelizer_next.document.ModelDocument;
 
-public record DocumentSnapshot(String json, String source) {
+public record DocumentSnapshot(String json) {
 
 	public static DocumentSnapshot from(final ModelDocument document) {
 		try {
-			return new DocumentSnapshot(MNMain.OBJECT_MAPPER.writeValueAsString(document), document.getSource());
+			return new DocumentSnapshot(MNMain.OBJECT_MAPPER.writeValueAsString(document));
 		} catch (final IOException ex) {
 			throw new UncheckedIOException("Failed to create document snapshot", ex);
 		}
@@ -28,10 +28,8 @@ public record DocumentSnapshot(String json, String source) {
 			target.setMeta(restored.getMeta());
 			target.setModel(restored.getModel());
 			target.setWorkspace(restored.getWorkspace());
-			target.setSource(this.source);
 		} catch (final IOException ex) {
 			throw new UncheckedIOException("Failed to restore document snapshot", ex);
 		}
 	}
-
 }

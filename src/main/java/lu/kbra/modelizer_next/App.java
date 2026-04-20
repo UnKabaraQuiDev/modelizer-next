@@ -19,8 +19,12 @@ public class App {
 	public static String DESCRIPTION;
 	public static String VERSION;
 	public static String REVISION;
+	public static String DISTRIBUTOR;
 
-	public static String ISSUES_URL = "https://github.com/UnKabaraQuiDev/modelizer-next/issues/";
+	public static String REPOSITORY_URL = "https://github.com/UnKabaraQuiDev/modelizer-next";
+	public static String RELEASES_URL = App.REPOSITORY_URL + "/releases";
+	public static String UPDATES_MANIFEST_URL = "https://raw.githubusercontent.com/UnKabaraQuiDev/modelizer-next/main/versions.json";
+	public static String ISSUES_URL = App.REPOSITORY_URL + "/issues/";
 
 	public static void init() throws JsonProcessingException {
 		final String fileContent = PCUtils.readPackagedStringFile("/app.json");
@@ -30,6 +34,10 @@ public class App {
 		App.DESCRIPTION = App.JSON.path("description").asText();
 		App.VERSION = App.JSON.path("version").asText();
 		App.REVISION = App.JSON.path("revision").asText();
+		App.DISTRIBUTOR = App.JSON.path("distributor").asText();
+		App.REPOSITORY_URL = App.JSON.path("repository").asText(App.REPOSITORY_URL);
+		App.RELEASES_URL = App.JSON.path("releases").asText(App.REPOSITORY_URL + "/releases");
+		App.UPDATES_MANIFEST_URL = App.JSON.path("updatesManifest").asText(App.UPDATES_MANIFEST_URL);
 		App.ISSUES_URL = App.JSON.path("issues").asText(App.ISSUES_URL);
 
 		App.ensureDirsExists();
@@ -60,9 +68,14 @@ public class App {
 		return new File(App.getAppDirectory(), "styles");
 	}
 
+	public static File getUpdateDownloadsDirectory() {
+		return new File(App.getAppDirectory(), "updates");
+	}
+
 	public static void ensureDirsExists() {
 		App.getAppDirectory().mkdirs();
 		App.getStylesDirectory().mkdirs();
+		App.getUpdateDownloadsDirectory().mkdirs();
 	}
 
 	public static String title(final String title) {

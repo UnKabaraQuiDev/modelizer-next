@@ -107,8 +107,8 @@ public final class OnlineModelizerImporter {
 		}
 
 		for (final JsonNode edgeNode : root.path("edges")) {
-			final LinkModel linkModel = OnlineModelizerImporter
-					.createLink(edgeNode, classIdsBySourceId, fieldIdsBySourceId, classIdsByName, fieldIdsByQualifiedName);
+			final LinkModel linkModel = OnlineModelizerImporter.createLink(edgeNode, classIdsBySourceId, fieldIdsBySourceId,
+					classIdsByName, fieldIdsByQualifiedName);
 			if (linkModel == null) {
 				continue;
 			}
@@ -126,11 +126,15 @@ public final class OnlineModelizerImporter {
 	}
 
 	private static boolean isOnlineRoot(final JsonNode root) {
-		return root != null && root.isObject() && root.has("nodes") && root.has("edges") && root.has("modelName") && !root.has("model")
-				&& !root.has("workspace");
+		return root != null && root.isObject() && root.has("nodes") && root.has("edges") && root.has("modelName")
+				&& !root.has("model") && !root.has("workspace");
 	}
 
-	private static void addNodeLayouts(final ModelDocument document, final JsonNode node, final String objectId, final boolean comment) {
+	private static void addNodeLayouts(
+			final ModelDocument document,
+			final JsonNode node,
+			final String objectId,
+			final boolean comment) {
 		final JsonNode dataNode = node.path("data");
 		final JsonNode viewPositions = dataNode.path("viewPositions");
 		final JsonNode basePosition = node.path("position");
@@ -174,9 +178,11 @@ public final class OnlineModelizerImporter {
 			final JsonNode fallbackPosition,
 			final double width,
 			final double height) {
-		final double x = preferredPosition.path("x").isNumber() ? preferredPosition.path("x").asDouble(80.0)
+		final double x = preferredPosition.path("x").isNumber()
+				? preferredPosition.path("x").asDouble(80.0)
 				: fallbackPosition.path("x").asDouble(80.0);
-		final double y = preferredPosition.path("y").isNumber() ? preferredPosition.path("y").asDouble(80.0)
+		final double y = preferredPosition.path("y").isNumber()
+				? preferredPosition.path("y").asDouble(80.0)
 				: fallbackPosition.path("y").asDouble(80.0);
 
 		if (comment) {
@@ -233,15 +239,14 @@ public final class OnlineModelizerImporter {
 		linkModel.setComment(OnlineModelizerImporter.readEdgeText(dataNode, dataNode, "comment", "description", ""));
 		linkModel.setFrom(new LinkEnd(sourceClassId, sourceFieldId));
 		linkModel.setTo(new LinkEnd(targetClassId, targetFieldId));
-		linkModel.setCardinalityFrom(OnlineModelizerImporter
-				.parseCardinality(OnlineModelizerImporter.readEdgeText(dataNode, dataNode, "cardinalityFrom", "sourceCardinality", "")));
-		linkModel.setCardinalityTo(OnlineModelizerImporter
-				.parseCardinality(OnlineModelizerImporter.readEdgeText(dataNode, dataNode, "cardinalityTo", "targetCardinality", "")));
+		linkModel.setCardinalityFrom(OnlineModelizerImporter.parseCardinality(
+				OnlineModelizerImporter.readEdgeText(dataNode, dataNode, "cardinalityFrom", "sourceCardinality", "")));
+		linkModel.setCardinalityTo(OnlineModelizerImporter.parseCardinality(
+				OnlineModelizerImporter.readEdgeText(dataNode, dataNode, "cardinalityTo", "targetCardinality", "")));
 		linkModel.setLineColor(ImportJsonSupport.parseColor(dataNode.get("color"),
 				ImportJsonSupport.parseColor(edgeNode.path("style").get("stroke"), Color.BLACK)));
 
-		final String associationRaw = OnlineModelizerImporter
-				.readEdgeText(dataNode, dataNode, "associationClassId", "associationNodeId", "");
+		final String associationRaw = OnlineModelizerImporter.readEdgeText(dataNode, dataNode, "associationClassId", "associationNodeId", "");
 		if (!associationRaw.isBlank()) {
 			linkModel.setAssociationClassId(OnlineModelizerImporter.resolveClassId(associationRaw, classIdsBySourceId, classIdsByName));
 		}

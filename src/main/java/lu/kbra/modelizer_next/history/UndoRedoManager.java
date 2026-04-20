@@ -21,17 +21,14 @@ public class UndoRedoManager {
 	public void recordState(final ModelDocument document) {
 		final DocumentSnapshot snapshot = DocumentSnapshot.from(document);
 		final DocumentSnapshot current = this.undoStack.peek();
-
 		if (snapshot.equals(current)) {
 			return;
 		}
 
 		this.undoStack.push(snapshot);
-
 		while (this.undoStack.size() > MAX_HISTORY) {
 			this.undoStack.removeLast();
 		}
-
 		this.redoStack.clear();
 	}
 
@@ -70,5 +67,4 @@ public class UndoRedoManager {
 		this.undoStack.push(next);
 		return true;
 	}
-
 }
