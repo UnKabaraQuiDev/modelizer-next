@@ -217,8 +217,11 @@ public final class LinkEditorDialog {
 			final AssociationOption associationOption = (AssociationOption) associationBox.getSelectedItem();
 			System.err.println(associationOption);
 
-			holder.result = new Result(nameField.getText(), commentField.getText(), colorButton.getSelectedColor(),
-					fromClass == null ? null : fromClass.getId(), toClass == null ? null : toClass.getId(),
+			holder.result = new Result(nameField.getText(),
+					commentField.getText(),
+					colorButton.getSelectedColor(),
+					fromClass == null ? null : fromClass.getId(),
+					toClass == null ? null : toClass.getId(),
 					panelType == PanelType.CONCEPTUAL ? null
 							: fromField == null ? null
 							: fromField.getId(),
@@ -321,9 +324,8 @@ public final class LinkEditorDialog {
 				final boolean cellHasFocus) {
 			super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
 			if (value instanceof final ClassModel classModel) {
-				this
-						.setText(this.panelType == PanelType.CONCEPTUAL ? classModel.getNames().getConceptualName()
-								: classModel.getNames().getTechnicalName());
+				this.setText(this.panelType == PanelType.CONCEPTUAL ? classModel.getNames().getConceptualName()
+						: classModel.getNames().getTechnicalName());
 			}
 			return this;
 		}
@@ -346,9 +348,8 @@ public final class LinkEditorDialog {
 				final boolean cellHasFocus) {
 			super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
 			if (value instanceof final FieldModel fieldModel) {
-				this
-						.setText(this.panelType == PanelType.CONCEPTUAL ? fieldModel.getNames().getName()
-								: fieldModel.getNames().getTechnicalName());
+				this.setText(this.panelType == PanelType.CONCEPTUAL ? fieldModel.getNames().getName()
+						: fieldModel.getNames().getTechnicalName());
 			}
 			return this;
 		}

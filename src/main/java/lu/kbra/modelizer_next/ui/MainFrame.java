@@ -144,12 +144,11 @@ public class MainFrame extends JFrame {
 		this.appConfig.setThemeMode(mode);
 		App.saveConfig(this.appConfig);
 
-		final int choice = JOptionPane
-				.showConfirmDialog(this,
-						"Theme change requires restarting the window.\nReopen now with the current document?",
-						"Apply theme",
-						JOptionPane.YES_NO_OPTION,
-						JOptionPane.QUESTION_MESSAGE);
+		final int choice = JOptionPane.showConfirmDialog(this,
+				"Theme change requires restarting the window.\nReopen now with the current document?",
+				"Apply theme",
+				JOptionPane.YES_NO_OPTION,
+				JOptionPane.QUESTION_MESSAGE);
 
 		if (choice != JOptionPane.YES_OPTION) {
 			return;
@@ -164,12 +163,11 @@ public class MainFrame extends JFrame {
 			return;
 		}
 
-		final int choice = JOptionPane
-				.showConfirmDialog(this,
-						"Do you want to save changes before closing?",
-						"Unsaved changes",
-						JOptionPane.YES_NO_CANCEL_OPTION,
-						JOptionPane.WARNING_MESSAGE);
+		final int choice = JOptionPane.showConfirmDialog(this,
+				"Do you want to save changes before closing?",
+				"Unsaved changes",
+				JOptionPane.YES_NO_CANCEL_OPTION,
+				JOptionPane.WARNING_MESSAGE);
 
 		if (choice == JOptionPane.CANCEL_OPTION || choice == JOptionPane.CLOSED_OPTION) {
 			return;
@@ -189,13 +187,12 @@ public class MainFrame extends JFrame {
 		final String fileVersion = loadedDocument.getMeta() == null ? null : loadedDocument.getMeta().getApplicationVersion();
 
 		if (fileVersion != null && !fileVersion.isBlank() && VersionComparator.COMPARATOR.compare(fileVersion, App.VERSION) > 0) {
-			final int choice = JOptionPane
-					.showConfirmDialog(this,
-							"This file was created with a newer version of the application (" + fileVersion
-									+ ").\nDo you want to try to load the file anyways ?",
-							"Newer file version",
-							JOptionPane.YES_NO_OPTION,
-							JOptionPane.WARNING_MESSAGE);
+			final int choice = JOptionPane.showConfirmDialog(this,
+					"This file was created with a newer version of the application (" + fileVersion
+							+ ").\nDo you want to try to load the file anyways ?",
+					"Newer file version",
+					JOptionPane.YES_NO_OPTION,
+					JOptionPane.WARNING_MESSAGE);
 			return choice == JOptionPane.YES_OPTION;
 		}
 
@@ -238,11 +235,9 @@ public class MainFrame extends JFrame {
 		fileMenu.add(this.createFileMenuItem("New", KeyStroke.getKeyStroke(KeyEvent.VK_N, InputEvent.CTRL_DOWN_MASK), this::newDocument));
 		fileMenu.add(this.createFileMenuItem("Load", KeyStroke.getKeyStroke(KeyEvent.VK_O, InputEvent.CTRL_DOWN_MASK), this::loadDocument));
 		fileMenu.add(this.createFileMenuItem("Save", KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK), this::saveDocument));
-		fileMenu
-				.add(this
-						.createFileMenuItem("Save As...",
-								KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK),
-								this::saveDocumentAs));
+		fileMenu.add(this.createFileMenuItem("Save As...",
+				KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK),
+				this::saveDocumentAs));
 
 		final JMenu editMenu = this.createEditMenu();
 
@@ -251,11 +246,8 @@ public class MainFrame extends JFrame {
 				.add(this.createCanvasMenuItem("New table", "addTable", KeyStroke.getKeyStroke(KeyEvent.VK_T, InputEvent.CTRL_DOWN_MASK)));
 		insertMenu
 				.add(this.createCanvasMenuItem("New field", "addField", KeyStroke.getKeyStroke(KeyEvent.VK_F, InputEvent.CTRL_DOWN_MASK)));
-		insertMenu
-				.add(this
-						.createCanvasMenuItem("New comment",
-								"addComment",
-								KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK)));
+		insertMenu.add(
+				this.createCanvasMenuItem("New comment", "addComment", KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK)));
 		insertMenu.add(this.createCanvasMenuItem("New link", "addLink", KeyStroke.getKeyStroke(KeyEvent.VK_L, InputEvent.CTRL_DOWN_MASK)));
 
 		final JMenu appearanceMenu = new JMenu("Appearance");
@@ -298,6 +290,7 @@ public class MainFrame extends JFrame {
 		this.undoRedoManager.recordState(this.document);
 		this.refreshDirtyState();
 		this.updateUndoRedoMenuItems();
+		this.markDirty();
 	}
 
 	private void undo() {
@@ -491,12 +484,11 @@ public class MainFrame extends JFrame {
 
 			switch (extension) {
 			case "mod" -> {
-				final int choice = JOptionPane
-						.showConfirmDialog(this,
-								"This file comes from an older version of Modelizer.\nThere may be errors or unsupported elements during import.\nDo you want to continue?",
-								"Legacy Modelizer import",
-								JOptionPane.YES_NO_OPTION,
-								JOptionPane.WARNING_MESSAGE);
+				final int choice = JOptionPane.showConfirmDialog(this,
+						"This file comes from an older version of Modelizer.\nThere may be errors or unsupported elements during import.\nDo you want to continue?",
+						"Legacy Modelizer import",
+						JOptionPane.YES_NO_OPTION,
+						JOptionPane.WARNING_MESSAGE);
 				if (choice != JOptionPane.YES_OPTION) {
 					return;
 				}
