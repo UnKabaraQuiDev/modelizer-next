@@ -24,7 +24,7 @@ jobs:
           java-version: 21
           cache: maven
       - name: Build Linux snapshot artifacts
-        run: ./script/build-snapshot-linux.sh
+        run: bash ./script/build-snapshot-linux.sh
       - uses: actions/upload-artifact@v4
         with:
           name: snapshot-linux
@@ -43,12 +43,40 @@ jobs:
           distribution: temurin
           java-version: 21
           cache: maven
-      - name: Install WiX Toolset 3
+      - name: Ensure WiX Toolset 3 is available
+        shell: pwsh
         run: |
-          choco install wixtoolset --version 3.11.2 --no-progress -y
-          echo "/c/Program Files (x86)/WiX Toolset v3.11/bin" >> "$GITHUB_PATH"
+          $candidates = @(
+            "$env:ProgramFiles(x86)\WiX Toolset v3.14\bin",
+            "$env:ProgramFiles(x86)\WiX Toolset v3.11\bin"
+          )
+
+          $wixPath = $null
+          foreach ($candidate in $candidates) {
+            if (Test-Path (Join-Path $candidate "candle.exe")) {
+              $wixPath = $candidate
+              break
+            }
+          }
+
+          if (-not $wixPath) {
+            choco install wixtoolset --no-progress -y
+
+            foreach ($candidate in $candidates) {
+              if (Test-Path (Join-Path $candidate "candle.exe")) {
+                $wixPath = $candidate
+                break
+              }
+            }
+          }
+
+          if (-not $wixPath) {
+            throw "WiX Toolset 3 was not found after installation."
+          }
+
+          Add-Content -Path $env:GITHUB_PATH -Value $wixPath
       - name: Build Windows snapshot artifacts
-        run: ./script/build-snapshot-windows.sh
+        run: bash ./script/build-snapshot-windows.sh
       - uses: actions/upload-artifact@v4
         with:
           name: snapshot-windows
@@ -101,11 +129,11 @@ jobs:
             git rm -rf . >/dev/null 2>&1 || true
           fi
           mkdir -p registry
-          "$SCRIPT_PATH" registry/snapshot.json snapshot "$VERSION" "$RELEASE_TAG" \
+          bash "$SCRIPT_PATH" registry/snapshot.json snapshot "$VERSION" "$RELEASE_TAG" \
             "https://github.com/${{ github.repository }}/releases/tag/$RELEASE_TAG" \
             "https://github.com/${{ github.repository }}/releases/download/$RELEASE_TAG/modelizer-next-app-$VERSION.jar" \
             '["linux","windows"]' \
             "Latest snapshot build."
           git add registry/snapshot.json
-          git commit -m "[skip ci] Update snapshot registry to $VERSION" || exit 0
+          git commit -m "[bot] Update snapshot registry to $VERSION" || exit 0
           git push origin update-registry
