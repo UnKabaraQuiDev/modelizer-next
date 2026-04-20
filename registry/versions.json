@@ -1,0 +1,23 @@
+{
+  "release": {
+    "version": "",
+    "url": "",
+    "releaseUrl": "",
+    "notes": "",
+    "tag": ""
+  },
+  "snapshot": {
+    "version": "",
+    "url": "",
+    "releaseUrl": "",
+    "notes": "",
+    "tag": ""
+  },
+  "nightly": {
+    "version": "",
+    "url": "",
+    "releaseUrl": "",
+    "notes": "",
+    "tag": ""
+  }
+}

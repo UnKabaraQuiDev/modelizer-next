@@ -67,7 +67,7 @@ public final class BootstrapApp {
 		BootstrapApp.REPOSITORY_URL = BootstrapApp.JSON.path("repository").asText("https://github.com/UnKabaraQuiDev/modelizer-next");
 		BootstrapApp.RELEASES_URL = BootstrapApp.JSON.path("releases").asText(BootstrapApp.REPOSITORY_URL + "/releases");
 		BootstrapApp.UPDATES_MANIFEST_URL = BootstrapApp.JSON.path("updatesManifest")
-				.asText(BootstrapApp.REPOSITORY_URL + "/raw/main/versions.json");
+				.asText(BootstrapApp.REPOSITORY_URL + "/raw/update-registry/versions.json");
 
 		BootstrapApp.ensureDirectories();
 	}

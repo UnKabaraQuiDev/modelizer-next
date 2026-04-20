@@ -44,12 +44,18 @@ for asset in assets:
     if platform and platform not in platforms:
         platforms.append(platform)
 
+portable_asset_name = f'modelizer-next-app-{version}.jar'
 primary_asset_url = ''
 for asset in assets:
-    name = asset.get('name', '')
-    if name.startswith('modelizer-next-app-') and name.endswith('.jar'):
+    if asset.get('name') == portable_asset_name:
         primary_asset_url = asset.get('url', '')
         break
+if not primary_asset_url:
+    for asset in assets:
+        name = asset.get('name', '')
+        if name.startswith('modelizer-next-app-') and name.endswith('.jar') and '-windows-' not in name and '-linux-' not in name:
+            primary_asset_url = asset.get('url', '')
+            break
 if not primary_asset_url and assets:
     primary_asset_url = assets[0].get('url', '')
 
@@ -58,6 +64,7 @@ entry = {
     'tag': tag,
     'releaseUrl': release_url,
     'assetUrl': primary_asset_url,
+    'url': primary_asset_url,
     'platforms': platforms,
     'notes': notes,
     'publishedAt': published_at,
@@ -80,6 +87,7 @@ output = {
     'tag': latest.get('tag', ''),
     'releaseUrl': latest.get('releaseUrl', ''),
     'assetUrl': latest.get('assetUrl', ''),
+    'url': latest.get('url', ''),
     'platforms': latest.get('platforms', []),
     'notes': latest.get('notes', ''),
     'updatedAt': published_at,
