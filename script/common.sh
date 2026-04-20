@@ -52,21 +52,9 @@ compute_build_metadata() {
   PLATFORM="${platform}"
   TAG_PREFIX="${tag_prefix}"
   PRERELEASE="${prerelease}"
+  RELEASE_TAG="${TAG_PREFIX}-${VERSION}"
 
-  export BUILD_DATE BASE_VERSION VERSION APP_VERSION CHANNEL PLATFORM TAG_PREFIX PRERELEASE
-}
-
-release_tag_for_channel() {
-  local channel="$1"
-  local version="$2"
-  case "${channel}" in
-    release)
-      printf 'v%s' "${version}"
-      ;;
-    *)
-      printf '%s-%s' "${channel}" "${version}"
-      ;;
-  esac
+  export BUILD_DATE BASE_VERSION VERSION APP_VERSION CHANNEL PLATFORM TAG_PREFIX PRERELEASE RELEASE_TAG
 }
 
 stage_artifacts() {
@@ -88,25 +76,34 @@ stage_artifacts() {
     app_src="modelizer-next-app/target/modelizer-next-app-${VERSION}-shaded.jar"
   fi
   cp "${app_src}" "${out_dir}/modelizer-next-app-${platform}-${VERSION}.jar"
-  
+
   if [ "${platform}" = "windows" ]; then
-    cp modelizer-next-bootstrap/target/dist/windows/*.exe "${out_dir}/"
-    cp modelizer-next-app/target/dist/windows/*.exe "${out_dir}/"
+    local bootstrap_exe
+    bootstrap_exe="$(find modelizer-next-bootstrap/target/dist/windows -maxdepth 1 -type f -name '*.exe' | head -n 1)"
+    local app_exe
+    app_exe="$(find modelizer-next-app/target/dist/windows -maxdepth 1 -type f -name '*.exe' | head -n 1)"
+
+    if [ -z "${bootstrap_exe}" ] || [ -z "${app_exe}" ]; then
+      echo "Missing Windows executables in dist/windows" >&2
+      exit 1
+    fi
+
+    cp "${bootstrap_exe}" "${out_dir}/modelizer-next-bootstrap-${platform}-${VERSION}.exe"
+    cp "${app_exe}" "${out_dir}/modelizer-next-app-${platform}-${VERSION}.exe"
   else
     tar -C modelizer-next-bootstrap/target/dist/linux -czf \
-      "${out_dir}/modelizer-next-bootstrap-linux-${VERSION}-app-image.tar.gz" .
+      "${out_dir}/modelizer-next-bootstrap-${platform}-${VERSION}-app-image.tar.gz" .
     tar -C modelizer-next-app/target/dist/linux -czf \
-      "${out_dir}/modelizer-next-app-linux-${VERSION}-app-image.tar.gz" .
+      "${out_dir}/modelizer-next-app-${platform}-${VERSION}-app-image.tar.gz" .
   fi
 
-  cat > "${out_dir}/build-info.json" <<JSON
+  cat > "${out_dir}/${platform}-build-info.json" <<JSON
 {
   "channel": "${CHANNEL}",
-  "platform": "${PLATFORM}",
   "baseVersion": "${BASE_VERSION}",
   "version": "${VERSION}",
   "appVersion": "${APP_VERSION}",
-  "releaseTag": "$(release_tag_for_channel "${CHANNEL}" "${VERSION}")",
+  "releaseTag": "${RELEASE_TAG}",
   "prerelease": ${PRERELEASE}
 }
 JSON
@@ -137,7 +134,7 @@ run_build() {
 
   stage_artifacts "${channel}" "${platform}"
 
-  echo "${VERSION}" > "${ARTIFACTS_ROOT}/${channel}/${platform}/version.txt"
-  echo "${APP_VERSION}" > "${ARTIFACTS_ROOT}/${channel}/${platform}/app-version.txt"
-  release_tag_for_channel "${channel}" "${VERSION}" > "${ARTIFACTS_ROOT}/${channel}/${platform}/release-tag.txt"
+  echo "${VERSION}" > "${ARTIFACTS_ROOT}/${channel}/${platform}/${platform}-version.txt"
+  echo "${APP_VERSION}" > "${ARTIFACTS_ROOT}/${channel}/${platform}/${platform}-app-version.txt"
+  echo "${VERSION}" > "${ARTIFACTS_ROOT}/${channel}/${platform}/${platform}-release-tag.txt"
 }
