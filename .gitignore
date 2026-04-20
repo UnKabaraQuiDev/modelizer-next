@@ -101,4 +101,6 @@ logs/
 .local/
 dependency-reduced-pom.xml
 
+artifacts/
+
 # pom.xml

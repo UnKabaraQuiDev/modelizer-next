@@ -23,6 +23,7 @@
 		<maven.compiler.target>${java.version}</maven.compiler.target>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<distributor>Manual build</distributor>
+		<modelizer.version></modelizer.version>
 		<modelizer.repositoryUrl>
 			https://github.com/UnKabaraQuiDev/modelizer-next</modelizer.repositoryUrl>
 		<modelizer.releasesUrl>${modelizer.repositoryUrl}/releases</modelizer.releasesUrl>
