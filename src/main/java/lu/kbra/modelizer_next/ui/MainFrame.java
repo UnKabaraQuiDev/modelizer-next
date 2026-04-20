@@ -5,6 +5,8 @@ import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
 import java.time.Instant;
@@ -39,10 +41,16 @@ import lu.kbra.modelizer_next.MNMain;
 import lu.kbra.modelizer_next.ThemeMode;
 import lu.kbra.modelizer_next.common.VersionComparator;
 import lu.kbra.modelizer_next.document.ModelDocument;
+import lu.kbra.modelizer_next.history.DocumentSnapshot;
+import lu.kbra.modelizer_next.history.UndoRedoManager;
+import lu.kbra.modelizer_next.json.LegacyModelizerImporter;
+import lu.kbra.modelizer_next.json.ModernModelizerImporter;
+import lu.kbra.modelizer_next.json.OnlineModelizerImporter;
 import lu.kbra.modelizer_next.layout.PanelType;
 import lu.kbra.modelizer_next.style.StylePalette;
 import lu.kbra.modelizer_next.style.StylePaletteService;
 import lu.kbra.modelizer_next.ui.dialogs.StylePaletteEditorDialog;
+import lu.kbra.pclib.PCUtils;
 
 public class MainFrame extends JFrame {
 
@@ -60,12 +68,20 @@ public class MainFrame extends JFrame {
 	private final AppConfig appConfig;
 	private List<StylePalette> palettes;
 
+	private final UndoRedoManager undoRedoManager;
+	private DocumentSnapshot savedSnapshot;
+	private JMenuItem undoMenuItem;
+	private JMenuItem redoMenuItem;
+
+	private boolean dirty;
+
 	public MainFrame(final ModelDocument document) {
 		super("Modelizer Next");
 		this.document = document;
+		this.undoRedoManager = new UndoRedoManager();
 
-		this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		this.setLayout(new BorderLayout());
+		this.installCloseHandling();
 
 		this.appConfig = App.loadConfig();
 		this.palettes = StylePaletteService.loadAll();
@@ -80,9 +96,9 @@ public class MainFrame extends JFrame {
 			}
 		};
 
-		this.conceptualCanvas = new DiagramCanvas(this.document, PanelType.CONCEPTUAL, statusListener);
-		this.logicalCanvas = new DiagramCanvas(this.document, PanelType.LOGICAL, statusListener);
-		this.physicalCanvas = new DiagramCanvas(this.document, PanelType.PHYSICAL, statusListener);
+		this.conceptualCanvas = new DiagramCanvas(this.document, PanelType.CONCEPTUAL, statusListener, this::onDocumentChanged);
+		this.logicalCanvas = new DiagramCanvas(this.document, PanelType.LOGICAL, statusListener, this::onDocumentChanged);
+		this.physicalCanvas = new DiagramCanvas(this.document, PanelType.PHYSICAL, statusListener, this::onDocumentChanged);
 		this.applyDefaultPaletteToCanvases();
 
 		this.tabbedPane = new JTabbedPane();
@@ -109,23 +125,261 @@ public class MainFrame extends JFrame {
 		this.setSize(1200, 800);
 		this.setLocationRelativeTo(null);
 
+		this.undoRedoManager.reset(this.document);
+		this.savedSnapshot = DocumentSnapshot.from(this.document);
+		this.refreshDirtyState();
+		this.updateUndoRedoMenuItems();
+
 		this.updateSelectionLabel(this.getActiveCanvas().getSelectionInfo());
 	}
 
-	private void refreshToolbarLabels() {
-		for (int i = 0; i < this.toolBar.getComponentCount(); i++) {
-			if (this.toolBar.getComponent(i) instanceof final JButton button) {
-				final String actionKey = (String) button.getClientProperty("actionKey");
-				final String baseText = (String) button.getClientProperty("baseText");
-				if (actionKey == null || baseText == null) {
-					continue;
-				}
+	private void applyDefaultPaletteToCanvases() {
+		final StylePalette palette = this.findPaletteByName(this.appConfig.getDefaultPaletteName());
+		this.conceptualCanvas.setDefaultPalette(palette);
+		this.logicalCanvas.setDefaultPalette(palette);
+		this.physicalCanvas.setDefaultPalette(palette);
+	}
 
-				final DiagramCanvas canvas = this.getActiveCanvas();
-				final String shortcutText = canvas == null ? "" : this.findShortcutText(canvas, actionKey);
-				button.setText(shortcutText.isBlank() ? baseText : baseText + " (" + shortcutText + ")");
+	private void applyThemeAndReopen(final ThemeMode mode) {
+		this.appConfig.setThemeMode(mode);
+		App.saveConfig(this.appConfig);
+
+		final int choice = JOptionPane
+				.showConfirmDialog(this,
+						"Theme change requires restarting the window.\nReopen now with the current document?",
+						"Apply theme",
+						JOptionPane.YES_NO_OPTION,
+						JOptionPane.QUESTION_MESSAGE);
+
+		if (choice != JOptionPane.YES_OPTION) {
+			return;
+		}
+
+		this.reopenWithCurrentDocument();
+	}
+
+	private void attemptClose() {
+		if (!this.dirty) {
+			this.dispose();
+			return;
+		}
+
+		final int choice = JOptionPane
+				.showConfirmDialog(this,
+						"Do you want to save changes before closing?",
+						"Unsaved changes",
+						JOptionPane.YES_NO_CANCEL_OPTION,
+						JOptionPane.WARNING_MESSAGE);
+
+		if (choice == JOptionPane.CANCEL_OPTION || choice == JOptionPane.CLOSED_OPTION) {
+			return;
+		}
+
+		if (choice == JOptionPane.YES_OPTION) {
+			final boolean saved = this.saveDocument();
+			if (!saved) {
+				return;
 			}
 		}
+
+		this.dispose();
+	}
+
+	private boolean confirmModernDocumentVersion(final ModelDocument loadedDocument) {
+		final String fileVersion = loadedDocument.getMeta() == null ? null : loadedDocument.getMeta().getApplicationVersion();
+
+		if (fileVersion != null && !fileVersion.isBlank() && VersionComparator.COMPARATOR.compare(fileVersion, App.VERSION) > 0) {
+			final int choice = JOptionPane
+					.showConfirmDialog(this,
+							"This file was created with a newer version of the application (" + fileVersion
+									+ ").\nDo you want to try to load the file anyways ?",
+							"Newer file version",
+							JOptionPane.YES_NO_OPTION,
+							JOptionPane.WARNING_MESSAGE);
+			return choice == JOptionPane.YES_OPTION;
+		}
+
+		return true;
+	}
+
+	private JMenuItem createCanvasMenuItem(final String text, final String actionKey, final KeyStroke keyStroke) {
+		final JMenuItem item = new JMenuItem(text);
+		item.setAccelerator(keyStroke);
+		item.addActionListener(event -> {
+			final DiagramCanvas canvas = this.getActiveCanvas();
+			if (canvas == null) {
+				return;
+			}
+
+			final javax.swing.Action action = canvas.getActionMap().get(actionKey);
+			if (action != null) {
+				action.actionPerformed(new ActionEvent(canvas, ActionEvent.ACTION_PERFORMED, actionKey));
+				canvas.requestFocusInWindow();
+			}
+		});
+		return item;
+	}
+
+	private JMenuItem createFileMenuItem(final String text, final KeyStroke keyStroke, final Runnable action) {
+		final JMenuItem item = new JMenuItem(new AbstractAction(text) {
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				action.run();
+			}
+		});
+		item.setAccelerator(keyStroke);
+		return item;
+	}
+
+	private JMenuBar createMenuBar() {
+		final JMenuBar menuBar = new JMenuBar();
+
+		final JMenu fileMenu = new JMenu("File");
+		fileMenu.add(this.createFileMenuItem("New", KeyStroke.getKeyStroke(KeyEvent.VK_N, InputEvent.CTRL_DOWN_MASK), this::newDocument));
+		fileMenu.add(this.createFileMenuItem("Load", KeyStroke.getKeyStroke(KeyEvent.VK_O, InputEvent.CTRL_DOWN_MASK), this::loadDocument));
+		fileMenu.add(this.createFileMenuItem("Save", KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK), this::saveDocument));
+		fileMenu
+				.add(this
+						.createFileMenuItem("Save As...",
+								KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK),
+								this::saveDocumentAs));
+
+		final JMenu editMenu = this.createEditMenu();
+
+		final JMenu insertMenu = new JMenu("Insert");
+		insertMenu
+				.add(this.createCanvasMenuItem("New table", "addTable", KeyStroke.getKeyStroke(KeyEvent.VK_T, InputEvent.CTRL_DOWN_MASK)));
+		insertMenu
+				.add(this.createCanvasMenuItem("New field", "addField", KeyStroke.getKeyStroke(KeyEvent.VK_F, InputEvent.CTRL_DOWN_MASK)));
+		insertMenu
+				.add(this
+						.createCanvasMenuItem("New comment",
+								"addComment",
+								KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK)));
+		insertMenu.add(this.createCanvasMenuItem("New link", "addLink", KeyStroke.getKeyStroke(KeyEvent.VK_L, InputEvent.CTRL_DOWN_MASK)));
+
+		final JMenu appearanceMenu = new JMenu("Appearance");
+		final ButtonGroup group = new ButtonGroup();
+		appearanceMenu.add(this.createThemeItem("Light", ThemeMode.LIGHT, group));
+		appearanceMenu.add(this.createThemeItem("Dark", ThemeMode.DARK, group));
+		appearanceMenu.add(this.createThemeItem("Follow system", ThemeMode.SYSTEM, group));
+
+		final JMenu stylesMenu = new JMenu("Styles");
+		this.populateStylesMenu(stylesMenu);
+
+		menuBar.add(fileMenu);
+		menuBar.add(editMenu);
+		menuBar.add(insertMenu);
+		menuBar.add(appearanceMenu);
+		menuBar.add(stylesMenu);
+
+		this.updateUndoRedoMenuItems();
+		return menuBar;
+	}
+
+	private JMenu createEditMenu() {
+		final JMenu editMenu = new JMenu("Edit");
+
+		this.undoMenuItem = new JMenuItem("Undo");
+		this.undoMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Z, InputEvent.CTRL_DOWN_MASK));
+		this.undoMenuItem.addActionListener(event -> this.undo());
+
+		this.redoMenuItem = new JMenuItem("Redo");
+		this.redoMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Z, InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK));
+		this.redoMenuItem.addActionListener(event -> this.redo());
+
+		editMenu.add(this.undoMenuItem);
+		editMenu.add(this.redoMenuItem);
+
+		return editMenu;
+	}
+
+	private void onDocumentChanged() {
+		this.undoRedoManager.recordState(this.document);
+		this.refreshDirtyState();
+		this.updateUndoRedoMenuItems();
+	}
+
+	private void undo() {
+		if (!this.undoRedoManager.undo(this.document)) {
+			return;
+		}
+
+		this.refreshDirtyState();
+		this.refreshAfterHistoryRestore();
+	}
+
+	private void redo() {
+		if (!this.undoRedoManager.redo(this.document)) {
+			return;
+		}
+
+		this.refreshDirtyState();
+		this.refreshAfterHistoryRestore();
+	}
+
+	private void refreshAfterHistoryRestore() {
+		this.conceptualCanvas.resetUiAfterDocumentRestore();
+		this.logicalCanvas.resetUiAfterDocumentRestore();
+		this.physicalCanvas.resetUiAfterDocumentRestore();
+
+		this.updateSelectionLabel(this.getActiveCanvas().getSelectionInfo());
+		this.refreshToolbarLabels();
+		this.updateUndoRedoMenuItems();
+
+		this.revalidate();
+		this.repaint();
+	}
+
+	private void refreshDirtyState() {
+		this.dirty = this.savedSnapshot == null || !this.savedSnapshot.sameDocumentState(this.document);
+	}
+
+	private void updateUndoRedoMenuItems() {
+		if (this.undoMenuItem != null) {
+			this.undoMenuItem.setEnabled(this.undoRedoManager != null && this.undoRedoManager.canUndo());
+		}
+		if (this.redoMenuItem != null) {
+			this.redoMenuItem.setEnabled(this.undoRedoManager != null && this.undoRedoManager.canRedo());
+		}
+	}
+
+	private JFileChooser createOpenFileChooser() {
+		final JFileChooser chooser = new JFileChooser();
+		chooser.setFileFilter(new FileNameExtensionFilter("Model files (*.mn, *.mod, *.mdlz)", "mn", "mod", "mdlz"));
+		return chooser;
+	}
+
+	private JFileChooser createSaveFileChooser() {
+		final JFileChooser chooser = new JFileChooser();
+		chooser.setFileFilter(new FileNameExtensionFilter("Modelizer Next (*.mn)", "mn"));
+		return chooser;
+	}
+
+	private JRadioButtonMenuItem createThemeItem(final String text, final ThemeMode mode, final ButtonGroup group) {
+		final JRadioButtonMenuItem item = new JRadioButtonMenuItem(text);
+		item.setSelected(this.appConfig.getThemeMode() == mode);
+		item.addActionListener(event -> this.applyThemeAndReopen(mode));
+		group.add(item);
+		return item;
+	}
+
+	private JToolBar createToolBar() {
+		final JToolBar toolbar = new JToolBar();
+		toolbar.setFloatable(false);
+		toolbar.setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));
+		toolbar.setLayout(new FlowLayout(FlowLayout.LEFT, 6, 0));
+
+		toolbar.add(this.createToolbarButton("New table", "addTable"));
+		toolbar.add(this.createToolbarButton("New field", "addField"));
+		toolbar.add(this.createToolbarButton("New comment", "addComment"));
+		toolbar.add(this.createToolbarButton("New link", "addLink"));
+		toolbar.addSeparator();
+		toolbar.add(this.createToolbarButton("Rename", "renameSelection"));
+		toolbar.add(this.createToolbarButton("Delete", "deleteSelection"));
+		toolbar.add(this.createToolbarButton("Duplicate", "duplicateSelection"));
+
+		return toolbar;
 	}
 
 	private JButton createToolbarButton(final String text, final String actionKey) {
@@ -158,43 +412,6 @@ public class MainFrame extends JFrame {
 		return button;
 	}
 
-	private JMenuBar createMenuBar() {
-		final JMenuBar menuBar = new JMenuBar();
-
-		final JMenu fileMenu = new JMenu("File");
-		fileMenu.add(this.createFileMenuItem("New", KeyStroke.getKeyStroke(KeyEvent.VK_N, InputEvent.CTRL_DOWN_MASK), this::newDocument));
-		fileMenu.add(this.createFileMenuItem("Load", KeyStroke.getKeyStroke(KeyEvent.VK_O, InputEvent.CTRL_DOWN_MASK), this::loadDocument));
-		fileMenu.add(this.createFileMenuItem("Save", KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK), this::saveDocument));
-		fileMenu.add(this.createFileMenuItem("Save As...",
-				KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK),
-				this::saveDocumentAs));
-
-		final JMenu insertMenu = new JMenu("Insert");
-		insertMenu
-				.add(this.createCanvasMenuItem("New table", "addTable", KeyStroke.getKeyStroke(KeyEvent.VK_T, InputEvent.CTRL_DOWN_MASK)));
-		insertMenu
-				.add(this.createCanvasMenuItem("New field", "addField", KeyStroke.getKeyStroke(KeyEvent.VK_F, InputEvent.CTRL_DOWN_MASK)));
-		insertMenu.add(
-				this.createCanvasMenuItem("New comment", "addComment", KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK)));
-		insertMenu.add(this.createCanvasMenuItem("New link", "addLink", KeyStroke.getKeyStroke(KeyEvent.VK_L, InputEvent.CTRL_DOWN_MASK)));
-
-		final JMenu appearanceMenu = new JMenu("Appearance");
-		final ButtonGroup group = new ButtonGroup();
-		appearanceMenu.add(this.createThemeItem("Light", ThemeMode.LIGHT, group));
-		appearanceMenu.add(this.createThemeItem("Dark", ThemeMode.DARK, group));
-		appearanceMenu.add(this.createThemeItem("Follow system", ThemeMode.SYSTEM, group));
-
-		final JMenu stylesMenu = new JMenu("Styles");
-		this.populateStylesMenu(stylesMenu);
-
-		menuBar.add(fileMenu);
-		menuBar.add(insertMenu);
-		menuBar.add(appearanceMenu);
-		menuBar.add(stylesMenu);
-
-		return menuBar;
-	}
-
 	private StylePalette findPaletteByName(final String paletteName) {
 		if (paletteName == null || paletteName.isBlank()) {
 			return null;
@@ -209,11 +426,126 @@ public class MainFrame extends JFrame {
 		return null;
 	}
 
-	private void applyDefaultPaletteToCanvases() {
-		final StylePalette palette = this.findPaletteByName(this.appConfig.getDefaultPaletteName());
-		this.conceptualCanvas.setDefaultPalette(palette);
-		this.logicalCanvas.setDefaultPalette(palette);
-		this.physicalCanvas.setDefaultPalette(palette);
+	private String findShortcutText(final DiagramCanvas canvas, final String actionKey) {
+		for (final KeyStroke keyStroke : canvas.getInputMap(JComponent.WHEN_FOCUSED).allKeys()) {
+			if (keyStroke == null) {
+				continue;
+			}
+			final Object mapped = canvas.getInputMap(JComponent.WHEN_FOCUSED).get(keyStroke);
+			if (actionKey.equals(mapped)) {
+				return this.formatKeyStroke(keyStroke);
+			}
+		}
+		return "";
+	}
+
+	private String formatKeyStroke(final KeyStroke keyStroke) {
+		final StringBuilder builder = new StringBuilder();
+
+		final int modifiers = keyStroke.getModifiers();
+		if ((modifiers & InputEvent.CTRL_DOWN_MASK) != 0) {
+			builder.append("Ctrl+");
+		}
+		if ((modifiers & InputEvent.SHIFT_DOWN_MASK) != 0) {
+			builder.append("Shift+");
+		}
+		if ((modifiers & InputEvent.ALT_DOWN_MASK) != 0) {
+			builder.append("Alt+");
+		}
+
+		builder.append(KeyEvent.getKeyText(keyStroke.getKeyCode()));
+		return builder.toString();
+	}
+
+	private DiagramCanvas getActiveCanvas() {
+		return switch (this.tabbedPane.getSelectedIndex()) {
+		case 0 -> this.conceptualCanvas;
+		case 1 -> this.logicalCanvas;
+		case 2 -> this.physicalCanvas;
+		default -> this.conceptualCanvas;
+		};
+	}
+
+	private void installCloseHandling() {
+		this.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+		this.addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosing(final WindowEvent e) {
+				MainFrame.this.attemptClose();
+			}
+		});
+	}
+
+	private void loadDocument() {
+		final JFileChooser chooser = this.createOpenFileChooser();
+		if (chooser.showOpenDialog(this) != JFileChooser.APPROVE_OPTION) {
+			return;
+		}
+
+		final File selectedFile = chooser.getSelectedFile();
+		final String extension = PCUtils.getFileExtension(selectedFile.getName());
+
+		try {
+			final ModelDocument loadedDocument;
+			final File openedFile;
+
+			switch (extension) {
+			case "mod" -> {
+				final int choice = JOptionPane
+						.showConfirmDialog(this,
+								"This file comes from an older version of Modelizer.\nThere may be errors or unsupported elements during import.\nDo you want to continue?",
+								"Legacy Modelizer import",
+								JOptionPane.YES_NO_OPTION,
+								JOptionPane.WARNING_MESSAGE);
+				if (choice != JOptionPane.YES_OPTION) {
+					return;
+				}
+
+				loadedDocument = LegacyModelizerImporter.importFile(selectedFile);
+				openedFile = null;
+			}
+			case "mdlz" -> {
+				loadedDocument = OnlineModelizerImporter.importFile(selectedFile);
+				openedFile = null;
+			}
+			case "mn" -> {
+				loadedDocument = ModernModelizerImporter.importFile(selectedFile);
+				if (!this.confirmModernDocumentVersion(loadedDocument)) {
+					return;
+				}
+				openedFile = selectedFile;
+			}
+			default -> throw new IOException("Unsupported file extension: ." + extension);
+			}
+
+			if (loadedDocument == null) {
+				return;
+			}
+
+			loadedDocument.setSource(selectedFile.getPath());
+			this.openInNewFrame(loadedDocument, openedFile);
+		} catch (final IOException ex) {
+			JOptionPane.showMessageDialog(this, "Failed to load file:\n" + ex.getMessage(), "Load error", JOptionPane.ERROR_MESSAGE);
+		}
+	}
+
+	private void markDirty() {
+		this.dirty = true;
+	}
+
+	private void newDocument() {
+		final ModelDocument newDocument = new ModelDocument();
+		newDocument.setSource("New document");
+		this.openInNewFrame(newDocument, null);
+	}
+
+	private void openInNewFrame(final ModelDocument modelDocument, final File file) {
+		final MainFrame frame = new MainFrame(modelDocument);
+		frame.currentFile = file;
+		frame.dirty = false;
+		frame.setTitle(App.title(modelDocument.getSource()));
+		frame.setVisible(true);
+		this.dispose();
 	}
 
 	private void populateStylesMenu(final JMenu stylesMenu) {
@@ -324,21 +656,20 @@ public class MainFrame extends JFrame {
 		stylesMenu.add(reloadItem);
 	}
 
-	private void applyThemeAndReopen(final ThemeMode mode) {
-		this.appConfig.setThemeMode(mode);
-		App.saveConfig(this.appConfig);
+	private void refreshToolbarLabels() {
+		for (int i = 0; i < this.toolBar.getComponentCount(); i++) {
+			if (this.toolBar.getComponent(i) instanceof final JButton button) {
+				final String actionKey = (String) button.getClientProperty("actionKey");
+				final String baseText = (String) button.getClientProperty("baseText");
+				if (actionKey == null || baseText == null) {
+					continue;
+				}
 
-		final int choice = JOptionPane.showConfirmDialog(this,
-				"Theme change requires restarting the window.\nReopen now with the current document?",
-				"Apply theme",
-				JOptionPane.YES_NO_OPTION,
-				JOptionPane.QUESTION_MESSAGE);
-
-		if (choice != JOptionPane.YES_OPTION) {
-			return;
+				final DiagramCanvas canvas = this.getActiveCanvas();
+				final String shortcutText = canvas == null ? "" : this.findShortcutText(canvas, actionKey);
+				button.setText(shortcutText.isBlank() ? baseText : baseText + " (" + shortcutText + ")");
+			}
 		}
-
-		this.reopenWithCurrentDocument();
 	}
 
 	private void reopenWithCurrentDocument() {
@@ -354,77 +685,21 @@ public class MainFrame extends JFrame {
 		});
 	}
 
-	private JRadioButtonMenuItem createThemeItem(final String text, final ThemeMode mode, final ButtonGroup group) {
-		final JRadioButtonMenuItem item = new JRadioButtonMenuItem(text);
-		item.setSelected(this.appConfig.getThemeMode() == mode);
-		item.addActionListener(event -> this.applyThemeAndReopen(mode));
-		group.add(item);
-		return item;
-	}
-
-	private JMenuItem createFileMenuItem(final String text, final KeyStroke keyStroke, final Runnable action) {
-		final JMenuItem item = new JMenuItem(new AbstractAction(text) {
-			@Override
-			public void actionPerformed(final ActionEvent e) {
-				action.run();
-			}
-		});
-		item.setAccelerator(keyStroke);
-		return item;
-	}
-
-	private void newDocument() {
-		final ModelDocument newDocument = new ModelDocument();
-		newDocument.setSource("New document");
-		this.openInNewFrame(newDocument, null);
-	}
-
-	private void loadDocument() {
-		final JFileChooser chooser = this.createFileChooser();
-		if (chooser.showOpenDialog(this) != JFileChooser.APPROVE_OPTION) {
-			return;
-		}
-
-		final File selectedFile = chooser.getSelectedFile();
-		try {
-			final ModelDocument loadedDocument = MNMain.OBJECT_MAPPER.readValue(selectedFile, ModelDocument.class);
-			loadedDocument.setSource(selectedFile.getPath());
-			final String fileVersion = loadedDocument.getMeta() == null ? null : loadedDocument.getMeta().getApplicationVersion();
-
-			if (fileVersion != null && !fileVersion.isBlank() && VersionComparator.COMPARATOR.compare(fileVersion, App.VERSION) > 0) {
-				final int choice = JOptionPane.showConfirmDialog(this,
-						"This file was created with a newer version of the application (" + fileVersion
-								+ ").\nDo you want to try to load the file anyways ?",
-						"Newer file version",
-						JOptionPane.YES_NO_OPTION,
-						JOptionPane.WARNING_MESSAGE);
-				if (choice != JOptionPane.YES_OPTION) {
-					return;
-				}
-			}
-
-			this.openInNewFrame(loadedDocument, selectedFile);
-		} catch (final IOException ex) {
-			JOptionPane.showMessageDialog(this, "Failed to load file:\n" + ex.getMessage(), "Load error", JOptionPane.ERROR_MESSAGE);
-		}
-	}
-
-	private void saveDocument() {
+	private boolean saveDocument() {
 		if (this.currentFile == null) {
-			this.saveDocumentAs();
-			return;
+			return this.saveDocumentAs();
 		}
-		this.writeDocument(this.currentFile);
+		return this.writeDocument(this.currentFile);
 	}
 
-	private void saveDocumentAs() {
-		final JFileChooser chooser = this.createFileChooser();
+	private boolean saveDocumentAs() {
+		final JFileChooser chooser = this.createSaveFileChooser();
 		if (this.currentFile != null) {
 			chooser.setSelectedFile(this.currentFile);
 		}
 
 		if (chooser.showSaveDialog(this) != JFileChooser.APPROVE_OPTION) {
-			return;
+			return false;
 		}
 
 		File selectedFile = chooser.getSelectedFile();
@@ -432,111 +707,7 @@ public class MainFrame extends JFrame {
 			selectedFile = new File(selectedFile.getParentFile(), selectedFile.getName() + ".mn");
 		}
 
-		this.writeDocument(selectedFile);
-	}
-
-	private void writeDocument(final File file) {
-		try {
-			this.document.getMeta().setUpdatedAt(Instant.now());
-			this.document.getMeta().setApplicationVersion(App.VERSION);
-			this.document.setSource(file.getPath());
-
-			MNMain.OBJECT_MAPPER.writeValue(file, this.document);
-			this.currentFile = file;
-			this.setTitle(App.title(this.document.getSource()));
-		} catch (final IOException ex) {
-			JOptionPane.showMessageDialog(this, "Failed to save file:\n" + ex.getMessage(), "Save error", JOptionPane.ERROR_MESSAGE);
-		}
-	}
-
-	private JFileChooser createFileChooser() {
-		final JFileChooser chooser = new JFileChooser();
-		chooser.setFileFilter(new FileNameExtensionFilter("Modelizer Next (*.mn)", "mn"));
-		return chooser;
-	}
-
-	private void openInNewFrame(final ModelDocument modelDocument, final File file) {
-		final MainFrame frame = new MainFrame(modelDocument);
-		frame.currentFile = file;
-		frame.setTitle(App.title(modelDocument.getSource()));
-		frame.setVisible(true);
-		this.dispose();
-	}
-
-	private JMenuItem createCanvasMenuItem(final String text, final String actionKey, final KeyStroke keyStroke) {
-		final JMenuItem item = new JMenuItem(text);
-		item.setAccelerator(keyStroke);
-		item.addActionListener(event -> {
-			final DiagramCanvas canvas = this.getActiveCanvas();
-			if (canvas == null) {
-				return;
-			}
-
-			final javax.swing.Action action = canvas.getActionMap().get(actionKey);
-			if (action != null) {
-				action.actionPerformed(new ActionEvent(canvas, ActionEvent.ACTION_PERFORMED, actionKey));
-				canvas.requestFocusInWindow();
-			}
-		});
-		return item;
-	}
-
-	private JToolBar createToolBar() {
-		final JToolBar toolbar = new JToolBar();
-		toolbar.setFloatable(false);
-		toolbar.setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));
-		toolbar.setLayout(new FlowLayout(FlowLayout.LEFT, 6, 0));
-
-		toolbar.add(this.createToolbarButton("New table", "addTable"));
-		toolbar.add(this.createToolbarButton("New field", "addField"));
-		toolbar.add(this.createToolbarButton("New comment", "addComment"));
-		toolbar.add(this.createToolbarButton("New link", "addLink"));
-		toolbar.addSeparator();
-		toolbar.add(this.createToolbarButton("Rename", "renameSelection"));
-		toolbar.add(this.createToolbarButton("Delete", "deleteSelection"));
-		toolbar.add(this.createToolbarButton("Duplicate", "duplicateSelection"));
-
-		return toolbar;
-	}
-
-	private String findShortcutText(final DiagramCanvas canvas, final String actionKey) {
-		for (final KeyStroke keyStroke : canvas.getInputMap(JComponent.WHEN_FOCUSED).allKeys()) {
-			if (keyStroke == null) {
-				continue;
-			}
-			final Object mapped = canvas.getInputMap(JComponent.WHEN_FOCUSED).get(keyStroke);
-			if (actionKey.equals(mapped)) {
-				return this.formatKeyStroke(keyStroke);
-			}
-		}
-		return "";
-	}
-
-	private String formatKeyStroke(final KeyStroke keyStroke) {
-		final StringBuilder builder = new StringBuilder();
-
-		final int modifiers = keyStroke.getModifiers();
-		if ((modifiers & InputEvent.CTRL_DOWN_MASK) != 0) {
-			builder.append("Ctrl+");
-		}
-		if ((modifiers & InputEvent.SHIFT_DOWN_MASK) != 0) {
-			builder.append("Shift+");
-		}
-		if ((modifiers & InputEvent.ALT_DOWN_MASK) != 0) {
-			builder.append("Alt+");
-		}
-
-		builder.append(KeyEvent.getKeyText(keyStroke.getKeyCode()));
-		return builder.toString();
-	}
-
-	private DiagramCanvas getActiveCanvas() {
-		return switch (this.tabbedPane.getSelectedIndex()) {
-		case 0 -> this.conceptualCanvas;
-		case 1 -> this.logicalCanvas;
-		case 2 -> this.physicalCanvas;
-		default -> this.conceptualCanvas;
-		};
+		return this.writeDocument(selectedFile);
 	}
 
 	private void updateSelectionLabel(final SelectionInfo selectionInfo) {
@@ -545,4 +716,22 @@ public class MainFrame extends JFrame {
 		this.selectionPathLabel.setText(path);
 	}
 
+	private boolean writeDocument(final File file) {
+		try {
+			this.document.getMeta().setUpdatedAt(Instant.now());
+			this.document.getMeta().setApplicationVersion(App.VERSION);
+			this.document.setSource(file.getPath());
+
+			MNMain.OBJECT_MAPPER.writeValue(file, this.document);
+			this.currentFile = file;
+			this.savedSnapshot = DocumentSnapshot.from(this.document);
+			this.refreshDirtyState();
+			this.updateUndoRedoMenuItems();
+			this.setTitle(App.title(this.document.getSource()));
+			return true;
+		} catch (final IOException ex) {
+			JOptionPane.showMessageDialog(this, "Failed to save file:\n" + ex.getMessage(), "Save error", JOptionPane.ERROR_MESSAGE);
+			return false;
+		}
+	}
 }

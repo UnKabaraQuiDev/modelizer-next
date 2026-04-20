@@ -9,6 +9,7 @@ import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.util.List;
+import java.util.Objects;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
@@ -61,6 +62,25 @@ public final class LinkEditorDialog {
 		final JComboBox<Cardinality> fromCardinalityBox = new JComboBox<>(Cardinality.values());
 		final JComboBox<Cardinality> toCardinalityBox = new JComboBox<>(Cardinality.values());
 
+		final JComboBox<AssociationOption> associationBox = new JComboBox<>();
+		associationBox.setRenderer(new DefaultListCellRenderer() {
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public Component getListCellRendererComponent(
+					final javax.swing.JList<?> list,
+					final Object value,
+					final int index,
+					final boolean isSelected,
+					final boolean cellHasFocus) {
+				super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+				if (value instanceof final AssociationOption option) {
+					this.setText(option.label());
+				}
+				return this;
+			}
+		});
+
 		fromClassBox.setSelectedItem(LinkEditorDialog.findClass(document.getModel().getClasses(), linkModel.getFrom().getClassId()));
 		toClassBox.setSelectedItem(LinkEditorDialog.findClass(document.getModel().getClasses(), linkModel.getTo().getClassId()));
 		fromCardinalityBox.setSelectedItem(linkModel.getCardinalityFrom());
@@ -103,9 +123,39 @@ public final class LinkEditorDialog {
 			}
 		};
 
-		fromClassBox.addActionListener(event -> syncFields.run());
-		toClassBox.addActionListener(event -> syncFields.run());
+		final Runnable syncAssociation = () -> {
+			final AssociationOption currentSelection = (AssociationOption) associationBox.getSelectedItem();
+			final String selectedAssociationId = currentSelection == null ? linkModel.getAssociationClassId() : currentSelection.classId();
+
+			associationBox.removeAllItems();
+			associationBox.addItem(AssociationOption.none());
+
+			final ClassModel fromClass = (ClassModel) fromClassBox.getSelectedItem();
+			final ClassModel toClass = (ClassModel) toClassBox.getSelectedItem();
+
+			for (final ClassModel classModel : document.getModel().getClasses()) {
+				if (fromClass != null && fromClass.getId().equals(classModel.getId())) {
+					continue;
+				}
+				if (toClass != null && toClass.getId().equals(classModel.getId())) {
+					continue;
+				}
+				associationBox.addItem(AssociationOption.forClass(classModel, panelType));
+			}
+
+			associationBox.setSelectedItem(LinkEditorDialog.findAssociationOption(associationBox, selectedAssociationId));
+		};
+
+		fromClassBox.addActionListener(event -> {
+			syncFields.run();
+			syncAssociation.run();
+		});
+		toClassBox.addActionListener(event -> {
+			syncFields.run();
+			syncAssociation.run();
+		});
 		syncFields.run();
+		syncAssociation.run();
 
 		final JPanel topRow = new JPanel(new GridLayout(1, 3, 8, 0));
 		topRow.add(LinkEditorDialog.labeled("Name", nameField));
@@ -139,6 +189,9 @@ public final class LinkEditorDialog {
 		content.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 		content.add(topRow, BorderLayout.NORTH);
 		content.add(bottomRow, BorderLayout.CENTER);
+		if (panelType == PanelType.CONCEPTUAL) {
+			content.add(LinkEditorDialog.labeled("Association table", associationBox), BorderLayout.SOUTH);
+		}
 
 		final Holder holder = new Holder();
 
@@ -161,11 +214,11 @@ public final class LinkEditorDialog {
 				}
 			}
 
-			holder.result = new Result(nameField.getText(),
-					commentField.getText(),
-					colorButton.getSelectedColor(),
-					fromClass == null ? null : fromClass.getId(),
-					toClass == null ? null : toClass.getId(),
+			final AssociationOption associationOption = (AssociationOption) associationBox.getSelectedItem();
+			System.err.println(associationOption);
+
+			holder.result = new Result(nameField.getText(), commentField.getText(), colorButton.getSelectedColor(),
+					fromClass == null ? null : fromClass.getId(), toClass == null ? null : toClass.getId(),
 					panelType == PanelType.CONCEPTUAL ? null
 							: fromField == null ? null
 							: fromField.getId(),
@@ -173,7 +226,8 @@ public final class LinkEditorDialog {
 							: toField == null ? null
 							: toField.getId(),
 					panelType == PanelType.CONCEPTUAL ? (Cardinality) fromCardinalityBox.getSelectedItem() : null,
-					panelType == PanelType.CONCEPTUAL ? (Cardinality) toCardinalityBox.getSelectedItem() : null);
+					panelType == PanelType.CONCEPTUAL ? (Cardinality) toCardinalityBox.getSelectedItem() : null,
+					panelType == PanelType.CONCEPTUAL && associationOption != null ? associationOption.classId() : null);
 			dialog.dispose();
 		});
 		cancelButton.addActionListener(event -> dialog.dispose());
@@ -198,6 +252,28 @@ public final class LinkEditorDialog {
 		dialog.setVisible(true);
 
 		return holder.result;
+	}
+
+	private static AssociationOption findAssociationOption(final JComboBox<AssociationOption> box, final String classId) {
+		for (int i = 0; i < box.getItemCount(); i++) {
+			final AssociationOption option = box.getItemAt(i);
+			if (Objects.equals(option.classId(), classId)) {
+				return option;
+			}
+		}
+		return box.getItemAt(0);
+	}
+
+	private record AssociationOption(String classId, String label) {
+		private static AssociationOption none() {
+			return new AssociationOption(null, "None");
+		}
+
+		private static AssociationOption forClass(final ClassModel classModel, final PanelType panelType) {
+			final String label = panelType == PanelType.CONCEPTUAL ? classModel.getNames().getConceptualName()
+					: classModel.getNames().getTechnicalName();
+			return new AssociationOption(classModel.getId(), label);
+		}
 	}
 
 	private static JPanel labeled(final String labelText, final Component component) {
@@ -245,8 +321,9 @@ public final class LinkEditorDialog {
 				final boolean cellHasFocus) {
 			super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
 			if (value instanceof final ClassModel classModel) {
-				this.setText(this.panelType == PanelType.CONCEPTUAL ? classModel.getNames().getConceptualName()
-						: classModel.getNames().getTechnicalName());
+				this
+						.setText(this.panelType == PanelType.CONCEPTUAL ? classModel.getNames().getConceptualName()
+								: classModel.getNames().getTechnicalName());
 			}
 			return this;
 		}
@@ -269,8 +346,9 @@ public final class LinkEditorDialog {
 				final boolean cellHasFocus) {
 			super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
 			if (value instanceof final FieldModel fieldModel) {
-				this.setText(this.panelType == PanelType.CONCEPTUAL ? fieldModel.getNames().getName()
-						: fieldModel.getNames().getTechnicalName());
+				this
+						.setText(this.panelType == PanelType.CONCEPTUAL ? fieldModel.getNames().getName()
+								: fieldModel.getNames().getTechnicalName());
 			}
 			return this;
 		}
@@ -281,7 +359,7 @@ public final class LinkEditorDialog {
 	}
 
 	public record Result(String name, String comment, Color lineColor, String fromClassId, String toClassId, String fromFieldId,
-			String toFieldId, Cardinality cardinalityFrom, Cardinality cardinalityTo) {
+			String toFieldId, Cardinality cardinalityFrom, Cardinality cardinalityTo, String associationClassId) {
 	}
 
 }

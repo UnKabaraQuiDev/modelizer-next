@@ -187,6 +187,8 @@ public class DiagramCanvas extends JPanel {
 	private final Set<String> movingCommentIds = new HashSet<>();
 	private final Set<String> movingLinkIds = new HashSet<>();
 
+	private final Runnable onDocumentChanged;
+
 	private final Comparator<ClassModel> comparator = (a, b) -> {
 		if (this.selectedElement == null || this.selectedElement.type() != SelectedType.CLASS) {
 			return 0;
@@ -203,10 +205,12 @@ public class DiagramCanvas extends JPanel {
 		return aSelected ? -1 : 1;
 	};
 
-	public DiagramCanvas(final ModelDocument document, final PanelType panelType, final CanvasStatusListener statusListener) {
+	public DiagramCanvas(final ModelDocument document, final PanelType panelType, final CanvasStatusListener statusListener,
+			final Runnable onDocumentChanged) {
 		this.document = document;
 		this.panelType = panelType;
 		this.statusListener = statusListener;
+		this.onDocumentChanged = onDocumentChanged;
 
 		this.setBackground(new Color(0xF2F2F2));
 		this.setOpaque(true);
@@ -257,6 +261,7 @@ public class DiagramCanvas extends JPanel {
 
 		this.select(SelectedElement.forComment(commentModel.getId()));
 		this.notifySelectionChanged();
+		this.notifyDocumentChanged();
 		this.repaint();
 	}
 
@@ -300,6 +305,7 @@ public class DiagramCanvas extends JPanel {
 
 		this.select(SelectedElement.forField(targetClass.getId(), fieldModel.getId()));
 		this.notifySelectionChanged();
+		this.notifyDocumentChanged();
 		this.repaint();
 	}
 
@@ -331,6 +337,7 @@ public class DiagramCanvas extends JPanel {
 		createdLink.setName(result.name());
 		createdLink.setComment(result.comment());
 		createdLink.setLineColor(result.lineColor());
+		createdLink.setAssociationClassId(result.associationClassId());
 		createdLink.setFrom(new LinkEnd(result.fromClassId(), result.fromFieldId()));
 		createdLink.setTo(new LinkEnd(result.toClassId(), result.toFieldId()));
 
@@ -348,6 +355,7 @@ public class DiagramCanvas extends JPanel {
 		this.findOrCreateLinkLayout(createdLink.getId());
 		this.select(SelectedElement.forLink(createdLink.getId()));
 		this.notifySelectionChanged();
+		this.notifyDocumentChanged();
 		this.repaint();
 	}
 
@@ -365,6 +373,7 @@ public class DiagramCanvas extends JPanel {
 
 		this.select(SelectedElement.forClass(classModel.getId()));
 		this.notifySelectionChanged();
+		this.notifyDocumentChanged();
 		this.repaint();
 	}
 
@@ -470,6 +479,7 @@ public class DiagramCanvas extends JPanel {
 			}
 		}
 
+		this.notifyDocumentChanged();
 		this.repaint();
 	}
 
@@ -824,6 +834,38 @@ public class DiagramCanvas extends JPanel {
 		return new Point2D.Double(last.getX(), last.getY());
 	}
 
+	private boolean hasAssociationClass(final LinkModel linkModel) {
+		return linkModel != null && linkModel.getAssociationClassId() != null && !linkModel.getAssociationClassId().isBlank();
+	}
+
+	private void drawAssociationClassConnector(final Graphics2D g2, final LinkModel linkModel, final LinkGeometry geometry) {
+		if (this.panelType != PanelType.CONCEPTUAL || !this.hasAssociationClass(linkModel) || geometry == null) {
+			return;
+		}
+
+		final ClassModel associationClass = this.findClassById(linkModel.getAssociationClassId());
+		if (associationClass == null || !this.isVisible(associationClass) || geometry.middlePoint() == null) {
+			return;
+		}
+
+		final Point2D associationAnchor = this.resolveConceptualPreviewAnchor(g2, associationClass.getId(), geometry.middlePoint());
+
+		if (associationAnchor == null) {
+			return;
+		}
+
+		final Graphics2D connectorGraphics = (Graphics2D) g2.create();
+		try {
+			connectorGraphics.setColor(this.isLinkSelected(linkModel.getId()) ? DiagramCanvas.SELECTION_COLOR : linkModel.getLineColor());
+			connectorGraphics
+					.setStroke(new BasicStroke(this.isLinkSelected(linkModel.getId()) ? 2.0f : 1.0f, BasicStroke.CAP_BUTT,
+							BasicStroke.JOIN_MITER, 10.0f, new float[] { 5.0f, 5.0f }, 0.0f));
+			connectorGraphics.draw(new Line2D.Double(associationAnchor, geometry.middlePoint()));
+		} finally {
+			connectorGraphics.dispose();
+		}
+	}
+
 	private double computeUprightAngleAtMiddle(final List<Point2D> points) {
 		if (points == null || points.size() < 2) {
 			return 0.0;
@@ -993,6 +1035,7 @@ public class DiagramCanvas extends JPanel {
 		}
 
 		this.clearSelection();
+		this.notifyDocumentChanged();
 		this.repaint();
 	}
 
@@ -1053,6 +1096,34 @@ public class DiagramCanvas extends JPanel {
 		final Point2D center = new Point2D.Double(anchor.getX() + ux * alongOffset, anchor.getY() + uy * alongOffset);
 
 		this.drawAlignedLinkLabel(g2, text, center, angle);
+	}
+
+	public void resetUiAfterDocumentRestore() {
+		this.draggedSelection = null;
+		this.lastScreenPoint = null;
+		this.panning = false;
+		this.linkCreationState = null;
+		this.linkPreviewTarget = null;
+		this.linkPreviewMousePoint = null;
+		this.selectedElement = null;
+		this.selectedElements.clear();
+		this.resizingComment = null;
+
+		this.pendingClickSelection = null;
+		this.pendingModifierSelection = false;
+		this.dragOccurred = false;
+
+		this.staticDragLayer = null;
+		this.movingDragLayer = null;
+		this.currentDragOffset = new Point2D.Double();
+		this.movingClassIds.clear();
+		this.movingCommentIds.clear();
+		this.movingLinkIds.clear();
+
+		this.setCursor(Cursor.getDefaultCursor());
+		this.notifySelectionChanged();
+		this.revalidate();
+		this.repaint();
 	}
 
 	private void drawClasses(final Graphics2D g2, final RenderPass pass) {
@@ -1274,6 +1345,8 @@ public class DiagramCanvas extends JPanel {
 									geometry.labelAngle());
 				}
 			}
+
+			this.drawAssociationClassConnector(g2, linkModel, geometry);
 		}
 	}
 
@@ -1498,6 +1571,7 @@ public class DiagramCanvas extends JPanel {
 		this.selectedElement = this.selectedElements.isEmpty() ? null : this.selectedElements.getLast();
 
 		this.notifySelectionChanged();
+		this.notifyDocumentChanged();
 		this.repaint();
 	}
 
@@ -1520,6 +1594,7 @@ public class DiagramCanvas extends JPanel {
 		classModel.getStyle().setBorderColor(result.borderColor());
 
 		this.notifySelectionChanged();
+		this.notifyDocumentChanged();
 		this.repaint();
 	}
 
@@ -1545,6 +1620,7 @@ public class DiagramCanvas extends JPanel {
 		commentModel.setVisibleInPhysical(result.visibleInPhysical());
 
 		this.notifySelectionChanged();
+		this.notifyDocumentChanged();
 		this.repaint();
 	}
 
@@ -1557,6 +1633,7 @@ public class DiagramCanvas extends JPanel {
 		final FieldEditorDialog.Result result = FieldEditorDialog.showDialog(this, fieldModel, moveDelta -> {
 			this.moveSelectedFieldInList(moveDelta);
 			this.notifySelectionChanged();
+			this.notifyDocumentChanged();
 			this.repaint();
 		});
 		if (result == null) {
@@ -1572,6 +1649,7 @@ public class DiagramCanvas extends JPanel {
 		fieldModel.getStyle().setBackgroundColor(result.backgroundColor());
 
 		this.notifySelectionChanged();
+		this.notifyDocumentChanged();
 		this.repaint();
 	}
 
@@ -1591,6 +1669,7 @@ public class DiagramCanvas extends JPanel {
 		linkModel.setLineColor(result.lineColor());
 		linkModel.setFrom(new LinkEnd(result.fromClassId(), result.fromFieldId()));
 		linkModel.setTo(new LinkEnd(result.toClassId(), result.toFieldId()));
+		linkModel.setAssociationClassId(result.associationClassId());
 
 		if (this.panelType == PanelType.CONCEPTUAL) {
 			linkModel.setCardinalityFrom(result.cardinalityFrom() == null ? Cardinality.ONE : result.cardinalityFrom());
@@ -1601,6 +1680,7 @@ public class DiagramCanvas extends JPanel {
 		}
 
 		this.notifySelectionChanged();
+		this.notifyDocumentChanged();
 		this.repaint();
 	}
 
@@ -1875,7 +1955,7 @@ public class DiagramCanvas extends JPanel {
 		}
 
 		this.findOrCreateLinkLayout(linkModel.getId());
-		this.select(SelectedElement.forLink(linkModel.getId()));
+		this.select(SelectedElement.forLink(linkModel.getId()));	this.notifyDocumentChanged();
 	}
 
 	private List<LinkModel> getActiveLinks() {
@@ -2093,6 +2173,8 @@ public class DiagramCanvas extends JPanel {
 	}
 
 	private void handleMouseReleased(final MouseEvent event) {
+		boolean documentChanged = false;
+
 		if (SwingUtilities.isRightMouseButton(event) && this.linkCreationState != null) {
 			this.finishLinkCreation(this.screenToWorld(event.getPoint()));
 		}
@@ -2102,8 +2184,21 @@ public class DiagramCanvas extends JPanel {
 			final double deltaX = this.currentDragOffset.getX() / zoom;
 			final double deltaY = this.currentDragOffset.getY() / zoom;
 
-			for (final DraggedLayout draggedLayout : this.draggedSelection.layouts()) {
-				draggedLayout.layout().getPosition().setLocation(draggedLayout.startX() + deltaX, draggedLayout.startY() + deltaY);
+			if (Math.abs(deltaX) > 0.0001 || Math.abs(deltaY) > 0.0001) {
+				for (final DraggedLayout draggedLayout : this.draggedSelection.layouts()) {
+					draggedLayout.layout().getPosition().setLocation(draggedLayout.startX() + deltaX, draggedLayout.startY() + deltaY);
+				}
+				documentChanged = true;
+			}
+		}
+
+		if (SwingUtilities.isLeftMouseButton(event) && this.resizingComment != null) {
+			final double currentWidth = this.resizingComment.layout().getSize().getWidth();
+			final double currentHeight = this.resizingComment.layout().getSize().getHeight();
+
+			if (Math.abs(currentWidth - this.resizingComment.initialWidth()) > 0.0001
+					|| Math.abs(currentHeight - this.resizingComment.initialHeight()) > 0.0001) {
+				documentChanged = true;
 			}
 		}
 
@@ -2129,6 +2224,10 @@ public class DiagramCanvas extends JPanel {
 		this.movingClassIds.clear();
 		this.movingCommentIds.clear();
 		this.movingLinkIds.clear();
+
+		if (documentChanged) {
+			this.notifyDocumentChanged();
+		}
 
 		this.setCursor(Cursor.getDefaultCursor());
 		this.repaint();
@@ -2260,6 +2359,39 @@ public class DiagramCanvas extends JPanel {
 				DiagramCanvas.this.addLink();
 			}
 		});
+
+		this.getInputMap(JComponent.WHEN_FOCUSED).put(KeyStroke.getKeyStroke(KeyEvent.VK_A, InputEvent.CTRL_DOWN_MASK), "selectAll");
+		this.getActionMap().put("selectAll", new AbstractAction() {
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				DiagramCanvas.this.selectAll();
+			}
+		});
+	}
+
+	private void selectAll() {
+		this.selectedElements.clear();
+
+		for (final ClassModel classModel : this.document.getModel().getClasses()) {
+			if (this.isVisible(classModel)) {
+				this.selectedElements.add(SelectedElement.forClass(classModel.getId()));
+			}
+		}
+
+		for (final CommentModel commentModel : this.document.getModel().getComments()) {
+			final String text = this.resolveCommentText(commentModel);
+			if (this.isCommentVisible(commentModel) && text != null && !text.isBlank()) {
+				this.selectedElements.add(SelectedElement.forComment(commentModel.getId()));
+			}
+		}
+
+		for (final LinkModel linkModel : this.getActiveLinks()) {
+			this.selectedElements.add(SelectedElement.forLink(linkModel.getId()));
+		}
+
+		this.selectedElement = this.selectedElements.isEmpty() ? null : this.selectedElements.getLast();
+		this.notifySelectionChanged();
+		this.repaint();
 	}
 
 	private boolean isClassSelected(final String classId) {
@@ -2329,17 +2461,21 @@ public class DiagramCanvas extends JPanel {
 			return false;
 		}
 
-		if (this.panelType == PanelType.CONCEPTUAL) {
-			return this.movingClassIds.contains(linkModel.getFrom().getClassId())
-					|| this.movingClassIds.contains(linkModel.getTo().getClassId());
+		if (this.movingClassIds.contains(linkModel.getFrom().getClassId())
+				|| this.movingClassIds.contains(linkModel.getTo().getClassId())) {
+			return true;
 		}
 
-		return this.movingClassIds.contains(linkModel.getFrom().getClassId())
-				|| this.movingClassIds.contains(linkModel.getTo().getClassId());
+		return this.panelType == PanelType.CONCEPTUAL && this.hasAssociationClass(linkModel)
+				&& this.movingClassIds.contains(linkModel.getAssociationClassId());
 	}
 
 	private boolean isLinkBetweenMovingObjects(final LinkModel linkModel) {
 		if (linkModel == null || linkModel.getFrom() == null || linkModel.getTo() == null) {
+			return false;
+		}
+
+		if (this.panelType == PanelType.CONCEPTUAL && this.hasAssociationClass(linkModel)) {
 			return false;
 		}
 
@@ -2492,7 +2628,7 @@ public class DiagramCanvas extends JPanel {
 		final FieldModel moved = classModel.getFields().remove(currentIndex);
 		classModel.getFields().add(newIndex, moved);
 
-		this.select(SelectedElement.forField(classModel.getId(), moved.getId()));
+		this.select(SelectedElement.forField(classModel.getId(), moved.getId()));	this.notifyDocumentChanged();
 		this.repaint();
 	}
 
@@ -3145,6 +3281,12 @@ public class DiagramCanvas extends JPanel {
 			lines.add(current.toString());
 		}
 		return lines;
+	}
+
+	private void notifyDocumentChanged() {
+		if (this.onDocumentChanged != null) {
+			this.onDocumentChanged.run();
+		}
 	}
 
 }
