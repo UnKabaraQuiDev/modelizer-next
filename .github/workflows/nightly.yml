@@ -10,7 +10,7 @@ permissions:
 
 jobs:
   prepare:
-    runs-on: linux
+    runs-on: self-hosted
 
     outputs:
       should_run: ${{ steps.decision.outputs.should_run }}
@@ -84,7 +84,7 @@ jobs:
           fi
 
   format:
-    runs-on: linux
+    runs-on: self-hosted
     needs: prepare
     if: github.event_name == 'workflow_dispatch' || needs.prepare.outputs.should_run == 'true'
 
@@ -120,7 +120,7 @@ jobs:
           git push origin "$TAG"
 
   build:
-    runs-on: linux
+    runs-on: self-hosted
     needs: [prepare, format]
     if: github.event_name == 'workflow_dispatch' || needs.prepare.outputs.should_run == 'true'
 
