@@ -104,9 +104,6 @@ jobs:
           distribution: temurin
           java-version: 21
           cache: maven
-      - name: Ensure WiX Toolset 3 is available
-        shell: pwsh
-        run: choco install wixtoolset --version 3.11.2 --no-progress -y || true
       - name: Build Windows nightly artifacts
         run: bash ./script/build-nightly-windows.sh
       - uses: actions/upload-artifact@v4
