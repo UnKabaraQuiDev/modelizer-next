@@ -10,7 +10,7 @@ permissions:
 
 jobs:
   prepare:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux]
     outputs:
       should_run: ${{ steps.decide.outputs.should_run }}
       version: ${{ steps.meta.outputs.version }}
@@ -49,7 +49,7 @@ jobs:
   build-shared:
     needs: prepare
     if: needs.prepare.outputs.should_run == 'true'
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux]
     env:
       VERSION_OVERRIDE: ${{ needs.prepare.outputs.version }}
     steps:
@@ -70,7 +70,7 @@ jobs:
   build-linux:
     needs: prepare
     if: needs.prepare.outputs.should_run == 'true'
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux]
     env:
       VERSION_OVERRIDE: ${{ needs.prepare.outputs.version }}
     steps:
@@ -91,7 +91,7 @@ jobs:
   build-windows:
     needs: prepare
     if: needs.prepare.outputs.should_run == 'true'
-    runs-on: windows-latest
+    runs-on: [self-hosted, windows]
     env:
       VERSION_OVERRIDE: ${{ needs.prepare.outputs.version }}
     defaults:
@@ -118,7 +118,7 @@ jobs:
   publish:
     needs: [prepare, build-shared, build-linux, build-windows]
     if: needs.prepare.outputs.should_run == 'true'
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux]
     env:
       VERSION: ${{ needs.prepare.outputs.version }}
       RELEASE_TAG: ${{ needs.prepare.outputs.release_tag }}
