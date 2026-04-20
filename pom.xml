@@ -144,7 +144,7 @@
 				  	<executions>
 					    <execution>
 					    	<id>copy-shaded-jar</id>
-					      	<phase>install</phase>
+					      	<phase>package</phase>
 					      	<configuration>
 						        <target>
 						          	<mkdir dir="${project.build.directory}/jpackage-input" />

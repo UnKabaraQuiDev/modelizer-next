@@ -12,24 +12,22 @@ public class BootstrapRuntime extends AbstractBootstrapRuntime {
 		boolean prepareForExit() throws IOException;
 	}
 
-	private static BootstrapRuntime instance;
-
 	public static synchronized BootstrapRuntime bootstrap() throws IOException {
 		BootstrapApp.init();
-		BootstrapRuntime.instance = new BootstrapRuntime(BootstrapApp.loadConfiguration(),
+		AbstractBootstrapRuntime.INSTANCE = new BootstrapRuntime(BootstrapApp.loadConfiguration(),
 				new ApplicationInventory(),
 				new RemoteUpdateService(),
 				new JarApplicationLauncher(),
 				BootstrapApp.ENABLE_UPDATE);
-		return BootstrapRuntime.instance;
+		return (BootstrapRuntime) AbstractBootstrapRuntime.INSTANCE;
 	}
 
 	public static synchronized BootstrapRuntime getInstance() {
-		return BootstrapRuntime.instance;
+		return (BootstrapRuntime) AbstractBootstrapRuntime.INSTANCE;
 	}
 
 	public static boolean isActive() {
-		return BootstrapRuntime.instance != null;
+		return AbstractBootstrapRuntime.INSTANCE != null;
 	}
 
 	private final BootstrapConfiguration configuration;
@@ -56,6 +54,7 @@ public class BootstrapRuntime extends AbstractBootstrapRuntime {
 		this.automaticUpdatesEnabled = automaticUpdatesEnabled;
 	}
 
+	@Override
 	public AvailableUpdate checkForUpdates() throws IOException {
 		try {
 			final String currentVersion = this.currentApplication == null ? null : this.currentApplication.version();
@@ -66,10 +65,12 @@ public class BootstrapRuntime extends AbstractBootstrapRuntime {
 		}
 	}
 
+	@Override
 	public String getCurrentApplicationVersion() {
 		return this.currentApplication == null ? null : this.currentApplication.version();
 	}
 
+	@Override
 	public UpdateChannel getSelectedChannel() {
 		return this.configuration.getUpdateChannel();
 	}
@@ -90,7 +91,7 @@ public class BootstrapRuntime extends AbstractBootstrapRuntime {
 				"Install update",
 				JOptionPane.YES_NO_OPTION,
 				JOptionPane.QUESTION_MESSAGE);
-		if ((choice != JOptionPane.YES_OPTION) || (preparation != null && !preparation.prepareForExit())) {
+		if (choice != JOptionPane.YES_OPTION || preparation != null && !preparation.prepareForExit()) {
 			return false;
 		}
 
@@ -106,10 +107,12 @@ public class BootstrapRuntime extends AbstractBootstrapRuntime {
 		return true;
 	}
 
+	@Override
 	public boolean isAutoCheckUpdates() {
 		return this.configuration.isAutoCheckUpdates();
 	}
 
+	@Override
 	public boolean isAutomaticUpdateChecksEnabledByProperty() {
 		return this.automaticUpdatesEnabled;
 	}
@@ -156,11 +159,13 @@ public class BootstrapRuntime extends AbstractBootstrapRuntime {
 		}
 	}
 
+	@Override
 	public void setAutoCheckUpdates(final boolean enabled) {
 		this.configuration.setAutoCheckUpdates(enabled);
 		BootstrapApp.saveConfiguration(this.configuration);
 	}
 
+	@Override
 	public void setSelectedChannel(final UpdateChannel updateChannel) {
 		this.configuration.setUpdateChannel(updateChannel);
 		BootstrapApp.saveConfiguration(this.configuration);

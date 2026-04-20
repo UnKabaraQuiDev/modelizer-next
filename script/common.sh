@@ -135,7 +135,7 @@ run_build() {
 
   mvn -B -DskipTests -Drevision="${VERSION}" -DappVersion="${APP_VERSION}" \
     -Ddistributor="${discriminator}" \
-    -Pall,${extra_profiles} clean install
+    -Pall,${extra_profiles} clean package
 
   stage_artifacts "${channel}" "${platform}"
 

@@ -44,6 +44,11 @@
 			<artifactId>modelizer-next-common</artifactId>
 			<scope>${common.scope}</scope>
 		</dependency>
+		<dependency>
+			<groupId>com.formdev</groupId>
+			<artifactId>flatlaf</artifactId>
+			<version>3.7.1</version>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -93,7 +98,7 @@
 						<executions>
 							<execution>
 								<id>package-app-standalone-windows</id>
-								<phase>install</phase>
+								<phase>package</phase>
 								<goals>
 									<goal>exec</goal>
 								</goals>
@@ -155,7 +160,7 @@
 						<executions>
 							<execution>
 								<id>package-app-standalone-linux</id>
-								<phase>install</phase>
+								<phase>package</phase>
 								<goals>
 									<goal>exec</goal>
 								</goals>

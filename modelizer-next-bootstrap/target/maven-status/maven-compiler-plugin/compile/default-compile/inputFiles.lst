@@ -1,7 +1,5 @@
 /ssd2/workspaces/java2/modelizer-next/modelizer-next-bootstrap/src/main/java/lu/kbra/modelizer_next/bootstrap/AppLaunchException.java
-/ssd2/workspaces/java2/modelizer-next/modelizer-next-bootstrap/src/main/java/lu/kbra/modelizer_next/bootstrap/AppMain.java
 /ssd2/workspaces/java2/modelizer-next/modelizer-next-bootstrap/src/main/java/lu/kbra/modelizer_next/bootstrap/ApplicationInventory.java
-/ssd2/workspaces/java2/modelizer-next/modelizer-next-bootstrap/src/main/java/lu/kbra/modelizer_next/bootstrap/AvailableUpdate.java
 /ssd2/workspaces/java2/modelizer-next/modelizer-next-bootstrap/src/main/java/lu/kbra/modelizer_next/bootstrap/BootstrapApp.java
 /ssd2/workspaces/java2/modelizer-next/modelizer-next-bootstrap/src/main/java/lu/kbra/modelizer_next/bootstrap/BootstrapConfiguration.java
 /ssd2/workspaces/java2/modelizer-next/modelizer-next-bootstrap/src/main/java/lu/kbra/modelizer_next/bootstrap/BootstrapLoadingFrame.java
@@ -13,4 +11,3 @@
 /ssd2/workspaces/java2/modelizer-next/modelizer-next-bootstrap/src/main/java/lu/kbra/modelizer_next/bootstrap/ProgressListener.java
 /ssd2/workspaces/java2/modelizer-next/modelizer-next-bootstrap/src/main/java/lu/kbra/modelizer_next/bootstrap/RemoteUpdateService.java
 /ssd2/workspaces/java2/modelizer-next/modelizer-next-bootstrap/src/main/java/lu/kbra/modelizer_next/bootstrap/SystemThemeDetector.java
-/ssd2/workspaces/java2/modelizer-next/modelizer-next-bootstrap/src/main/java/lu/kbra/modelizer_next/bootstrap/UpdateChannel.java

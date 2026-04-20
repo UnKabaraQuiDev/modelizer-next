@@ -3,11 +3,11 @@ package lu.kbra.modelizer_next.bootstrap;
 import java.awt.Component;
 import java.io.IOException;
 
-public final class AbstractBootstrapRuntime {
+public class AbstractBootstrapRuntime {
 
-	private static final AbstractBootstrapRuntime INSTANCE = new AbstractBootstrapRuntime();
+	protected static AbstractBootstrapRuntime INSTANCE = new AbstractBootstrapRuntime();
 
-	private AbstractBootstrapRuntime() {
+	protected AbstractBootstrapRuntime() {
 	}
 
 	public static boolean isActive() {

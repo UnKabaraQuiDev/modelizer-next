@@ -55,7 +55,3 @@
 /ssd2/workspaces/java2/modelizer-next/modelizer-next-app/src/main/java/lu/kbra/modelizer_next/ui/dialogs/LinkEditorDialog.java
 /ssd2/workspaces/java2/modelizer-next/modelizer-next-app/src/main/java/lu/kbra/modelizer_next/ui/dialogs/RenameDialog.java
 /ssd2/workspaces/java2/modelizer-next/modelizer-next-app/src/main/java/lu/kbra/modelizer_next/ui/dialogs/StylePaletteEditorDialog.java
-/ssd2/workspaces/java2/modelizer-next/modelizer-next-app/src/standalone/java/lu/kbra/modelizer_next/bootstrap/AppMain.java
-/ssd2/workspaces/java2/modelizer-next/modelizer-next-app/src/standalone/java/lu/kbra/modelizer_next/bootstrap/AvailableUpdate.java
-/ssd2/workspaces/java2/modelizer-next/modelizer-next-app/src/standalone/java/lu/kbra/modelizer_next/bootstrap/BootstrapRuntime.java
-/ssd2/workspaces/java2/modelizer-next/modelizer-next-app/src/standalone/java/lu/kbra/modelizer_next/bootstrap/UpdateChannel.java

@@ -39,7 +39,7 @@ jobs:
   build-linux:
     needs: prepare
     if: needs.prepare.outputs.should_run == 'true'
-    runs-on: ubuntu-latest
+    runs-on: [ubuntu-latest]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v5

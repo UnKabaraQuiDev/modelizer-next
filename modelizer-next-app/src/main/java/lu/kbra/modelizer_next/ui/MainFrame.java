@@ -11,6 +11,7 @@ import java.io.File;
 import java.io.IOException;
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
@@ -41,8 +42,8 @@ import lu.kbra.modelizer_next.App;
 import lu.kbra.modelizer_next.AppConfig;
 import lu.kbra.modelizer_next.MNMain;
 import lu.kbra.modelizer_next.ThemeMode;
+import lu.kbra.modelizer_next.bootstrap.AbstractBootstrapRuntime;
 import lu.kbra.modelizer_next.bootstrap.AvailableUpdate;
-import lu.kbra.modelizer_next.bootstrap.BootstrapRuntime;
 import lu.kbra.modelizer_next.bootstrap.UpdateChannel;
 import lu.kbra.modelizer_next.common.VersionComparator;
 import lu.kbra.modelizer_next.document.ModelDocument;
@@ -175,13 +176,13 @@ public class MainFrame extends JFrame {
 		}
 	}
 
-	private BootstrapRuntime bootstrapRuntime() {
-		return BootstrapRuntime.isActive() ? BootstrapRuntime.getInstance() : null;
+	private Optional<AbstractBootstrapRuntime> bootstrapRuntime() {
+		return AbstractBootstrapRuntime.isActive() ? Optional.of(AbstractBootstrapRuntime.getInstance()) : Optional.empty();
 	}
 
 	private void checkForUpdatesManually() {
-		final BootstrapRuntime runtime = this.bootstrapRuntime();
-		if (runtime == null) {
+		final Optional<AbstractBootstrapRuntime> runtime = this.bootstrapRuntime();
+		if (runtime.isPresent()) {
 			JOptionPane.showMessageDialog(this,
 					"Updates are only available when the application is launched through the bootstrap launcher.",
 					"Updates unavailable",
@@ -192,7 +193,7 @@ public class MainFrame extends JFrame {
 		new SwingWorker<AvailableUpdate, Void>() {
 			@Override
 			protected AvailableUpdate doInBackground() throws Exception {
-				return runtime.checkForUpdates();
+				return runtime.get().checkForUpdates();
 			}
 
 			@Override
@@ -226,7 +227,7 @@ public class MainFrame extends JFrame {
 							JOptionPane.YES_NO_OPTION,
 							JOptionPane.INFORMATION_MESSAGE);
 					if (choice == JOptionPane.YES_OPTION) {
-						runtime.installUpdateAndExit(MainFrame.this, update, MainFrame.this::prepareForUpdateInstall);
+						runtime.get().installUpdateAndExit(MainFrame.this, update, MainFrame.this::prepareForUpdateInstall);
 					}
 				} catch (final Exception ex) {
 					final Throwable cause = ex.getCause() == null ? ex : ex.getCause();
@@ -322,33 +323,24 @@ public class MainFrame extends JFrame {
 		checkForUpdates.addActionListener(event -> this.checkForUpdatesManually());
 		helpMenu.add(checkForUpdates);
 
-		final BootstrapRuntime bootstrapRuntime = this.bootstrapRuntime();
+		final Optional<AbstractBootstrapRuntime> bootstrapRuntime = this.bootstrapRuntime();
 		final boolean updateRuntimeAvailable = bootstrapRuntime != null;
 
 		final JCheckBoxMenuItem autoCheckUpdates = new JCheckBoxMenuItem("Check for updates on startup",
-				updateRuntimeAvailable && bootstrapRuntime.isAutoCheckUpdates());
-		autoCheckUpdates.setEnabled(updateRuntimeAvailable && bootstrapRuntime.isAutomaticUpdateChecksEnabledByProperty());
-		autoCheckUpdates.addActionListener(event -> {
-			final BootstrapRuntime runtime = this.bootstrapRuntime();
-			if (runtime != null) {
-				runtime.setAutoCheckUpdates(autoCheckUpdates.isSelected());
-			}
-		});
+				updateRuntimeAvailable && bootstrapRuntime.get().isAutoCheckUpdates());
+		autoCheckUpdates.setEnabled(updateRuntimeAvailable && bootstrapRuntime.get().isAutomaticUpdateChecksEnabledByProperty());
+		autoCheckUpdates
+				.addActionListener(event -> this.bootstrapRuntime().ifPresent(c -> c.setAutoCheckUpdates(autoCheckUpdates.isSelected())));
 		helpMenu.add(autoCheckUpdates);
 
 		final JMenu channelMenu = new JMenu("Update channel");
 		channelMenu.setEnabled(updateRuntimeAvailable);
 		final ButtonGroup channelGroup = new ButtonGroup();
-		final UpdateChannel selectedChannel = updateRuntimeAvailable ? bootstrapRuntime.getSelectedChannel() : UpdateChannel.RELEASE;
+		final UpdateChannel selectedChannel = updateRuntimeAvailable ? bootstrapRuntime.get().getSelectedChannel() : UpdateChannel.RELEASE;
 		for (final UpdateChannel updateChannel : UpdateChannel.values()) {
 			final JRadioButtonMenuItem item = new JRadioButtonMenuItem(updateChannel.displayName());
 			item.setSelected(updateChannel == selectedChannel);
-			item.addActionListener(event -> {
-				final BootstrapRuntime runtime = this.bootstrapRuntime();
-				if (runtime != null) {
-					runtime.setSelectedChannel(updateChannel);
-				}
-			});
+			item.addActionListener(event -> this.bootstrapRuntime().ifPresent(c -> c.setSelectedChannel(updateChannel)));
 			channelGroup.add(item);
 			channelMenu.add(item);
 		}

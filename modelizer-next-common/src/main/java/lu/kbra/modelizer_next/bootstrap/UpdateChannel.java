@@ -6,6 +6,10 @@ public enum UpdateChannel {
 	SNAPSHOT,
 	NIGHTLY;
 
+	public String manifestKey() {
+		return this.name().toLowerCase();
+	}
+
 	public String displayName() {
 		return switch (this) {
 		case RELEASE -> "Release";

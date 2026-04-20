@@ -6,10 +6,8 @@ lu/kbra/modelizer_next/domain/DiagramModel.class
 lu/kbra/modelizer_next/ui/MainFrame$2.class
 lu/kbra/modelizer_next/ui/dialogs/StylePaletteEditorDialog.class
 lu/kbra/modelizer_next/ui/DiagramCanvas$LinkGeometry.class
-lu/kbra/modelizer_next/bootstrap/AppMain.class
 lu/kbra/modelizer_next/json/ModernModelizerImporter.class
 lu/kbra/modelizer_next/ui/dialogs/LinkEditorDialog$2.class
-lu/kbra/modelizer_next/bootstrap/AvailableUpdate.class
 lu/kbra/modelizer_next/json/LegacyModelizerImporter.class
 lu/kbra/modelizer_next/ui/DiagramCanvasActionRegistrar$DiagramCanvasActions.class
 lu/kbra/modelizer_next/ui/MainFrame.class
@@ -49,7 +47,6 @@ lu/kbra/modelizer_next/ui/dialogs/FieldEditorDialog$Holder.class
 lu/kbra/modelizer_next/layout/LayoutObjectType.class
 lu/kbra/modelizer_next/App.class
 lu/kbra/modelizer_next/ui/DiagramCanvas$LinkCreationState.class
-lu/kbra/modelizer_next/bootstrap/UpdateChannel.class
 lu/kbra/modelizer_next/domain/ClassStyle.class
 lu/kbra/modelizer_next/domain/CommentKind.class
 lu/kbra/modelizer_next/ModelizerAppEntryPoint.class
@@ -69,7 +66,6 @@ lu/kbra/modelizer_next/ui/dialogs/LinkEditorDialog.class
 lu/kbra/modelizer_next/ui/dialogs/RenameDialog.class
 lu/kbra/modelizer_next/document/DocumentMeta.class
 lu/kbra/modelizer_next/json/OnlineModelizerImporter.class
-lu/kbra/modelizer_next/bootstrap/BootstrapRuntime$UpdatePreparation.class
 lu/kbra/modelizer_next/ui/DiagramCanvas$SelectedType.class
 lu/kbra/modelizer_next/ui/DiagramCanvas$DraggedLayout.class
 lu/kbra/modelizer_next/layout/DockLayoutState.class
@@ -108,6 +104,5 @@ lu/kbra/modelizer_next/ui/MainFrame$1.class
 lu/kbra/modelizer_next/ui/CanvasStatusListener.class
 lu/kbra/modelizer_next/ui/DiagramCanvasActionRegistrar$1.class
 lu/kbra/modelizer_next/layout/WorkspaceState.class
-lu/kbra/modelizer_next/bootstrap/BootstrapRuntime.class
 lu/kbra/modelizer_next/domain/CommentModel$1.class
 lu/kbra/modelizer_next/json/ColorModule$AwtColorSerializer.class
