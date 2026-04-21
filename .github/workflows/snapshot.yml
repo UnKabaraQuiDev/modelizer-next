@@ -21,6 +21,7 @@ jobs:
       app_version: ${{ steps.meta.outputs.app_version }}
       release_tag: ${{ steps.meta.outputs.release_tag }}
       prerelease: ${{ steps.meta.outputs.prerelease }}
+	  should_format: ${{ steps.decide.outputs.should_format }}
     steps:
       - uses: actions/checkout@v4
       - id: meta
@@ -31,8 +32,53 @@ jobs:
           compute_build_metadata snapshot shared
           emit_github_outputs "$GITHUB_OUTPUT"
 
-  build-shared:
+      - name: Decide if formatting should run
+        id: decide
+        run: |
+          SHOULD_FORMAT=false
+          if [ "${{ github.event_name }}" = "push" ]; then
+            TAG_COMMIT=$(git rev-list -n 1 ${{ github.ref }})
+            HEAD_COMMIT=$(git rev-parse HEAD)
+            echo "Tag commit: $TAG_COMMIT"
+            echo "HEAD commit: $HEAD_COMMIT"
+            if [ "$TAG_COMMIT" = "$HEAD_COMMIT" ]; then
+              SHOULD_FORMAT=true
+            fi
+          fi
+          echo "should_format=$SHOULD_FORMAT" >> $GITHUB_OUTPUT
+
+  format:
     needs: prepare
+    runs-on: [self-hosted, linux]
+
+    if: needs.prepare.outputs.should_format == 'true'
+
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.tag || github.ref }}
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Apply formatting
+        run: mvn -B -Pformat initialize spotless:apply
+
+      - name: Commit & push if needed
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add .
+          git diff --cached --quiet || git commit -m "[bot] Apply code formatting"
+          git push || echo "Push failed, continuing..."
+
+  build-shared:
+    needs: [prepare, format]
     runs-on: [self-hosted, linux]
     env:
       VERSION_OVERRIDE: ${{ needs.prepare.outputs.version }}
@@ -51,7 +97,7 @@ jobs:
           if-no-files-found: error
 
   build-linux:
-    needs: prepare
+    needs: [prepare, format]
     runs-on: [self-hosted, linux]
     env:
       VERSION_OVERRIDE: ${{ needs.prepare.outputs.version }}
@@ -70,7 +116,7 @@ jobs:
           if-no-files-found: error
 
   build-windows:
-    needs: prepare
+    needs: [prepare, format]
     runs-on: [self-hosted, windows]
     env:
       VERSION_OVERRIDE: ${{ needs.prepare.outputs.version }}

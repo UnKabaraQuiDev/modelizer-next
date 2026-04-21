@@ -46,8 +46,35 @@ jobs:
           compute_build_metadata nightly shared
           emit_github_outputs "$GITHUB_OUTPUT"
 
+  format:
+    runs-on: [self-hosted, linux]
+    needs: [prepare]
+    if: github.event_name == 'workflow_dispatch' || needs.prepare.outputs.should_run == 'true'
+  
+    permissions:
+      contents: write
+  
+    steps:
+      - uses: actions/checkout@v4
+  
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 21
+  
+      - name: Apply formatting
+        run: mvn -B -Pformat initialize spotless:apply
+  
+      - name: Commit & push if needed
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add .
+          git diff --cached --quiet || git commit -m "[bot] Apply code formatting"
+          git push || echo "Push failed, continuing..."
+
   build-shared:
-    needs: prepare
+    needs: [prepare, format]
     if: needs.prepare.outputs.should_run == 'true'
     runs-on: [self-hosted, linux]
     env:
@@ -67,7 +94,7 @@ jobs:
           if-no-files-found: error
 
   build-linux:
-    needs: prepare
+    needs: [prepare, format]
     if: needs.prepare.outputs.should_run == 'true'
     runs-on: [self-hosted, linux]
     env:
@@ -87,7 +114,7 @@ jobs:
           if-no-files-found: error
 
   build-windows:
-    needs: prepare
+    needs: [prepare, format]
     if: needs.prepare.outputs.should_run == 'true'
     runs-on: [self-hosted, windows]
     env:

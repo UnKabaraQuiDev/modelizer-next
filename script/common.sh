@@ -143,15 +143,9 @@ stage_shared_artifacts() {
   mkdir -p "${out_dir}"
 
   local bootstrap_src="modelizer-next-bootstrap/target/modelizer-next-bootstrap-${VERSION}-with-dependencies.jar"
-  if [ ! -f "${bootstrap_src}" ]; then
-    bootstrap_src="modelizer-next-bootstrap/target/modelizer-next-bootstrap-${VERSION}-with-dependencies.jar"
-  fi
   cp "${bootstrap_src}" "${out_dir}/modelizer-next-bootstrap-${VERSION}.jar"
 
   local app_src="modelizer-next-app/target/modelizer-next-app-${VERSION}-with-dependencies.jar"
-  if [ ! -f "${app_src}" ]; then
-    app_src="modelizer-next-app/target/modelizer-next-app-${VERSION}-with-dependencies.jar"
-  fi
   cp "${app_src}" "${out_dir}/modelizer-next-app-${VERSION}.jar"
 }
 
