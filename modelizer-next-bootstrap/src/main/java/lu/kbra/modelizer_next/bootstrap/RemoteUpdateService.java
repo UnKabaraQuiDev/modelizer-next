@@ -41,7 +41,6 @@ final class RemoteUpdateService {
 		String releaseUrlOrDefault() {
 			return this.releaseUrl == null || this.releaseUrl.isBlank() ? BootstrapApp.RELEASES_URL : this.releaseUrl;
 		}
-
 	}
 
 	private final ObjectMapper mapper = new ObjectMapper();
@@ -50,6 +49,21 @@ final class RemoteUpdateService {
 			.connectTimeout(Duration.ofSeconds(15))
 			.followRedirects(HttpClient.Redirect.NORMAL)
 			.build();
+
+	UpdateManifest fetchManifest() throws IOException, InterruptedException {
+		final HttpRequest request = HttpRequest.newBuilder(URI.create(BootstrapApp.UPDATES_MANIFEST_URL))
+				.header("Accept", "application/json")
+				.header("User-Agent", BootstrapApp.NAME + "/" + BootstrapApp.VERSION)
+				.timeout(Duration.ofSeconds(20))
+				.GET()
+				.build();
+
+		final HttpResponse<String> response = this.httpClient.send(request, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
+		if (response.statusCode() < 200 || response.statusCode() >= 300) {
+			throw new IOException("Failed to fetch versions manifest: HTTP " + response.statusCode());
+		}
+		return this.mapper.readValue(response.body(), UpdateManifest.class);
+	}
 
 	void download(final AvailableUpdate update, final Path destination, final ProgressListener listener) throws IOException {
 		if (update == null || update.downloadUri() == null) {
@@ -91,19 +105,7 @@ final class RemoteUpdateService {
 	}
 
 	AvailableUpdate findLatest(final UpdateChannel channel, final String currentVersion) throws IOException, InterruptedException {
-		final HttpRequest request = HttpRequest.newBuilder(URI.create(BootstrapApp.UPDATES_MANIFEST_URL))
-				.header("Accept", "application/json")
-				.header("User-Agent", BootstrapApp.NAME + "/" + BootstrapApp.VERSION)
-				.timeout(Duration.ofSeconds(20))
-				.GET()
-				.build();
-
-		final HttpResponse<String> response = this.httpClient.send(request, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
-		if (response.statusCode() < 200 || response.statusCode() >= 300) {
-			throw new IOException("Failed to fetch versions manifest: HTTP " + response.statusCode());
-		}
-
-		final UpdateManifest manifest = this.mapper.readValue(response.body(), UpdateManifest.class);
+		final UpdateManifest manifest = this.fetchManifest();
 		final UpdateRelease release = manifest.channel(channel);
 		if (release == null || release.version == null || release.version.isBlank() || release.url == null || release.url.isBlank()) {
 			throw new IOException("No release configured for channel '" + channel.manifestKey() + "'.");

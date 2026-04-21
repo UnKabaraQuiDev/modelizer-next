@@ -29,14 +29,14 @@ public final class BootstrapMain {
 			runtime.launch();
 		} catch (final Exception ex) {
 			ex.printStackTrace();
-			SwingUtilities.invokeLater(() -> JOptionPane.showMessageDialog(null,
-					"Failed to start Modelizer Next:\n" + ex.getMessage(),
-					"Bootstrap error",
-					JOptionPane.ERROR_MESSAGE));
+			SwingUtilities.invokeLater(() -> {
+				JOptionPane.showMessageDialog(null, "Failed to start Modelizer Next:\n" + ex.getMessage(),
+						"Bootstrap error", JOptionPane.ERROR_MESSAGE);
+				System.exit(1);
+			});
 		}
 	}
 
 	private BootstrapMain() {
 	}
-
 }

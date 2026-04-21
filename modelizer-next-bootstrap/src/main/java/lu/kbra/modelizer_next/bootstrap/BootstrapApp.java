@@ -60,7 +60,7 @@ public final class BootstrapApp {
 	}
 
 	public static void init() throws IOException {
-		BootstrapApp.JSON = BootstrapApp.MAPPER.readTree(PCUtils.readPackagedStringFile("/app.json"));
+		BootstrapApp.JSON = BootstrapApp.MAPPER.readTree(PCUtils.readPackagedStringFile("/bootstrap.json"));
 
 		BootstrapApp.NAME = BootstrapApp.JSON.path("name").asText("Modelizer Next Bootstrap");
 		BootstrapApp.VERSION = BootstrapApp.JSON.path("version").asText("0.0.0");
@@ -72,12 +72,14 @@ public final class BootstrapApp {
 		BootstrapApp.ensureDirectories();
 	}
 
+	public static boolean isFirstLaunch() {
+		return !BootstrapApp.getBootstrapConfigFile().isFile();
+	}
+
 	public static BootstrapConfiguration loadConfiguration() {
 		final File file = BootstrapApp.getBootstrapConfigFile();
 		if (!file.isFile()) {
-			final BootstrapConfiguration configuration = new BootstrapConfiguration();
-			BootstrapApp.saveConfiguration(configuration);
-			return configuration;
+			return new BootstrapConfiguration();
 		}
 		try {
 			return BootstrapApp.MAPPER.readValue(file, BootstrapConfiguration.class);
