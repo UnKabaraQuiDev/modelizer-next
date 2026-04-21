@@ -16,6 +16,7 @@
 
 	<properties>
 		<app.mainClass>lu.kbra.modelizer_next.bootstrap.BootstrapMain</app.mainClass>
+		<jpackage.name>Modelizer Next</jpackage.name>
 	</properties>
 
 	<dependencies>
@@ -73,7 +74,7 @@
 										<argument>--type</argument>
 										<argument>exe</argument>
 										<argument>--name</argument>
-										<argument>${project.artifactId}</argument>
+										<argument>${jpackage.name}</argument>
 										<argument>--app-version</argument>
 										<argument>${appVersion}</argument>
 										<argument>--input</argument>
@@ -86,6 +87,17 @@
 											${project.build.directory}/dist/windows</argument>
 										<argument>--add-modules</argument>
 										<argument>${jpackage.addModules}</argument>
+										<argument>--win-menu-group</argument>
+										<argument>${jpackage.category}</argument>
+										<argument>--win-menu</argument>
+										<argument>--icon</argument>
+										<argument>${jpackage.icon}</argument>
+										<argument>--file-associations</argument>
+										<argument>${jpackage.fa1}</argument>
+										<argument>--file-associations</argument>
+										<argument>${jpackage.fa2}</argument>
+										<argument>--file-associations</argument>
+										<argument>${jpackage.fa3}</argument>
 									</arguments>
 								</configuration>
 							</execution>
@@ -114,7 +126,7 @@
 										<argument>--type</argument>
 										<argument>deb</argument>
 										<argument>--name</argument>
-										<argument>${project.artifactId}</argument>
+										<argument>${jpackage.name}</argument>
 										<argument>--app-version</argument>
 										<argument>${appVersion}</argument>
 										<argument>--input</argument>
@@ -127,6 +139,17 @@
 											${project.build.directory}/dist/linux</argument>
 										<argument>--add-modules</argument>
 										<argument>${jpackage.addModules}</argument>
+										<argument>--linux-menu-group</argument>
+										<argument>${jpackage.category}</argument>
+										<argument>--linux-shortcut</argument>
+										<argument>--icon</argument>
+										<argument>${jpackage.icon}</argument>
+										<argument>--file-associations</argument>
+										<argument>${jpackage.fa1}</argument>
+										<argument>--file-associations</argument>
+										<argument>${jpackage.fa2}</argument>
+										<argument>--file-associations</argument>
+										<argument>${jpackage.fa3}</argument>
 									</arguments>
 								</configuration>
 							</execution>

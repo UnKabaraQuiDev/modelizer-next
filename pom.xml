@@ -32,6 +32,13 @@
 		<modelizer.issuesUrl>${modelizer.repositoryUrl}/issues</modelizer.issuesUrl>
 		<jpackage.addModules>
 			java.base,java.desktop,java.logging,java.net.http,jdk.unsupported,jdk.crypto.ec</jpackage.addModules>
+		<jpackage.category>Programming,Utilities</jpackage.category>
+		<jpackage.dir>${maven.multiModuleProjectDirectory}/app</jpackage.dir>
+		<jpackage.icon>${jpackage.dir}/icon.png</jpackage.icon>
+		<jpackage.fa1>${jpackage.dir}/FAmod.properties</jpackage.fa1>
+		<jpackage.fa2>${jpackage.dir}/FAmn.properties</jpackage.fa2>
+		<jpackage.fa3>${jpackage.dir}/FAmdlz.properties</jpackage.fa3>
+		<jpackage.name>filled in by modules</jpackage.name>
 		<app.mainClass>filled in by modules</app.mainClass>
 	</properties>
 
@@ -153,6 +160,20 @@
 									<copy
 										file="${project.build.directory}/${project.build.finalName}-with-dependencies.jar"
 										tofile="${project.build.directory}/jpackage-input/${project.build.finalName}.jar" />
+								</target>
+							</configuration>
+							<goals>
+								<goal>run</goal>
+							</goals>
+						</execution>
+						<execution>
+							<id>copy-icon</id>
+							<phase>package</phase>
+							<configuration>
+								<target>
+									<copy
+										file="${jpackage.icon}"
+										tofile="${project.build.directory}/jpackage-input/icon.png" />
 								</target>
 							</configuration>
 							<goals>
