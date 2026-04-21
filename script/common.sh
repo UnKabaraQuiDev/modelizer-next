@@ -66,14 +66,18 @@ compute_build_metadata() {
   channel_name="$(channel_upper "${channel}")"
 
   if [[ -n "${version_override}" ]]; then
-    if [[ ! "${version_override}" =~ ^([0-9]+(\.[0-9]+)*)-(${channel_name})-([0-9]{4}-[0-9]{2}-[0-9]{2})_([0-9]{2}-[0-9]{2}-[0-9]{2})$ ]]; then
-      echo "Version '${version_override}' does not match expected format '<x.y>- ${channel_name} -YYYY-MM-DD_HH-MM-SS'" >&2
+    if [[ "${version_override}" =~ ^([0-9]+(\.[0-9]+)*)-(${channel_name})-([0-9]+)$ ]]; then
+      base_version="${BASH_REMATCH[1]}"
+      raw_base_version="${BASH_REMATCH[1]}"
+      minutes_since_epoch="${BASH_REMATCH[4]}"
+    else
+      echo "Version '${version_override}' does not match expected format '<x.y>-${channel_name}-<minutes>'" >&2
       exit 1
     fi
-    base_version="${BASH_REMATCH[1]}"
-    raw_base_version="${BASH_REMATCH[1]}"
-    timestamp_date="${BASH_REMATCH[4]}"
-    timestamp_time="${BASH_REMATCH[5]}"
+    epoch_timestamp="$(date -u -d '2026-01-01 00:00:00' +%s)"
+    build_timestamp_seconds="$(( epoch_timestamp + minutes_since_epoch * 60 ))"
+    timestamp_date="$(date -u -d "@${build_timestamp_seconds}" +%Y-%m-%d)"
+    timestamp_time="$(date -u -d "@${build_timestamp_seconds}" +%H-%M-%S)"
   else
     raw_base_version="$(mvn -B help:evaluate -Dexpression=project.version -q -DforceStdout)"
     base_version="$(sanitize_base_for_public_version "${raw_base_version}")"
