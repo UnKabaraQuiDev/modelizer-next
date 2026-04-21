@@ -324,7 +324,7 @@ public class MainFrame extends JFrame {
 		helpMenu.add(checkForUpdates);
 
 		final Optional<AbstractBootstrapRuntime> bootstrapRuntime = this.bootstrapRuntime();
-		final boolean updateRuntimeAvailable = bootstrapRuntime != null;
+		final boolean updateRuntimeAvailable = bootstrapRuntime.isPresent();
 
 		final JCheckBoxMenuItem autoCheckUpdates = new JCheckBoxMenuItem("Check for updates on startup",
 				updateRuntimeAvailable && bootstrapRuntime.get().isAutoCheckUpdates());

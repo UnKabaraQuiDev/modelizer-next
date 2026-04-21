@@ -60,25 +60,42 @@ compute_build_metadata() {
   local channel_name
   channel_name="$(channel_upper "${channel}")"
 
-  if [[ -n "${version_override}" ]]; then
-    if [[ ! "${version_override}" =~ ^(.+)-(${channel_name})-([0-9]{4}-[0-9]{2}-[0-9]{2})_([0-9]{2}-[0-9]{2}-[0-9]{2})$ ]]; then
-      echo "Version '${version_override}' does not match expected format '*-${channel_name}-YYYY-MM-DD_HH-MM-SS'" >&2
-      exit 1
-    fi
-    base_version="${BASH_REMATCH[1]}"
-    timestamp_date="${BASH_REMATCH[3]}"
-    timestamp_time="${BASH_REMATCH[4]}"
-  else
-    base_version="$(mvn -B help:evaluate -Dexpression=project.version -q -DforceStdout)"
-    timestamp_date="$(date -u +%Y-%m-%d)"
-    timestamp_time="$(date -u +%H-%M-%S)"
-    version_override="${base_version}-${channel_name}-${timestamp_date}_${timestamp_time}"
-  fi
+	if [[ -n "${version_override}" ]]; then
+	  if [[ ! "${version_override}" =~ ^(.+)-(${channel_name})-([0-9]{4}-[0-9]{2}-[0-9]{2})_([0-9]{2}-[0-9]{2}-[0-9]{2})$ ]]; then
+	    echo "Version '${version_override}' does not match expected format '*-${channel_name}-YYYY-MM-DD_HH-MM-SS'" >&2
+	    exit 1
+	  fi
+	  base_version="${BASH_REMATCH[1]}"
+	  timestamp_date="${BASH_REMATCH[3]}"
+	  timestamp_time="${BASH_REMATCH[4]}"
+	else
+	  base_version="$(mvn -B help:evaluate -Dexpression=project.version -q -DforceStdout)"
+	  timestamp_date="$(date -u +%Y-%m-%d)"
+	  timestamp_time="$(date -u +%H-%M-%S)"
+	  version_override="${base_version}-${channel_name}-${timestamp_date}_${timestamp_time}"
+	fi
 
-  local app_version_base
-  app_version_base="$(sanitize_base_for_app_version "${base_version}")"
-  local timestamp_compact="${timestamp_date//-/}${timestamp_time//-/}"
-  local app_version="${app_version_base}.$(channel_code "${channel}").${timestamp_compact}"
+	local app_version_base
+	app_version_base="$(sanitize_base_for_app_version "${base_version}")"
+
+	local build_timestamp_utc
+	build_timestamp_utc="${timestamp_date} ${timestamp_time//-/:}"
+
+	local epoch_timestamp
+	epoch_timestamp="$(date -u -d '2026-01-01 00:00:00' +%s)"
+
+	local build_timestamp_seconds
+	build_timestamp_seconds="$(date -u -d "${build_timestamp_utc}" +%s)"
+
+	if (( build_timestamp_seconds < epoch_timestamp )); then
+	  echo "Build timestamp '${build_timestamp_utc}' is before 2026-01-01 00:00:00 UTC" >&2
+	  exit 1
+	fi
+
+	local minutes_since_epoch
+	minutes_since_epoch="$(( (build_timestamp_seconds - epoch_timestamp) / 60 ))"
+
+	local app_version="${app_version_base}.$(channel_code "${channel}").${minutes_since_epoch}"
   local prerelease="$(channel_prerelease "${channel}")"
 
   BUILD_DATE="${timestamp_date}"
