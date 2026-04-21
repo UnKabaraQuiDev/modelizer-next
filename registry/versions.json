@@ -14,10 +14,10 @@
     "tag": ""
   },
   "nightly": {
-    "version": "0.1-SNAPSHOT-NIGHTLY-2026-04-21_07-04-51",
-    "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/0.1-SNAPSHOT-NIGHTLY-2026-04-21_07-04-51/modelizer-next-app-0.1-SNAPSHOT-NIGHTLY-2026-04-21_07-04-51.jar",
-    "releaseUrl": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/tag/0.1-SNAPSHOT-NIGHTLY-2026-04-21_07-04-51",
+    "version": "0.1-NIGHTLY-2026-04-21_13-15-04",
+    "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/0.1-NIGHTLY-2026-04-21_13-15-04/modelizer-next-app-0.1-NIGHTLY-2026-04-21_13-15-04.jar",
+    "releaseUrl": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/tag/0.1-NIGHTLY-2026-04-21_13-15-04",
     "notes": "Latest nightly build.",
-    "tag": "0.1-SNAPSHOT-NIGHTLY-2026-04-21_07-04-51"
+    "tag": "0.1-NIGHTLY-2026-04-21_13-15-04"
   }
 }
