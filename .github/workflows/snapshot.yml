@@ -161,7 +161,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ env.RELEASE_TAG }}
-          name: Snapshot ${{ env.VERSION }}
+          name: ${{ env.RELEASE_TAG }}
           prerelease: true
           make_latest: false
           generate_release_notes: true

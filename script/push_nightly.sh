@@ -11,7 +11,7 @@ BASE_TS=$(date -u -d "2026-01-01 00:00:00" +%s)
 NOW_TS=$(date -u +%s)
 MINUTES=$(( (NOW_TS - BASE_TS) / 60 ))
 
-TAG="${MVN_VERSION}-SNAPSHOT-${MINUTES}"
+TAG="${MVN_VERSION}-NIGHTLY-${MINUTES}"
 
 echo "Using tag: $TAG"
 

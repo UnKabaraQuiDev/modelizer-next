@@ -63,7 +63,11 @@ compute_build_metadata() {
   local timestamp_date
   local timestamp_time
   local channel_name
+  local epoch_timestamp
+  local build_timestamp_seconds
+  local minutes_since_epoch
   channel_name="$(channel_upper "${channel}")"
+  epoch_timestamp="$(date -u -d '2026-01-01 00:00:00' +%s)"
 
   if [[ -n "${version_override}" ]]; then
     if [[ "${version_override}" =~ ^([0-9]+(\.[0-9]+)*)-(${channel_name})-([0-9]+)$ ]]; then
@@ -74,38 +78,24 @@ compute_build_metadata() {
       echo "Version '${version_override}' does not match expected format '<x.y>-${channel_name}-<minutes>'" >&2
       exit 1
     fi
-    epoch_timestamp="$(date -u -d '2026-01-01 00:00:00' +%s)"
-    build_timestamp_seconds="$(( epoch_timestamp + minutes_since_epoch * 60 ))"
-    timestamp_date="$(date -u -d "@${build_timestamp_seconds}" +%Y-%m-%d)"
-    timestamp_time="$(date -u -d "@${build_timestamp_seconds}" +%H-%M-%S)"
   else
     raw_base_version="$(mvn -B help:evaluate -Dexpression=project.version -q -DforceStdout)"
     base_version="$(sanitize_base_for_public_version "${raw_base_version}")"
-    timestamp_date="$(date -u +%Y-%m-%d)"
-    timestamp_time="$(date -u +%H-%M-%S)"
-    version_override="${base_version}-${channel_name}-${timestamp_date}_${timestamp_time}"
+    build_timestamp_seconds="$(date -u +%s)"
+    if (( build_timestamp_seconds < epoch_timestamp )); then
+      echo "Current time is before 2026-01-01 00:00:00 UTC" >&2
+      exit 1
+    fi
+    minutes_since_epoch="$(( (build_timestamp_seconds - epoch_timestamp) / 60 ))"
+    version_override="${base_version}-${channel_name}-${minutes_since_epoch}"
   fi
+
+  build_timestamp_seconds="$(( epoch_timestamp + minutes_since_epoch * 60 ))"
+  timestamp_date="$(date -u -d "@${build_timestamp_seconds}" +%Y-%m-%d)"
+  timestamp_time="$(date -u -d "@${build_timestamp_seconds}" +%H-%M-%S)"
 
   local app_version_base
   app_version_base="$(sanitize_base_for_app_version "${base_version}")"
-
-  local build_timestamp_utc
-  build_timestamp_utc="${timestamp_date} ${timestamp_time//-/:}"
-
-  local epoch_timestamp
-  epoch_timestamp="$(date -u -d '2026-01-01 00:00:00' +%s)"
-
-  local build_timestamp_seconds
-  build_timestamp_seconds="$(date -u -d "${build_timestamp_utc}" +%s)"
-
-  if (( build_timestamp_seconds < epoch_timestamp )); then
-    echo "Build timestamp '${build_timestamp_utc}' is before 2026-01-01 00:00:00 UTC" >&2
-    exit 1
-  fi
-
-  local minutes_since_epoch
-  minutes_since_epoch="$(( (build_timestamp_seconds - epoch_timestamp) / 60 ))"
-
   local app_version="${app_version_base}.$(channel_code "${channel}").${minutes_since_epoch}"
   local prerelease="$(channel_prerelease "${channel}")"
 
@@ -146,10 +136,10 @@ stage_shared_artifacts() {
   rm -rf "${out_dir}"
   mkdir -p "${out_dir}"
 
-  local bootstrap_src="modelizer-next-bootstrap/target/modelizer-next-bootstrap-${VERSION}-with-dependencies.jar"
+  local bootstrap_src="modelizer-next-bootstrap/target/modelizer-next-bootstrap-${APP_VERSION}-with-dependencies.jar"
   cp "${bootstrap_src}" "${out_dir}/modelizer-next-bootstrap-${VERSION}.jar"
 
-  local app_src="modelizer-next-app/target/modelizer-next-app-${VERSION}-with-dependencies.jar"
+  local app_src="modelizer-next-app/target/modelizer-next-app-${APP_VERSION}-with-dependencies.jar"
   cp "${app_src}" "${out_dir}/modelizer-next-app-${VERSION}.jar"
 }
 
@@ -199,7 +189,7 @@ run_shared_build() {
   echo "Starting shared ${channel} build"
   echo "Version [$(channel_upper "${channel}")]: ${VERSION} (${BASE_VERSION}) = ${APP_VERSION}"
 
-  mvn -B -DskipTests -Drevision="${VERSION}" -DappVersion="${APP_VERSION}" \
+  mvn -B -DskipTests -Drevision="${APP_VERSION}" -DappVersion="${APP_VERSION}" \
     -Ddistributor="Automated ${channel} build ${BUILD_TIMESTAMP} (shared)" \
     -Pall clean package
 
@@ -221,7 +211,7 @@ run_platform_build() {
   echo "Starting ${platform} ${channel} native build"
   echo "Version [$(channel_upper "${channel}")]: ${VERSION} (${BASE_VERSION}) = ${APP_VERSION}"
 
-  mvn -B -DskipTests -Drevision="${VERSION}" -DappVersion="${APP_VERSION}" \
+  mvn -B -DskipTests -Drevision="${APP_VERSION}" -DappVersion="${APP_VERSION}" \
     -Ddistributor="Automated ${channel} build ${BUILD_TIMESTAMP} (${platform})" \
     -Pall,${extra_profiles} clean package
 
