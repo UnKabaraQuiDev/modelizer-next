@@ -97,12 +97,7 @@ final class RemoteUpdateService {
 				.timeout(Duration.ofSeconds(20))
 				.GET()
 				.build();
-		System.err.println(request);
-		// https://raw.githubusercontent.com/UnKabaraQuiDev/modelizer-next/refs/heads/main/registry/versions.json
-		// https://raw.githubusercontent.com/UnKabaraQuiDev/modelizer-next/refs/heads/main/registry/versions.json
-		// https://raw.githubusercontent.com/UnKabaraQuiDev/modelizer-next/refs/heads/main/registry/versions.json
-		// https://raw.githubusercontent.com/UnKabaraQuiDev/modelizer-next/refs/heads/main/registry/versions.json
-		// https://raw.githubusercontent.com/UnKabaraQuiDev/modelizer-next/main/registry/versions.json
+
 		final HttpResponse<String> response = this.httpClient.send(request, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
 		if (response.statusCode() < 200 || response.statusCode() >= 300) {
 			throw new IOException("Failed to fetch versions manifest: HTTP " + response.statusCode());

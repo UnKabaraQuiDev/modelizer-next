@@ -178,22 +178,13 @@ stage_platform_artifacts() {
     cp "${bootstrap_exe}" "${out_dir}/modelizer-next-bootstrap-${platform}-${VERSION}.exe"
     cp "${app_exe}" "${out_dir}/modelizer-next-app-portable-${platform}-${VERSION}.exe"
   else
-    local bootstrap_dir
-    bootstrap_dir="$(find modelizer-next-bootstrap/target/dist/linux -mindepth 1 -maxdepth 1 -type d | head -n 1 || true)"
-    local app_dir
-    app_dir="$(find modelizer-next-app/target/dist/linux -mindepth 1 -maxdepth 1 -type d | head -n 1 || true)"
+    local bootstrap_exe
+    bootstrap_exe="$(find_single_file "modelizer-next-bootstrap/target/dist/linux" '*.deb')"
+    local app_exe
+    app_exe="$(find_single_file "modelizer-next-app/target/dist/linux" '*.deb')"
 
-    if [ -z "${bootstrap_dir}" ] || [ -z "${app_dir}" ]; then
-      echo "Missing Linux app-image directory in target/dist/linux" >&2
-      exit 1
-    fi
-
-    tar -C "$(dirname "${bootstrap_dir}")" -czf \
-      "${out_dir}/modelizer-next-bootstrap-${platform}-${VERSION}.tar.gz" \
-      "$(basename "${bootstrap_dir}")"
-    tar -C "$(dirname "${app_dir}")" -czf \
-      "${out_dir}/modelizer-next-app-portable-${platform}-${VERSION}.tar.gz" \
-      "$(basename "${app_dir}")"
+    cp "${bootstrap_exe}" "${out_dir}/modelizer-next-bootstrap-${platform}-${VERSION}.deb"
+    cp "${app_exe}" "${out_dir}/modelizer-next-app-portable-${platform}-${VERSION}.deb"
   fi
 }
 

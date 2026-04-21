@@ -15,7 +15,7 @@
 	<description>Bootstrap launcher and updater for Modelizer Next</description>
 
 	<properties>
-		<bootstrap.mainClass>lu.kbra.modelizer_next.bootstrap.BootstrapMain</bootstrap.mainClass>
+		<app.mainClass>lu.kbra.modelizer_next.bootstrap.BootstrapMain</app.mainClass>
 	</properties>
 
 	<dependencies>
@@ -112,7 +112,7 @@
 									<executable>jpackage</executable>
 									<arguments>
 										<argument>--type</argument>
-										<argument>app-image</argument>
+										<argument>deb</argument>
 										<argument>--name</argument>
 										<argument>${project.artifactId}</argument>
 										<argument>--app-version</argument>

@@ -163,7 +163,7 @@
 									<executable>jpackage</executable>
 									<arguments>
 										<argument>--type</argument>
-										<argument>app-image</argument>
+										<argument>deb</argument>
 										<argument>--name</argument>
 										<argument>${project.artifactId}</argument>
 										<argument>--app-version</argument>
