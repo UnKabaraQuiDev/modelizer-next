@@ -3,6 +3,8 @@ package lu.kbra.modelizer_next.bootstrap;
 import java.awt.Component;
 import java.io.IOException;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
 public interface UpdateRuntime {
 
 	@FunctionalInterface
@@ -16,7 +18,8 @@ public interface UpdateRuntime {
 
 	UpdateChannel getSelectedChannel();
 
-	boolean installUpdateAndExit(Component parentComponent, AvailableUpdate update, UpdatePreparation preparation) throws IOException;
+	boolean installUpdateAndExit(Component parentComponent, AvailableUpdate update, UpdatePreparation preparation)
+			throws IOException;
 
 	boolean isAutoCheckUpdates();
 
@@ -27,5 +30,9 @@ public interface UpdateRuntime {
 	void setAutoCheckUpdates(boolean enabled);
 
 	void setSelectedChannel(UpdateChannel updateChannel);
+
+	JsonNode getBootstrapJson();
+	
+	BootstrapConfig getBootstrapConfig();
 
 }

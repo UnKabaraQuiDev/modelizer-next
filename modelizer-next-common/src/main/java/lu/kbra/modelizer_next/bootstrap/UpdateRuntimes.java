@@ -4,6 +4,8 @@ import java.awt.Component;
 import java.io.IOException;
 import java.util.Objects;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
 public final class UpdateRuntimes {
 
 	private static final class NoOpUpdateRuntime implements UpdateRuntime {
@@ -24,9 +26,7 @@ public final class UpdateRuntimes {
 		}
 
 		@Override
-		public boolean installUpdateAndExit(
-				final Component parentComponent,
-				final AvailableUpdate update,
+		public boolean installUpdateAndExit(final Component parentComponent, final AvailableUpdate update,
 				final UpdatePreparation preparation) throws IOException {
 			return false;
 		}
@@ -53,6 +53,17 @@ public final class UpdateRuntimes {
 		@Override
 		public void setSelectedChannel(final UpdateChannel updateChannel) {
 		}
+
+		@Override
+		public JsonNode getBootstrapJson() {
+			return null;
+		}
+
+		@Override
+		public BootstrapConfig getBootstrapConfig() {
+			return null;
+		}
+
 	}
 
 	private static final UpdateRuntime NO_OP_RUNTIME = new NoOpUpdateRuntime();

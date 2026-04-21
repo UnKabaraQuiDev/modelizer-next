@@ -11,6 +11,8 @@ import java.util.regex.Pattern;
 
 import javax.swing.JOptionPane;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
 public class BootstrapRuntime implements UpdateRuntime {
 
 	private static final Pattern VERSION_MINUTES_PATTERN = Pattern.compile("^.+-(RELEASE|SNAPSHOT|NIGHTLY)-(\\d+)$");
@@ -270,4 +272,15 @@ public class BootstrapRuntime implements UpdateRuntime {
 		this.configuration.setUpdateChannel(updateChannel);
 		BootstrapApp.saveConfiguration(this.configuration);
 	}
+
+	@Override
+	public JsonNode getBootstrapJson() {
+		return BootstrapApp.JSON;
+	}
+
+	@Override
+	public BootstrapConfig getBootstrapConfig() {
+		return BootstrapApp.BOOTSTRAP_CONFIG;
+	}
+
 }

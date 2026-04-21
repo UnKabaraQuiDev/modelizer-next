@@ -2,7 +2,10 @@ package lu.kbra.modelizer_next.ui;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
+import java.awt.Toolkit;
+import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
@@ -43,6 +46,7 @@ import lu.kbra.modelizer_next.AppConfig;
 import lu.kbra.modelizer_next.MNMain;
 import lu.kbra.modelizer_next.ThemeMode;
 import lu.kbra.modelizer_next.bootstrap.AvailableUpdate;
+import lu.kbra.modelizer_next.bootstrap.BootstrapConfig;
 import lu.kbra.modelizer_next.bootstrap.UpdateChannel;
 import lu.kbra.modelizer_next.bootstrap.UpdateRuntime;
 import lu.kbra.modelizer_next.bootstrap.UpdateRuntimes;
@@ -317,12 +321,12 @@ public class MainFrame extends JFrame {
 		return item;
 	}
 
-	private JMenu createHelpMenu() {
-		final JMenu helpMenu = new JMenu("Help");
+	private JMenu createInfoMenu() {
+		final JMenu infoMenu = new JMenu("Info");
 
 		final JMenuItem checkForUpdates = new JMenuItem("Check for updates...");
 		checkForUpdates.addActionListener(event -> this.checkForUpdatesManually());
-		helpMenu.add(checkForUpdates);
+		infoMenu.add(checkForUpdates);
 
 		final Optional<UpdateRuntime> bootstrapRuntime = this.bootstrapRuntime();
 		final boolean updateRuntimeAvailable = bootstrapRuntime.isPresent();
@@ -332,7 +336,7 @@ public class MainFrame extends JFrame {
 		autoCheckUpdates.setEnabled(updateRuntimeAvailable && bootstrapRuntime.get().isAutomaticUpdateChecksEnabledByProperty());
 		autoCheckUpdates
 				.addActionListener(event -> this.bootstrapRuntime().ifPresent(c -> c.setAutoCheckUpdates(autoCheckUpdates.isSelected())));
-		helpMenu.add(autoCheckUpdates);
+		infoMenu.add(autoCheckUpdates);
 
 		final JMenu channelMenu = new JMenu("Update channel");
 		channelMenu.setEnabled(updateRuntimeAvailable);
@@ -345,15 +349,35 @@ public class MainFrame extends JFrame {
 			channelGroup.add(item);
 			channelMenu.add(item);
 		}
-		helpMenu.add(channelMenu);
+		infoMenu.add(channelMenu);
 
-		if (!updateRuntimeAvailable) {
-			final JMenuItem standaloneInfo = new JMenuItem("Standalone mode: bootstrap updates unavailable");
-			standaloneInfo.setEnabled(false);
-			helpMenu.add(standaloneInfo);
+		final JMenuItem versionInfo = new JMenuItem("Version: " + App.VERSION + " (" + App.REVISION + ") [" + App.DISTRIBUTOR + "]");
+		versionInfo.setToolTipText("Click to copy version informations.");
+		final ActionListener al = event -> {
+			final StringSelection selection = new StringSelection(
+					"==== APP INFO ====\n" + App.JSON.toPrettyString() + "\n==== BOOTSTRAP INFO ====\n"
+							+ (updateRuntimeAvailable ? bootstrapRuntime.get().getBootstrapJson().toPrettyString() : "NONE"));
+			Toolkit.getDefaultToolkit().getSystemClipboard().setContents(selection, null);
+		};
+		versionInfo.addActionListener(al);
+		infoMenu.add(versionInfo);
+
+		if (updateRuntimeAvailable) {
+			final BootstrapConfig bootstrapConfig = bootstrapRuntime.get().getBootstrapConfig();
+			final JMenuItem bootstrapVersionInfo = new JMenuItem("Bootstrap Version: " + bootstrapConfig.versio() + " ("
+					+ bootstrapConfig.revision() + ") [" + bootstrapConfig.distributor() + "]");
+			bootstrapVersionInfo.setToolTipText("Click to copy bootstrap version informations.");
+			bootstrapVersionInfo.addActionListener(al);
+			infoMenu.add(bootstrapVersionInfo);
 		}
 
-		return helpMenu;
+//		if (!updateRuntimeAvailable) {
+//			final JMenuItem standaloneInfo = new JMenuItem("Standalone mode: bootstrap updates unavailable.");
+//			standaloneInfo.setEnabled(false);
+//			infoMenu.add(standaloneInfo);
+//		}
+
+		return infoMenu;
 	}
 
 	private JMenuBar createMenuBar() {
@@ -387,7 +411,7 @@ public class MainFrame extends JFrame {
 		final JMenu stylesMenu = new JMenu("Styles");
 		this.populateStylesMenu(stylesMenu);
 
-		final JMenu helpMenu = this.createHelpMenu();
+		final JMenu helpMenu = this.createInfoMenu();
 
 		menuBar.add(fileMenu);
 		menuBar.add(editMenu);
@@ -736,7 +760,7 @@ public class MainFrame extends JFrame {
 	private void refreshFrameTitle() {
 		final String source = this.document.getSource() == null || this.document.getSource().isBlank() ? "Untitled"
 				: this.document.getSource();
-		this.setTitle((this.session.isDirty() ? "* " : "") + App.title(source));
+		this.setTitle(App.title(source + (this.session.isDirty() ? " *" : "")));
 	}
 
 	private void refreshToolbarLabels() {

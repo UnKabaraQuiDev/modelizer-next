@@ -109,7 +109,7 @@ public class App {
 	}
 
 	public static String title(final String title) {
-		return App.NAME + " " + App.VERSION + " - " + title;
+		return App.NAME + " - " + title;
 	}
 
 }
