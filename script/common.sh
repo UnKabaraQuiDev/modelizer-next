@@ -189,7 +189,7 @@ run_shared_build() {
   echo "Starting shared ${channel} build"
   echo "Version [$(channel_upper "${channel}")]: ${VERSION} (${BASE_VERSION}) = ${APP_VERSION}"
 
-  mvn -B -DskipTests -Drevision="${APP_VERSION}" -DappVersion="${APP_VERSION}" \
+  mvn -B -DskipTests -Drevision="${VERSION}" -DappVersion="${APP_VERSION}" \
     -Ddistributor="Automated ${channel} build ${BUILD_TIMESTAMP} (shared)" \
     -Pall clean package
 
@@ -211,7 +211,7 @@ run_platform_build() {
   echo "Starting ${platform} ${channel} native build"
   echo "Version [$(channel_upper "${channel}")]: ${VERSION} (${BASE_VERSION}) = ${APP_VERSION}"
 
-  mvn -B -DskipTests -Drevision="${APP_VERSION}" -DappVersion="${APP_VERSION}" \
+  mvn -B -DskipTests -Drevision="${VERSION}" -DappVersion="${APP_VERSION}" \
     -Ddistributor="Automated ${channel} build ${BUILD_TIMESTAMP} (${platform})" \
     -Pall,${extra_profiles} clean package
 
