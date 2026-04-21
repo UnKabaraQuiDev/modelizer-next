@@ -1,12 +1,69 @@
 {
   "channel": "release",
-  "version": "",
-  "tag": "",
-  "releaseUrl": "",
-  "assetUrl": "",
-  "url": "",
-  "platforms": [],
-  "notes": "",
-  "updatedAt": "",
-  "entries": []
+  "version": "0.1-RELEASE-159546",
+  "tag": "0.1-RELEASE-159546",
+  "releaseUrl": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/tag/0.1-RELEASE-159546",
+  "assetUrl": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/0.1-RELEASE-159546/modelizer-next-app-0.1-RELEASE-159546.jar",
+  "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/0.1-RELEASE-159546/modelizer-next-app-0.1-RELEASE-159546.jar",
+  "platforms": [
+    "portable",
+    "linux",
+    "windows"
+  ],
+  "notes": "Latest stable release.",
+  "updatedAt": "2026-04-21T17:10:53Z",
+  "entries": [
+    {
+      "version": "0.1-RELEASE-159546",
+      "tag": "0.1-RELEASE-159546",
+      "releaseUrl": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/tag/0.1-RELEASE-159546",
+      "assetUrl": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/0.1-RELEASE-159546/modelizer-next-app-0.1-RELEASE-159546.jar",
+      "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/0.1-RELEASE-159546/modelizer-next-app-0.1-RELEASE-159546.jar",
+      "platforms": [
+        "portable",
+        "linux",
+        "windows"
+      ],
+      "notes": "Latest stable release.",
+      "publishedAt": "2026-04-21T17:10:53Z",
+      "assets": [
+        {
+          "name": "modelizer-next-app-0.1-RELEASE-159546.jar",
+          "platform": "portable",
+          "kind": "app-portable-jar",
+          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/0.1-RELEASE-159546/modelizer-next-app-0.1-RELEASE-159546.jar"
+        },
+        {
+          "name": "modelizer-next-app-portable-linux-0.1-RELEASE-159546.deb",
+          "platform": "linux",
+          "kind": "app-portable-native",
+          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/0.1-RELEASE-159546/modelizer-next-app-portable-linux-0.1-RELEASE-159546.deb"
+        },
+        {
+          "name": "modelizer-next-app-portable-windows-0.1-RELEASE-159546.exe",
+          "platform": "windows",
+          "kind": "app-portable-native",
+          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/0.1-RELEASE-159546/modelizer-next-app-portable-windows-0.1-RELEASE-159546.exe"
+        },
+        {
+          "name": "modelizer-next-bootstrap-0.1-RELEASE-159546.jar",
+          "platform": "portable",
+          "kind": "bootstrap-jar",
+          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/0.1-RELEASE-159546/modelizer-next-bootstrap-0.1-RELEASE-159546.jar"
+        },
+        {
+          "name": "modelizer-next-bootstrap-linux-0.1-RELEASE-159546.deb",
+          "platform": "linux",
+          "kind": "bootstrap-native",
+          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/0.1-RELEASE-159546/modelizer-next-bootstrap-linux-0.1-RELEASE-159546.deb"
+        },
+        {
+          "name": "modelizer-next-bootstrap-windows-0.1-RELEASE-159546.exe",
+          "platform": "windows",
+          "kind": "bootstrap-native",
+          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/0.1-RELEASE-159546/modelizer-next-bootstrap-windows-0.1-RELEASE-159546.exe"
+        }
+      ]
+    }
+  ]
 }
