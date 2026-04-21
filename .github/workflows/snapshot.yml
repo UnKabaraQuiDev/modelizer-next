@@ -21,7 +21,7 @@ jobs:
       app_version: ${{ steps.meta.outputs.app_version }}
       release_tag: ${{ steps.meta.outputs.release_tag }}
       prerelease: ${{ steps.meta.outputs.prerelease }}
-	  should_format: ${{ steps.decide.outputs.should_format }}
+      should_format: ${{ steps.decide.outputs.should_format }}
     steps:
       - uses: actions/checkout@v4
       - id: meta
