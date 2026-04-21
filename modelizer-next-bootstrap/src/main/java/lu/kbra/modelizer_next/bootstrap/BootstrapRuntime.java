@@ -5,29 +5,26 @@ import java.io.IOException;
 
 import javax.swing.JOptionPane;
 
-public class BootstrapRuntime extends AbstractBootstrapRuntime {
+public class BootstrapRuntime implements UpdateRuntime {
 
-	@FunctionalInterface
-	public interface UpdatePreparation {
-		boolean prepareForExit() throws IOException;
-	}
 
 	public static synchronized BootstrapRuntime bootstrap() throws IOException {
 		BootstrapApp.init();
-		AbstractBootstrapRuntime.INSTANCE = new BootstrapRuntime(BootstrapApp.loadConfiguration(),
+		final BootstrapRuntime runtime = new BootstrapRuntime(BootstrapApp.loadConfiguration(),
 				new ApplicationInventory(),
 				new RemoteUpdateService(),
 				new JarApplicationLauncher(),
 				BootstrapApp.ENABLE_UPDATE);
-		return (BootstrapRuntime) AbstractBootstrapRuntime.INSTANCE;
+		UpdateRuntimes.install(runtime);
+		return runtime;
 	}
 
 	public static synchronized BootstrapRuntime getInstance() {
-		return (BootstrapRuntime) AbstractBootstrapRuntime.INSTANCE;
+		return (BootstrapRuntime) UpdateRuntimes.getInstance();
 	}
 
 	public static boolean isActive() {
-		return AbstractBootstrapRuntime.INSTANCE != null;
+		return UpdateRuntimes.isActive();
 	}
 
 	private final BootstrapConfiguration configuration;
@@ -55,6 +52,11 @@ public class BootstrapRuntime extends AbstractBootstrapRuntime {
 	}
 
 	@Override
+	public boolean isAvailable() {
+		return true;
+	}
+
+	@Override
 	public AvailableUpdate checkForUpdates() throws IOException {
 		try {
 			final String currentVersion = this.currentApplication == null ? null : this.currentApplication.version();
@@ -75,6 +77,7 @@ public class BootstrapRuntime extends AbstractBootstrapRuntime {
 		return this.configuration.getUpdateChannel();
 	}
 
+	@Override
 	public boolean installUpdateAndExit(final Component parentComponent, final AvailableUpdate update, final UpdatePreparation preparation)
 			throws IOException {
 		if (update == null || !update.isUpdateAvailable()) {

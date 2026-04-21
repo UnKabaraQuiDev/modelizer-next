@@ -23,7 +23,7 @@ public class App {
 
 	public static String REPOSITORY_URL = "https://github.com/UnKabaraQuiDev/modelizer-next";
 	public static String RELEASES_URL = App.REPOSITORY_URL + "/releases";
-	public static String UPDATES_MANIFEST_URL = "https://raw.githubusercontent.com/UnKabaraQuiDev/modelizer-next/update-registry/versions.json";
+	public static String UPDATES_MANIFEST_URL = "https://raw.githubusercontent.com/UnKabaraQuiDev/modelizer-next/main/registry/versions.json";
 	public static String ISSUES_URL = App.REPOSITORY_URL + "/issues/";
 	public static String ENTRY_POINT;
 

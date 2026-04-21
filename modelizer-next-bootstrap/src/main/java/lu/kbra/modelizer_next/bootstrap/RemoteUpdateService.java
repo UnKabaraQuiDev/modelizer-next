@@ -15,6 +15,8 @@ import java.util.Map;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import lu.kbra.modelizer_next.common.VersionComparator;
+
 final class RemoteUpdateService {
 
 	static final class UpdateManifest {
@@ -109,7 +111,7 @@ final class RemoteUpdateService {
 		}
 
 		final String normalizedCurrent = currentVersion == null || currentVersion.isBlank() ? "0.0.0" : currentVersion;
-		if (BootstrapVersionComparator.COMPARATOR.compare(release.version, normalizedCurrent) <= 0) {
+		if (VersionComparator.COMPARATOR.compare(release.version, normalizedCurrent) <= 0) {
 			return new AvailableUpdate(channel,
 					normalizedCurrent,
 					normalizedCurrent,

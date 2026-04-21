@@ -3,7 +3,7 @@ name: Snapshot Build
 on:
   push:
     tags:
-      - '*-SNAPSHOT-SNAPSHOT-*'
+      - '*-SNAPSHOT-*'
   workflow_dispatch:
     inputs:
       version:
@@ -148,56 +148,27 @@ jobs:
           make_latest: false
           generate_release_notes: true
           files: release-assets/*
-      - name: Update registry branch
+      - name: Update registry on main
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          python3 - <<'PY' > assets.json
-          from pathlib import Path
-          import json
-          repo = "${{ github.repository }}"
-          tag = "${RELEASE_TAG}"
-          assets = []
-          for path in sorted(Path('release-assets').iterdir()):
-              if not path.is_file():
-                  continue
-              name = path.name
-              platform = 'linux' if '-linux-' in name else 'windows' if '-windows-' in name else 'portable'
-              kind = 'bootstrap'
-              if name.startswith('modelizer-next-app-portable-'):
-                  kind = 'app-portable-native'
-              elif name.startswith('modelizer-next-app-') and name.endswith('.jar'):
-                  kind = 'app-portable-jar'
-              elif name.startswith('modelizer-next-bootstrap-') and name.endswith('.jar'):
-                  kind = 'bootstrap-jar'
-              elif name.startswith('modelizer-next-bootstrap-'):
-                  kind = 'bootstrap-native'
-              assets.append({
-                  'name': name,
-                  'platform': platform,
-                  'kind': kind,
-                  'url': f'https://github.com/{repo}/releases/download/{tag}/{name}'
-              })
-          print(json.dumps(assets))
-          PY
+          REPOSITORY="${{ github.repository }}" RELEASE_TAG="$RELEASE_TAG" \
+            python3 "$GITHUB_WORKSPACE/script/generate-assets-json.py" release-assets > assets.json
           git config --global user.name "github-actions"
           git config --global user.email "github-actions@github.com"
-          if git ls-remote --heads origin update-registry | grep -q update-registry; then
-            git fetch origin update-registry:update-registry
-            git checkout update-registry
-          else
-            git checkout --orphan update-registry
-            git rm -rf . >/dev/null 2>&1 || true
-          fi
+
           mkdir -p registry
-          [ -f registry/release.json ] || cp "$GITHUB_WORKSPACE/registry/release.json" registry/release.json
-          [ -f registry/snapshot.json ] || cp "$GITHUB_WORKSPACE/registry/snapshot.json" registry/snapshot.json
-          [ -f registry/nightly.json ] || cp "$GITHUB_WORKSPACE/registry/nightly.json" registry/nightly.json
+
+          [ -f registry/release.json ] || echo '{"channel":"release","entries":[]}' > registry/release.json
+          [ -f registry/snapshot.json ] || echo '{"channel":"snapshot","entries":[]}' > registry/snapshot.json
+          [ -f registry/nightly.json ] || echo '{"channel":"nightly","entries":[]}' > registry/nightly.json
+
           bash "$GITHUB_WORKSPACE/script/update-channel-registry.sh" registry/snapshot.json snapshot "$VERSION" "$RELEASE_TAG" \
             "https://github.com/${{ github.repository }}/releases/tag/$RELEASE_TAG" \
             "$(cat assets.json)" \
             "Latest snapshot build."
           bash "$GITHUB_WORKSPACE/script/rebuild-versions-manifest.sh" registry registry/versions.json
+
           git add registry/nightly.json registry/release.json registry/snapshot.json registry/versions.json
           git commit -m "[bot] Update snapshot registry to $VERSION" || exit 0
-          git push origin update-registry
+          git push origin HEAD:main

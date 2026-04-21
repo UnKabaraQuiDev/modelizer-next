@@ -11,7 +11,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.formdev.flatlaf.FlatDarkLaf;
 import com.formdev.flatlaf.FlatLightLaf;
 
-import lu.kbra.modelizer_next.bootstrap.SystemThemeDetector;
+import lu.kbra.modelizer_next.common.SystemThemeDetector;
 import lu.kbra.modelizer_next.json.ColorModule;
 
 public class MNMain {

@@ -42,9 +42,10 @@ import lu.kbra.modelizer_next.App;
 import lu.kbra.modelizer_next.AppConfig;
 import lu.kbra.modelizer_next.MNMain;
 import lu.kbra.modelizer_next.ThemeMode;
-import lu.kbra.modelizer_next.bootstrap.AbstractBootstrapRuntime;
 import lu.kbra.modelizer_next.bootstrap.AvailableUpdate;
 import lu.kbra.modelizer_next.bootstrap.UpdateChannel;
+import lu.kbra.modelizer_next.bootstrap.UpdateRuntime;
+import lu.kbra.modelizer_next.bootstrap.UpdateRuntimes;
 import lu.kbra.modelizer_next.common.VersionComparator;
 import lu.kbra.modelizer_next.document.ModelDocument;
 import lu.kbra.modelizer_next.json.LegacyModelizerImporter;
@@ -176,13 +177,13 @@ public class MainFrame extends JFrame {
 		}
 	}
 
-	private Optional<AbstractBootstrapRuntime> bootstrapRuntime() {
-		return AbstractBootstrapRuntime.isActive() ? Optional.of(AbstractBootstrapRuntime.getInstance()) : Optional.empty();
+	private Optional<UpdateRuntime> bootstrapRuntime() {
+		return UpdateRuntimes.isActive() ? Optional.of(UpdateRuntimes.getInstance()) : Optional.empty();
 	}
 
 	private void checkForUpdatesManually() {
-		final Optional<AbstractBootstrapRuntime> runtime = this.bootstrapRuntime();
-		if (runtime.isPresent()) {
+		final Optional<UpdateRuntime> runtime = this.bootstrapRuntime();
+		if (runtime.isEmpty()) {
 			JOptionPane.showMessageDialog(this,
 					"Updates are only available when the application is launched through the bootstrap launcher.",
 					"Updates unavailable",
@@ -323,7 +324,7 @@ public class MainFrame extends JFrame {
 		checkForUpdates.addActionListener(event -> this.checkForUpdatesManually());
 		helpMenu.add(checkForUpdates);
 
-		final Optional<AbstractBootstrapRuntime> bootstrapRuntime = this.bootstrapRuntime();
+		final Optional<UpdateRuntime> bootstrapRuntime = this.bootstrapRuntime();
 		final boolean updateRuntimeAvailable = bootstrapRuntime.isPresent();
 
 		final JCheckBoxMenuItem autoCheckUpdates = new JCheckBoxMenuItem("Check for updates on startup",

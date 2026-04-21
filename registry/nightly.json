@@ -3,8 +3,8 @@
   "version": "0.1-SNAPSHOT-NIGHTLY-2026-04-21_07-04-51",
   "tag": "0.1-SNAPSHOT-NIGHTLY-2026-04-21_07-04-51",
   "releaseUrl": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/tag/0.1-SNAPSHOT-NIGHTLY-2026-04-21_07-04-51",
-  "assetUrl": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/${RELEASE_TAG}/modelizer-next-app-0.1-SNAPSHOT-NIGHTLY-2026-04-21_07-04-51.jar",
-  "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/${RELEASE_TAG}/modelizer-next-app-0.1-SNAPSHOT-NIGHTLY-2026-04-21_07-04-51.jar",
+  "assetUrl": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/0.1-SNAPSHOT-NIGHTLY-2026-04-21_07-04-51/modelizer-next-app-0.1-SNAPSHOT-NIGHTLY-2026-04-21_07-04-51.jar",
+  "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/0.1-SNAPSHOT-NIGHTLY-2026-04-21_07-04-51/modelizer-next-app-0.1-SNAPSHOT-NIGHTLY-2026-04-21_07-04-51.jar",
   "platforms": [
     "portable",
     "linux",
@@ -17,8 +17,8 @@
       "version": "0.1-SNAPSHOT-NIGHTLY-2026-04-21_07-04-51",
       "tag": "0.1-SNAPSHOT-NIGHTLY-2026-04-21_07-04-51",
       "releaseUrl": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/tag/0.1-SNAPSHOT-NIGHTLY-2026-04-21_07-04-51",
-      "assetUrl": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/${RELEASE_TAG}/modelizer-next-app-0.1-SNAPSHOT-NIGHTLY-2026-04-21_07-04-51.jar",
-      "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/${RELEASE_TAG}/modelizer-next-app-0.1-SNAPSHOT-NIGHTLY-2026-04-21_07-04-51.jar",
+      "assetUrl": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/0.1-SNAPSHOT-NIGHTLY-2026-04-21_07-04-51/modelizer-next-app-0.1-SNAPSHOT-NIGHTLY-2026-04-21_07-04-51.jar",
+      "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/0.1-SNAPSHOT-NIGHTLY-2026-04-21_07-04-51/modelizer-next-app-0.1-SNAPSHOT-NIGHTLY-2026-04-21_07-04-51.jar",
       "platforms": [
         "portable",
         "linux",
@@ -31,37 +31,37 @@
           "name": "modelizer-next-app-0.1-SNAPSHOT-NIGHTLY-2026-04-21_07-04-51.jar",
           "platform": "portable",
           "kind": "app-portable-jar",
-          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/${RELEASE_TAG}/modelizer-next-app-0.1-SNAPSHOT-NIGHTLY-2026-04-21_07-04-51.jar"
+          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/0.1-SNAPSHOT-NIGHTLY-2026-04-21_07-04-51/modelizer-next-app-0.1-SNAPSHOT-NIGHTLY-2026-04-21_07-04-51.jar"
         },
         {
           "name": "modelizer-next-app-portable-linux-0.1-SNAPSHOT-NIGHTLY-2026-04-21_07-04-51.tar.gz",
           "platform": "linux",
           "kind": "app-portable-native",
-          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/${RELEASE_TAG}/modelizer-next-app-portable-linux-0.1-SNAPSHOT-NIGHTLY-2026-04-21_07-04-51.tar.gz"
+          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/0.1-SNAPSHOT-NIGHTLY-2026-04-21_07-04-51/modelizer-next-app-portable-linux-0.1-SNAPSHOT-NIGHTLY-2026-04-21_07-04-51.tar.gz"
         },
         {
           "name": "modelizer-next-app-portable-windows-0.1-SNAPSHOT-NIGHTLY-2026-04-21_07-04-51.exe",
           "platform": "windows",
           "kind": "app-portable-native",
-          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/${RELEASE_TAG}/modelizer-next-app-portable-windows-0.1-SNAPSHOT-NIGHTLY-2026-04-21_07-04-51.exe"
+          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/0.1-SNAPSHOT-NIGHTLY-2026-04-21_07-04-51/modelizer-next-app-portable-windows-0.1-SNAPSHOT-NIGHTLY-2026-04-21_07-04-51.exe"
         },
         {
           "name": "modelizer-next-bootstrap-0.1-SNAPSHOT-NIGHTLY-2026-04-21_07-04-51.jar",
           "platform": "portable",
           "kind": "bootstrap-jar",
-          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/${RELEASE_TAG}/modelizer-next-bootstrap-0.1-SNAPSHOT-NIGHTLY-2026-04-21_07-04-51.jar"
+          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/0.1-SNAPSHOT-NIGHTLY-2026-04-21_07-04-51/modelizer-next-bootstrap-0.1-SNAPSHOT-NIGHTLY-2026-04-21_07-04-51.jar"
         },
         {
           "name": "modelizer-next-bootstrap-linux-0.1-SNAPSHOT-NIGHTLY-2026-04-21_07-04-51.tar.gz",
           "platform": "linux",
           "kind": "bootstrap-native",
-          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/${RELEASE_TAG}/modelizer-next-bootstrap-linux-0.1-SNAPSHOT-NIGHTLY-2026-04-21_07-04-51.tar.gz"
+          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/0.1-SNAPSHOT-NIGHTLY-2026-04-21_07-04-51/modelizer-next-bootstrap-linux-0.1-SNAPSHOT-NIGHTLY-2026-04-21_07-04-51.tar.gz"
         },
         {
           "name": "modelizer-next-bootstrap-windows-0.1-SNAPSHOT-NIGHTLY-2026-04-21_07-04-51.exe",
           "platform": "windows",
           "kind": "bootstrap-native",
-          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/${RELEASE_TAG}/modelizer-next-bootstrap-windows-0.1-SNAPSHOT-NIGHTLY-2026-04-21_07-04-51.exe"
+          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/0.1-SNAPSHOT-NIGHTLY-2026-04-21_07-04-51/modelizer-next-bootstrap-windows-0.1-SNAPSHOT-NIGHTLY-2026-04-21_07-04-51.exe"
         }
       ]
     }

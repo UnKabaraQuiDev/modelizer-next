@@ -44,18 +44,14 @@ for asset in assets:
     if platform and platform not in platforms:
         platforms.append(platform)
 
-portable_asset_name = f'modelizer-next-app-{version}.jar'
 primary_asset_url = ''
-for asset in assets:
-    if asset.get('name') == portable_asset_name:
-        primary_asset_url = asset.get('url', '')
-        break
-if not primary_asset_url:
+for preferred_kind in ('app-portable-jar', 'bootstrap-jar', 'app-portable-native', 'bootstrap-native'):
     for asset in assets:
-        name = asset.get('name', '')
-        if name.startswith('modelizer-next-app-') and name.endswith('.jar') and '-windows-' not in name and '-linux-' not in name:
+        if asset.get('kind') == preferred_kind and asset.get('url'):
             primary_asset_url = asset.get('url', '')
             break
+    if primary_asset_url:
+        break
 if not primary_asset_url and assets:
     primary_asset_url = assets[0].get('url', '')
 

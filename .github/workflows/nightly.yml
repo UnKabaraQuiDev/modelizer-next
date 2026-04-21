@@ -146,35 +146,8 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          python3 - <<'PY' > assets.json
-          from pathlib import Path
-          import json
-          repo = "${{ github.repository }}"
-          tag = "${RELEASE_TAG}"
-          assets = []
-          for path in sorted(Path('release-assets').iterdir()):
-              if not path.is_file():
-                  continue
-              name = path.name
-              platform = 'linux' if '-linux-' in name else 'windows' if '-windows-' in name else 'portable'
-              kind = 'bootstrap'
-              if name.startswith('modelizer-next-app-portable-'):
-                  kind = 'app-portable-native'
-              elif name.startswith('modelizer-next-app-') and name.endswith('.jar'):
-                  kind = 'app-portable-jar'
-              elif name.startswith('modelizer-next-bootstrap-') and name.endswith('.jar'):
-                  kind = 'bootstrap-jar'
-              elif name.startswith('modelizer-next-bootstrap-'):
-                  kind = 'bootstrap-native'
-              assets.append({
-                  'name': name,
-                  'platform': platform,
-                  'kind': kind,
-                  'url': f'https://github.com/{repo}/releases/download/{tag}/{name}'
-              })
-          print(json.dumps(assets))
-          PY
-
+          REPOSITORY="${{ github.repository }}" RELEASE_TAG="$RELEASE_TAG" \
+            python3 "$GITHUB_WORKSPACE/script/generate-assets-json.py" release-assets > assets.json
           git config --global user.name "github-actions"
           git config --global user.email "github-actions@github.com"
 
@@ -184,12 +157,11 @@ jobs:
           [ -f registry/snapshot.json ] || echo '{"channel":"snapshot","entries":[]}' > registry/snapshot.json
           [ -f registry/nightly.json ] || echo '{"channel":"nightly","entries":[]}' > registry/nightly.json
 
-          bash script/update-channel-registry.sh registry/nightly.json nightly "$VERSION" "$RELEASE_TAG" \
+          bash "$GITHUB_WORKSPACE/script/update-channel-registry.sh" registry/nightly.json nightly "$VERSION" "$RELEASE_TAG" \
             "https://github.com/${{ github.repository }}/releases/tag/$RELEASE_TAG" \
             "$(cat assets.json)" \
             "Latest nightly build."
-
-          bash script/rebuild-versions-manifest.sh registry registry/versions.json
+          bash "$GITHUB_WORKSPACE/script/rebuild-versions-manifest.sh" registry registry/versions.json
 
           git add registry/nightly.json registry/release.json registry/snapshot.json registry/versions.json
           git commit -m "[bot] Update nightly registry to $VERSION" || exit 0

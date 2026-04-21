@@ -22,11 +22,6 @@
 	<dependencies>
 		<dependency>
 			<groupId>lu.kbra</groupId>
-			<artifactId>modelizer-next-bootstrap</artifactId>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>lu.kbra</groupId>
 			<artifactId>pclib-common</artifactId>
 		</dependency>
 		<dependency>

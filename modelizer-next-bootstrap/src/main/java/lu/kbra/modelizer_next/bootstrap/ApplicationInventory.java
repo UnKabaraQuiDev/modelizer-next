@@ -12,6 +12,8 @@ import java.util.jar.JarFile;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import lu.kbra.modelizer_next.common.VersionComparator;
+
 final class ApplicationInventory {
 
 	private final ObjectMapper mapper = new ObjectMapper();
@@ -26,7 +28,7 @@ final class ApplicationInventory {
 					.map(this::readInstalledApplication)
 					.filter(Optional::isPresent)
 					.map(Optional::get)
-					.max(Comparator.comparing(InstalledApplication::version, BootstrapVersionComparator.COMPARATOR));
+					.max(Comparator.comparing(InstalledApplication::version, VersionComparator.COMPARATOR));
 		}
 	}
 
