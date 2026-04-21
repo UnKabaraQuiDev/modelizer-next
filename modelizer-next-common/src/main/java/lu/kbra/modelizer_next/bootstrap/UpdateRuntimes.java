@@ -6,33 +6,28 @@ import java.util.Objects;
 
 public final class UpdateRuntimes {
 
-	private static final UpdateRuntime NO_OP_RUNTIME = new NoOpUpdateRuntime();
-	private static volatile UpdateRuntime runtime = NO_OP_RUNTIME;
-
-	public static UpdateRuntime getInstance() {
-		return runtime;
-	}
-
-	public static boolean isActive() {
-		return runtime.isAvailable();
-	}
-
-	public static void install(final UpdateRuntime updateRuntime) {
-		runtime = Objects.requireNonNullElse(updateRuntime, NO_OP_RUNTIME);
-	}
-
-	private UpdateRuntimes() {
-	}
-
 	private static final class NoOpUpdateRuntime implements UpdateRuntime {
 
 		@Override
-		public boolean isAvailable() {
-			return false;
+		public AvailableUpdate checkForUpdates() throws IOException {
+			return new AvailableUpdate(UpdateChannel.RELEASE, null, null, null, null, null);
 		}
 
 		@Override
-		public boolean isAutomaticUpdateChecksEnabledByProperty() {
+		public String getCurrentApplicationVersion() {
+			return null;
+		}
+
+		@Override
+		public UpdateChannel getSelectedChannel() {
+			return UpdateChannel.RELEASE;
+		}
+
+		@Override
+		public boolean installUpdateAndExit(
+				final Component parentComponent,
+				final AvailableUpdate update,
+				final UpdatePreparation preparation) throws IOException {
 			return false;
 		}
 
@@ -42,34 +37,41 @@ public final class UpdateRuntimes {
 		}
 
 		@Override
-		public void setAutoCheckUpdates(final boolean enabled) {
+		public boolean isAutomaticUpdateChecksEnabledByProperty() {
+			return false;
 		}
 
 		@Override
-		public UpdateChannel getSelectedChannel() {
-			return UpdateChannel.RELEASE;
+		public boolean isAvailable() {
+			return false;
+		}
+
+		@Override
+		public void setAutoCheckUpdates(final boolean enabled) {
 		}
 
 		@Override
 		public void setSelectedChannel(final UpdateChannel updateChannel) {
 		}
+	}
 
-		@Override
-		public String getCurrentApplicationVersion() {
-			return null;
-		}
+	private static final UpdateRuntime NO_OP_RUNTIME = new NoOpUpdateRuntime();
 
-		@Override
-		public AvailableUpdate checkForUpdates() throws IOException {
-			return new AvailableUpdate(UpdateChannel.RELEASE, null, null, null, null, null);
-		}
+	private static volatile UpdateRuntime runtime = UpdateRuntimes.NO_OP_RUNTIME;
 
-		@Override
-		public boolean installUpdateAndExit(final Component parentComponent,
-				final AvailableUpdate update,
-				final UpdatePreparation preparation) throws IOException {
-			return false;
-		}
+	public static UpdateRuntime getInstance() {
+		return UpdateRuntimes.runtime;
+	}
+
+	public static void install(final UpdateRuntime updateRuntime) {
+		UpdateRuntimes.runtime = Objects.requireNonNullElse(updateRuntime, UpdateRuntimes.NO_OP_RUNTIME);
+	}
+
+	public static boolean isActive() {
+		return UpdateRuntimes.runtime.isAvailable();
+	}
+
+	private UpdateRuntimes() {
 	}
 
 }

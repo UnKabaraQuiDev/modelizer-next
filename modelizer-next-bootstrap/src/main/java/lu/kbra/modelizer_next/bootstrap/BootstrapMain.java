@@ -24,7 +24,7 @@ public final class BootstrapMain {
 
 	public static void main(final String[] args) {
 		try {
-			applyConfiguredLookAndFeel();
+			BootstrapMain.applyConfiguredLookAndFeel();
 			final BootstrapRuntime runtime = BootstrapRuntime.bootstrap();
 			runtime.launch();
 		} catch (final Exception ex) {

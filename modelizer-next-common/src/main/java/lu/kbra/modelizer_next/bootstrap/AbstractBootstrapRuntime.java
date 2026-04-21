@@ -5,43 +5,34 @@ import java.io.IOException;
 
 public class AbstractBootstrapRuntime {
 
+	@FunctionalInterface
+	public interface UpdatePreparation {
+		boolean prepareForExit() throws IOException;
+	}
+
 	protected static AbstractBootstrapRuntime INSTANCE = new AbstractBootstrapRuntime();
 
-	protected AbstractBootstrapRuntime() {
+	public static AbstractBootstrapRuntime getInstance() {
+		return AbstractBootstrapRuntime.INSTANCE;
 	}
 
 	public static boolean isActive() {
 		return false;
 	}
 
-	public static AbstractBootstrapRuntime getInstance() {
-		return INSTANCE;
+	protected AbstractBootstrapRuntime() {
 	}
 
-	public boolean isAutomaticUpdateChecksEnabledByProperty() {
-		return false;
-	}
-
-	public boolean isAutoCheckUpdates() {
-		return false;
-	}
-
-	public void setAutoCheckUpdates(final boolean enabled) {
-	}
-
-	public UpdateChannel getSelectedChannel() {
-		return UpdateChannel.RELEASE;
-	}
-
-	public void setSelectedChannel(final UpdateChannel updateChannel) {
+	public AvailableUpdate checkForUpdates() throws IOException {
+		return new AvailableUpdate(UpdateChannel.RELEASE, null, null, null, null, null);
 	}
 
 	public String getCurrentApplicationVersion() {
 		return null;
 	}
 
-	public AvailableUpdate checkForUpdates() throws IOException {
-		return new AvailableUpdate(UpdateChannel.RELEASE, null, null, null, null, null);
+	public UpdateChannel getSelectedChannel() {
+		return UpdateChannel.RELEASE;
 	}
 
 	public boolean installUpdateAndExit(final Component parentComponent, final AvailableUpdate update, final UpdatePreparation preparation)
@@ -49,9 +40,18 @@ public class AbstractBootstrapRuntime {
 		return false;
 	}
 
-	@FunctionalInterface
-	public interface UpdatePreparation {
-		boolean prepareForExit() throws IOException;
+	public boolean isAutoCheckUpdates() {
+		return false;
+	}
+
+	public boolean isAutomaticUpdateChecksEnabledByProperty() {
+		return false;
+	}
+
+	public void setAutoCheckUpdates(final boolean enabled) {
+	}
+
+	public void setSelectedChannel(final UpdateChannel updateChannel) {
 	}
 
 }

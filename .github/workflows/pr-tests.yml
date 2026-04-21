@@ -16,7 +16,6 @@ jobs:
         with:
           distribution: temurin
           java-version: 21
-          cache: maven
       - name: Apply formatting
         run: mvn -B -Pformat initialize spotless:apply
       - name: Fail if formatting changes detected
@@ -35,6 +34,5 @@ jobs:
         with:
           distribution: temurin
           java-version: 21
-          cache: maven
       - name: Build and test
         run: mvn -B clean test

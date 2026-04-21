@@ -42,7 +42,6 @@ jobs:
         with:
           distribution: temurin
           java-version: 21
-          cache: maven
       - name: Build shared release artifacts
         run: bash ./script/build-release-shared.sh
       - uses: actions/upload-artifact@v4
@@ -62,7 +61,6 @@ jobs:
         with:
           distribution: temurin
           java-version: 21
-          cache: maven
       - name: Build Linux release artifacts
         run: bash ./script/build-release-linux.sh
       - uses: actions/upload-artifact@v4
@@ -85,32 +83,6 @@ jobs:
         with:
           distribution: temurin
           java-version: 21
-          cache: maven
-      - name: Ensure WiX Toolset 3 is available
-        shell: pwsh
-        run: |
-          $candidates = @(
-            "$env:ProgramFiles(x86)\WiX Toolset v3.14\bin",
-            "$env:ProgramFiles(x86)\WiX Toolset v3.11\bin"
-          )
-          $wixPath = $null
-          foreach ($candidate in $candidates) {
-            if (Test-Path (Join-Path $candidate 'candle.exe')) {
-              $wixPath = $candidate
-              break
-            }
-          }
-          if (-not $wixPath) {
-            choco install wixtoolset --no-progress -y
-            foreach ($candidate in $candidates) {
-              if (Test-Path (Join-Path $candidate 'candle.exe')) {
-                $wixPath = $candidate
-                break
-              }
-            }
-          }
-          if (-not $wixPath) { throw 'WiX Toolset 3 was not found after installation.' }
-          Add-Content -Path $env:GITHUB_PATH -Value $wixPath
       - name: Build Windows release artifacts
         run: bash ./script/build-release-windows.sh
       - uses: actions/upload-artifact@v4

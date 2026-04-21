@@ -5,27 +5,27 @@ import java.io.IOException;
 
 public interface UpdateRuntime {
 
-	boolean isAvailable();
-
-	boolean isAutomaticUpdateChecksEnabledByProperty();
-
-	boolean isAutoCheckUpdates();
-
-	void setAutoCheckUpdates(boolean enabled);
-
-	UpdateChannel getSelectedChannel();
-
-	void setSelectedChannel(UpdateChannel updateChannel);
-
-	String getCurrentApplicationVersion();
-
-	AvailableUpdate checkForUpdates() throws IOException;
-
-	boolean installUpdateAndExit(Component parentComponent, AvailableUpdate update, UpdatePreparation preparation) throws IOException;
-
 	@FunctionalInterface
 	interface UpdatePreparation {
 		boolean prepareForExit() throws IOException;
 	}
+
+	AvailableUpdate checkForUpdates() throws IOException;
+
+	String getCurrentApplicationVersion();
+
+	UpdateChannel getSelectedChannel();
+
+	boolean installUpdateAndExit(Component parentComponent, AvailableUpdate update, UpdatePreparation preparation) throws IOException;
+
+	boolean isAutoCheckUpdates();
+
+	boolean isAutomaticUpdateChecksEnabledByProperty();
+
+	boolean isAvailable();
+
+	void setAutoCheckUpdates(boolean enabled);
+
+	void setSelectedChannel(UpdateChannel updateChannel);
 
 }

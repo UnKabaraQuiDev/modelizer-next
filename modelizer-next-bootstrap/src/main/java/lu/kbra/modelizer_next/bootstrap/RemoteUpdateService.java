@@ -10,8 +10,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -38,11 +36,12 @@ final class RemoteUpdateService {
 		public String url;
 		public String releaseUrl;
 		public String notes;
-		public Map<String, String> metadata = new LinkedHashMap<>();
+		public String tag;
 
 		String releaseUrlOrDefault() {
 			return this.releaseUrl == null || this.releaseUrl.isBlank() ? BootstrapApp.RELEASES_URL : this.releaseUrl;
 		}
+
 	}
 
 	private final ObjectMapper mapper = new ObjectMapper();
@@ -98,7 +97,12 @@ final class RemoteUpdateService {
 				.timeout(Duration.ofSeconds(20))
 				.GET()
 				.build();
-
+		System.err.println(request);
+		// https://raw.githubusercontent.com/UnKabaraQuiDev/modelizer-next/refs/heads/main/registry/versions.json
+		// https://raw.githubusercontent.com/UnKabaraQuiDev/modelizer-next/refs/heads/main/registry/versions.json
+		// https://raw.githubusercontent.com/UnKabaraQuiDev/modelizer-next/refs/heads/main/registry/versions.json
+		// https://raw.githubusercontent.com/UnKabaraQuiDev/modelizer-next/refs/heads/main/registry/versions.json
+		// https://raw.githubusercontent.com/UnKabaraQuiDev/modelizer-next/main/registry/versions.json
 		final HttpResponse<String> response = this.httpClient.send(request, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
 		if (response.statusCode() < 200 || response.statusCode() >= 300) {
 			throw new IOException("Failed to fetch versions manifest: HTTP " + response.statusCode());

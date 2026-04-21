@@ -235,7 +235,8 @@ public final class LinkEditorDialog {
 			final ClassModel toClass = (ClassModel) toClassBox.getSelectedItem();
 
 			for (final ClassModel classModel : document.getModel().getClasses()) {
-				if ((fromClass != null && fromClass.getId().equals(classModel.getId())) || (toClass != null && toClass.getId().equals(classModel.getId()))) {
+				if (fromClass != null && fromClass.getId().equals(classModel.getId())
+						|| toClass != null && toClass.getId().equals(classModel.getId())) {
 					continue;
 				}
 				associationBox.addItem(AssociationOption.forClass(classModel, panelType));

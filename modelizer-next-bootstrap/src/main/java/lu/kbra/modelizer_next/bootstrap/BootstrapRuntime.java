@@ -7,7 +7,6 @@ import javax.swing.JOptionPane;
 
 public class BootstrapRuntime implements UpdateRuntime {
 
-
 	public static synchronized BootstrapRuntime bootstrap() throws IOException {
 		BootstrapApp.init();
 		final BootstrapRuntime runtime = new BootstrapRuntime(BootstrapApp.loadConfiguration(),
@@ -49,11 +48,6 @@ public class BootstrapRuntime implements UpdateRuntime {
 		this.remoteUpdateService = remoteUpdateService;
 		this.applicationLauncher = applicationLauncher;
 		this.automaticUpdatesEnabled = automaticUpdatesEnabled;
-	}
-
-	@Override
-	public boolean isAvailable() {
-		return true;
 	}
 
 	@Override
@@ -118,6 +112,11 @@ public class BootstrapRuntime implements UpdateRuntime {
 	@Override
 	public boolean isAutomaticUpdateChecksEnabledByProperty() {
 		return this.automaticUpdatesEnabled;
+	}
+
+	@Override
+	public boolean isAvailable() {
+		return true;
 	}
 
 	public void launch() throws Exception {

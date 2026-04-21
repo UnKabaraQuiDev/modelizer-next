@@ -8,6 +8,7 @@ public class WorkspaceState {
 	public static WorkspaceState createDefault() {
 		return new WorkspaceState();
 	}
+
 	private DockLayoutState dockLayout;
 
 	private Map<PanelType, PanelState> panels;

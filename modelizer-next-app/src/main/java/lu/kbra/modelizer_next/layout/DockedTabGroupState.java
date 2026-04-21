@@ -14,6 +14,7 @@ public class DockedTabGroupState {
 		state.setSelectedTab(PanelType.CONCEPTUAL);
 		return state;
 	}
+
 	private String id;
 	private double x;
 	private double y;

@@ -7,12 +7,13 @@ import java.util.Locale;
 
 public class VersionComparator implements Comparator<String> {
 
-	private static final int CHANNEL_NIGHTLY = 0;
-	private static final int CHANNEL_SNAPSHOT = 1;
-	private static final int CHANNEL_RELEASE = 2;
-
 	private record ParsedVersion(List<Integer> numbers, int channelRank, long buildNumber) {
 	}
+
+	private static final int CHANNEL_NIGHTLY = 0;
+	private static final int CHANNEL_SNAPSHOT = 1;
+
+	private static final int CHANNEL_RELEASE = 2;
 
 	public static final VersionComparator COMPARATOR = new VersionComparator();
 
@@ -39,11 +40,10 @@ public class VersionComparator implements Comparator<String> {
 
 	private ParsedVersion parse(final String version) {
 		if (version == null || version.isBlank()) {
-			return new ParsedVersion(List.of(0), CHANNEL_RELEASE, 0L);
+			return new ParsedVersion(List.of(0), VersionComparator.CHANNEL_RELEASE, 0L);
 		}
 
-		final String normalized = version.trim().startsWith("v") || version.trim().startsWith("V")
-				? version.trim().substring(1)
+		final String normalized = version.trim().startsWith("v") || version.trim().startsWith("V") ? version.trim().substring(1)
 				: version.trim();
 		final String[] tokens = normalized.split("-");
 		final List<Integer> numbers = new ArrayList<>();
@@ -58,7 +58,7 @@ public class VersionComparator implements Comparator<String> {
 		}
 
 		int channelIndex = -1;
-		int channelRank = CHANNEL_RELEASE;
+		int channelRank = VersionComparator.CHANNEL_RELEASE;
 		for (int i = 1; i < tokens.length; i++) {
 			final int candidate = this.parseChannelRank(tokens[i]);
 			if (candidate >= 0) {
@@ -87,9 +87,9 @@ public class VersionComparator implements Comparator<String> {
 
 	private int parseChannelRank(final String token) {
 		return switch (token.toUpperCase(Locale.ROOT)) {
-		case "NIGHTLY" -> CHANNEL_NIGHTLY;
-		case "SNAPSHOT" -> CHANNEL_SNAPSHOT;
-		case "RELEASE" -> CHANNEL_RELEASE;
+		case "NIGHTLY" -> VersionComparator.CHANNEL_NIGHTLY;
+		case "SNAPSHOT" -> VersionComparator.CHANNEL_SNAPSHOT;
+		case "RELEASE" -> VersionComparator.CHANNEL_RELEASE;
 		default -> -1;
 		};
 	}
