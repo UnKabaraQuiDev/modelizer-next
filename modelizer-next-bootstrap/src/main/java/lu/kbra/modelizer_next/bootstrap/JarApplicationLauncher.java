@@ -7,7 +7,7 @@ final class JarApplicationLauncher {
 
 	private URLClassLoader activeLoader;
 
-	void launch(final InstalledApplication application) throws AppLaunchException {
+	void launch(final String[] args, final InstalledApplication application) throws AppLaunchException {
 		if (application == null) {
 			throw new AppLaunchException("No installed application is available.");
 		}
@@ -17,10 +17,11 @@ final class JarApplicationLauncher {
 			Thread.currentThread().setContextClassLoader(this.activeLoader);
 			final Class<?> entryPointClass = Class.forName(application.entryPoint(), true, this.activeLoader);
 			if (!AppMain.class.isAssignableFrom(entryPointClass)) {
-				throw new AppLaunchException("Entry point '" + application.entryPoint() + "' does not implement AppMain.");
+				throw new AppLaunchException(
+						"Entry point '" + application.entryPoint() + "' does not implement AppMain.");
 			}
 			final AppMain appMain = (AppMain) entryPointClass.getDeclaredConstructor().newInstance();
-			appMain.start();
+			appMain.start(args);
 		} catch (final AppLaunchException ex) {
 			throw ex;
 		} catch (final Exception ex) {

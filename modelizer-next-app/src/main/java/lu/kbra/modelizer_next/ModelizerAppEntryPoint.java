@@ -1,5 +1,9 @@
 package lu.kbra.modelizer_next;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Optional;
+
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
@@ -7,13 +11,13 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 
 import lu.kbra.modelizer_next.bootstrap.AppMain;
 import lu.kbra.modelizer_next.common.SampleDocumentFactory;
-import lu.kbra.modelizer_next.document.ModelDocument;
+import lu.kbra.modelizer_next.ui.DocumentSession;
 import lu.kbra.modelizer_next.ui.MainFrame;
 
 public class ModelizerAppEntryPoint implements AppMain {
 
 	@Override
-	public void start() {
+	public void start(String[] args) {
 		try {
 			App.init();
 			System.out.println(App.NAME + " / " + App.VERSION + " (" + App.REVISION + ")");
@@ -30,9 +34,15 @@ public class ModelizerAppEntryPoint implements AppMain {
 
 		SwingUtilities.invokeLater(() -> {
 			MNMain.applyConfiguredLookAndFeel();
-			final ModelDocument document = SampleDocumentFactory.create();
-			final MainFrame frame = new MainFrame(document);
-			frame.setTitle(App.title(document.getMeta().getName()));
+			Optional<DocumentSession> document = Optional.empty();
+			if (args.length > 0) {
+				final Path file = Path.of(args[0]);
+
+				if (Files.exists(file)) {
+					document = MainFrame.createDocument(null, file.toFile());
+				}
+			}
+			final MainFrame frame = new MainFrame(document.orElseGet(() -> new DocumentSession(SampleDocumentFactory.create(), null)));
 			frame.setVisible(true);
 		});
 	}

@@ -58,7 +58,7 @@ public class MNMain {
 	}
 
 	public static void main(final String[] args) {
-		new ModelizerAppEntryPoint().start();
+		new ModelizerAppEntryPoint().start(args);
 	}
 
 }

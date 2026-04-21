@@ -1,6 +1,7 @@
 package lu.kbra.modelizer_next.ui;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.FlowLayout;
 import java.awt.Toolkit;
 import java.awt.datatransfer.StringSelection;
@@ -80,7 +81,7 @@ public class MainFrame extends JFrame {
 	private JMenuItem undoMenuItem;
 	private JMenuItem redoMenuItem;
 
-	private MainFrame(final DocumentSession session) {
+	public MainFrame(final DocumentSession session) {
 		super("Modelizer Next");
 		this.session = session;
 		this.document = session.getDocument();
@@ -260,11 +261,11 @@ public class MainFrame extends JFrame {
 		return choice != JOptionPane.YES_OPTION || this.saveDocument();
 	}
 
-	private boolean confirmModernDocumentVersion(final ModelDocument loadedDocument) {
+	public static boolean confirmModernDocumentVersion(final Component parent, final ModelDocument loadedDocument) {
 		final String fileVersion = loadedDocument.getMeta() == null ? null : loadedDocument.getMeta().getApplicationVersion();
 
 		if (fileVersion != null && !fileVersion.isBlank() && VersionComparator.COMPARATOR.compare(fileVersion, App.VERSION) > 0) {
-			final int choice = JOptionPane.showConfirmDialog(this,
+			final int choice = JOptionPane.showConfirmDialog(parent,
 					"This file was created with a newer version of the application (" + fileVersion
 							+ ").\nDo you want to try to load the file anyways ?",
 					"Newer file version",
@@ -562,6 +563,12 @@ public class MainFrame extends JFrame {
 		}
 
 		final File selectedFile = chooser.getSelectedFile();
+
+		final Optional<DocumentSession> model = createDocument(this, selectedFile);
+		model.ifPresent(this::openInNewFrame);
+	}
+
+	public static Optional<DocumentSession> createDocument(Component parent, File selectedFile) {
 		final String extension = PCUtils.getFileExtension(selectedFile.getName());
 
 		try {
@@ -570,13 +577,13 @@ public class MainFrame extends JFrame {
 
 			switch (extension) {
 			case "mod" -> {
-				final int choice = JOptionPane.showConfirmDialog(this,
+				final int choice = JOptionPane.showConfirmDialog(parent,
 						"This file comes from an older version of Modelizer.\nThere may be errors or unsupported elements during import.\nDo you want to continue?",
 						"Legacy Modelizer import",
 						JOptionPane.YES_NO_OPTION,
 						JOptionPane.WARNING_MESSAGE);
 				if (choice != JOptionPane.YES_OPTION) {
-					return;
+					return Optional.empty();
 				}
 
 				loadedDocument = LegacyModelizerImporter.importFile(selectedFile);
@@ -588,8 +595,8 @@ public class MainFrame extends JFrame {
 			}
 			case "mn" -> {
 				loadedDocument = ModernModelizerImporter.importFile(selectedFile);
-				if (!this.confirmModernDocumentVersion(loadedDocument)) {
-					return;
+				if (!confirmModernDocumentVersion(parent, loadedDocument)) {
+					return Optional.empty();
 				}
 				openedFile = selectedFile;
 			}
@@ -597,13 +604,15 @@ public class MainFrame extends JFrame {
 			}
 
 			if (loadedDocument == null) {
-				return;
+				return Optional.empty();
 			}
 
 			loadedDocument.setSource(selectedFile.getPath());
-			this.openInNewFrame(new DocumentSession(loadedDocument, openedFile));
+
+			return Optional.of(new DocumentSession(loadedDocument, openedFile));
 		} catch (final IOException ex) {
-			JOptionPane.showMessageDialog(this, "Failed to load file:\n" + ex.getMessage(), "Load error", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(parent, "Failed to load file:\n" + ex.getMessage(), "Load error", JOptionPane.ERROR_MESSAGE);
+			return Optional.empty();
 		}
 	}
 

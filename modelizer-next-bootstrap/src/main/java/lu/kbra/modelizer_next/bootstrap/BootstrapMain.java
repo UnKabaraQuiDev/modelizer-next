@@ -26,7 +26,7 @@ public final class BootstrapMain {
 		try {
 			BootstrapMain.applyConfiguredLookAndFeel();
 			final BootstrapRuntime runtime = BootstrapRuntime.bootstrap();
-			runtime.launch();
+			runtime.launch(args);
 		} catch (final Exception ex) {
 			ex.printStackTrace();
 			SwingUtilities.invokeLater(() -> {

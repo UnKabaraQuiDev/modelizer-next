@@ -217,7 +217,7 @@ public class BootstrapRuntime implements UpdateRuntime {
 		return true;
 	}
 
-	public void launch() throws Exception {
+	public void launch(final String[] args) throws Exception {
 		final BootstrapLoadingFrame loadingFrame = new BootstrapLoadingFrame();
 		loadingFrame.setVisible(true);
 		try {
@@ -243,7 +243,7 @@ public class BootstrapRuntime implements UpdateRuntime {
 		} finally {
 			loadingFrame.dispose();
 		}
-		this.applicationLauncher.launch(this.currentApplication);
+		this.applicationLauncher.launch(args, this.currentApplication);
 	}
 
 	private AvailableUpdate requireInstallableUpdate(final UpdateChannel channel, final String currentVersion)

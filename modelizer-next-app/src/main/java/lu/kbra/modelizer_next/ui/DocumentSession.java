@@ -6,18 +6,18 @@ import lu.kbra.modelizer_next.document.ModelDocument;
 import lu.kbra.modelizer_next.history.DocumentSnapshot;
 import lu.kbra.modelizer_next.history.UndoRedoManager;
 
-final class DocumentSession {
+public final class DocumentSession {
 
 	private final ModelDocument document;
 	private final UndoRedoManager undoRedoManager;
 	private File currentFile;
 	private DocumentSnapshot savedSnapshot;
 
-	DocumentSession(final ModelDocument document) {
+	public DocumentSession(final ModelDocument document) {
 		this(document, null);
 	}
 
-	DocumentSession(final ModelDocument document, final File currentFile) {
+	public DocumentSession(final ModelDocument document, final File currentFile) {
 		this.document = document;
 		this.currentFile = currentFile;
 		this.undoRedoManager = new UndoRedoManager();
@@ -61,4 +61,10 @@ final class DocumentSession {
 	boolean undo() {
 		return this.undoRedoManager.undo(this.document);
 	}
+
+	@Override
+	public String toString() {
+		return "DocumentSession@" + System.identityHashCode(this) + " [document=" + document + ", currentFile=" + currentFile + "]";
+	}
+
 }

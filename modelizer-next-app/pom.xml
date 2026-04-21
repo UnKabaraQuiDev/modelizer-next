@@ -45,6 +45,10 @@
 			<artifactId>flatlaf</artifactId>
 			<version>3.7.1</version>
 		</dependency>
+		<dependency>
+			<groupId>lu.kbra</groupId>
+			<artifactId>pclib-datastruct</artifactId>
+		</dependency>
 	</dependencies>
 
 	<build>
