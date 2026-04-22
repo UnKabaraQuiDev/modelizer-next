@@ -9,6 +9,11 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.RenderingHints;
+import java.awt.Toolkit;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.StringSelection;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
@@ -17,6 +22,7 @@ import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -27,11 +33,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.UUID;
 
+import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.ActionMap;
+import javax.swing.InputMap;
+import javax.swing.JComponent;
 import javax.swing.JPanel;
+import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 
+import lu.kbra.modelizer_next.MNMain;
 import lu.kbra.modelizer_next.common.Size2D;
 import lu.kbra.modelizer_next.document.ModelDocument;
 import lu.kbra.modelizer_next.domain.BoundTargetType;
@@ -76,7 +89,7 @@ public class DiagramCanvas extends JPanel {
 	private record FieldHitResult(FieldModel field, Rectangle2D bounds) {
 	}
 
-	private record LinkCreationState(String classId, String fieldId) {
+	private record ConnectionCreationState(SelectedElement source) {
 	}
 
 	private record LinkGeometry(Point2D fromPoint, Point2D toPoint, Point2D labelPoint, Point2D middlePoint, double labelAngle,
@@ -100,17 +113,14 @@ public class DiagramCanvas extends JPanel {
 	private record AnchorPair(Point2D from, Point2D to) {
 	}
 
-	private record ClassSideKey(String classId, AnchorSide side) {
+	private record AnchorCandidate(AnchorSide side, Point2D point) {
 	}
 
-	private record AnchorSidePair(AnchorSide fromSide, AnchorSide toSide) {
-	}
-
-	private record LinkAnchorPlacement(AnchorSide fromSide, AnchorSide toSide, int fromIndex, int fromCount, int toIndex, int toCount) {
-	}
-
-	private record AnchorCandidate(AnchorSide side, int index, Point2D point) {
-	}
+	private static final class ClipboardPayload { public PanelType panelType; public double originX; public double originY; public List<ClipboardClass> classes = new ArrayList<>(); public List<ClipboardField> fields = new ArrayList<>(); public List<ClipboardComment> comments = new ArrayList<>(); public List<ClipboardLink> links = new ArrayList<>(); }
+	private static final class ClipboardClass { public ClassModel model; public NodeLayout layout; }
+	private static final class ClipboardField { public String ownerClassId; public FieldModel model; }
+	private static final class ClipboardComment { public CommentModel model; public NodeLayout layout; }
+	private static final class ClipboardLink { public LinkModel model; public LinkLayout layout; }
 
 	private record SelectedElement(SelectedType type, String classId, String fieldId, String commentId, String linkId) {
 		private static SelectedElement forClass(final String classId) {
@@ -182,7 +192,7 @@ public class DiagramCanvas extends JPanel {
 	private Point lastScreenPoint;
 
 	private boolean panning;
-	private LinkCreationState linkCreationState;
+	private ConnectionCreationState connectionCreationState;
 	private SelectedElement linkPreviewTarget;
 	private Point2D.Double linkPreviewMousePoint;
 
@@ -197,13 +207,9 @@ public class DiagramCanvas extends JPanel {
 	private boolean dragOccurred;
 
 	private Point2D.Double currentDragOffset = new Point2D.Double();
-
-	private static final double CONCEPTUAL_ANCHOR_SPACING = 18.0;
-	private static final double SELF_LINK_OUTSIDE_OFFSET = 40.0;
-	private final Map<String, AnchorPair> conceptualAnchorCache = new HashMap<>();
-	private final Map<String, LinkAnchorPlacement> conceptualAnchorPlacements = new HashMap<>();
-	private final Map<ClassSideKey, List<String>> conceptualSideLinkCache = new HashMap<>();
-	private boolean conceptualAnchorCacheValid;
+	private static final String CLIPBOARD_PREFIX = "MODELIZER_NEXT_SELECTION_V1\n";
+	private static final double CLIPBOARD_PASTE_OFFSET = 32.0;
+	private int pasteInvocationCount;
 
 	private final Comparator<ClassModel> comparator = (a, b) -> {
 		if (this.selectedElement == null || this.selectedElement.type() != SelectedType.CLASS) {
@@ -368,6 +374,8 @@ public class DiagramCanvas extends JPanel {
 		createdLink.setName(result.name());
 		createdLink.setLineColor(result.lineColor());
 		createdLink.setAssociationClassId(result.associationClassId());
+		createdLink.setLabelFrom(result.labelFrom());
+		createdLink.setLabelTo(result.labelTo());
 		createdLink.setFrom(new LinkEnd(result.fromClassId(), result.fromFieldId()));
 		createdLink.setTo(new LinkEnd(result.toClassId(), result.toFieldId()));
 
@@ -469,13 +477,8 @@ public class DiagramCanvas extends JPanel {
 	}
 
 	public void applyPalette(final StylePalette palette) {
-		if (palette == null) {
+		if (palette == null || this.selectedElements.isEmpty()) {
 			return;
-		}
-		boolean needsDeselect = false;
-		if (this.selectedElements.isEmpty()) {
-			selectAll();
-			needsDeselect = true;
 		}
 
 		for (final SelectedElement element : this.selectedElements) {
@@ -513,11 +516,7 @@ public class DiagramCanvas extends JPanel {
 			}
 			}
 		}
-		if (needsDeselect) {
-			selectedElement = null;
-			selectedElements.clear();
-			notifySelectionChanged();
-		}
+
 		this.notifyDocumentChanged();
 		this.repaint();
 	}
@@ -625,48 +624,18 @@ public class DiagramCanvas extends JPanel {
 			return points;
 		}
 
-		final LinkAnchorPlacement placement = this.conceptualAnchorPlacements.get(linkModel.getId());
-		if (placement == null) {
-			points.add(toPoint);
-			return points;
-		}
-
 		final NodeLayout layout = this.resolveRenderLayout(this.findOrCreateNodeLayout(LayoutObjectType.CLASS, classModel.getId()));
 		final Rectangle2D bounds = this.computeClassBounds(g2, classModel, layout);
-		final double outsideOffset = DiagramCanvas.SELF_LINK_OUTSIDE_OFFSET + Math.max(placement.fromCount(), placement.toCount()) * 4.0;
 
-		switch (placement.fromSide()) {
-		case TOP -> {
-			final double outsideY = bounds.getY() - outsideOffset;
-			final double outsideX = bounds.getMaxX() + outsideOffset;
-			points.add(new Point2D.Double(fromPoint.getX(), outsideY));
-			points.add(new Point2D.Double(outsideX, outsideY));
-			points.add(new Point2D.Double(outsideX, toPoint.getY()));
-		}
-		case RIGHT -> {
-			final double outsideX = bounds.getMaxX() + outsideOffset;
-			final double outsideY = bounds.getMaxY() + outsideOffset;
-			points.add(new Point2D.Double(outsideX, fromPoint.getY()));
-			points.add(new Point2D.Double(outsideX, outsideY));
-			points.add(new Point2D.Double(toPoint.getX(), outsideY));
-		}
-		case BOTTOM -> {
-			final double outsideY = bounds.getMaxY() + outsideOffset;
-			final double outsideX = bounds.getX() - outsideOffset;
-			points.add(new Point2D.Double(fromPoint.getX(), outsideY));
-			points.add(new Point2D.Double(outsideX, outsideY));
-			points.add(new Point2D.Double(outsideX, toPoint.getY()));
-		}
-		case LEFT -> {
-			final double outsideX = bounds.getX() - outsideOffset;
-			final double outsideY = bounds.getY() - outsideOffset;
-			points.add(new Point2D.Double(outsideX, fromPoint.getY()));
-			points.add(new Point2D.Double(outsideX, outsideY));
-			points.add(new Point2D.Double(toPoint.getX(), outsideY));
-		}
-		}
+		final boolean useRightSide = fromPoint.getX() >= bounds.getCenterX() || toPoint.getX() >= bounds.getCenterX();
+		final double horizontalOffset = 40.0;
 
+		final double outsideX = useRightSide ? bounds.getMaxX() + horizontalOffset : bounds.getX() - horizontalOffset;
+
+		points.add(new Point2D.Double(outsideX, fromPoint.getY()));
+		points.add(new Point2D.Double(outsideX, toPoint.getY()));
 		points.add(toPoint);
+
 		return points;
 	}
 
@@ -729,226 +698,90 @@ public class DiagramCanvas extends JPanel {
 				Math.max(DiagramCanvas.COMMENT_MIN_HEIGHT, layout.getSize().getHeight()));
 	}
 
-	private Point2D computeConceptualAnchorPoint(final Rectangle2D bounds, final AnchorSide side, final int index, final int totalCount) {
-		final double offset = (index - (totalCount - 1) / 2.0) * DiagramCanvas.CONCEPTUAL_ANCHOR_SPACING;
-		return switch (side) {
-		case TOP -> new Point2D.Double(bounds.getCenterX() + offset, bounds.getY());
-		case BOTTOM -> new Point2D.Double(bounds.getCenterX() + offset, bounds.getMaxY());
-		case LEFT -> new Point2D.Double(bounds.getX(), bounds.getCenterY() + offset);
-		case RIGHT -> new Point2D.Double(bounds.getMaxX(), bounds.getCenterY() + offset);
-		};
-	}
-
-	private Point2D computeConceptualSideCenter(final Rectangle2D bounds, final AnchorSide side) {
-		return this.computeConceptualAnchorPoint(bounds, side, 0, 1);
-	}
-
-	private double computeConceptualSortValue(
-			final String linkId,
+	private List<AnchorCandidate> computeConceptualCandidates(
+			final Graphics2D g2,
+			final LinkModel targetLink,
 			final String classId,
-			final AnchorSide side,
-			final Map<String, Rectangle2D> boundsByClassId,
-			final Map<String, AnchorSidePair> sidePairs) {
-		final LinkModel linkModel = this.findLinkById(linkId);
-		if (linkModel == null) {
-			return 0.0;
-		}
-
-		final AnchorSidePair sidePair = sidePairs.get(linkId);
-		if (sidePair == null) {
-			return 0.0;
-		}
-
-		final boolean fromEndpoint = classId.equals(linkModel.getFrom().getClassId()) && side == sidePair.fromSide();
-		final boolean toEndpoint = classId.equals(linkModel.getTo().getClassId()) && side == sidePair.toSide();
-		if (!fromEndpoint && !toEndpoint) {
-			return 0.0;
-		}
-
-		if (linkModel.isSelfLinking()) {
-			final Rectangle2D bounds = boundsByClassId.get(classId);
-			if (bounds == null) {
-				return 0.0;
-			}
-
-			final AnchorSide oppositeSide = fromEndpoint ? sidePair.toSide() : sidePair.fromSide();
-			final Point2D oppositePoint = this.computeConceptualSideCenter(bounds, oppositeSide);
-			return switch (side) {
-			case TOP, BOTTOM -> oppositePoint.getX();
-			case LEFT, RIGHT -> oppositePoint.getY();
-			};
-		}
-
-		final String otherClassId = fromEndpoint ? linkModel.getTo().getClassId() : linkModel.getFrom().getClassId();
-		final Rectangle2D otherBounds = boundsByClassId.get(otherClassId);
-		if (otherBounds == null) {
-			return 0.0;
-		}
-
-		return switch (side) {
-		case TOP, BOTTOM -> otherBounds.getCenterX();
-		case LEFT, RIGHT -> otherBounds.getCenterY();
-		};
-	}
-
-	private AnchorSide clockwise(final AnchorSide side) {
-		return switch (side) {
-		case TOP -> AnchorSide.RIGHT;
-		case RIGHT -> AnchorSide.BOTTOM;
-		case BOTTOM -> AnchorSide.LEFT;
-		case LEFT -> AnchorSide.TOP;
-		};
-	}
-
-	private AnchorSide chooseSelfLinkFromSide(final String classId) {
-		AnchorSide bestSide = AnchorSide.TOP;
-		int bestCount = Integer.MAX_VALUE;
+			final Rectangle2D bounds) {
+		final List<AnchorCandidate> candidates = new ArrayList<>();
 
 		for (final AnchorSide side : AnchorSide.values()) {
-			final int sideCount = this.getConceptualSideLinkCount(classId, side);
-			if (sideCount < bestCount) {
-				bestCount = sideCount;
-				bestSide = side;
-			}
+			final double offset = this.computeConceptualSideOffset(g2, targetLink, classId, side);
+			final Point2D point = switch (side) {
+			case TOP ->
+				new Point2D.Double(this.clamp(bounds.getCenterX() + offset, bounds.getX() + 12, bounds.getMaxX() - 12), bounds.getY());
+			case BOTTOM ->
+				new Point2D.Double(this.clamp(bounds.getCenterX() + offset, bounds.getX() + 12, bounds.getMaxX() - 12), bounds.getMaxY());
+			case LEFT ->
+				new Point2D.Double(bounds.getX(), this.clamp(bounds.getCenterY() + offset, bounds.getY() + 12, bounds.getMaxY() - 12));
+			case RIGHT ->
+				new Point2D.Double(bounds.getMaxX(), this.clamp(bounds.getCenterY() + offset, bounds.getY() + 12, bounds.getMaxY() - 12));
+			};
+
+			candidates.add(new AnchorCandidate(side, point));
 		}
 
-		return bestSide;
+		return candidates;
 	}
 
-	private AnchorSidePair chooseBestConceptualSidePair(
-			final String fromClassId,
-			final Rectangle2D fromBounds,
-			final String toClassId,
-			final Rectangle2D toBounds) {
-		AnchorSide bestFromSide = AnchorSide.TOP;
-		AnchorSide bestToSide = AnchorSide.TOP;
-		double bestScore = Double.POSITIVE_INFINITY;
-
-		for (final AnchorSide fromSide : AnchorSide.values()) {
-			final Point2D fromCenter = this.computeConceptualSideCenter(fromBounds, fromSide);
-			for (final AnchorSide toSide : AnchorSide.values()) {
-				final Point2D toCenter = this.computeConceptualSideCenter(toBounds, toSide);
-				final double distance = fromCenter.distance(toCenter);
-				final double loadPenalty = (this.getConceptualSideLinkCount(fromClassId, fromSide)
-						+ this.getConceptualSideLinkCount(toClassId, toSide)) * 12.0;
-				final double score = distance + loadPenalty;
-
-				if (score < bestScore) {
-					bestScore = score;
-					bestFromSide = fromSide;
-					bestToSide = toSide;
-				}
-			}
-		}
-
-		return new AnchorSidePair(bestFromSide, bestToSide);
-	}
-
-	private int getConceptualSideLinkCount(final String classId, final AnchorSide side) {
-		final List<String> links = this.conceptualSideLinkCache.get(new ClassSideKey(classId, side));
-		return links == null ? 0 : links.size();
-	}
-
-	private void ensureConceptualAnchorCache(final Graphics2D g2) {
-		if (this.panelType != PanelType.CONCEPTUAL || this.conceptualAnchorCacheValid) {
-			return;
-		}
-
-		this.rebuildConceptualAnchorCache(g2);
-	}
-
-	private void invalidateConceptualAnchorCache() {
-		this.conceptualAnchorCache.clear();
-		this.conceptualAnchorPlacements.clear();
-		this.conceptualSideLinkCache.clear();
-		this.conceptualAnchorCacheValid = false;
-	}
-
-	private void rebuildConceptualAnchorCache(final Graphics2D g2) {
-		this.invalidateConceptualAnchorCache();
-
-		final Map<String, Rectangle2D> boundsByClassId = new HashMap<>();
-		final List<LinkModel> visibleLinks = new ArrayList<>();
-		final Map<String, AnchorSidePair> sidePairs = new HashMap<>();
+	private double computeConceptualSideOffset(
+			final Graphics2D g2,
+			final LinkModel targetLink,
+			final String classId,
+			final AnchorSide side) {
+		final List<LinkSlot> slots = new ArrayList<>();
 
 		for (final LinkModel linkModel : this.getActiveLinks()) {
-			final ClassModel fromClass = this.findClassById(linkModel.getFrom().getClassId());
-			final ClassModel toClass = this.findClassById(linkModel.getTo().getClassId());
-			if (fromClass == null || toClass == null || !this.isVisible(fromClass) || !this.isVisible(toClass)) {
+			if (this.panelType != PanelType.CONCEPTUAL) {
 				continue;
 			}
 
-			final Rectangle2D fromBounds = boundsByClassId.computeIfAbsent(fromClass.getId(), classId -> {
-				final NodeLayout layout = this.resolveRenderLayout(this.findOrCreateNodeLayout(LayoutObjectType.CLASS, classId));
-				return this.computeClassBounds(g2, fromClass, layout);
-			});
-			final Rectangle2D toBounds = boundsByClassId.computeIfAbsent(toClass.getId(), classId -> {
-				final NodeLayout layout = this.resolveRenderLayout(this.findOrCreateNodeLayout(LayoutObjectType.CLASS, classId));
-				return this.computeClassBounds(g2, toClass, layout);
-			});
-
-			final AnchorSidePair sidePair;
-			if (linkModel.isSelfLinking()) {
-				final AnchorSide fromSide = this.chooseSelfLinkFromSide(fromClass.getId());
-				sidePair = new AnchorSidePair(fromSide, this.clockwise(fromSide));
-			} else {
-				sidePair = this.chooseBestConceptualSidePair(fromClass.getId(), fromBounds, toClass.getId(), toBounds);
+			final boolean matchesFrom = classId.equals(linkModel.getFrom().getClassId());
+			final boolean matchesTo = classId.equals(linkModel.getTo().getClassId());
+			if (!matchesFrom && !matchesTo) {
+				continue;
 			}
 
-			sidePairs.put(linkModel.getId(), sidePair);
-			this.conceptualSideLinkCache.computeIfAbsent(new ClassSideKey(fromClass.getId(), sidePair.fromSide()), key -> new ArrayList<>())
-					.add(linkModel.getId());
-			this.conceptualSideLinkCache.computeIfAbsent(new ClassSideKey(toClass.getId(), sidePair.toSide()), key -> new ArrayList<>())
-					.add(linkModel.getId());
-			visibleLinks.add(linkModel);
+			final String otherClassId = matchesFrom ? linkModel.getTo().getClassId() : linkModel.getFrom().getClassId();
+			final ClassModel classModel = this.findClassById(classId);
+			final ClassModel otherClassModel = this.findClassById(otherClassId);
+			if (classModel == null || otherClassModel == null || !this.isVisible(classModel) || !this.isVisible(otherClassModel)) {
+				continue;
+			}
+
+			final NodeLayout layout = this.resolveRenderLayout(this.findOrCreateNodeLayout(LayoutObjectType.CLASS, classId));
+			final NodeLayout otherLayout = this.resolveRenderLayout(this.findOrCreateNodeLayout(LayoutObjectType.CLASS, otherClassId));
+
+			final Rectangle2D bounds = this.computeClassBounds(g2, classModel, layout);
+			final Rectangle2D otherBounds = this.computeClassBounds(g2, otherClassModel, otherLayout);
+
+			final AnchorSide preferredSide = this.findClosestSideFromCenter(bounds, otherBounds.getCenterX(), otherBounds.getCenterY());
+
+			if (preferredSide != side) {
+				continue;
+			}
+
+			final double sortValue = switch (side) {
+			case TOP, BOTTOM -> otherBounds.getCenterX();
+			case LEFT, RIGHT -> otherBounds.getCenterY();
+			};
+
+			slots.add(new LinkSlot(linkModel.getId(), sortValue));
 		}
 
-		final Map<ClassSideKey, Map<String, Integer>> indexByKey = new HashMap<>();
-		for (final Map.Entry<ClassSideKey, List<String>> entry : this.conceptualSideLinkCache.entrySet()) {
-			final ClassSideKey key = entry.getKey();
-			final List<String> linkIds = entry.getValue();
-			linkIds.sort(Comparator.comparingDouble(
-					(String linkId) -> this.computeConceptualSortValue(linkId, key.classId(), key.side(), boundsByClassId, sidePairs))
-					.thenComparing(linkId -> linkId));
+		slots.sort(Comparator.comparing(LinkSlot::sortValue));
 
-			final Map<String, Integer> indices = new HashMap<>();
-			for (int i = 0; i < linkIds.size(); i++) {
-				indices.put(linkIds.get(i), i);
+		int index = 0;
+		for (int i = 0; i < slots.size(); i++) {
+			if (slots.get(i).linkId().equals(targetLink.getId())) {
+				index = i;
+				break;
 			}
-			indexByKey.put(key, indices);
 		}
 
-		for (final LinkModel linkModel : visibleLinks) {
-			final AnchorSidePair sidePair = sidePairs.get(linkModel.getId());
-			if (sidePair == null) {
-				continue;
-			}
-
-			final Rectangle2D fromBounds = boundsByClassId.get(linkModel.getFrom().getClassId());
-			final Rectangle2D toBounds = boundsByClassId.get(linkModel.getTo().getClassId());
-			if (fromBounds == null || toBounds == null) {
-				continue;
-			}
-
-			final ClassSideKey fromKey = new ClassSideKey(linkModel.getFrom().getClassId(), sidePair.fromSide());
-			final ClassSideKey toKey = new ClassSideKey(linkModel.getTo().getClassId(), sidePair.toSide());
-			final List<String> fromLinks = this.conceptualSideLinkCache.get(fromKey);
-			final List<String> toLinks = this.conceptualSideLinkCache.get(toKey);
-			if (fromLinks == null || toLinks == null) {
-				continue;
-			}
-
-			final int fromIndex = indexByKey.get(fromKey).get(linkModel.getId());
-			final int toIndex = indexByKey.get(toKey).get(linkModel.getId());
-			final Point2D fromPoint = this.computeConceptualAnchorPoint(fromBounds, sidePair.fromSide(), fromIndex, fromLinks.size());
-			final Point2D toPoint = this.computeConceptualAnchorPoint(toBounds, sidePair.toSide(), toIndex, toLinks.size());
-
-			this.conceptualAnchorCache.put(linkModel.getId(), new AnchorPair(fromPoint, toPoint));
-			this.conceptualAnchorPlacements.put(linkModel.getId(),
-					new LinkAnchorPlacement(sidePair.fromSide(), sidePair.toSide(), fromIndex, fromLinks.size(), toIndex, toLinks.size()));
-		}
-
-		this.conceptualAnchorCacheValid = true;
+		final double spacing = 14.0;
+		final double centerIndex = (slots.size() - 1) / 2.0;
+		return (index - centerIndex) * spacing;
 	}
 
 	private Point2D computePolylineMiddlePoint(final List<Point2D> points) {
@@ -1218,31 +1051,38 @@ public class DiagramCanvas extends JPanel {
 		}
 	}
 
-	private void drawCardinalityLabel(
+	private Point2D computeEndpointLabelCenter(final Point2D anchor, final Point2D adjacentPoint) {
+		final double dx = adjacentPoint.getX() - anchor.getX();
+		final double dy = adjacentPoint.getY() - anchor.getY();
+		final double length = Math.hypot(dx, dy);
+		final double ux = length <= 0.0 ? 0.0 : dx / length;
+		final double uy = length <= 0.0 ? 0.0 : dy / length;
+		return new Point2D.Double(anchor.getX() + ux * 16.0, anchor.getY() + uy * 16.0);
+	}
+
+	private void drawEndpointLabel(
 			final Graphics2D g2,
-			final String text,
+			final String cardinalityText,
+			final String endpointLabel,
 			final Point2D anchor,
 			final Point2D adjacentPoint,
 			final double angle) {
-		final double dx = adjacentPoint.getX() - anchor.getX();
-		final double dy = adjacentPoint.getY() - anchor.getY();
-
-		double ux = 0.0;
-		double uy = 0.0;
-		final double length = Math.hypot(dx, dy);
-		if (length > 0.0) {
-			ux = dx / length;
-			uy = dy / length;
+		if ((cardinalityText == null || cardinalityText.isBlank()) && (endpointLabel == null || endpointLabel.isBlank())) {
+			return;
 		}
-
-		final double alongOffset = 16.0;
-
-		final Point2D center = new Point2D.Double(anchor.getX() + ux * alongOffset, anchor.getY() + uy * alongOffset);
-
-		this.drawAlignedLinkLabel(g2, text, center, angle);
+		final Point2D center = this.computeEndpointLabelCenter(anchor, adjacentPoint);
+		if (cardinalityText != null && !cardinalityText.isBlank()) {
+			this.drawAlignedLinkLabel(g2, cardinalityText, center, angle);
+		}
+		if (endpointLabel != null && !endpointLabel.isBlank()) {
+			final double normalX = -Math.sin(angle);
+			final double normalY = Math.cos(angle);
+			final double labelOffset = cardinalityText != null && !cardinalityText.isBlank() ? 14.0 : 0.0;
+			this.drawAlignedLinkLabel(g2, endpointLabel, new Point2D.Double(center.getX() + normalX * labelOffset, center.getY() + normalY * labelOffset), angle);
+		}
 	}
 
-	private void drawClasses(final Graphics2D g2) {
+	private void drawClasses	private void drawClasses(final Graphics2D g2) {
 		for (final ClassModel classModel : this.document.getModel().getClasses()) {
 			if (!this.isVisible(classModel)) {
 				continue;
@@ -1408,10 +1248,6 @@ public class DiagramCanvas extends JPanel {
 	}
 
 	private void drawLinks(final Graphics2D g2) {
-		if (this.panelType == PanelType.CONCEPTUAL) {
-			this.ensureConceptualAnchorCache(g2);
-		}
-
 		g2.setFont(DiagramCanvas.BODY_FONT);
 
 		for (final LinkModel linkModel : this.getActiveLinks()) {
@@ -1438,20 +1274,18 @@ public class DiagramCanvas extends JPanel {
 			}
 
 			if (this.panelType == PanelType.CONCEPTUAL) {
-				if (linkModel.getCardinalityFrom() != null) {
-					this.drawCardinalityLabel(g2,
-							linkModel.getCardinalityFrom().getDisplayValue(),
-							geometry.fromPoint(),
-							geometry.points().get(1),
-							geometry.labelAngle());
-				}
-				if (linkModel.getCardinalityTo() != null) {
-					this.drawCardinalityLabel(g2,
-							linkModel.getCardinalityTo().getDisplayValue(),
-							geometry.toPoint(),
-							geometry.points().get(geometry.points().size() - 2),
-							geometry.labelAngle());
-				}
+				this.drawEndpointLabel(g2,
+						linkModel.getCardinalityFrom() == null ? null : linkModel.getCardinalityFrom().getDisplayValue(),
+						linkModel.getLabelFrom(),
+						geometry.fromPoint(),
+						geometry.points().get(1),
+						geometry.labelAngle());
+				this.drawEndpointLabel(g2,
+						linkModel.getCardinalityTo() == null ? null : linkModel.getCardinalityTo().getDisplayValue(),
+						linkModel.getLabelTo(),
+						geometry.toPoint(),
+						geometry.points().get(geometry.points().size() - 2),
+						geometry.labelAngle());
 			}
 
 			this.drawAssociationClassConnector(g2, linkModel, geometry);
@@ -1648,6 +1482,8 @@ public class DiagramCanvas extends JPanel {
 			copy.setLineColor(source.getLineColor());
 			copy.setAssociationClassId(source.getAssociationClassId() == null ? null
 					: duplicatedClassIds.getOrDefault(source.getAssociationClassId(), source.getAssociationClassId()));
+			copy.setLabelFrom(source.getLabelFrom());
+			copy.setLabelTo(source.getLabelTo());
 			copy.setFrom(new LinkEnd(newFromClassId, newFromFieldId));
 			copy.setTo(new LinkEnd(newToClassId, newToFieldId));
 			copy.setCardinalityFrom(source.getCardinalityFrom());
@@ -1767,8 +1603,6 @@ public class DiagramCanvas extends JPanel {
 		linkModel.setFrom(new LinkEnd(result.fromClassId(), result.fromFieldId()));
 		linkModel.setTo(new LinkEnd(result.toClassId(), result.toFieldId()));
 		linkModel.setAssociationClassId(result.associationClassId());
-		linkModel.setLabelFrom(result.labelFrom());
-		linkModel.setLabelTo(result.labelTo());
 
 		if (this.panelType == PanelType.CONCEPTUAL) {
 			linkModel.setCardinalityFrom(result.cardinalityFrom() == null ? Cardinality.ONE : result.cardinalityFrom());
@@ -2656,7 +2490,6 @@ public class DiagramCanvas extends JPanel {
 	}
 
 	private void notifyDocumentChanged() {
-		this.invalidateConceptualAnchorCache();
 		if (this.eventListener != null) {
 			this.eventListener.onDocumentChanged();
 		}
@@ -2686,7 +2519,6 @@ public class DiagramCanvas extends JPanel {
 	@Override
 	protected void paintComponent(final Graphics graphics) {
 		super.paintComponent(graphics);
-		this.invalidateConceptualAnchorCache();
 		this.ensureLayouts();
 
 		final Graphics2D g2 = (Graphics2D) graphics.create();
@@ -2826,8 +2658,39 @@ public class DiagramCanvas extends JPanel {
 	}
 
 	private AnchorPair resolveConceptualAnchorPair(final Graphics2D g2, final LinkModel targetLink) {
-		this.ensureConceptualAnchorCache(g2);
-		return this.conceptualAnchorCache.get(targetLink.getId());
+		final ClassModel fromClass = this.findClassById(targetLink.getFrom().getClassId());
+		final ClassModel toClass = this.findClassById(targetLink.getTo().getClassId());
+
+		if (fromClass == null || toClass == null || !this.isVisible(fromClass) || !this.isVisible(toClass)) {
+			return null;
+		}
+
+		final NodeLayout fromLayout = this.resolveRenderLayout(this.findOrCreateNodeLayout(LayoutObjectType.CLASS, fromClass.getId()));
+		final NodeLayout toLayout = this.resolveRenderLayout(this.findOrCreateNodeLayout(LayoutObjectType.CLASS, toClass.getId()));
+
+		final Rectangle2D fromBounds = this.computeClassBounds(g2, fromClass, fromLayout);
+		final Rectangle2D toBounds = this.computeClassBounds(g2, toClass, toLayout);
+
+		AnchorCandidate bestFrom = null;
+		AnchorCandidate bestTo = null;
+		double bestDistance = Double.POSITIVE_INFINITY;
+
+		for (final AnchorCandidate fromCandidate : this.computeConceptualCandidates(g2, targetLink, fromClass.getId(), fromBounds)) {
+			for (final AnchorCandidate toCandidate : this.computeConceptualCandidates(g2, targetLink, toClass.getId(), toBounds)) {
+				final double distance = fromCandidate.point().distance(toCandidate.point());
+				if (distance < bestDistance) {
+					bestDistance = distance;
+					bestFrom = fromCandidate;
+					bestTo = toCandidate;
+				}
+			}
+		}
+
+		if (bestFrom == null || bestTo == null) {
+			return null;
+		}
+
+		return new AnchorPair(bestFrom.point(), bestTo.point());
 	}
 
 	private Point2D resolveConceptualPreviewAnchor(final Graphics2D g2, final String classId, final Point2D reference) {
