@@ -23,7 +23,7 @@
 		<maven.compiler.target>${java.version}</maven.compiler.target>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<distributor>Manual build</distributor>
-		<appVersion></appVersion>
+		<appVersion>0.1</appVersion>
 		<modelizer.repositoryUrl>
 			https://github.com/UnKabaraQuiDev/modelizer-next</modelizer.repositoryUrl>
 		<modelizer.releasesUrl>${modelizer.repositoryUrl}/releases</modelizer.releasesUrl>
@@ -149,6 +149,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-antrun-plugin</artifactId>
+					<version>3.2.0</version>
 					<executions>
 						<execution>
 							<id>copy-shaded-jar</id>
@@ -160,17 +161,6 @@
 									<copy
 										file="${project.build.directory}/${project.build.finalName}-with-dependencies.jar"
 										tofile="${project.build.directory}/jpackage-input/${project.build.finalName}.jar" />
-								</target>
-							</configuration>
-							<goals>
-								<goal>run</goal>
-							</goals>
-						</execution>
-						<execution>
-							<id>copy-icon</id>
-							<phase>package</phase>
-							<configuration>
-								<target>
 									<copy
 										file="${jpackage.icon}"
 										tofile="${project.build.directory}/jpackage-input/icon.png" />
@@ -235,8 +225,8 @@
 			<build>
 				<plugins>
 					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-antrun-plugin</artifactId>
-						<version>3.1.0</version>
 						<executions>
 							<execution>
 								<phase>initialize</phase>
