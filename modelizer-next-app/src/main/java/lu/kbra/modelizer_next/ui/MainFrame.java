@@ -116,7 +116,7 @@ public class MainFrame extends JFrame {
 		this.conceptualCanvas = new DiagramCanvas(this.document, PanelType.CONCEPTUAL, canvasListener);
 		this.logicalCanvas = new DiagramCanvas(this.document, PanelType.LOGICAL, canvasListener);
 		this.physicalCanvas = new DiagramCanvas(this.document, PanelType.PHYSICAL, canvasListener);
-		this.applyDefaultPaletteToCanvases();
+		this.setDefaultPaletteToCanvases();
 
 		this.tabbedPane = new JTabbedPane();
 		this.tabbedPane.addTab("Conceptual", this.conceptualCanvas);
@@ -152,11 +152,18 @@ public class MainFrame extends JFrame {
 		this(new DocumentSession(document));
 	}
 
-	private void applyDefaultPaletteToCanvases() {
+	private void setDefaultPaletteToCanvases() {
 		final StylePalette palette = this.findPaletteByName(this.appConfig.getDefaultPaletteName());
 		this.conceptualCanvas.setDefaultPalette(palette);
 		this.logicalCanvas.setDefaultPalette(palette);
 		this.physicalCanvas.setDefaultPalette(palette);
+	}
+	
+	public void applyDefaultPaletteToCanvases() {
+		final StylePalette palette = this.findPaletteByName(this.appConfig.getDefaultPaletteName());
+		this.conceptualCanvas.applyPalette(palette);
+		this.logicalCanvas.applyPalette(palette);
+		this.physicalCanvas.applyPalette(palette);
 	}
 
 	private void applyThemeAndReopen(final ThemeMode mode) {
@@ -647,7 +654,7 @@ public class MainFrame extends JFrame {
 			StylePaletteService.save(palette);
 			this.palettes = StylePaletteService.loadAll();
 			this.setJMenuBar(this.createMenuBar());
-			this.applyDefaultPaletteToCanvases();
+			this.setDefaultPaletteToCanvases();
 			this.revalidate();
 			this.repaint();
 		});
@@ -689,7 +696,7 @@ public class MainFrame extends JFrame {
 
 				StylePaletteService.save(edited);
 				this.palettes = StylePaletteService.loadAll();
-				this.applyDefaultPaletteToCanvases();
+				this.setDefaultPaletteToCanvases();
 				this.setJMenuBar(this.createMenuBar());
 				this.revalidate();
 				this.repaint();
@@ -705,7 +712,7 @@ public class MainFrame extends JFrame {
 		noneItem.addActionListener(event -> {
 			this.appConfig.setDefaultPaletteName(null);
 			App.saveConfig(this.appConfig);
-			this.applyDefaultPaletteToCanvases();
+			this.setDefaultPaletteToCanvases();
 		});
 		defaultGroup.add(noneItem);
 		defaultMenu.add(noneItem);
@@ -718,7 +725,7 @@ public class MainFrame extends JFrame {
 			item.addActionListener(event -> {
 				this.appConfig.setDefaultPaletteName(palette.getName());
 				App.saveConfig(this.appConfig);
-				this.applyDefaultPaletteToCanvases();
+				this.setDefaultPaletteToCanvases();
 			});
 			defaultGroup.add(item);
 			defaultMenu.add(item);
@@ -727,7 +734,7 @@ public class MainFrame extends JFrame {
 		final JMenuItem reloadItem = new JMenuItem("Reload styles");
 		reloadItem.addActionListener(event -> {
 			this.palettes = StylePaletteService.loadAll();
-			this.applyDefaultPaletteToCanvases();
+			this.setDefaultPaletteToCanvases();
 			this.setJMenuBar(this.createMenuBar());
 			this.revalidate();
 			this.repaint();

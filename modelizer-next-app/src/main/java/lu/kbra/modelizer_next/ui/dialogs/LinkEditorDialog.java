@@ -99,7 +99,7 @@ public final class LinkEditorDialog {
 	}
 
 	public record Result(String name, Color lineColor, String fromClassId, String toClassId, String fromFieldId, String toFieldId,
-			Cardinality cardinalityFrom, Cardinality cardinalityTo, String associationClassId) {
+			Cardinality cardinalityFrom, Cardinality cardinalityTo, String associationClassId, String labelFrom, String labelTo) {
 	}
 
 	private static AssociationOption findAssociationOption(final JComboBox<AssociationOption> box, final String classId) {
@@ -329,7 +329,9 @@ public final class LinkEditorDialog {
 							: toField.getId(),
 					panelType == PanelType.CONCEPTUAL ? (Cardinality) fromCardinalityBox.getSelectedItem() : null,
 					panelType == PanelType.CONCEPTUAL ? (Cardinality) toCardinalityBox.getSelectedItem() : null,
-					panelType == PanelType.CONCEPTUAL && associationOption != null ? associationOption.classId() : null);
+					panelType == PanelType.CONCEPTUAL && associationOption != null ? associationOption.classId() : null,
+					panelType == PanelType.CONCEPTUAL ? labelFrom.getText() : null,
+					panelType == PanelType.CONCEPTUAL ? labelTo.getText() : null);
 			dialog.dispose();
 		});
 		cancelButton.addActionListener(event -> dialog.dispose());

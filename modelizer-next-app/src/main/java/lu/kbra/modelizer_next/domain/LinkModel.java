@@ -14,8 +14,8 @@ public class LinkModel {
 	private Cardinality cardinalityTo;
 	private String associationClassId;
 	private Color lineColor;
-	private String nameFrom;
-	private String nameTo;
+	private String labelFrom;
+	private String labelTo;
 
 	public LinkModel() {
 		this.id = UUID.randomUUID().toString();
@@ -26,8 +26,8 @@ public class LinkModel {
 		this.cardinalityTo = Cardinality.ZERO_OR_MANY;
 		this.associationClassId = null;
 		this.lineColor = Color.BLACK;
-		this.nameFrom = "";
-		this.nameTo = "";
+		this.labelFrom = "";
+		this.labelTo = "";
 	}
 
 	public String getAssociationClassId() {
@@ -99,26 +99,26 @@ public class LinkModel {
 	}
 
 	public String getLabelFrom() {
-		return nameFrom;
+		return labelFrom;
 	}
 
-	public void setNameFrom(String nameFrom) {
-		this.nameFrom = nameFrom;
+	public void setLabelFrom(String nameFrom) {
+		this.labelFrom = nameFrom;
 	}
 
 	public String getLabelTo() {
-		return nameTo;
+		return labelTo;
 	}
 
-	public void setNameTo(String nameTo) {
-		this.nameTo = nameTo;
+	public void setLabelTo(String nameTo) {
+		this.labelTo = nameTo;
 	}
 
 	@Override
 	public String toString() {
 		return "LinkModel [id=" + id + ", name=" + name + ", from=" + from + ", to=" + to + ", cardinalityFrom=" + cardinalityFrom
 				+ ", cardinalityTo=" + cardinalityTo + ", associationClassId=" + associationClassId + ", lineColor=" + lineColor
-				+ ", nameFrom=" + nameFrom + ", nameTo=" + nameTo + "]";
+				+ ", labelFrom=" + labelFrom + ", labelTo=" + labelTo + "]";
 	}
 
 }

@@ -43,6 +43,9 @@ public class ModelizerAppEntryPoint implements AppMain {
 				}
 			}
 			final MainFrame frame = new MainFrame(document.orElseGet(() -> new DocumentSession(SampleDocumentFactory.create(), null)));
+			if (document.isEmpty()) {
+				frame.applyDefaultPaletteToCanvases();
+			}
 			frame.setVisible(true);
 		});
 	}
