@@ -26,7 +26,9 @@ public final class UpdateRuntimes {
 		}
 
 		@Override
-		public boolean installUpdateAndExit(final Component parentComponent, final AvailableUpdate update,
+		public boolean installUpdateAndExit(
+				final Component parentComponent,
+				final AvailableUpdate update,
 				final UpdatePreparation preparation) throws IOException {
 			return false;
 		}

@@ -17,8 +17,7 @@ final class JarApplicationLauncher {
 			Thread.currentThread().setContextClassLoader(this.activeLoader);
 			final Class<?> entryPointClass = Class.forName(application.entryPoint(), true, this.activeLoader);
 			if (!AppMain.class.isAssignableFrom(entryPointClass)) {
-				throw new AppLaunchException(
-						"Entry point '" + application.entryPoint() + "' does not implement AppMain.");
+				throw new AppLaunchException("Entry point '" + application.entryPoint() + "' does not implement AppMain.");
 			}
 			final AppMain appMain = (AppMain) entryPointClass.getDeclaredConstructor().newInstance();
 			appMain.start(args);

@@ -26,8 +26,11 @@ public class BootstrapRuntime implements UpdateRuntime {
 		final boolean firstLaunch = BootstrapApp.isFirstLaunch();
 		final BootstrapConfiguration configuration = BootstrapApp.loadConfiguration();
 
-		final BootstrapRuntime runtime = new BootstrapRuntime(configuration, new ApplicationInventory(),
-				new RemoteUpdateService(), new JarApplicationLauncher(), BootstrapApp.ENABLE_UPDATE);
+		final BootstrapRuntime runtime = new BootstrapRuntime(configuration,
+				new ApplicationInventory(),
+				new RemoteUpdateService(),
+				new JarApplicationLauncher(),
+				BootstrapApp.ENABLE_UPDATE);
 
 		if (firstLaunch) {
 			runtime.promptForInitialChannelSelection();
@@ -54,8 +57,11 @@ public class BootstrapRuntime implements UpdateRuntime {
 
 	private InstalledApplication currentApplication;
 
-	private BootstrapRuntime(final BootstrapConfiguration configuration, final ApplicationInventory inventory,
-			final RemoteUpdateService remoteUpdateService, final JarApplicationLauncher applicationLauncher,
+	private BootstrapRuntime(
+			final BootstrapConfiguration configuration,
+			final ApplicationInventory inventory,
+			final RemoteUpdateService remoteUpdateService,
+			final JarApplicationLauncher applicationLauncher,
 			final boolean automaticUpdatesEnabled) {
 		this.configuration = configuration;
 		this.inventory = inventory;
@@ -64,8 +70,7 @@ public class BootstrapRuntime implements UpdateRuntime {
 		this.automaticUpdatesEnabled = automaticUpdatesEnabled;
 	}
 
-	private static String describeChannelOption(final UpdateChannel channel,
-			final RemoteUpdateService.UpdateRelease release) {
+	private static String describeChannelOption(final UpdateChannel channel, final RemoteUpdateService.UpdateRelease release) {
 		final StringBuilder builder = new StringBuilder(channel.displayName());
 
 		if (release == null || release.version == null || release.version.isBlank()) {
@@ -85,12 +90,15 @@ public class BootstrapRuntime implements UpdateRuntime {
 		final StringBuilder builder = new StringBuilder();
 		builder.append("Choose the update channel to subscribe to.\n\n");
 		builder.append("Latest known versions:\n");
-		builder.append("• ").append(BootstrapRuntime.describeChannelOption(UpdateChannel.RELEASE,
-				manifest == null ? null : manifest.release)).append('\n');
-		builder.append("• ").append(BootstrapRuntime.describeChannelOption(UpdateChannel.SNAPSHOT,
-				manifest == null ? null : manifest.snapshot)).append('\n');
-		builder.append("• ").append(BootstrapRuntime.describeChannelOption(UpdateChannel.NIGHTLY,
-				manifest == null ? null : manifest.nightly)).append('\n');
+		builder.append("• ")
+				.append(BootstrapRuntime.describeChannelOption(UpdateChannel.RELEASE, manifest == null ? null : manifest.release))
+				.append('\n');
+		builder.append("• ")
+				.append(BootstrapRuntime.describeChannelOption(UpdateChannel.SNAPSHOT, manifest == null ? null : manifest.snapshot))
+				.append('\n');
+		builder.append("• ")
+				.append(BootstrapRuntime.describeChannelOption(UpdateChannel.NIGHTLY, manifest == null ? null : manifest.nightly))
+				.append('\n');
 		return builder.toString();
 	}
 
@@ -111,8 +119,7 @@ public class BootstrapRuntime implements UpdateRuntime {
 
 		try {
 			final long minutesSinceEpoch = Long.parseLong(matcher.group(2));
-			final Instant publishedAt = Instant
-					.ofEpochSecond(BootstrapRuntime.UPDATE_EPOCH_SECONDS + minutesSinceEpoch * 60L);
+			final Instant publishedAt = Instant.ofEpochSecond(BootstrapRuntime.UPDATE_EPOCH_SECONDS + minutesSinceEpoch * 60L);
 			return BootstrapRuntime.VERSION_DATE_FORMATTER.format(publishedAt);
 		} catch (final NumberFormatException ex) {
 			return null;
@@ -130,11 +137,18 @@ public class BootstrapRuntime implements UpdateRuntime {
 			ex.printStackTrace();
 		}
 
-		final Object[] options = { UpdateChannel.RELEASE.displayName(), UpdateChannel.SNAPSHOT.displayName(),
+		final Object[] options = {
+				UpdateChannel.RELEASE.displayName(),
+				UpdateChannel.SNAPSHOT.displayName(),
 				UpdateChannel.NIGHTLY.displayName() };
 
-		final int choice = JOptionPane.showOptionDialog(null, BootstrapRuntime.buildFirstLaunchMessage(manifest),
-				"Choose update channel", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options,
+		final int choice = JOptionPane.showOptionDialog(null,
+				BootstrapRuntime.buildFirstLaunchMessage(manifest),
+				"Choose update channel",
+				JOptionPane.DEFAULT_OPTION,
+				JOptionPane.QUESTION_MESSAGE,
+				null,
+				options,
 				options[0]);
 
 		final UpdateChannel selectedChannel = switch (choice) {
@@ -173,19 +187,22 @@ public class BootstrapRuntime implements UpdateRuntime {
 	}
 
 	@Override
-	public boolean installUpdateAndExit(final Component parentComponent, final AvailableUpdate update,
-			final UpdatePreparation preparation) throws IOException {
+	public boolean installUpdateAndExit(final Component parentComponent, final AvailableUpdate update, final UpdatePreparation preparation)
+			throws IOException {
 		if (update == null || !update.isUpdateAvailable()) {
 			JOptionPane.showMessageDialog(parentComponent,
-					"You are already using the latest version for the selected channel.", "No updates available",
+					"You are already using the latest version for the selected channel.",
+					"No updates available",
 					JOptionPane.INFORMATION_MESSAGE);
 			return false;
 		}
 
 		final int choice = JOptionPane.showConfirmDialog(parentComponent,
-				"Install version " + update.latestVersion() + " from the "
-						+ update.channel().displayName().toLowerCase() + " channel and close the application?",
-				"Install update", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+				"Install version " + update.latestVersion() + " from the " + update.channel().displayName().toLowerCase()
+						+ " channel and close the application?",
+				"Install update",
+				JOptionPane.YES_NO_OPTION,
+				JOptionPane.QUESTION_MESSAGE);
 		if (choice != JOptionPane.YES_OPTION || preparation != null && !preparation.prepareForExit()) {
 			return false;
 		}
@@ -224,14 +241,13 @@ public class BootstrapRuntime implements UpdateRuntime {
 			loadingFrame.update("Checking installed application...", 0, 0);
 			this.currentApplication = this.inventory.findLatestInstalled().orElse(null);
 			if (this.currentApplication == null) {
-				final AvailableUpdate bootstrapInstall = this
-						.requireInstallableUpdate(this.configuration.getUpdateChannel(), null);
+				final AvailableUpdate bootstrapInstall = this.requireInstallableUpdate(this.configuration.getUpdateChannel(), null);
 				loadingFrame.update("Installing " + bootstrapInstall.latestVersion() + "...", 0, 1);
 				this.currentApplication = this.inventory.install(bootstrapInstall, loadingFrame::update);
 			} else if (this.automaticUpdatesEnabled && this.configuration.isAutoCheckUpdates()) {
 				try {
-					final AvailableUpdate update = this.remoteUpdateService
-							.findLatest(this.configuration.getUpdateChannel(), this.currentApplication.version());
+					final AvailableUpdate update = this.remoteUpdateService.findLatest(this.configuration.getUpdateChannel(),
+							this.currentApplication.version());
 					if (update.isUpdateAvailable()) {
 						loadingFrame.update("Updating to " + update.latestVersion() + "...", 0, 1);
 						this.currentApplication = this.inventory.install(update, loadingFrame::update);
@@ -246,13 +262,12 @@ public class BootstrapRuntime implements UpdateRuntime {
 		this.applicationLauncher.launch(args, this.currentApplication);
 	}
 
-	private AvailableUpdate requireInstallableUpdate(final UpdateChannel channel, final String currentVersion)
-			throws IOException {
+	private AvailableUpdate requireInstallableUpdate(final UpdateChannel channel, final String currentVersion) throws IOException {
 		try {
 			final AvailableUpdate update = this.remoteUpdateService.findLatest(channel, currentVersion);
 			if (update.downloadUri() == null) {
-				throw new IOException("No downloadable application is configured for the "
-						+ channel.displayName().toLowerCase() + " channel.");
+				throw new IOException(
+						"No downloadable application is configured for the " + channel.displayName().toLowerCase() + " channel.");
 			}
 			return update;
 		} catch (final InterruptedException ex) {

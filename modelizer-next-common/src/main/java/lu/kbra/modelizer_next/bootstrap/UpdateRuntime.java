@@ -18,8 +18,7 @@ public interface UpdateRuntime {
 
 	UpdateChannel getSelectedChannel();
 
-	boolean installUpdateAndExit(Component parentComponent, AvailableUpdate update, UpdatePreparation preparation)
-			throws IOException;
+	boolean installUpdateAndExit(Component parentComponent, AvailableUpdate update, UpdatePreparation preparation) throws IOException;
 
 	boolean isAutoCheckUpdates();
 
@@ -32,7 +31,7 @@ public interface UpdateRuntime {
 	void setSelectedChannel(UpdateChannel updateChannel);
 
 	JsonNode getBootstrapJson();
-	
+
 	BootstrapConfig getBootstrapConfig();
 
 }
