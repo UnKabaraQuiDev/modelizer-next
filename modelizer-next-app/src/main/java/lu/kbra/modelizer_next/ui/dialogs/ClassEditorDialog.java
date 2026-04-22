@@ -32,8 +32,7 @@ public final class ClassEditorDialog {
 		private Result result;
 	}
 
-	public record Result(String conceptualName, String technicalName, String comment, Color textColor, Color backgroundColor,
-			Color borderColor) {
+	public record Result(String conceptualName, String technicalName, Color textColor, Color backgroundColor, Color borderColor) {
 	}
 
 	private static JPanel row(final String labelText, final Component component) {
@@ -50,9 +49,6 @@ public final class ClassEditorDialog {
 
 		final JTextField conceptualNameField = new JTextField(classModel.getNames().getConceptualName(), 24);
 		final JTextField technicalNameField = new JTextField(classModel.getNames().getTechnicalName(), 24);
-		final JTextArea commentArea = new JTextArea(classModel.getComment(), 8, 32);
-		commentArea.setLineWrap(true);
-		commentArea.setWrapStyleWord(true);
 
 		final ColorButton textColorButton = new ColorButton("Text color", classModel.getStyle().getTextColor());
 		final ColorButton backgroundColorButton = new ColorButton("Background color", classModel.getStyle().getBackgroundColor());
@@ -65,7 +61,6 @@ public final class ClassEditorDialog {
 		form.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 		form.add(ClassEditorDialog.row("Conceptual name", conceptualNameField));
 		form.add(ClassEditorDialog.row("Technical name", technicalNameField));
-		form.add(ClassEditorDialog.row("Comment", new JScrollPane(commentArea)));
 
 		final JPanel colorRow = new JPanel(new GridLayout(1, 3, 8, 0));
 		colorRow.add(textColorButton);
@@ -80,7 +75,6 @@ public final class ClassEditorDialog {
 		saveButton.addActionListener(event -> {
 			holder.result = new Result(conceptualNameField.getText(),
 					technicalNameField.getText(),
-					commentArea.getText(),
 					textColorButton.getSelectedColor(),
 					backgroundColorButton.getSelectedColor(),
 					borderColorButton.getSelectedColor());

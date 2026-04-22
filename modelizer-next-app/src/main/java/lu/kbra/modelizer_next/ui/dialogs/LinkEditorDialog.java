@@ -98,8 +98,8 @@ public final class LinkEditorDialog {
 		private Result result;
 	}
 
-	public record Result(String name, String comment, Color lineColor, String fromClassId, String toClassId, String fromFieldId,
-			String toFieldId, Cardinality cardinalityFrom, Cardinality cardinalityTo, String associationClassId) {
+	public record Result(String name, Color lineColor, String fromClassId, String toClassId, String fromFieldId, String toFieldId,
+			Cardinality cardinalityFrom, Cardinality cardinalityTo, String associationClassId) {
 	}
 
 	private static AssociationOption findAssociationOption(final JComboBox<AssociationOption> box, final String classId) {
@@ -149,7 +149,6 @@ public final class LinkEditorDialog {
 		final JDialog dialog = new JDialog(owner, "Edit relation", Dialog.ModalityType.APPLICATION_MODAL);
 
 		final JTextField nameField = new JTextField(linkModel.getName(), 24);
-		final JTextField commentField = new JTextField(linkModel.getComment(), 24);
 		final ColorButton colorButton = new ColorButton("Line color", linkModel.getLineColor());
 
 		final JComboBox<ClassModel> fromClassBox = new JComboBox<>(document.getModel().getClasses().toArray(ClassModel[]::new));
@@ -258,7 +257,6 @@ public final class LinkEditorDialog {
 
 		final JPanel topRow = new JPanel(new GridLayout(1, 3, 8, 0));
 		topRow.add(LinkEditorDialog.labeled("Name", nameField));
-		topRow.add(LinkEditorDialog.labeled("Comment", commentField));
 		topRow.add(LinkEditorDialog.labeled("Color", colorButton));
 
 		final JPanel leftPanel = new JPanel(new GridLayout(panelType == PanelType.CONCEPTUAL ? 2 : 2, 1, 6, 6));
@@ -316,7 +314,6 @@ public final class LinkEditorDialog {
 			final AssociationOption associationOption = (AssociationOption) associationBox.getSelectedItem();
 
 			holder.result = new Result(nameField.getText(),
-					commentField.getText(),
 					colorButton.getSelectedColor(),
 					fromClass == null ? null : fromClass.getId(),
 					toClass == null ? null : toClass.getId(),

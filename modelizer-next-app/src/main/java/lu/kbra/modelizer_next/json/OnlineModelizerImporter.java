@@ -120,7 +120,7 @@ public final class OnlineModelizerImporter {
 		final JsonNode dataNode = edgeNode.path("data");
 		final LinkModel linkModel = new LinkModel();
 		linkModel.setName(OnlineModelizerImporter.readEdgeText(edgeNode, dataNode, "label", "name", ""));
-		linkModel.setComment(OnlineModelizerImporter.readEdgeText(dataNode, dataNode, "comment", "description", ""));
+//		linkModel.setComment(OnlineModelizerImporter.readEdgeText(dataNode, dataNode, "comment", "description", ""));
 		linkModel.setFrom(new LinkEnd(sourceClassId, sourceFieldId));
 		linkModel.setTo(new LinkEnd(targetClassId, targetFieldId));
 		linkModel.setCardinalityFrom(OnlineModelizerImporter
@@ -180,7 +180,7 @@ public final class OnlineModelizerImporter {
 
 			classModel.getNames().setConceptualName(conceptualName);
 			classModel.getNames().setTechnicalName(technicalName);
-			classModel.setComment(ImportJsonSupport.readText(dataNode, "comment", ""));
+//			classModel.setComment(ImportJsonSupport.readText(dataNode, "comment", ""));
 			classModel.setGroup(ImportJsonSupport.readText(dataNode, "group", ""));
 			classModel.getVisibility().setConceptual(dataNode.path("visibility").path("conceptual").asBoolean(true));
 			classModel.getVisibility().setLogical(dataNode.path("visibility").path("logical").asBoolean(true));

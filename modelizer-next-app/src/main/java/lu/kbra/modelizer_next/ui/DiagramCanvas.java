@@ -64,13 +64,6 @@ public class DiagramCanvas extends JPanel {
 		RIGHT
 	}
 
-	private enum RenderPass {
-		FULL,
-		STATIC,
-		MOVING,
-		TRANSITION
-	}
-
 	private record DraggedLayout(NodeLayout layout, double startX, double startY) {
 	}
 
@@ -144,6 +137,16 @@ public class DiagramCanvas extends JPanel {
 
 	}
 
+	public Object findType(SelectedElement se) {
+		return switch (se.type()) {
+		case CLASS -> findClassById(se.classId());
+		case COMMENT -> findCommentById(se.commentId());
+		case FIELD -> findFieldById(se.classId(), se.fieldId());
+		case LINK -> findLinkById(se.linkId());
+		default -> null;
+		};
+	}
+
 	private static final long serialVersionUID = -3410889122837999151L;
 	private static final Font TITLE_FONT = new Font(Font.SANS_SERIF, Font.BOLD, 14);
 	private static final Font BODY_FONT = new Font(Font.SANS_SERIF, Font.PLAIN, 12);
@@ -184,12 +187,7 @@ public class DiagramCanvas extends JPanel {
 	private boolean pendingModifierSelection;
 	private boolean dragOccurred;
 
-	private BufferedImage staticDragLayer;
-	private BufferedImage movingDragLayer;
 	private Point2D.Double currentDragOffset = new Point2D.Double();
-	private final Set<String> movingClassIds = new HashSet<>();
-	private final Set<String> movingCommentIds = new HashSet<>();
-	private final Set<String> movingLinkIds = new HashSet<>();
 
 	private final Comparator<ClassModel> comparator = (a, b) -> {
 		if (this.selectedElement == null || this.selectedElement.type() != SelectedType.CLASS) {
@@ -252,9 +250,27 @@ public class DiagramCanvas extends JPanel {
 		commentModel.setVisibility(PanelType.CONCEPTUAL, PanelType.LOGICAL, PanelType.LOGICAL);
 		this.applyDefaultPaletteToComment(commentModel);
 
+		if (selectedElement != null && selectedElement.type() == SelectedType.COMMENT) {
+			final CommentModel cm = findCommentById(selectedElement.commentId());
+			final CommentBinding cb = cm.getBinding();
+			if (cm.getKind() != CommentKind.STANDALONE) {
+				commentModel.setKind(CommentKind.BOUND);
+				commentModel.setBinding(new CommentBinding(cb.getTargetType(), cb.getTargetId()));
+			}
+		} else if (selectedElement != null && selectedElement.type() != SelectedType.COMMENT
+				&& selectedElement.type() != SelectedType.NONE) {
+			commentModel.setKind(CommentKind.BOUND);
+			commentModel.setBinding(switch (selectedElement.type()) {
+			case CLASS -> new CommentBinding(BoundTargetType.CLASS, selectedElement.classId());
+			case LINK -> new CommentBinding(BoundTargetType.LINK, selectedElement.linkId());
+			case FIELD -> new CommentBinding(BoundTargetType.CLASS, selectedElement.classId());
+			default -> throw new IllegalStateException("Cannot bind comment to: " + selectedElement);
+			});
+		}
+
 		this.document.getModel().getComments().add(commentModel);
 
-		final NodeLayout layout = this.findOrCreateNodeLayout(LayoutObjectType.COMMENT, commentModel.getId());
+		final NodeLayout layout = this.resolveRenderLayout(this.findOrCreateNodeLayout(LayoutObjectType.COMMENT, commentModel.getId()));
 		final Point2D.Double center = this.viewportCenterWorld();
 		layout.setPosition(new Point2D.Double(center.getX() - 100, center.getY() - 30));
 		layout.setSize(new Size2D(220, 80));
@@ -334,7 +350,6 @@ public class DiagramCanvas extends JPanel {
 
 		final LinkModel createdLink = new LinkModel();
 		createdLink.setName(result.name());
-		createdLink.setComment(result.comment());
 		createdLink.setLineColor(result.lineColor());
 		createdLink.setAssociationClassId(result.associationClassId());
 		createdLink.setFrom(new LinkEnd(result.fromClassId(), result.fromFieldId()));
@@ -365,7 +380,7 @@ public class DiagramCanvas extends JPanel {
 
 		this.document.getModel().getClasses().add(classModel);
 
-		final NodeLayout layout = this.findOrCreateNodeLayout(LayoutObjectType.CLASS, classModel.getId());
+		final NodeLayout layout = this.resolveRenderLayout(this.findOrCreateNodeLayout(LayoutObjectType.CLASS, classModel.getId()));
 		final Point2D.Double center = this.viewportCenterWorld();
 		layout.setPosition(new Point2D.Double(center.getX() - 100, center.getY() - 40));
 		layout.setSize(new Size2D(180, 0));
@@ -389,7 +404,7 @@ public class DiagramCanvas extends JPanel {
 	}
 
 	private Point2D applyCurrentDragOffsetIfNeeded(final Point2D point, final String classId) {
-		if (point == null || classId == null || !this.isDragRenderingActive() || !this.movingClassIds.contains(classId)) {
+		if (point == null || classId == null || !this.isMovingClass(classId)) {
 			return point;
 		}
 
@@ -493,62 +508,7 @@ public class DiagramCanvas extends JPanel {
 	}
 
 	private void buildDragRenderLayers(final DraggedSelection selection) {
-		this.movingClassIds.clear();
-		this.movingCommentIds.clear();
-		this.movingLinkIds.clear();
 		this.currentDragOffset = new Point2D.Double();
-
-		if (selection == null || this.getWidth() <= 0 || this.getHeight() <= 0) {
-			this.staticDragLayer = null;
-			this.movingDragLayer = null;
-			return;
-		}
-
-		for (final DraggedLayout draggedLayout : selection.layouts()) {
-			if (draggedLayout.layout().getObjectType() == LayoutObjectType.CLASS) {
-				this.movingClassIds.add(draggedLayout.layout().getObjectId());
-			} else if (draggedLayout.layout().getObjectType() == LayoutObjectType.COMMENT) {
-				this.movingCommentIds.add(draggedLayout.layout().getObjectId());
-			}
-		}
-
-		for (final LinkModel linkModel : this.getActiveLinks()) {
-			if (this.isLinkBetweenMovingObjects(linkModel)) {
-				this.movingLinkIds.add(linkModel.getId());
-			}
-		}
-
-		this.staticDragLayer = new BufferedImage(this.getWidth(), this.getHeight(), BufferedImage.TYPE_INT_ARGB);
-		this.movingDragLayer = new BufferedImage(this.getWidth(), this.getHeight(), BufferedImage.TYPE_INT_ARGB);
-
-		final Graphics2D staticGraphics = this.staticDragLayer.createGraphics();
-		final Graphics2D movingGraphics = this.movingDragLayer.createGraphics();
-
-		try {
-			this.configureGraphics(staticGraphics);
-			this.configureGraphics(movingGraphics);
-
-			this.drawGrid(staticGraphics);
-
-			final PanelState state = this.getPanelState();
-
-			staticGraphics.translate(state.getPanX(), state.getPanY());
-			staticGraphics.scale(state.getZoom(), state.getZoom());
-
-			movingGraphics.translate(state.getPanX(), state.getPanY());
-			movingGraphics.scale(state.getZoom(), state.getZoom());
-
-			this.drawComments(staticGraphics, RenderPass.STATIC);
-			this.drawClasses(staticGraphics, RenderPass.STATIC);
-			this.drawLinks(staticGraphics, RenderPass.STATIC);
-
-			this.drawComments(movingGraphics, RenderPass.MOVING);
-			this.drawClasses(movingGraphics, RenderPass.MOVING);
-			this.drawLinks(movingGraphics, RenderPass.MOVING);
-		} finally {
-			staticGraphics.dispose();
-			movingGraphics.dispose();
-		}
 	}
 
 	private String buildLinkPath(final LinkModel linkModel) {
@@ -640,7 +600,7 @@ public class DiagramCanvas extends JPanel {
 			return points;
 		}
 
-		final NodeLayout layout = this.findOrCreateNodeLayout(LayoutObjectType.CLASS, classModel.getId());
+		final NodeLayout layout = this.resolveRenderLayout(this.findOrCreateNodeLayout(LayoutObjectType.CLASS, classModel.getId()));
 		final Rectangle2D bounds = this.computeClassBounds(g2, classModel, layout);
 
 		final boolean useRightSide = fromPoint.getX() >= bounds.getCenterX() || toPoint.getX() >= bounds.getCenterX();
@@ -765,8 +725,8 @@ public class DiagramCanvas extends JPanel {
 				continue;
 			}
 
-			final NodeLayout layout = this.findOrCreateNodeLayout(LayoutObjectType.CLASS, classId);
-			final NodeLayout otherLayout = this.findOrCreateNodeLayout(LayoutObjectType.CLASS, otherClassId);
+			final NodeLayout layout = this.resolveRenderLayout(this.findOrCreateNodeLayout(LayoutObjectType.CLASS, classId));
+			final NodeLayout otherLayout = this.resolveRenderLayout(this.findOrCreateNodeLayout(LayoutObjectType.CLASS, otherClassId));
 
 			final Rectangle2D bounds = this.computeClassBounds(g2, classModel, layout);
 			final Rectangle2D otherBounds = this.computeClassBounds(g2, otherClassModel, otherLayout);
@@ -1091,20 +1051,16 @@ public class DiagramCanvas extends JPanel {
 		this.drawAlignedLinkLabel(g2, text, center, angle);
 	}
 
-	private void drawClasses(final Graphics2D g2, final RenderPass pass) {
+	private void drawClasses(final Graphics2D g2) {
 		for (final ClassModel classModel : this.document.getModel().getClasses()) {
 			if (!this.isVisible(classModel)) {
 				continue;
 			}
-			final boolean moving = this.isMovingClass(classModel.getId());
-			if ((moving ? pass == RenderPass.STATIC : pass == RenderPass.MOVING) || pass == RenderPass.TRANSITION) {
-				continue;
-			}
 
-			final NodeLayout layout = this.findOrCreateNodeLayout(LayoutObjectType.CLASS, classModel.getId());
+			final NodeLayout layout = this.resolveRenderLayout(this.findOrCreateNodeLayout(LayoutObjectType.CLASS, classModel.getId()));
 			final Rectangle2D bounds = this.computeClassBounds(g2, classModel, layout);
-			layout.getSize().setWidth(bounds.getWidth());
-			layout.getSize().setHeight(bounds.getHeight());
+			this.findOrCreateNodeLayout(LayoutObjectType.CLASS, classModel.getId()).getSize().setWidth(bounds.getWidth());
+			this.findOrCreateNodeLayout(LayoutObjectType.CLASS, classModel.getId()).getSize().setHeight(bounds.getHeight());
 
 			g2.setColor(classModel.getStyle().getBackgroundColor());
 			g2.fill(bounds);
@@ -1163,31 +1119,19 @@ public class DiagramCanvas extends JPanel {
 		}
 	}
 
-	private void drawComments(final Graphics2D g2, final RenderPass pass) {
+	private void drawComments(final Graphics2D g2) {
 		for (final CommentModel commentModel : this.document.getModel().getComments()) {
 			final String commentText = this.resolveCommentText(commentModel);
 			if (commentText == null || commentText.isBlank() || !this.isCommentVisible(commentModel)) {
 				continue;
 			}
-			final boolean moving = this.isMovingComment(commentModel.getId());
-			if ((moving ? pass == RenderPass.STATIC : pass == RenderPass.MOVING) || pass == RenderPass.TRANSITION) {
-				continue;
-			}
 
-			final NodeLayout layout = this.findOrCreateNodeLayout(LayoutObjectType.COMMENT, commentModel.getId());
+			final NodeLayout layout = this.resolveRenderLayout(this.findOrCreateNodeLayout(LayoutObjectType.COMMENT, commentModel.getId()));
 			final Rectangle2D bounds = this.computeCommentBounds(g2, commentText, layout);
-			layout.getSize().setWidth(bounds.getWidth());
-			layout.getSize().setHeight(bounds.getHeight());
+			this.findOrCreateNodeLayout(LayoutObjectType.COMMENT, commentModel.getId()).getSize().setWidth(bounds.getWidth());
+			this.findOrCreateNodeLayout(LayoutObjectType.COMMENT, commentModel.getId()).getSize().setHeight(bounds.getHeight());
 
-			if (commentModel.getKind() == CommentKind.BOUND && commentModel.getBinding() != null) {
-				final Point2D anchor = this.findBoundTargetAnchor(g2, commentModel);
-				if (anchor != null) {
-					g2.setColor(this.isCommentSelected(commentModel.getId()) ? DiagramCanvas.SELECTION_COLOR : new Color(0x777777));
-					g2.setStroke(new BasicStroke(this.isCommentSelected(commentModel.getId()) ? 2.0f : 1.0f));
-					g2.draw(new Line2D.Double(anchor.getX(), anchor.getY(), bounds.getCenterX(), bounds.getCenterY()));
-					g2.setStroke(new BasicStroke(1.0f));
-				}
-			}
+			this.drawCommentConnector(g2, commentModel, bounds);
 
 			g2.setColor(commentModel.getBackgroundColor());
 			g2.fill(bounds);
@@ -1197,11 +1141,9 @@ public class DiagramCanvas extends JPanel {
 			g2.draw(bounds);
 			g2.setStroke(new BasicStroke(1.0f));
 
-			// if (draggedNode == null || !commentModel.getId().equals(draggedNode.layout().getObjectId())) {
 			g2.setFont(DiagramCanvas.BODY_FONT);
 			g2.setColor(commentModel.getTextColor());
 			this.drawMultilineText(g2, commentText, bounds, DiagramCanvas.PADDING);
-			// }
 
 			if (this.isCommentSelected(commentModel.getId())) {
 				g2.setColor(DiagramCanvas.SELECTION_COLOR);
@@ -1211,6 +1153,22 @@ public class DiagramCanvas extends JPanel {
 						DiagramCanvas.COMMENT_RESIZE_HANDLE_SIZE));
 			}
 		}
+	}
+
+	private void drawCommentConnector(final Graphics2D g2, final CommentModel commentModel, final Rectangle2D bounds) {
+		if (commentModel.getKind() != CommentKind.BOUND || commentModel.getBinding() == null) {
+			return;
+		}
+
+		final Point2D anchor = this.findBoundTargetAnchor(g2, commentModel);
+		if (anchor == null) {
+			return;
+		}
+
+		g2.setColor(this.isCommentSelected(commentModel.getId()) ? DiagramCanvas.SELECTION_COLOR : new Color(0x777777));
+		g2.setStroke(new BasicStroke(this.isCommentSelected(commentModel.getId()) ? 2.0f : 1.0f));
+		g2.draw(new Line2D.Double(anchor.getX(), anchor.getY(), bounds.getCenterX(), bounds.getCenterY()));
+		g2.setStroke(new BasicStroke(1.0f));
 	}
 
 	private void drawGrid(final Graphics2D g2) {
@@ -1258,17 +1216,10 @@ public class DiagramCanvas extends JPanel {
 		}
 	}
 
-	private void drawLinks(final Graphics2D g2, final RenderPass pass) {
+	private void drawLinks(final Graphics2D g2) {
 		g2.setFont(DiagramCanvas.BODY_FONT);
 
 		for (final LinkModel linkModel : this.getActiveLinks()) {
-			final boolean moving = this.isMovingLink(linkModel.getId());
-			final boolean transition = this.isLinkAttachedToMovingObject(linkModel) && !moving;
-
-			if (pass == RenderPass.STATIC && (moving || transition) || pass == RenderPass.MOVING && !moving
-					|| pass == RenderPass.TRANSITION && !transition) {
-				continue;
-			}
 			final LinkGeometry geometry = this.resolveLinkGeometry(g2, linkModel);
 			if (geometry == null) {
 				continue;
@@ -1366,7 +1317,6 @@ public class DiagramCanvas extends JPanel {
 			final ClassModel copy = new ClassModel();
 			copy.getNames().setConceptualName(source.getNames().getConceptualName() + " Copy");
 			copy.getNames().setTechnicalName(source.getNames().getTechnicalName() + "_COPY");
-			copy.setComment(source.getComment());
 			copy.setGroup(source.getGroup());
 			copy.getVisibility().setConceptual(source.getVisibility().isConceptual());
 			copy.getVisibility().setLogical(source.getVisibility().isLogical());
@@ -1500,7 +1450,6 @@ public class DiagramCanvas extends JPanel {
 
 			final LinkModel copy = new LinkModel();
 			copy.setName(source.getName());
-			copy.setComment(source.getComment());
 			copy.setLineColor(source.getLineColor());
 			copy.setAssociationClassId(source.getAssociationClassId() == null ? null
 					: duplicatedClassIds.getOrDefault(source.getAssociationClassId(), source.getAssociationClassId()));
@@ -1548,7 +1497,6 @@ public class DiagramCanvas extends JPanel {
 
 		classModel.getNames().setConceptualName(result.conceptualName());
 		classModel.getNames().setTechnicalName(result.technicalName());
-		classModel.setComment(result.comment());
 		classModel.getStyle().setTextColor(result.textColor());
 		classModel.getStyle().setBackgroundColor(result.backgroundColor());
 		classModel.getStyle().setBorderColor(result.borderColor());
@@ -1620,7 +1568,6 @@ public class DiagramCanvas extends JPanel {
 		}
 
 		linkModel.setName(result.name());
-		linkModel.setComment(result.comment());
 		linkModel.setLineColor(result.lineColor());
 		linkModel.setFrom(new LinkEnd(result.fromClassId(), result.fromFieldId()));
 		linkModel.setTo(new LinkEnd(result.toClassId(), result.toFieldId()));
@@ -1664,7 +1611,7 @@ public class DiagramCanvas extends JPanel {
 				return null;
 			}
 
-			final NodeLayout layout = this.findOrCreateNodeLayout(LayoutObjectType.CLASS, classModel.getId());
+			final NodeLayout layout = this.resolveRenderLayout(this.findOrCreateNodeLayout(LayoutObjectType.CLASS, classModel.getId()));
 			final Rectangle2D bounds = this.computeClassBounds(g2, classModel, layout);
 			return new Point2D.Double(bounds.getCenterX(), bounds.getCenterY());
 		}
@@ -1806,6 +1753,29 @@ public class DiagramCanvas extends JPanel {
 		return layout;
 	}
 
+	private NodeLayout resolveRenderLayout(final NodeLayout layout) {
+		if (layout == null || !this.isDragRenderingActive()) {
+			return layout;
+		}
+
+		for (final DraggedLayout dragged : this.draggedSelection.layouts()) {
+			if (dragged.layout() == layout) {
+				final double zoom = this.getPanelState().getZoom();
+				final double dx = this.currentDragOffset.getX() / zoom;
+				final double dy = this.currentDragOffset.getY() / zoom;
+
+				final NodeLayout copy = new NodeLayout();
+				copy.setObjectType(layout.getObjectType());
+				copy.setObjectId(layout.getObjectId());
+				copy.setPosition(new Point2D.Double(dragged.startX() + dx, dragged.startY() + dy));
+				copy.setSize(new Size2D(layout.getSize().getWidth(), layout.getSize().getHeight()));
+				return copy;
+			}
+		}
+
+		return layout;
+	}
+
 	private ClassModel findOwnerClassOfField(final String fieldId) {
 		for (final ClassModel classModel : this.document.getModel().getClasses()) {
 			for (final FieldModel fieldModel : classModel.getFields()) {
@@ -1857,7 +1827,7 @@ public class DiagramCanvas extends JPanel {
 					continue;
 				}
 
-				final NodeLayout layout = this.findOrCreateNodeLayout(LayoutObjectType.CLASS, classModel.getId());
+				final NodeLayout layout = this.resolveRenderLayout(this.findOrCreateNodeLayout(LayoutObjectType.CLASS, classModel.getId()));
 				final Rectangle2D bounds = this.computeClassBounds(g2, classModel, layout);
 
 				if (!bounds.contains(worldPoint.getX(), worldPoint.getY())) {
@@ -1935,21 +1905,7 @@ public class DiagramCanvas extends JPanel {
 			return "";
 		}
 
-		if (commentModel.getKind() == CommentKind.STANDALONE) {
-			return commentModel.getText();
-		}
-
-		if (commentModel.getBinding() != null && commentModel.getBinding().getTargetType() == BoundTargetType.CLASS) {
-			final ClassModel classModel = this.findClassById(commentModel.getBinding().getTargetId());
-			return classModel == null ? "" : classModel.getComment();
-		}
-
-		if (commentModel.getBinding() != null) {
-			final LinkModel linkModel = this.findLinkById(commentModel.getBinding().getTargetId());
-			return linkModel == null ? "" : linkModel.getComment();
-		}
-
-		return "";
+		return commentModel.getText();
 	}
 
 	private String getEditableFieldName(final FieldModel fieldModel) {
@@ -2171,12 +2127,7 @@ public class DiagramCanvas extends JPanel {
 		this.pendingModifierSelection = false;
 		this.dragOccurred = false;
 
-		this.staticDragLayer = null;
-		this.movingDragLayer = null;
 		this.currentDragOffset = new Point2D.Double();
-		this.movingClassIds.clear();
-		this.movingCommentIds.clear();
-		this.movingLinkIds.clear();
 
 		if (documentChanged) {
 			this.notifyDocumentChanged();
@@ -2279,7 +2230,7 @@ public class DiagramCanvas extends JPanel {
 	}
 
 	private boolean isDragRenderingActive() {
-		return this.draggedSelection != null && this.staticDragLayer != null && this.movingDragLayer != null;
+		return this.draggedSelection != null;
 	}
 
 	private boolean isElementSelected(final SelectedElement element) {
@@ -2300,13 +2251,12 @@ public class DiagramCanvas extends JPanel {
 			return false;
 		}
 
-		if (this.movingClassIds.contains(linkModel.getFrom().getClassId())
-				|| this.movingClassIds.contains(linkModel.getTo().getClassId())) {
+		if (this.isMovingClass(linkModel.getFrom().getClassId()) || this.isMovingClass(linkModel.getTo().getClassId())) {
 			return true;
 		}
 
 		return this.panelType == PanelType.CONCEPTUAL && this.hasAssociationClass(linkModel)
-				&& this.movingClassIds.contains(linkModel.getAssociationClassId());
+				&& this.isMovingClass(linkModel.getAssociationClassId());
 	}
 
 	private boolean isLinkBetweenMovingObjects(final LinkModel linkModel) {
@@ -2318,8 +2268,7 @@ public class DiagramCanvas extends JPanel {
 			return false;
 		}
 
-		return this.movingClassIds.contains(linkModel.getFrom().getClassId())
-				&& this.movingClassIds.contains(linkModel.getTo().getClassId());
+		return this.isMovingClass(linkModel.getFrom().getClassId()) && this.isMovingClass(linkModel.getTo().getClassId());
 	}
 
 	private boolean isLinkSelected(final String linkId) {
@@ -2327,15 +2276,37 @@ public class DiagramCanvas extends JPanel {
 	}
 
 	private boolean isMovingClass(final String classId) {
-		return this.movingClassIds.contains(classId);
+		if (classId == null || this.draggedSelection == null) {
+			return false;
+		}
+
+		for (final DraggedLayout draggedLayout : this.draggedSelection.layouts()) {
+			if (draggedLayout.layout().getObjectType() == LayoutObjectType.CLASS && classId.equals(draggedLayout.layout().getObjectId())) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	private boolean isMovingComment(final String commentId) {
-		return this.movingCommentIds.contains(commentId);
+		if (commentId == null || this.draggedSelection == null) {
+			return false;
+		}
+
+		for (final DraggedLayout draggedLayout : this.draggedSelection.layouts()) {
+			if (draggedLayout.layout().getObjectType() == LayoutObjectType.COMMENT
+					&& commentId.equals(draggedLayout.layout().getObjectId())) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	private boolean isMovingLink(final String linkId) {
-		return this.movingLinkIds.contains(linkId);
+		final LinkModel linkModel = this.findLinkById(linkId);
+		return this.isLinkBetweenMovingObjects(linkModel);
 	}
 
 	private boolean isPointNearGeometry(final Point2D.Double worldPoint, final LinkGeometry geometry) {
@@ -2522,30 +2493,6 @@ public class DiagramCanvas extends JPanel {
 		final Graphics2D g2 = (Graphics2D) graphics.create();
 		this.configureGraphics(g2);
 
-		if (this.isDragRenderingActive()) {
-			g2.drawImage(this.staticDragLayer, 0, 0, null);
-
-			final Graphics2D translated = (Graphics2D) g2.create();
-			try {
-				translated.translate(this.currentDragOffset.getX(), this.currentDragOffset.getY());
-				translated.drawImage(this.movingDragLayer, 0, 0, null);
-			} finally {
-				translated.dispose();
-			}
-
-			final AffineTransform oldTransform = g2.getTransform();
-			final PanelState state = this.getPanelState();
-			g2.translate(state.getPanX(), state.getPanY());
-			g2.scale(state.getZoom(), state.getZoom());
-
-			this.drawLinks(g2, RenderPass.TRANSITION);
-			this.drawLinkPreview(g2);
-
-			g2.setTransform(oldTransform);
-			g2.dispose();
-			return;
-		}
-
 		this.drawGrid(g2);
 
 		final AffineTransform oldTransform = g2.getTransform();
@@ -2553,9 +2500,9 @@ public class DiagramCanvas extends JPanel {
 		g2.translate(state.getPanX(), state.getPanY());
 		g2.scale(state.getZoom(), state.getZoom());
 
-		this.drawComments(g2, RenderPass.FULL);
-		this.drawClasses(g2, RenderPass.FULL);
-		this.drawLinks(g2, RenderPass.FULL);
+		this.drawComments(g2);
+		this.drawClasses(g2);
+		this.drawLinks(g2);
 		this.drawLinkPreview(g2);
 
 		g2.setTransform(oldTransform);
@@ -2657,12 +2604,7 @@ public class DiagramCanvas extends JPanel {
 		this.pendingModifierSelection = false;
 		this.dragOccurred = false;
 
-		this.staticDragLayer = null;
-		this.movingDragLayer = null;
 		this.currentDragOffset = new Point2D.Double();
-		this.movingClassIds.clear();
-		this.movingCommentIds.clear();
-		this.movingLinkIds.clear();
 
 		this.setCursor(Cursor.getDefaultCursor());
 		this.notifySelectionChanged();
@@ -2692,8 +2634,8 @@ public class DiagramCanvas extends JPanel {
 			return null;
 		}
 
-		final NodeLayout fromLayout = this.findOrCreateNodeLayout(LayoutObjectType.CLASS, fromClass.getId());
-		final NodeLayout toLayout = this.findOrCreateNodeLayout(LayoutObjectType.CLASS, toClass.getId());
+		final NodeLayout fromLayout = this.resolveRenderLayout(this.findOrCreateNodeLayout(LayoutObjectType.CLASS, fromClass.getId()));
+		final NodeLayout toLayout = this.resolveRenderLayout(this.findOrCreateNodeLayout(LayoutObjectType.CLASS, toClass.getId()));
 
 		final Rectangle2D fromBounds = this.computeClassBounds(g2, fromClass, fromLayout);
 		final Rectangle2D toBounds = this.computeClassBounds(g2, toClass, toLayout);
@@ -2726,7 +2668,7 @@ public class DiagramCanvas extends JPanel {
 			return null;
 		}
 
-		final NodeLayout layout = this.findOrCreateNodeLayout(LayoutObjectType.CLASS, classId);
+		final NodeLayout layout = this.resolveRenderLayout(this.findOrCreateNodeLayout(LayoutObjectType.CLASS, classId));
 		final Rectangle2D bounds = this.computeClassBounds(g2, classModel, layout);
 
 		final Point2D effectiveReference = reference == null ? new Point2D.Double(bounds.getCenterX(), bounds.getCenterY()) : reference;
@@ -2804,26 +2746,23 @@ public class DiagramCanvas extends JPanel {
 					linkModel.getFrom().getFieldId());
 		}
 
-		final Point2D adjustedFromPoint = this.applyCurrentDragOffsetIfNeeded(fromPoint, linkModel.getFrom().getClassId());
-		final Point2D adjustedToPoint = this.applyCurrentDragOffsetIfNeeded(toPoint, linkModel.getTo().getClassId());
-
-		if (adjustedFromPoint == null || adjustedToPoint == null) {
+		if (fromPoint == null || toPoint == null) {
 			return null;
 		}
 
 		final List<Point2D> points;
 		if (this.isSelfLink(linkModel)) {
-			points = this.buildSelfLinkPoints(g2, linkModel, adjustedFromPoint, adjustedToPoint);
+			points = this.buildSelfLinkPoints(g2, linkModel, fromPoint, toPoint);
 		} else {
 			points = new ArrayList<>();
-			points.add(adjustedFromPoint);
+			points.add(fromPoint);
 
 			final LinkLayout linkLayout = this.findOrCreateLinkLayout(linkModel.getId());
 			for (final Point2D.Double bendPoint : linkLayout.getBendPoints()) {
 				points.add(new Point2D.Double(bendPoint.getX(), bendPoint.getY()));
 			}
 
-			points.add(adjustedToPoint);
+			points.add(toPoint);
 		}
 
 		final Point2D middlePoint = this.computePolylineMiddlePoint(points);
@@ -2837,7 +2776,7 @@ public class DiagramCanvas extends JPanel {
 			labelPoint = middlePoint;
 		}
 
-		return new LinkGeometry(adjustedFromPoint, adjustedToPoint, labelPoint, middlePoint, labelAngle, points);
+		return new LinkGeometry(fromPoint, toPoint, labelPoint, middlePoint, labelAngle, points);
 	}
 
 	private NodeLayout resolveNodeLayoutForSelection(final SelectedElement element, final NodeLayout fallbackLayout) {
@@ -2858,7 +2797,7 @@ public class DiagramCanvas extends JPanel {
 			return null;
 		}
 
-		final NodeLayout layout = this.findOrCreateNodeLayout(LayoutObjectType.CLASS, classId);
+		final NodeLayout layout = this.resolveRenderLayout(this.findOrCreateNodeLayout(LayoutObjectType.CLASS, classId));
 		final Rectangle2D classBounds = this.computeClassBounds(g2, classModel, layout);
 
 		if (this.panelType == PanelType.CONCEPTUAL || fieldId == null) {
@@ -2916,7 +2855,7 @@ public class DiagramCanvas extends JPanel {
 				return this.linkPreviewMousePoint;
 			}
 
-			final NodeLayout layout = this.findOrCreateNodeLayout(LayoutObjectType.CLASS, classModel.getId());
+			final NodeLayout layout = this.resolveRenderLayout(this.findOrCreateNodeLayout(LayoutObjectType.CLASS, classModel.getId()));
 			final Rectangle2D bounds = this.computeClassBounds(g2, classModel, layout);
 			return new Point2D.Double(bounds.getCenterX(), bounds.getCenterY());
 		}
@@ -2951,7 +2890,7 @@ public class DiagramCanvas extends JPanel {
 			return null;
 		}
 
-		final NodeLayout layout = this.findOrCreateNodeLayout(LayoutObjectType.CLASS, classId);
+		final NodeLayout layout = this.resolveRenderLayout(this.findOrCreateNodeLayout(LayoutObjectType.CLASS, classId));
 		final Rectangle2D classBounds = this.computeClassBounds(g2, classModel, layout);
 
 		if (fieldId == null) {
@@ -2986,7 +2925,7 @@ public class DiagramCanvas extends JPanel {
 			return null;
 		}
 
-		final NodeLayout layout = this.findOrCreateNodeLayout(LayoutObjectType.CLASS, classId);
+		final NodeLayout layout = this.resolveRenderLayout(this.findOrCreateNodeLayout(LayoutObjectType.CLASS, classId));
 		final Rectangle2D classBounds = this.computeClassBounds(g2, classModel, layout);
 
 		final Point2D oppositeReference = this.resolveOppositeReferencePoint(g2, oppositeClassId, oppositeFieldId);
@@ -3083,25 +3022,7 @@ public class DiagramCanvas extends JPanel {
 			return;
 		}
 
-		if (commentModel.getKind() == CommentKind.STANDALONE) {
-			commentModel.setText(value);
-			return;
-		}
-
-		if (commentModel.getBinding() != null && commentModel.getBinding().getTargetType() == BoundTargetType.CLASS) {
-			final ClassModel classModel = this.findClassById(commentModel.getBinding().getTargetId());
-			if (classModel != null) {
-				classModel.setComment(value);
-			}
-			return;
-		}
-
-		if (commentModel.getBinding() != null) {
-			final LinkModel linkModel = this.findLinkById(commentModel.getBinding().getTargetId());
-			if (linkModel != null) {
-				linkModel.setComment(value);
-			}
-		}
+		commentModel.setText(value);
 	}
 
 	private void setEditableFieldName(final FieldModel fieldModel, final String value) {

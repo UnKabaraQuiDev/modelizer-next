@@ -68,7 +68,7 @@ public class LegacyModelizerImporter {
 
 		final LinkModel linkModel = new LinkModel();
 		linkModel.setName(LegacyModelizerImporter.readText(linkNode, "name", ""));
-		linkModel.setComment(LegacyModelizerImporter.readText(linkNode, "comment", ""));
+//		linkModel.setComment(LegacyModelizerImporter.readText(linkNode, "comment", ""));
 		linkModel.setFrom(new LinkEnd(fromClassId, null));
 		linkModel.setTo(new LinkEnd(toClassId, null));
 		linkModel.setCardinalityFrom(LegacyModelizerImporter.parseCardinality(endpoints.get(0).path("cardinality").asText("")));
@@ -127,7 +127,7 @@ public class LegacyModelizerImporter {
 
 		final LinkModel linkModel = new LinkModel();
 		linkModel.setName(LegacyModelizerImporter.readText(linkNode, "name", ""));
-		linkModel.setComment(LegacyModelizerImporter.readText(linkNode, "comment", ""));
+//		linkModel.setComment(LegacyModelizerImporter.readText(linkNode, "comment", ""));
 		linkModel.setFrom(new LinkEnd(fromClassId, fromFieldId));
 		linkModel.setTo(new LinkEnd(toClassId, toFieldId));
 		return linkModel;
@@ -156,7 +156,7 @@ public class LegacyModelizerImporter {
 
 			classModel.getNames().setConceptualName(className);
 			classModel.getNames().setTechnicalName(technicalName);
-			classModel.setComment(LegacyModelizerImporter.readText(tableNode, "comment", ""));
+//			classModel.setComment(LegacyModelizerImporter.readText(tableNode, "comment", ""));
 			classModel.setGroup(LegacyModelizerImporter.readText(tableNode, "group", ""));
 			classModel.getVisibility().setConceptual(tableNode.path("conceptual").asBoolean(true));
 			classModel.getVisibility().setLogical(tableNode.path("logical").asBoolean(true));

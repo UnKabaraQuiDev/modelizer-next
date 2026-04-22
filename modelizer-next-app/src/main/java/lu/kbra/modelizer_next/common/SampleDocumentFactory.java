@@ -26,7 +26,7 @@ public final class SampleDocumentFactory {
 		final ClassModel customer = new ClassModel();
 		customer.getNames().setConceptualName("Customer");
 		customer.getNames().setTechnicalName("T_CUSTOMER");
-		customer.setComment("Stores the master customer record.");
+//		customer.setComment("Stores the master customer record.");
 		customer.getFields().add(SampleDocumentFactory.field("Customer ID", "CUSTOMER_ID", false, true, true, true));
 		customer.getFields().add(SampleDocumentFactory.field("Display name", "DISPLAY_NAME", false, false, false, true));
 		customer.getFields().add(SampleDocumentFactory.field("Email", "EMAIL", false, false, true, false));
@@ -34,7 +34,7 @@ public final class SampleDocumentFactory {
 		final ClassModel order = new ClassModel();
 		order.getNames().setConceptualName("Order");
 		order.getNames().setTechnicalName("T_ORDER");
-		order.setComment("A placed order.");
+//		order.setComment("A placed order.");
 		order.getFields().add(SampleDocumentFactory.field("Order ID", "ORDER_ID", false, true, true, true));
 		order.getFields().add(SampleDocumentFactory.field("Customer ID", "CUSTOMER_ID", true, false, false, true));
 		order.getFields().add(SampleDocumentFactory.field("Created at", "CREATED_AT", true, false, false, true));
@@ -45,7 +45,7 @@ public final class SampleDocumentFactory {
 		conceptualCustomerOrders.setTo(new LinkEnd(order.getId(), null));
 		conceptualCustomerOrders.setCardinalityFrom(Cardinality.ONE);
 		conceptualCustomerOrders.setCardinalityTo(Cardinality.ZERO_OR_MANY);
-		conceptualCustomerOrders.setComment("One customer can place many orders.");
+//		conceptualCustomerOrders.setComment("One customer can place many orders.");
 
 		final LinkModel logicalCustomerOrders = new LinkModel();
 		logicalCustomerOrders.setName("FK_ORDER_CUSTOMER");
@@ -53,7 +53,7 @@ public final class SampleDocumentFactory {
 		logicalCustomerOrders.setTo(new LinkEnd(customer.getId(), customer.getFields().get(0).getId()));
 		logicalCustomerOrders.setCardinalityFrom(null);
 		logicalCustomerOrders.setCardinalityTo(null);
-		logicalCustomerOrders.setComment("Order.CUSTOMER_ID references Customer.CUSTOMER_ID.");
+//		logicalCustomerOrders.setComment("Order.CUSTOMER_ID references Customer.CUSTOMER_ID.");
 
 		final CommentModel note = new CommentModel();
 		note.setKind(CommentKind.STANDALONE);

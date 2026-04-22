@@ -8,10 +8,14 @@ import java.awt.GridLayout;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -61,6 +65,24 @@ public final class CommentEditorDialog {
 					+ (linkModel.getName() == null || linkModel.getName().isBlank() ? linkModel.getId() : linkModel.getName());
 			return new AssociationTarget(label, CommentKind.BOUND, new CommentBinding(BoundTargetType.LINK, linkModel.getId()));
 		}
+
+		@Override
+		public int hashCode() {
+			return Objects.hash(this.binding, this.kind);
+		}
+
+		@Override
+		public boolean equals(final Object obj) {
+			if (this == obj) {
+				return true;
+			}
+			if (obj == null || this.getClass() != obj.getClass()) {
+				return false;
+			}
+			final AssociationTarget other = (AssociationTarget) obj;
+			return Objects.equals(this.binding, other.binding) && this.kind == other.kind;
+		}
+
 	}
 
 	public record Result(String text, Color textColor, Color backgroundColor, Color borderColor, CommentKind kind, CommentBinding binding,
@@ -125,20 +147,21 @@ public final class CommentEditorDialog {
 		final JCheckBox logicalBox = new JCheckBox("Logical", initialComment == null || initialComment.isVisibleInLogical());
 		final JCheckBox physicalBox = new JCheckBox("Physical", initialComment == null || initialComment.isVisibleInPhysical());
 
-		final JComboBox<AssociationTarget> associationBox = new JComboBox<>();
-		associationBox.addItem(AssociationTarget.standalone());
-
+		final List<AssociationTarget> associationList = new ArrayList<>();
+		associationList.add(AssociationTarget.standalone());
 		if (document != null) {
 			for (final ClassModel classModel : document.getModel().getClasses()) {
-				associationBox.addItem(AssociationTarget.forClass(classModel));
+				associationList.add(AssociationTarget.forClass(classModel));
 			}
 			for (final LinkModel linkModel : document.getModel().getConceptualLinks()) {
-				associationBox.addItem(AssociationTarget.forLink(linkModel, true));
+				associationList.add(AssociationTarget.forLink(linkModel, true));
 			}
 			for (final LinkModel linkModel : document.getModel().getTechnicalLinks()) {
-				associationBox.addItem(AssociationTarget.forLink(linkModel, false));
+				associationList.add(AssociationTarget.forLink(linkModel, false));
 			}
 		}
+		final JComboBox<AssociationTarget> associationBox = new JComboBox<>(
+				new DefaultComboBoxModel<>(associationList.toArray(AssociationTarget[]::new)));
 
 		associationBox.setRenderer(new DefaultListCellRenderer() {
 			private static final long serialVersionUID = 1L;
@@ -159,7 +182,7 @@ public final class CommentEditorDialog {
 		});
 
 		if (initialComment != null) {
-			associationBox.setSelectedItem(CommentEditorDialog.resolveInitialAssociation(document, initialComment));
+			associationBox.getModel().setSelectedItem(CommentEditorDialog.resolveInitialAssociation(document, initialComment));
 		}
 
 		final Holder holder = new Holder();

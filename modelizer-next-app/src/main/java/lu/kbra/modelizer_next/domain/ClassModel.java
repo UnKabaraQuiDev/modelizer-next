@@ -11,7 +11,6 @@ public class ClassModel {
 	private String group;
 	private LayerVisibility visibility;
 	private ClassStyle style;
-	private String comment;
 	private List<FieldModel> fields;
 
 	public ClassModel() {
@@ -20,12 +19,7 @@ public class ClassModel {
 		this.group = "";
 		this.visibility = new LayerVisibility();
 		this.style = new ClassStyle();
-		this.comment = "";
 		this.fields = new ArrayList<>();
-	}
-
-	public String getComment() {
-		return this.comment;
 	}
 
 	public List<FieldModel> getFields() {
@@ -50,10 +44,6 @@ public class ClassModel {
 
 	public LayerVisibility getVisibility() {
 		return this.visibility;
-	}
-
-	public void setComment(final String comment) {
-		this.comment = comment;
 	}
 
 	public void setFields(final List<FieldModel> fields) {
@@ -82,9 +72,8 @@ public class ClassModel {
 
 	@Override
 	public String toString() {
-		return "ClassModel@" + System.identityHashCode(this) + " [id=" + this.id + ", names=" + this.names + ", group=" + this.group
-				+ ", visibility=" + this.visibility + ", style=" + this.style + ", comment=" + this.comment + ", fields=" + this.fields
-				+ "]";
+		return "ClassModel [id=" + id + ", names=" + names + ", group=" + group + ", visibility=" + visibility + ", style=" + style
+				+ ", fields=" + fields + "]";
 	}
 
 }

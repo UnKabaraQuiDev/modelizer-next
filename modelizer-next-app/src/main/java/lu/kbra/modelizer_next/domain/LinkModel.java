@@ -1,6 +1,7 @@
 package lu.kbra.modelizer_next.domain;
 
 import java.awt.Color;
+import java.util.Objects;
 import java.util.UUID;
 
 public class LinkModel {
@@ -12,7 +13,6 @@ public class LinkModel {
 	private Cardinality cardinalityFrom;
 	private Cardinality cardinalityTo;
 	private String associationClassId;
-	private String comment;
 	private Color lineColor;
 
 	public LinkModel() {
@@ -23,7 +23,6 @@ public class LinkModel {
 		this.cardinalityFrom = Cardinality.ONE;
 		this.cardinalityTo = Cardinality.ZERO_OR_MANY;
 		this.associationClassId = null;
-		this.comment = "";
 		this.lineColor = Color.BLACK;
 	}
 
@@ -37,10 +36,6 @@ public class LinkModel {
 
 	public Cardinality getCardinalityTo() {
 		return this.cardinalityTo;
-	}
-
-	public String getComment() {
-		return this.comment;
 	}
 
 	public LinkEnd getFrom() {
@@ -75,10 +70,6 @@ public class LinkModel {
 		this.cardinalityTo = cardinalityTo;
 	}
 
-	public void setComment(final String comment) {
-		this.comment = comment;
-	}
-
 	public void setFrom(final LinkEnd from) {
 		this.from = from;
 	}
@@ -99,11 +90,14 @@ public class LinkModel {
 		this.to = to;
 	}
 
+	public boolean isSelfLinking() {
+		return Objects.equals(to.getClassId(), from.getClassId());
+	}
+
 	@Override
 	public String toString() {
-		return "LinkModel@" + System.identityHashCode(this) + " [id=" + this.id + ", name=" + this.name + ", from=" + this.from + ", to="
-				+ this.to + ", cardinalityFrom=" + this.cardinalityFrom + ", cardinalityTo=" + this.cardinalityTo + ", associationClassId="
-				+ this.associationClassId + ", comment=" + this.comment + ", lineColor=" + this.lineColor + "]";
+		return "LinkModel [id=" + id + ", name=" + name + ", from=" + from + ", to=" + to + ", cardinalityFrom=" + cardinalityFrom
+				+ ", cardinalityTo=" + cardinalityTo + ", associationClassId=" + associationClassId + ", lineColor=" + lineColor + "]";
 	}
 
 }

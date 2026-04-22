@@ -3,7 +3,7 @@ package lu.kbra.modelizer_next;
 public class AppConfig {
 
 	private ThemeMode themeMode = ThemeMode.SYSTEM;
-	private String selectedPaletteName;
+	private String selectedPaletteName = "Default";
 	private String defaultPaletteName;
 	private boolean autoCheckUpdates = true;
 	private String skippedUpdateVersion;
