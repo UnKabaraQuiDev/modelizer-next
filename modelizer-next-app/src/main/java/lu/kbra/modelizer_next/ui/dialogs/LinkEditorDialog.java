@@ -163,6 +163,8 @@ public final class LinkEditorDialog {
 
 		final JComboBox<Cardinality> fromCardinalityBox = new JComboBox<>(Cardinality.values());
 		final JComboBox<Cardinality> toCardinalityBox = new JComboBox<>(Cardinality.values());
+		final JTextField labelFrom = new JTextField(linkModel.getLabelFrom(), 24);
+		final JTextField labelTo = new JTextField(linkModel.getLabelTo(), 24);
 
 		final JComboBox<AssociationOption> associationBox = new JComboBox<>();
 		associationBox.setRenderer(new DefaultListCellRenderer() {
@@ -266,9 +268,11 @@ public final class LinkEditorDialog {
 			leftPanel.setBorder(BorderFactory.createTitledBorder("Table 1"));
 			leftPanel.add(LinkEditorDialog.labeled("Cardinality", fromCardinalityBox));
 			leftPanel.add(LinkEditorDialog.labeled("Table", fromClassBox));
+			leftPanel.add(LinkEditorDialog.labeled("Label", labelFrom));
 			rightPanel.setBorder(BorderFactory.createTitledBorder("Table 2"));
 			rightPanel.add(LinkEditorDialog.labeled("Cardinality", toCardinalityBox));
 			rightPanel.add(LinkEditorDialog.labeled("Table", toClassBox));
+			rightPanel.add(LinkEditorDialog.labeled("Label", labelTo));
 		} else {
 			leftPanel.setBorder(BorderFactory.createTitledBorder("From"));
 			leftPanel.add(LinkEditorDialog.labeled("Table", fromClassBox));
