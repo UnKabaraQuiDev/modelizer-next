@@ -136,10 +136,10 @@ stage_shared_artifacts() {
   rm -rf "${out_dir}"
   mkdir -p "${out_dir}"
 
-  local bootstrap_src="modelizer-next-bootstrap/target/modelizer-next-bootstrap-${APP_VERSION}-with-dependencies.jar"
+  local bootstrap_src="modelizer-next-bootstrap/target/modelizer-next-bootstrap-${VERSION}-with-dependencies.jar"
   cp "${bootstrap_src}" "${out_dir}/modelizer-next-bootstrap-${VERSION}.jar"
 
-  local app_src="modelizer-next-app/target/modelizer-next-app-${APP_VERSION}-with-dependencies.jar"
+  local app_src="modelizer-next-app/target/modelizer-next-app-${VERSION}-with-dependencies.jar"
   cp "${app_src}" "${out_dir}/modelizer-next-app-${VERSION}.jar"
 }
 
@@ -213,7 +213,7 @@ run_platform_build() {
 
   mvn -B -DskipTests -Drevision="${VERSION}" -DappVersion="${APP_VERSION}" \
     -Ddistributor="Automated ${channel} build ${BUILD_TIMESTAMP} (${platform})" \
-    -Pall,${extra_profiles} clean package
+    -Pall,native,${extra_profiles} clean package
 
   stage_platform_artifacts "${channel}" "${platform}"
 }
