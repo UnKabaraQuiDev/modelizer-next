@@ -15,6 +15,7 @@ import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -32,19 +33,14 @@ public final class FieldEditorDialog {
 		private Result result;
 	}
 
-	public record Result(String name, String technicalName, boolean primaryKey, boolean unique, boolean notNull, Color textColor,
-			Color backgroundColor, int moveDelta) {
+	public record Result(String name, String technicalName, boolean primaryKey, boolean unique, boolean notNull,
+			Color textColor, Color backgroundColor, int moveDelta, String type) {
 	}
 
-	private static void applyFieldValues(
-			final FieldModel fieldModel,
-			final JTextField nameField,
-			final JTextField technicalNameField,
-			final JCheckBox primaryKeyBox,
-			final JCheckBox uniqueBox,
-			final JCheckBox notNullBox,
-			final ColorButton textColorButton,
-			final ColorButton backgroundColorButton) {
+	private static void applyFieldValues(final FieldModel fieldModel, final JTextField nameField,
+			final JTextField technicalNameField, final JCheckBox primaryKeyBox, final JCheckBox uniqueBox,
+			final JCheckBox notNullBox, final ColorButton textColorButton, final ColorButton backgroundColorButton,
+			final JComboBox<String> typeField) {
 		fieldModel.getNames().setName(nameField.getText());
 		fieldModel.getNames().setTechnicalName(technicalNameField.getText());
 		fieldModel.setPrimaryKey(primaryKeyBox.isSelected());
@@ -52,6 +48,8 @@ public final class FieldEditorDialog {
 		fieldModel.setNotNull(notNullBox.isSelected());
 		fieldModel.getStyle().setTextColor(textColorButton.getSelectedColor());
 		fieldModel.getStyle().setBackgroundColor(backgroundColorButton.getSelectedColor());
+		System.err.println(typeField.getSelectedItem());
+		fieldModel.setType(typeField.getSelectedItem() == null ? null : typeField.getSelectedItem().toString().trim());
 	}
 
 	private static JPanel row(final String labelText, final Component component) {
@@ -62,19 +60,25 @@ public final class FieldEditorDialog {
 		return row;
 	}
 
-	public static Result showDialog(final Component parent, final FieldModel fieldModel, final IntConsumer moveCallback) {
+	public static Result showDialog(final Component parent, final FieldModel fieldModel,
+			final IntConsumer moveCallback) {
 		final Window owner = parent == null ? null : SwingUtilities.getWindowAncestor(parent);
 		final JDialog dialog = new JDialog(owner, "Edit field", Dialog.ModalityType.APPLICATION_MODAL);
 
 		final JTextField nameField = new JTextField(fieldModel.getNames().getName(), 24);
 		final JTextField technicalNameField = new JTextField(fieldModel.getNames().getTechnicalName(), 24);
 
+		final JComboBox<String> sqlTypeBox = new JComboBox<>(FieldModel.SQL_TYPES);
+		sqlTypeBox.setSelectedItem(fieldModel.getType());
+		sqlTypeBox.setEditable(true);
+
 		final JCheckBox primaryKeyBox = new JCheckBox("PK", fieldModel.isPrimaryKey());
 		final JCheckBox uniqueBox = new JCheckBox("UQ", fieldModel.isUnique());
 		final JCheckBox notNullBox = new JCheckBox("NN", fieldModel.isNotNull());
 
 		final ColorButton textColorButton = new ColorButton("Text color", fieldModel.getStyle().getTextColor());
-		final ColorButton backgroundColorButton = new ColorButton("Background color", fieldModel.getStyle().getBackgroundColor());
+		final ColorButton backgroundColorButton = new ColorButton("Background color",
+				fieldModel.getStyle().getBackgroundColor());
 
 		final Holder holder = new Holder();
 
@@ -83,6 +87,7 @@ public final class FieldEditorDialog {
 		form.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 		form.add(FieldEditorDialog.row("Name", nameField));
 		form.add(FieldEditorDialog.row("Technical name", technicalNameField));
+		form.add(FieldEditorDialog.row("Type", sqlTypeBox));
 
 		final JPanel flagsRow = new JPanel(new GridLayout(1, 3, 8, 0));
 		flagsRow.add(primaryKeyBox);
@@ -102,38 +107,22 @@ public final class FieldEditorDialog {
 		final JButton cancelButton = new JButton("Cancel");
 
 		saveButton.addActionListener(event -> {
-			holder.result = new Result(nameField.getText(),
-					technicalNameField.getText(),
-					primaryKeyBox.isSelected(),
-					uniqueBox.isSelected(),
-					notNullBox.isSelected(),
-					textColorButton.getSelectedColor(),
-					backgroundColorButton.getSelectedColor(),
-					0);
+			holder.result = new Result(nameField.getText(), technicalNameField.getText(), primaryKeyBox.isSelected(),
+					uniqueBox.isSelected(), notNullBox.isSelected(), textColorButton.getSelectedColor(),
+					backgroundColorButton.getSelectedColor(), 0,
+					sqlTypeBox.getSelectedItem() == null ? null : sqlTypeBox.getSelectedItem().toString());
 			dialog.dispose();
 		});
 		upButton.addActionListener(event -> {
-			FieldEditorDialog.applyFieldValues(fieldModel,
-					nameField,
-					technicalNameField,
-					primaryKeyBox,
-					uniqueBox,
-					notNullBox,
-					textColorButton,
-					backgroundColorButton);
+			FieldEditorDialog.applyFieldValues(fieldModel, nameField, technicalNameField, primaryKeyBox, uniqueBox,
+					notNullBox, textColorButton, backgroundColorButton, sqlTypeBox);
 			if (moveCallback != null) {
 				moveCallback.accept(-1);
 			}
 		});
 		downButton.addActionListener(event -> {
-			FieldEditorDialog.applyFieldValues(fieldModel,
-					nameField,
-					technicalNameField,
-					primaryKeyBox,
-					uniqueBox,
-					notNullBox,
-					textColorButton,
-					backgroundColorButton);
+			FieldEditorDialog.applyFieldValues(fieldModel, nameField, technicalNameField, primaryKeyBox, uniqueBox,
+					notNullBox, textColorButton, backgroundColorButton, sqlTypeBox);
 			if (moveCallback != null) {
 				moveCallback.accept(1);
 			}

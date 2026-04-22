@@ -4,6 +4,9 @@ import java.util.UUID;
 
 public class FieldModel {
 
+	public static final String[] SQL_TYPES = { null, "INT", "BIGINT", "TEXT", "BOOLEAN", "TINYINT", "DATE",
+			"TIMESTAMP" };
+
 	private String id;
 	private FieldNames names;
 	private boolean notConceptual;
@@ -12,6 +15,7 @@ public class FieldModel {
 	private boolean primaryKey;
 	private boolean unique;
 	private boolean notNull;
+	private String type;
 
 	public FieldModel() {
 		this.id = UUID.randomUUID().toString();
@@ -22,6 +26,7 @@ public class FieldModel {
 		this.primaryKey = false;
 		this.unique = false;
 		this.notNull = false;
+		this.type = null;
 	}
 
 	public String getComment() {
@@ -88,10 +93,20 @@ public class FieldModel {
 		this.unique = unique;
 	}
 
+	public String getType() {
+		return this.type;
+	}
+
+	public void setType(final String type) {
+		this.type = type;
+	}
+
 	@Override
 	public String toString() {
-		return "FieldModel@" + System.identityHashCode(this) + " [id=" + this.id + ", names=" + this.names + ", notConceptual="
-				+ this.notConceptual + ", comment=" + this.comment + ", style=" + this.style + "]";
+		return "FieldModel@" + System.identityHashCode(this) + " [id=" + this.id + ", names=" + this.names
+				+ ", notConceptual=" + this.notConceptual + ", comment=" + this.comment + ", style=" + this.style
+				+ ", primaryKey=" + this.primaryKey + ", unique=" + this.unique + ", notNull=" + this.notNull
+				+ ", type=" + this.type + "]";
 	}
 
 }
