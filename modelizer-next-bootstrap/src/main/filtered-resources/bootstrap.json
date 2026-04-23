@@ -2,7 +2,6 @@
   "name": "Modelizer Next Bootstrap",
   "description": "Bootstrap launcher and updater for Modelizer Next",
   "version": "@project.version@",
-  "revision": "@revision@",
   "distributor": "@distributor@",
   "repository": "@modelizer.repositoryUrl@",
   "releases": "@modelizer.releasesUrl@",

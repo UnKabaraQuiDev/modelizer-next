@@ -24,7 +24,6 @@ public final class BootstrapApp {
 	public static String REPOSITORY_URL;
 	public static String RELEASES_URL;
 	public static String UPDATES_MANIFEST_URL;
-	public static String REVISION;
 	public static String DISTRIBUTOR;
 
 	public static BootstrapConfig BOOTSTRAP_CONFIG;
@@ -68,18 +67,16 @@ public final class BootstrapApp {
 
 		BootstrapApp.NAME = BootstrapApp.JSON.path("name").asText("Modelizer Next Bootstrap");
 		BootstrapApp.VERSION = BootstrapApp.JSON.path("version").asText("0.0.0");
-		BootstrapApp.REPOSITORY_URL = BootstrapApp.JSON.path("repository").asText("https://github.com/UnKabaraQuiDev/modelizer-next");
-		BootstrapApp.RELEASES_URL = BootstrapApp.JSON.path("releases").asText(BootstrapApp.REPOSITORY_URL + "/releases");
-		BootstrapApp.UPDATES_MANIFEST_URL = BootstrapApp.JSON.path("updatesManifest")
-				.asText("https://raw.githubusercontent.com/UnKabaraQuiDev/modelizer-next/refs/heads/main/registry/versions.json");
+		BootstrapApp.REPOSITORY_URL = BootstrapApp.JSON.path("repository")
+				.asText("https://github.com/UnKabaraQuiDev/modelizer-next");
+		BootstrapApp.RELEASES_URL = BootstrapApp.JSON.path("releases")
+				.asText(BootstrapApp.REPOSITORY_URL + "/releases");
+		BootstrapApp.UPDATES_MANIFEST_URL = BootstrapApp.JSON.path("updatesManifest").asText(
+				"https://raw.githubusercontent.com/UnKabaraQuiDev/modelizer-next/refs/heads/registry/registry/versions.json");
+		BootstrapApp.DISTRIBUTOR = BootstrapApp.JSON.path("distributor").asText();
 
-		BootstrapApp.BOOTSTRAP_CONFIG = new BootstrapConfig(NAME,
-				VERSION,
-				REPOSITORY_URL,
-				RELEASES_URL,
-				UPDATES_MANIFEST_URL,
-				REVISION,
-				DISTRIBUTOR);
+		BootstrapApp.BOOTSTRAP_CONFIG = new BootstrapConfig(NAME, VERSION, REPOSITORY_URL, RELEASES_URL,
+				UPDATES_MANIFEST_URL, DISTRIBUTOR);
 
 		BootstrapApp.ensureDirectories();
 	}
@@ -103,7 +100,8 @@ public final class BootstrapApp {
 	public static void saveConfiguration(final BootstrapConfiguration configuration) {
 		try {
 			BootstrapApp.ensureDirectories();
-			BootstrapApp.MAPPER.writerWithDefaultPrettyPrinter().writeValue(BootstrapApp.getBootstrapConfigFile(), configuration);
+			BootstrapApp.MAPPER.writerWithDefaultPrettyPrinter().writeValue(BootstrapApp.getBootstrapConfigFile(),
+					configuration);
 		} catch (final IOException ex) {
 			ex.printStackTrace();
 		}

@@ -1,8 +1,10 @@
 package lu.kbra.modelizer_next.ui;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.FlowLayout;
+import java.awt.Insets;
 import java.awt.Toolkit;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
@@ -14,6 +16,8 @@ import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 
@@ -64,6 +68,9 @@ import lu.kbra.pclib.PCUtils;
 
 public class MainFrame extends JFrame {
 
+	private record StatusStyleAppearance(Color foreground, Color background, Color border) {
+	}
+
 	private static final long serialVersionUID = 6643164008640695591L;
 	private final DocumentSession session;
 	private final ModelDocument document;
@@ -74,6 +81,7 @@ public class MainFrame extends JFrame {
 	private final DiagramCanvas logicalCanvas;
 	private final DiagramCanvas physicalCanvas;
 	private final JToolBar toolBar;
+	private final JPanel pinnedStylesPanel;
 
 	private final AppConfig appConfig;
 	private List<StylePalette> palettes;
@@ -91,8 +99,10 @@ public class MainFrame extends JFrame {
 
 		this.appConfig = App.loadConfig();
 		this.palettes = StylePaletteService.loadAll();
+		this.sanitizePinnedPaletteNames();
 
-		this.statusLabel = new JLabel("Left drag: move object   |   Middle drag: pan   |   Mouse wheel: zoom   |   Right drag: create link",
+		this.statusLabel = new JLabel(
+				"Left drag: move object   |   Middle drag: pan   |   Mouse wheel: zoom   |   Right drag: create link",
 				SwingConstants.LEFT);
 		this.selectionPathLabel = new JLabel("No selection", SwingConstants.RIGHT);
 
@@ -129,7 +139,11 @@ public class MainFrame extends JFrame {
 
 		this.setJMenuBar(this.createMenuBar());
 
+		this.pinnedStylesPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 6, 0));
+		this.pinnedStylesPanel.setOpaque(false);
+
 		this.toolBar = this.createToolBar();
+		toolBar.add(this.pinnedStylesPanel, BorderLayout.EAST);
 		this.add(this.toolBar, BorderLayout.NORTH);
 
 		final JPanel statusPanel = new JPanel(new BorderLayout(12, 0));
@@ -171,10 +185,8 @@ public class MainFrame extends JFrame {
 		App.saveConfig(this.appConfig);
 
 		final int choice = JOptionPane.showConfirmDialog(this,
-				"Theme change requires restarting the window.\nReopen now with the current document?",
-				"Apply theme",
-				JOptionPane.YES_NO_OPTION,
-				JOptionPane.QUESTION_MESSAGE);
+				"Theme change requires restarting the window.\nReopen now with the current document?", "Apply theme",
+				JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
 
 		if (choice != JOptionPane.YES_OPTION) {
 			return;
@@ -198,8 +210,7 @@ public class MainFrame extends JFrame {
 		if (runtime.isEmpty()) {
 			JOptionPane.showMessageDialog(this,
 					"Updates are only available when the application is launched through the bootstrap launcher.",
-					"Updates unavailable",
-					JOptionPane.INFORMATION_MESSAGE);
+					"Updates unavailable", JOptionPane.INFORMATION_MESSAGE);
 			return;
 		}
 
@@ -216,38 +227,30 @@ public class MainFrame extends JFrame {
 					if (update == null || !update.isUpdateAvailable()) {
 						JOptionPane.showMessageDialog(MainFrame.this,
 								"You are already using the latest version for the selected channel.",
-								"No updates available",
-								JOptionPane.INFORMATION_MESSAGE);
+								"No updates available", JOptionPane.INFORMATION_MESSAGE);
 						return;
 					}
 
 					final StringBuilder message = new StringBuilder();
-					message.append("A new ")
-							.append(update.channel().displayName().toLowerCase())
-							.append(" build is available.\n\n")
-							.append("Current version: ")
-							.append(update.currentVersion())
-							.append("\nLatest version: ")
+					message.append("A new ").append(update.channel().displayName().toLowerCase())
+							.append(" build is available.\n\n").append("Current version: ")
+							.append(update.currentVersion()).append("\nLatest version: ")
 							.append(update.latestVersion());
 					if (update.notes() != null && !update.notes().isBlank()) {
 						message.append("\n\n").append(update.notes());
 					}
 					message.append("\n\nThe application will close after the update is installed.");
 
-					final int choice = JOptionPane.showConfirmDialog(MainFrame.this,
-							message.toString(),
-							"Update available",
-							JOptionPane.YES_NO_OPTION,
-							JOptionPane.INFORMATION_MESSAGE);
+					final int choice = JOptionPane.showConfirmDialog(MainFrame.this, message.toString(),
+							"Update available", JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE);
 					if (choice == JOptionPane.YES_OPTION) {
-						runtime.get().installUpdateAndExit(MainFrame.this, update, MainFrame.this::prepareForUpdateInstall);
+						runtime.get().installUpdateAndExit(MainFrame.this, update,
+								MainFrame.this::prepareForUpdateInstall);
 					}
 				} catch (final Exception ex) {
 					final Throwable cause = ex.getCause() == null ? ex : ex.getCause();
-					JOptionPane.showMessageDialog(MainFrame.this,
-							"Failed to check for updates:\n" + cause.getMessage(),
-							"Update error",
-							JOptionPane.ERROR_MESSAGE);
+					JOptionPane.showMessageDialog(MainFrame.this, "Failed to check for updates:\n" + cause.getMessage(),
+							"Update error", JOptionPane.ERROR_MESSAGE);
 				}
 			}
 		}.execute();
@@ -258,8 +261,8 @@ public class MainFrame extends JFrame {
 			return true;
 		}
 
-		final int choice = JOptionPane
-				.showConfirmDialog(this, prompt, "Unsaved changes", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
+		final int choice = JOptionPane.showConfirmDialog(this, prompt, "Unsaved changes",
+				JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
 
 		if (choice == JOptionPane.CANCEL_OPTION || choice == JOptionPane.CLOSED_OPTION) {
 			return false;
@@ -269,15 +272,15 @@ public class MainFrame extends JFrame {
 	}
 
 	public static boolean confirmModernDocumentVersion(final Component parent, final ModelDocument loadedDocument) {
-		final String fileVersion = loadedDocument.getMeta() == null ? null : loadedDocument.getMeta().getApplicationVersion();
+		final String fileVersion = loadedDocument.getMeta() == null ? null
+				: loadedDocument.getMeta().getApplicationVersion();
 
-		if (fileVersion != null && !fileVersion.isBlank() && VersionComparator.COMPARATOR.compare(fileVersion, App.VERSION) > 0) {
+		if (fileVersion != null && !fileVersion.isBlank()
+				&& VersionComparator.COMPARATOR.compare(fileVersion, App.VERSION) > 0) {
 			final int choice = JOptionPane.showConfirmDialog(parent,
 					"This file was created with a newer version of the application (" + fileVersion
 							+ ").\nDo you want to try to load the file anyways ?",
-					"Newer file version",
-					JOptionPane.YES_NO_OPTION,
-					JOptionPane.WARNING_MESSAGE);
+					"Newer file version", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
 			return choice == JOptionPane.YES_OPTION;
 		}
 
@@ -310,7 +313,8 @@ public class MainFrame extends JFrame {
 		this.undoMenuItem.addActionListener(event -> this.undo());
 
 		this.redoMenuItem = new JMenuItem("Redo");
-		this.redoMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Z, InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK));
+		this.redoMenuItem.setAccelerator(
+				KeyStroke.getKeyStroke(KeyEvent.VK_Z, InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK));
 		this.redoMenuItem.addActionListener(event -> this.redo());
 
 		editMenu.add(this.undoMenuItem);
@@ -341,30 +345,33 @@ public class MainFrame extends JFrame {
 
 		final JCheckBoxMenuItem autoCheckUpdates = new JCheckBoxMenuItem("Check for updates on startup",
 				updateRuntimeAvailable && bootstrapRuntime.get().isAutoCheckUpdates());
-		autoCheckUpdates.setEnabled(updateRuntimeAvailable && bootstrapRuntime.get().isAutomaticUpdateChecksEnabledByProperty());
-		autoCheckUpdates
-				.addActionListener(event -> this.bootstrapRuntime().ifPresent(c -> c.setAutoCheckUpdates(autoCheckUpdates.isSelected())));
+		autoCheckUpdates.setEnabled(
+				updateRuntimeAvailable && bootstrapRuntime.get().isAutomaticUpdateChecksEnabledByProperty());
+		autoCheckUpdates.addActionListener(
+				event -> this.bootstrapRuntime().ifPresent(c -> c.setAutoCheckUpdates(autoCheckUpdates.isSelected())));
 		infoMenu.add(autoCheckUpdates);
 
 		final JMenu channelMenu = new JMenu("Update channel");
 		channelMenu.setEnabled(updateRuntimeAvailable);
 		final ButtonGroup channelGroup = new ButtonGroup();
-		final UpdateChannel selectedChannel = updateRuntimeAvailable ? bootstrapRuntime.get().getSelectedChannel() : UpdateChannel.RELEASE;
+		final UpdateChannel selectedChannel = updateRuntimeAvailable ? bootstrapRuntime.get().getSelectedChannel()
+				: UpdateChannel.RELEASE;
 		for (final UpdateChannel updateChannel : UpdateChannel.values()) {
 			final JRadioButtonMenuItem item = new JRadioButtonMenuItem(updateChannel.displayName());
 			item.setSelected(updateChannel == selectedChannel);
-			item.addActionListener(event -> this.bootstrapRuntime().ifPresent(c -> c.setSelectedChannel(updateChannel)));
+			item.addActionListener(
+					event -> this.bootstrapRuntime().ifPresent(c -> c.setSelectedChannel(updateChannel)));
 			channelGroup.add(item);
 			channelMenu.add(item);
 		}
 		infoMenu.add(channelMenu);
 
-		final JMenuItem versionInfo = new JMenuItem("Version: " + App.VERSION + " (" + App.REVISION + ") [" + App.DISTRIBUTOR + "]");
+		final JMenuItem versionInfo = new JMenuItem("Version: " + App.VERSION + " [" + App.DISTRIBUTOR + "]");
 		versionInfo.setToolTipText("Click to copy version informations.");
 		final ActionListener al = event -> {
-			final StringSelection selection = new StringSelection(
-					"==== APP INFO ====\n" + App.JSON.toPrettyString() + "\n==== BOOTSTRAP INFO ====\n"
-							+ (updateRuntimeAvailable ? bootstrapRuntime.get().getBootstrapJson().toPrettyString() : "NONE"));
+			final StringSelection selection = new StringSelection("==== APP INFO ====\n" + App.JSON.toPrettyString()
+					+ "\n==== BOOTSTRAP INFO ====\n"
+					+ (updateRuntimeAvailable ? bootstrapRuntime.get().getBootstrapJson().toPrettyString() : "NONE"));
 			Toolkit.getDefaultToolkit().getSystemClipboard().setContents(selection, null);
 		};
 		versionInfo.addActionListener(al);
@@ -372,8 +379,8 @@ public class MainFrame extends JFrame {
 
 		if (updateRuntimeAvailable) {
 			final BootstrapConfig bootstrapConfig = bootstrapRuntime.get().getBootstrapConfig();
-			final JMenuItem bootstrapVersionInfo = new JMenuItem("Bootstrap Version: " + bootstrapConfig.versio() + " ("
-					+ bootstrapConfig.revision() + ") [" + bootstrapConfig.distributor() + "]");
+			final JMenuItem bootstrapVersionInfo = new JMenuItem(
+					"Bootstrap Version: " + bootstrapConfig.version() + " [" + bootstrapConfig.distributor() + "]");
 			bootstrapVersionInfo.setToolTipText("Click to copy bootstrap version informations.");
 			bootstrapVersionInfo.addActionListener(al);
 			infoMenu.add(bootstrapVersionInfo);
@@ -392,9 +399,12 @@ public class MainFrame extends JFrame {
 		final JMenuBar menuBar = new JMenuBar();
 
 		final JMenu fileMenu = new JMenu("File");
-		fileMenu.add(this.createFileMenuItem("New", KeyStroke.getKeyStroke(KeyEvent.VK_N, InputEvent.CTRL_DOWN_MASK), this::newDocument));
-		fileMenu.add(this.createFileMenuItem("Load", KeyStroke.getKeyStroke(KeyEvent.VK_O, InputEvent.CTRL_DOWN_MASK), this::loadDocument));
-		fileMenu.add(this.createFileMenuItem("Save", KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK), this::saveDocument));
+		fileMenu.add(this.createFileMenuItem("New", KeyStroke.getKeyStroke(KeyEvent.VK_N, InputEvent.CTRL_DOWN_MASK),
+				this::newDocument));
+		fileMenu.add(this.createFileMenuItem("Load", KeyStroke.getKeyStroke(KeyEvent.VK_O, InputEvent.CTRL_DOWN_MASK),
+				this::loadDocument));
+		fileMenu.add(this.createFileMenuItem("Save", KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK),
+				this::saveDocument));
 		fileMenu.add(this.createFileMenuItem("Save As...",
 				KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK),
 				this::saveDocumentAs));
@@ -402,13 +412,14 @@ public class MainFrame extends JFrame {
 		final JMenu editMenu = this.createEditMenu();
 
 		final JMenu insertMenu = new JMenu("Insert");
-		insertMenu
-				.add(this.createCanvasMenuItem("New table", "addTable", KeyStroke.getKeyStroke(KeyEvent.VK_T, InputEvent.CTRL_DOWN_MASK)));
-		insertMenu
-				.add(this.createCanvasMenuItem("New field", "addField", KeyStroke.getKeyStroke(KeyEvent.VK_F, InputEvent.CTRL_DOWN_MASK)));
-		insertMenu.add(
-				this.createCanvasMenuItem("New comment", "addComment", KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK)));
-		insertMenu.add(this.createCanvasMenuItem("New link", "addLink", KeyStroke.getKeyStroke(KeyEvent.VK_L, InputEvent.CTRL_DOWN_MASK)));
+		insertMenu.add(this.createCanvasMenuItem("New table", "addTable",
+				KeyStroke.getKeyStroke(KeyEvent.VK_T, InputEvent.CTRL_DOWN_MASK)));
+		insertMenu.add(this.createCanvasMenuItem("New field", "addField",
+				KeyStroke.getKeyStroke(KeyEvent.VK_F, InputEvent.CTRL_DOWN_MASK)));
+		insertMenu.add(this.createCanvasMenuItem("New comment", "addComment",
+				KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK)));
+		insertMenu.add(this.createCanvasMenuItem("New link", "addLink",
+				KeyStroke.getKeyStroke(KeyEvent.VK_L, InputEvent.CTRL_DOWN_MASK)));
 
 		final JMenu appearanceMenu = new JMenu("Appearance");
 		final ButtonGroup group = new ButtonGroup();
@@ -456,16 +467,21 @@ public class MainFrame extends JFrame {
 		final JToolBar toolbar = new JToolBar();
 		toolbar.setFloatable(false);
 		toolbar.setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));
-		toolbar.setLayout(new FlowLayout(FlowLayout.LEFT, 6, 0));
+		toolbar.setLayout(new BorderLayout());
 
-		toolbar.add(this.createToolbarButton("New table", "addTable"));
-		toolbar.add(this.createToolbarButton("New field", "addField"));
-		toolbar.add(this.createToolbarButton("New comment", "addComment"));
-		toolbar.add(this.createToolbarButton("New link", "addLink"));
-		toolbar.addSeparator();
-		toolbar.add(this.createToolbarButton("Rename", "renameSelection"));
-		toolbar.add(this.createToolbarButton("Delete", "deleteSelection"));
-		toolbar.add(this.createToolbarButton("Duplicate", "duplicateSelection"));
+		final JPanel buttons = new JPanel();
+		buttons.setLayout(new FlowLayout(FlowLayout.LEFT, 6, 0));
+
+		buttons.add(this.createToolbarButton("New table", "addTable"));
+		buttons.add(this.createToolbarButton("New field", "addField"));
+		buttons.add(this.createToolbarButton("New comment", "addComment"));
+		buttons.add(this.createToolbarButton("New link", "addLink"));
+//		buttons.addSeparator();
+		buttons.add(this.createToolbarButton("Rename", "renameSelection"));
+		buttons.add(this.createToolbarButton("Delete", "deleteSelection"));
+		buttons.add(this.createToolbarButton("Duplicate", "duplicateSelection"));
+
+		toolbar.add(buttons, BorderLayout.WEST);
 
 		return toolbar;
 	}
@@ -511,6 +527,142 @@ public class MainFrame extends JFrame {
 			}
 		}
 		return null;
+	}
+
+	private JButton createPinnedStyleButton(final StylePalette palette,
+			final DiagramCanvas.StylePreviewType previewType) {
+		final JButton button = new JButton(palette.getName());
+		button.setFocusable(false);
+		button.setFocusPainted(false);
+		button.setMargin(new Insets(3, 10, 3, 10));
+
+		final StatusStyleAppearance appearance = this.resolvePinnedStyleAppearance(palette, previewType);
+		button.setForeground(appearance.foreground());
+		button.setBackground(appearance.background());
+		button.setOpaque(true);
+		button.setContentAreaFilled(true);
+		button.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(appearance.border(), 2),
+				BorderFactory.createEmptyBorder(2, 4, 2, 4)));
+		button.setToolTipText("Apply style to the current selection");
+		button.addActionListener(event -> {
+			final DiagramCanvas canvas = this.getActiveCanvas();
+			if (canvas == null) {
+				return;
+			}
+
+			canvas.applyPalette(palette);
+			canvas.requestFocusInWindow();
+			this.appConfig.setSelectedPaletteName(palette.getName());
+			App.saveConfig(this.appConfig);
+		});
+		return button;
+	}
+
+	private Color mixWithWhite(final Color color, final double amount) {
+		if (color == null) {
+			return Color.WHITE;
+		}
+
+		final double clampedAmount = Math.max(0.0, Math.min(1.0, amount));
+		final int red = (int) Math.round(color.getRed() + (255 - color.getRed()) * clampedAmount);
+		final int green = (int) Math.round(color.getGreen() + (255 - color.getGreen()) * clampedAmount);
+		final int blue = (int) Math.round(color.getBlue() + (255 - color.getBlue()) * clampedAmount);
+		return new Color(red, green, blue);
+	}
+
+	private void refreshPinnedStylesPanel() {
+		this.sanitizePinnedPaletteNames();
+		this.pinnedStylesPanel.removeAll();
+
+		final DiagramCanvas canvas = this.getActiveCanvas();
+		final DiagramCanvas.StylePreviewType previewType = canvas == null ? DiagramCanvas.StylePreviewType.NONE
+				: canvas.getStylePreviewType();
+
+		for (final String paletteName : this.appConfig.getPinnedPaletteNames()) {
+			final StylePalette palette = this.findPaletteByName(paletteName);
+			if (palette != null) {
+				this.pinnedStylesPanel.add(this.createPinnedStyleButton(palette, previewType));
+			}
+		}
+
+		this.pinnedStylesPanel.setVisible(this.pinnedStylesPanel.getComponentCount() > 0);
+		this.pinnedStylesPanel.revalidate();
+		this.pinnedStylesPanel.repaint();
+	}
+
+	private void replacePinnedPaletteName(final String oldName, final String newName) {
+		if (oldName == null || newName == null || oldName.equals(newName)) {
+			return;
+		}
+
+		final List<String> updatedNames = new ArrayList<>();
+		final LinkedHashSet<String> seen = new LinkedHashSet<>();
+		boolean changed = false;
+
+		for (final String paletteName : this.appConfig.getPinnedPaletteNames()) {
+			final String resolvedName = oldName.equals(paletteName) ? newName : paletteName;
+			changed |= !resolvedName.equals(paletteName);
+			if (seen.add(resolvedName)) {
+				updatedNames.add(resolvedName);
+			}
+		}
+
+		if (!changed) {
+			return;
+		}
+
+		this.appConfig.setPinnedPaletteNames(updatedNames);
+		App.saveConfig(this.appConfig);
+	}
+
+	private StatusStyleAppearance resolvePinnedStyleAppearance(final StylePalette palette,
+			final DiagramCanvas.StylePreviewType previewType) {
+		if (palette == null) {
+			return new StatusStyleAppearance(Color.BLACK, Color.WHITE, Color.GRAY);
+		}
+
+		return switch (previewType) {
+		case FIELD -> new StatusStyleAppearance(palette.getFieldTextColor(), palette.getFieldBackgroundColor(),
+				palette.getFieldTextColor());
+		case COMMENT -> new StatusStyleAppearance(palette.getCommentTextColor(), palette.getCommentBackgroundColor(),
+				palette.getCommentBorderColor());
+		case LINK -> new StatusStyleAppearance(palette.getLinkColor(), this.mixWithWhite(palette.getLinkColor(), 0.88),
+				palette.getLinkColor());
+		case NONE, CLASS -> new StatusStyleAppearance(palette.getClassTextColor(), palette.getClassBackgroundColor(),
+				palette.getClassBorderColor());
+		};
+	}
+
+	private void sanitizePinnedPaletteNames() {
+		final List<String> currentNames = new ArrayList<>(this.appConfig.getPinnedPaletteNames());
+		final List<String> sanitizedNames = new ArrayList<>();
+		final LinkedHashSet<String> seen = new LinkedHashSet<>();
+
+		for (final String paletteName : currentNames) {
+			if (this.findPaletteByName(paletteName) != null && seen.add(paletteName)) {
+				sanitizedNames.add(paletteName);
+			}
+		}
+
+		if (sanitizedNames.equals(currentNames)) {
+			return;
+		}
+
+		this.appConfig.setPinnedPaletteNames(sanitizedNames);
+		App.saveConfig(this.appConfig);
+	}
+
+	private void setPalettePinned(final String paletteName, final boolean pinned) {
+		final LinkedHashSet<String> names = new LinkedHashSet<>(this.appConfig.getPinnedPaletteNames());
+		if (pinned) {
+			names.add(paletteName);
+		} else {
+			names.remove(paletteName);
+		}
+
+		this.appConfig.setPinnedPaletteNames(new ArrayList<>(names));
+		App.saveConfig(this.appConfig);
+		this.refreshPinnedStylesPanel();
 	}
 
 	private String findShortcutText(final DiagramCanvas canvas, final String actionKey) {
@@ -586,9 +738,7 @@ public class MainFrame extends JFrame {
 			case "mod" -> {
 				final int choice = JOptionPane.showConfirmDialog(parent,
 						"This file comes from an older version of Modelizer.\nThere may be errors or unsupported elements during import.\nDo you want to continue?",
-						"Legacy Modelizer import",
-						JOptionPane.YES_NO_OPTION,
-						JOptionPane.WARNING_MESSAGE);
+						"Legacy Modelizer import", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
 				if (choice != JOptionPane.YES_OPTION) {
 					return Optional.empty();
 				}
@@ -618,7 +768,8 @@ public class MainFrame extends JFrame {
 
 			return Optional.of(new DocumentSession(loadedDocument, openedFile));
 		} catch (final IOException ex) {
-			JOptionPane.showMessageDialog(parent, "Failed to load file:\n" + ex.getMessage(), "Load error", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(parent, "Failed to load file:\n" + ex.getMessage(), "Load error",
+					JOptionPane.ERROR_MESSAGE);
 			return Optional.empty();
 		}
 	}
@@ -653,8 +804,10 @@ public class MainFrame extends JFrame {
 
 			StylePaletteService.save(palette);
 			this.palettes = StylePaletteService.loadAll();
+			this.sanitizePinnedPaletteNames();
 			this.setJMenuBar(this.createMenuBar());
 			this.setDefaultPaletteToCanvases();
+			this.refreshPinnedStylesPanel();
 			this.revalidate();
 			this.repaint();
 		});
@@ -668,6 +821,7 @@ public class MainFrame extends JFrame {
 					canvas.applyPalette(palette);
 					this.appConfig.setSelectedPaletteName(palette.getName());
 					App.saveConfig(this.appConfig);
+					this.refreshPinnedStylesPanel();
 				}
 			});
 			applyMenu.add(item);
@@ -691,33 +845,32 @@ public class MainFrame extends JFrame {
 					if (oldName.equals(this.appConfig.getSelectedPaletteName())) {
 						this.appConfig.setSelectedPaletteName(edited.getName());
 					}
+					this.replacePinnedPaletteName(oldName, edited.getName());
 					App.saveConfig(this.appConfig);
 				}
 
 				StylePaletteService.save(edited);
 				this.palettes = StylePaletteService.loadAll();
+				this.sanitizePinnedPaletteNames();
 				this.setDefaultPaletteToCanvases();
 				this.setJMenuBar(this.createMenuBar());
+				this.refreshPinnedStylesPanel();
 				this.revalidate();
 				this.repaint();
 			});
 			editMenu.add(item);
 		}
 
+		final JMenu pinMenu = new JMenu("Pin to status bar");
+		for (final StylePalette palette : this.palettes) {
+			final JCheckBoxMenuItem item = new JCheckBoxMenuItem(palette.getName(),
+					this.appConfig.getPinnedPaletteNames().contains(palette.getName()));
+			item.addActionListener(event -> this.setPalettePinned(palette.getName(), item.isSelected()));
+			pinMenu.add(item);
+		}
+
 		final JMenu defaultMenu = new JMenu("Default style");
 		final ButtonGroup defaultGroup = new ButtonGroup();
-
-		final JRadioButtonMenuItem noneItem = new JRadioButtonMenuItem("None");
-		noneItem.setSelected(this.appConfig.getDefaultPaletteName() == null || this.appConfig.getDefaultPaletteName().isBlank());
-		noneItem.addActionListener(event -> {
-			this.appConfig.setDefaultPaletteName(null);
-			App.saveConfig(this.appConfig);
-			this.setDefaultPaletteToCanvases();
-		});
-		defaultGroup.add(noneItem);
-		defaultMenu.add(noneItem);
-
-		defaultMenu.addSeparator();
 
 		for (final StylePalette palette : this.palettes) {
 			final JRadioButtonMenuItem item = new JRadioButtonMenuItem(palette.getName());
@@ -734,8 +887,10 @@ public class MainFrame extends JFrame {
 		final JMenuItem reloadItem = new JMenuItem("Reload styles");
 		reloadItem.addActionListener(event -> {
 			this.palettes = StylePaletteService.loadAll();
+			this.sanitizePinnedPaletteNames();
 			this.setDefaultPaletteToCanvases();
 			this.setJMenuBar(this.createMenuBar());
+			this.refreshPinnedStylesPanel();
 			this.revalidate();
 			this.repaint();
 		});
@@ -744,6 +899,7 @@ public class MainFrame extends JFrame {
 		stylesMenu.addSeparator();
 		stylesMenu.add(applyMenu);
 		stylesMenu.add(editMenu);
+		stylesMenu.add(pinMenu);
 		stylesMenu.add(defaultMenu);
 		stylesMenu.addSeparator();
 		stylesMenu.add(reloadItem);
@@ -840,9 +996,11 @@ public class MainFrame extends JFrame {
 	}
 
 	private void updateSelectionLabel(final SelectionInfo selectionInfo) {
-		final String path = selectionInfo == null || selectionInfo.path() == null || selectionInfo.path().isBlank() ? "No selection"
+		final String path = selectionInfo == null || selectionInfo.path() == null || selectionInfo.path().isBlank()
+				? "No selection"
 				: selectionInfo.path();
 		this.selectionPathLabel.setText(path);
+		this.refreshPinnedStylesPanel();
 	}
 
 	private void updateUndoRedoMenuItems() {
@@ -866,7 +1024,8 @@ public class MainFrame extends JFrame {
 			this.refreshFrameTitle();
 			return true;
 		} catch (final IOException ex) {
-			JOptionPane.showMessageDialog(this, "Failed to save file:\n" + ex.getMessage(), "Save error", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(this, "Failed to save file:\n" + ex.getMessage(), "Save error",
+					JOptionPane.ERROR_MESSAGE);
 			return false;
 		}
 	}

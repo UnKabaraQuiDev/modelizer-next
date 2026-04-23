@@ -1,10 +1,14 @@
 package lu.kbra.modelizer_next;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class AppConfig {
 
 	private ThemeMode themeMode = ThemeMode.SYSTEM;
 	private String selectedPaletteName = "Default";
 	private String defaultPaletteName;
+	private List<String> pinnedPaletteNames = new ArrayList<>();
 	private boolean autoCheckUpdates = true;
 	private String skippedUpdateVersion;
 
@@ -14,6 +18,13 @@ public class AppConfig {
 
 	public String getSelectedPaletteName() {
 		return this.selectedPaletteName;
+	}
+
+	public List<String> getPinnedPaletteNames() {
+		if (this.pinnedPaletteNames == null) {
+			this.pinnedPaletteNames = new ArrayList<>();
+		}
+		return this.pinnedPaletteNames;
 	}
 
 	public String getSkippedUpdateVersion() {
@@ -36,6 +47,10 @@ public class AppConfig {
 		this.defaultPaletteName = defaultPaletteName;
 	}
 
+	public void setPinnedPaletteNames(final List<String> pinnedPaletteNames) {
+		this.pinnedPaletteNames = pinnedPaletteNames == null ? new ArrayList<>() : new ArrayList<>(pinnedPaletteNames);
+	}
+
 	public void setSelectedPaletteName(final String selectedPaletteName) {
 		this.selectedPaletteName = selectedPaletteName;
 	}
@@ -51,8 +66,9 @@ public class AppConfig {
 	@Override
 	public String toString() {
 		return "AppConfig@" + System.identityHashCode(this) + " [themeMode=" + this.themeMode + ", selectedPaletteName="
-				+ this.selectedPaletteName + ", defaultPaletteName=" + this.defaultPaletteName + ", autoCheckUpdates="
-				+ this.autoCheckUpdates + ", skippedUpdateVersion=" + this.skippedUpdateVersion + "]";
+				+ this.selectedPaletteName + ", defaultPaletteName=" + this.defaultPaletteName + ", pinnedPaletteNames="
+				+ this.getPinnedPaletteNames() + ", autoCheckUpdates=" + this.autoCheckUpdates + ", skippedUpdateVersion="
+				+ this.skippedUpdateVersion + "]";
 	}
 
 }

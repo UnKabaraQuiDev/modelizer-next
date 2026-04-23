@@ -18,12 +18,11 @@ public class App {
 	public static String NAME;
 	public static String DESCRIPTION;
 	public static String VERSION;
-	public static String REVISION;
 	public static String DISTRIBUTOR;
 
 	public static String REPOSITORY_URL = "https://github.com/UnKabaraQuiDev/modelizer-next";
 	public static String RELEASES_URL = App.REPOSITORY_URL + "/releases";
-	public static String UPDATES_MANIFEST_URL = "https://raw.githubusercontent.com/UnKabaraQuiDev/modelizer-next/refs/heads/main/registry/versions.json";
+	public static String UPDATES_MANIFEST_URL = "https://raw.githubusercontent.com/UnKabaraQuiDev/modelizer-next/refs/heads/registry/registry/versions.json";
 	public static String ISSUES_URL = App.REPOSITORY_URL + "/issues/";
 	public static String ENTRY_POINT;
 
@@ -69,7 +68,6 @@ public class App {
 		App.NAME = App.JSON.path("name").asText();
 		App.DESCRIPTION = App.JSON.path("description").asText();
 		App.VERSION = App.JSON.path("version").asText();
-		App.REVISION = App.JSON.path("revision").asText();
 		App.DISTRIBUTOR = App.JSON.path("distributor").asText();
 		App.REPOSITORY_URL = App.JSON.path("repository").asText(App.REPOSITORY_URL);
 		App.RELEASES_URL = App.JSON.path("releases").asText(App.REPOSITORY_URL + "/releases");

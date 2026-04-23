@@ -20,15 +20,14 @@ public class ModelizerAppEntryPoint implements AppMain {
 	public void start(String[] args) {
 		try {
 			App.init();
-			System.out.println(App.NAME + " / " + App.VERSION + " (" + App.REVISION + ")");
+			System.out.println(App.NAME + " / " + App.VERSION + " [" + App.DISTRIBUTOR + "]");
 			System.out.println("App dir: " + App.getAppDirectory());
 		} catch (final JsonProcessingException e) {
 			e.printStackTrace();
 			JOptionPane.showMessageDialog(null,
 					"Uh uh ! It seems like this app's manifest is malformed, try\nrestarting it, redownloading it or updating it.\nIf nothing works, please report to: "
 							+ App.ISSUES_URL,
-					"Manifest error",
-					JOptionPane.ERROR_MESSAGE);
+					"Manifest error", JOptionPane.ERROR_MESSAGE);
 			return;
 		}
 
@@ -42,7 +41,8 @@ public class ModelizerAppEntryPoint implements AppMain {
 					document = MainFrame.createDocument(null, file.toFile());
 				}
 			}
-			final MainFrame frame = new MainFrame(document.orElseGet(() -> new DocumentSession(SampleDocumentFactory.create(), null)));
+			final MainFrame frame = new MainFrame(
+					document.orElseGet(() -> new DocumentSession(SampleDocumentFactory.create(), null)));
 			if (document.isEmpty()) {
 				frame.applyDefaultPaletteToCanvases();
 			}
