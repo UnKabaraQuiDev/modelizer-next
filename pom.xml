@@ -47,6 +47,7 @@
 		<app.mainClass>filled in by modules</app.mainClass>
 		<skipLinux>true</skipLinux>
 		<skipWindows>true</skipWindows>
+		<skipNative>true</skipNative>
 	</properties>
 
 	<repositories>
@@ -319,6 +320,7 @@
 								</goals>
 
 								<configuration>
+									<skip>${skipNative}</skip>
 									<target>
 										<mkdir
 											dir="${jpackage.inputDir}" />
@@ -466,6 +468,9 @@
 
 		<profile>
 			<id>native</id>
+			<properties>
+				<skipNative>false</skipNative>
+			</properties>
 		</profile>
 
 		<profile>
