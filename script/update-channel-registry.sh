@@ -45,7 +45,7 @@ for asset in assets:
         platforms.append(platform)
 
 primary_asset_url = ''
-for preferred_kind in ('app-portable-jar', 'bootstrap-jar', 'app-portable-native', 'bootstrap-native'):
+for preferred_kind in ('app-standalone-jar', 'bootstrap-jar', 'app-standalone-native', 'bootstrap-native'):
     for asset in assets:
         if asset.get('kind') == preferred_kind and asset.get('url'):
             primary_asset_url = asset.get('url', '')

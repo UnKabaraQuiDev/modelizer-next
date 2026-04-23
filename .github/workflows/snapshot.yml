@@ -148,7 +148,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          ref: 'HEAD'
+          ref: 'registry'
       - uses: actions/download-artifact@v4
         with:
           path: collected
@@ -167,7 +167,7 @@ jobs:
           make_latest: false
           generate_release_notes: true
           files: release-assets/*
-      - name: Update registry on main
+      - name: Update registry
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -190,4 +190,4 @@ jobs:
 
           git add registry/nightly.json registry/release.json registry/snapshot.json registry/versions.json
           git commit -m "[bot] Update snapshot registry to $VERSION" || exit 0
-          git push origin HEAD:main
+          git push origin HEAD:registry

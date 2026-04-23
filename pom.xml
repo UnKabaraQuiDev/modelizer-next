@@ -39,6 +39,8 @@
 		<jpackage.fa2>${jpackage.dir}/FAmn.properties</jpackage.fa2>
 		<jpackage.fa3>${jpackage.dir}/FAmdlz.properties</jpackage.fa3>
 		<jpackage.name>filled in by modules</jpackage.name>
+		<jpackage.type.windows>exe</jpackage.type.windows>
+		<jpackage.type.linux>deb</jpackage.type.linux>
 		<app.mainClass>filled in by modules</app.mainClass>
 	</properties>
 

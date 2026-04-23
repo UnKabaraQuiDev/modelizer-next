@@ -170,7 +170,7 @@ stage_platform_artifacts() {
     app_exe="$(find_single_file "modelizer-next-app/target/dist/windows" '*.exe')"
 
     cp "${bootstrap_exe}" "${out_dir}/modelizer-next-bootstrap-${platform}-${VERSION}.exe"
-    cp "${app_exe}" "${out_dir}/modelizer-next-app-portable-${platform}-${VERSION}.exe"
+    cp "${app_exe}" "${out_dir}/modelizer-next-app-standalone-${platform}-${VERSION}.exe"
   else
     local bootstrap_exe
     bootstrap_exe="$(find_single_file "modelizer-next-bootstrap/target/dist/linux" '*.deb')"
@@ -178,7 +178,7 @@ stage_platform_artifacts() {
     app_exe="$(find_single_file "modelizer-next-app/target/dist/linux" '*.deb')"
 
     cp "${bootstrap_exe}" "${out_dir}/modelizer-next-bootstrap-${platform}-${VERSION}.deb"
-    cp "${app_exe}" "${out_dir}/modelizer-next-app-portable-${platform}-${VERSION}.deb"
+    cp "${app_exe}" "${out_dir}/modelizer-next-app-standalone-${platform}-${VERSION}.deb"
   fi
 }
 
@@ -203,9 +203,9 @@ run_platform_build() {
   compute_build_metadata "${channel}" "${platform}"
 
   if [ "${platform}" = "windows" ]; then
-    extra_profiles="native-windows,standalone,standalone-native-windows"
+    extra_profiles="native-windows,standalone"
   else
-    extra_profiles="native-linux,standalone,standalone-native-linux"
+    extra_profiles="native-linux,standalone"
   fi
 
   echo "Starting ${platform} ${channel} native build"

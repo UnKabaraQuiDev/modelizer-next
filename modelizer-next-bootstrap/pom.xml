@@ -74,7 +74,7 @@
 									<executable>jpackage</executable>
 									<arguments>
 										<argument>--type</argument>
-										<argument>exe</argument>
+										<argument>${jpackage.type.windows}</argument>
 										<argument>--name</argument>
 										<argument>${jpackage.name}</argument>
 										<argument>--app-version</argument>
@@ -126,7 +126,7 @@
 									<executable>jpackage</executable>
 									<arguments>
 										<argument>--type</argument>
-										<argument>deb</argument>
+										<argument>${jpackage.type.linux}</argument>
 										<argument>--name</argument>
 										<argument>${jpackage.name}</argument>
 										<argument>--app-version</argument>

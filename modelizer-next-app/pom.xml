@@ -70,7 +70,7 @@
 			</build>
 		</profile>
 		<profile>
-			<id>standalone-native-windows</id>
+			<id>native-windows</id>
 			<activation>
 				<activeByDefault>false</activeByDefault>
 			</activation>
@@ -90,7 +90,7 @@
 									<executable>jpackage</executable>
 									<arguments>
 										<argument>--type</argument>
-										<argument>exe</argument>
+										<argument>${jpackage.type.windows}</argument>
 										<argument>--name</argument>
 										<argument>${jpackage.name}</argument>
 										<argument>--app-version</argument>
@@ -125,7 +125,7 @@
 			</build>
 		</profile>
 		<profile>
-			<id>standalone-native-linux</id>
+			<id>native-linux</id>
 			<activation>
 				<activeByDefault>false</activeByDefault>
 			</activation>
@@ -145,7 +145,7 @@
 									<executable>jpackage</executable>
 									<arguments>
 										<argument>--type</argument>
-										<argument>deb</argument>
+										<argument>${jpackage.type.linux}</argument>
 										<argument>--name</argument>
 										<argument>${jpackage.name}</argument>
 										<argument>--app-version</argument>
