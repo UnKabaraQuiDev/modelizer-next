@@ -166,11 +166,11 @@ jobs:
       - name: Prepare release assets
         run: |
           mkdir -p release-assets
-          cp collected/snapshot-shared/* release-assets/
-          cp collected/snapshot-linux/* release-assets/
-          cp collected/snapshot-windows/* release-assets/
+          cp collected/nightly-shared/* release-assets/
+          cp collected/nightly-linux/* release-assets/
+          cp collected/nightly-windows/* release-assets/
 
-      - name: Create or update snapshot release
+      - name: Create or update nightly release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ env.RELEASE_TAG }}
@@ -193,16 +193,16 @@ jobs:
           mkdir -p registry
 
           [ -f registry/release.json ] || echo '{"channel":"release","entries":[]}' > registry/release.json
-          [ -f registry/snapshot.json ] || echo '{"channel":"snapshot","entries":[]}' > registry/snapshot.json
+          [ -f registry/nightly.json ] || echo '{"channel":"nightly","entries":[]}' > registry/nightly.json
           [ -f registry/nightly.json ] || echo '{"channel":"nightly","entries":[]}' > registry/nightly.json
 
-          bash "$GITHUB_WORKSPACE/script/update-channel-registry.sh" registry/snapshot.json snapshot "$VERSION" "$RELEASE_TAG" \
+          bash "$GITHUB_WORKSPACE/script/update-channel-registry.sh" registry/nightly.json nightly "$VERSION" "$RELEASE_TAG" \
             "https://github.com/${{ github.repository }}/releases/tag/$RELEASE_TAG" \
             "$(cat assets.json)" \
-            "Latest snapshot build."
+            "Latest nightly build."
 
           bash "$GITHUB_WORKSPACE/script/rebuild-versions-manifest.sh" registry registry/versions.json
 
-          git add -A script .gitignore registry/nightly.json registry/release.json registry/snapshot.json registry/versions.json
-          git commit -m "[bot] Sync scripts from main and update snapshot registry to $VERSION" || exit 0
+          git add -A script .gitignore registry/nightly.json registry/release.json registry/nightly.json registry/versions.json
+          git commit -m "[bot] Sync scripts from main and update nightly registry to $VERSION" || exit 0
           git push origin HEAD:registry

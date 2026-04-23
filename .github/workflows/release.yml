@@ -148,46 +148,62 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          ref: 'registry'
+          ref: registry
+
+      - name: Sync script files and .gitignore from main into registry
+        run: |
+          git fetch origin main registry
+          git checkout -B registry origin/registry
+
+          rm -rf script
+          rm -f .gitignore
+
+          git checkout origin/main -- script .gitignore
+
       - uses: actions/download-artifact@v4
         with:
           path: collected
+
       - name: Prepare release assets
         run: |
           mkdir -p release-assets
           cp collected/release-shared/* release-assets/
           cp collected/release-linux/* release-assets/
           cp collected/release-windows/* release-assets/
-      - name: Create or update release
+
+      - name: Create or update release release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ env.RELEASE_TAG }}
           name: ${{ env.RELEASE_TAG }}
-          prerelease: false
-          make_latest: true
+          prerelease: true
+          make_latest: false
           generate_release_notes: true
           files: release-assets/*
+
       - name: Update registry
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           REPOSITORY="${{ github.repository }}" RELEASE_TAG="$RELEASE_TAG" \
             python3 "$GITHUB_WORKSPACE/script/generate-assets-json.py" release-assets > assets.json
+
           git config --global user.name "github-actions"
           git config --global user.email "github-actions@github.com"
 
           mkdir -p registry
 
           [ -f registry/release.json ] || echo '{"channel":"release","entries":[]}' > registry/release.json
-          [ -f registry/snapshot.json ] || echo '{"channel":"snapshot","entries":[]}' > registry/snapshot.json
-          [ -f registry/nightly.json ] || echo '{"channel":"nightly","entries":[]}' > registry/nightly.json
+          [ -f registry/release.json ] || echo '{"channel":"release","entries":[]}' > registry/release.json
+          [ -f registry/release.json ] || echo '{"channel":"release","entries":[]}' > registry/release.json
 
           bash "$GITHUB_WORKSPACE/script/update-channel-registry.sh" registry/release.json release "$VERSION" "$RELEASE_TAG" \
             "https://github.com/${{ github.repository }}/releases/tag/$RELEASE_TAG" \
             "$(cat assets.json)" \
-            "Latest stable release."
+            "Latest release build."
+
           bash "$GITHUB_WORKSPACE/script/rebuild-versions-manifest.sh" registry registry/versions.json
 
-          git add registry/nightly.json registry/release.json registry/snapshot.json registry/versions.json
-          git commit -m "[bot] Update release registry to $VERSION" || exit 0
+          git add -A script .gitignore registry/release.json registry/release.json registry/release.json registry/versions.json
+          git commit -m "[bot] Sync scripts from main and update release registry to $VERSION" || exit 0
           git push origin HEAD:registry
