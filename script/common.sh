@@ -182,6 +182,40 @@ stage_platform_artifacts() {
   fi
 }
 
+find_single_directory() {
+  local directory="$1"
+  local dir
+  dir="$(find "${directory}" -mindepth 1 -maxdepth 1 -type d | head -n 1 || true)"
+  if [ -z "${dir}" ]; then
+    echo "Missing directory in ${directory}" >&2
+    exit 1
+  fi
+  echo "${dir}"
+}
+
+stage_portable_artifacts() {
+  local channel="$1"
+  local platform="$2"
+  local out_dir="${ARTIFACTS_ROOT}/${channel}/${platform}-portable"
+  local source_dir
+  local archive_name
+
+  rm -rf "${out_dir}"
+  mkdir -p "${out_dir}"
+
+  if [ "${platform}" = "windows" ]; then
+    source_dir="$(find_single_directory "modelizer-next-app/target/dist/windows")"
+  else
+    source_dir="$(find_single_directory "modelizer-next-app/target/dist/linux")"
+  fi
+
+  archive_name="modelizer-next-app-portable-${platform}-${VERSION}.zip"
+  (
+    cd "$(dirname "${source_dir}")"
+    jar --create --file "${out_dir}/${archive_name}" "$(basename "${source_dir}")"
+  )
+}
+
 run_shared_build() {
   local channel="$1"
   compute_build_metadata "${channel}" "shared"
@@ -191,7 +225,7 @@ run_shared_build() {
 
   mvn -B -DskipTests -Drevision="${VERSION}" -DappVersion="${APP_VERSION}" \
     -Ddistributor="Automated ${channel} build ${BUILD_TIMESTAMP} (shared)" \
-    -Pall clean package
+    clean package
 
   stage_shared_artifacts "${channel}"
 }
@@ -199,21 +233,49 @@ run_shared_build() {
 run_platform_build() {
   local channel="$1"
   local platform="$2"
+  local build_kind="${3:-installer}"
   local extra_profiles
+  local mvn_args=()
+
   compute_build_metadata "${channel}" "${platform}"
 
-  if [ "${platform}" = "windows" ]; then
-    extra_profiles="native-windows,standalone"
-  else
-    extra_profiles="native-linux,standalone"
-  fi
+  case "${build_kind}" in
+    standalone)
+      echo "Starting ${platform} ${channel} standalone build"
+      mvn_args=(-pl modelizer-next-app -am -DskipLinuxInstaller=true -DskipWindowsInstaller=true)
+      extra_profiles="standalone,native-${platform}"
+      ;;
 
-  echo "Starting ${platform} ${channel} native build"
+    portable)
+      echo "Starting ${platform} ${channel} portable build"
+      mvn_args=(-pl modelizer-next-app -am -DskipLinuxInstaller=true -DskipWindowsInstaller=true)
+      extra_profiles="portable-${platform},native-${platform}"
+      ;;
+
+    installer|normal)
+      echo "Starting ${platform} ${channel} native installer build"
+      extra_profiles="native-${platform}"
+      ;;
+
+    *)
+      echo "Unknown build kind: ${build_kind}" >&2
+      return 1
+      ;;
+  esac
+
   echo "Version [$(channel_upper "${channel}")]: ${VERSION} (${BASE_VERSION}) = ${APP_VERSION}"
 
   mvn -B -DskipTests -Drevision="${VERSION}" -DappVersion="${APP_VERSION}" \
-    -Ddistributor="Automated ${channel} build ${BUILD_TIMESTAMP} (${platform})" \
-    -Pall,native,${extra_profiles} clean package
+    -Ddistributor="Automated ${channel} build ${BUILD_TIMESTAMP} (${platform}-${build_kind})" \
+    "${mvn_args[@]}" \
+    -Pnative,${extra_profiles} clean package
 
-  stage_platform_artifacts "${channel}" "${platform}"
+  case "${build_kind}" in
+    portable)
+      stage_portable_artifacts "${channel}" "${platform}"
+      ;;
+    *)
+      stage_platform_artifacts "${channel}" "${platform}"
+      ;;
+  esac
 }

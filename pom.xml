@@ -45,8 +45,10 @@
 		<jpackage.vendor>${project.groupId}</jpackage.vendor>
 		<jpackage.type>filled in by profiles</jpackage.type>
 		<app.mainClass>filled in by modules</app.mainClass>
-		<skipLinux>true</skipLinux>
-		<skipWindows>true</skipWindows>
+		<skipLinuxInstaller>true</skipLinuxInstaller>
+		<skipWindowsInstaller>true</skipWindowsInstaller>
+		<skipLinuxPortable>true</skipLinuxPortable>
+		<skipWindowsPortable>true</skipWindowsPortable>
 		<skipNative>true</skipNative>
 	</properties>
 
@@ -231,6 +233,7 @@
 									</target>
 								</configuration>
 							</execution>
+
 						</executions>
 					</plugin>
 					<plugin>
@@ -336,14 +339,14 @@
 							</execution>
 
 							<execution>
-								<id>package-app-linux</id>
+								<id>package-installer-linux</id>
 								<phase>package</phase>
 								<goals>
 									<goal>run</goal>
 								</goals>
 
 								<configuration>
-									<skip>${skipLinux}</skip>
+									<skip>${skipLinuxInstaller}</skip>
 									<target>
 
 										<exec executable="jpackage"
@@ -397,14 +400,14 @@
 								</configuration>
 							</execution>
 							<execution>
-								<id>package-app-windows</id>
+								<id>package-installer-windows</id>
 								<phase>package</phase>
 								<goals>
 									<goal>run</goal>
 								</goals>
 
 								<configuration>
-									<skip>${skipWindows}</skip>
+									<skip>${skipWindowsInstaller}</skip>
 									<target>
 
 										<exec executable="jpackage"
@@ -460,6 +463,99 @@
 									</target>
 								</configuration>
 							</execution>
+							<execution>
+								<id>package-app-image-linux</id>
+								<phase>package</phase>
+								<goals>
+									<goal>run</goal>
+								</goals>
+
+								<configuration>
+									<skip>${skipLinuxPortable}</skip>
+									<target>
+
+										<exec executable="jpackage"
+											failonerror="true">
+
+											<arg value="--type" />
+											<arg value="${jpackage.type}" />
+
+											<arg value="--name" />
+											<arg value="${jpackage.name}" />
+
+											<arg value="--vendor" />
+											<arg value="${jpackage.vendor}" />
+
+											<arg value="--app-version" />
+											<arg value="${appVersion}" />
+
+											<arg value="--input" />
+											<arg value="${jpackage.inputDir}" />
+
+											<arg value="--main-jar" />
+											<arg value="${jpackage.inputJar}" />
+
+											<arg value="--dest" />
+											<arg value="${jpackage.outputDir}" />
+
+											<arg value="--add-modules" />
+											<arg value="${jpackage.addModules}" />
+
+											<arg value="--icon" />
+											<arg value="${jpackage.icon}" />
+
+										</exec>
+
+									</target>
+								</configuration>
+							</execution>
+							<execution>
+								<id>package-app-image-windows</id>
+								<phase>package</phase>
+								<goals>
+									<goal>run</goal>
+								</goals>
+
+								<configuration>
+									<skip>${skipWindowsPortable}</skip>
+									<target>
+
+										<exec executable="jpackage"
+											failonerror="true">
+
+											<arg value="--type" />
+											<arg value="${jpackage.type}" />
+
+											<arg value="--name" />
+											<arg value="${jpackage.name}" />
+
+											<arg value="--vendor" />
+											<arg value="${jpackage.vendor}" />
+
+											<arg value="--app-version" />
+											<arg value="${appVersion}" />
+
+											<arg value="--input" />
+											<arg value="${jpackage.inputDir}" />
+
+											<arg value="--main-jar" />
+											<arg value="${jpackage.inputJar}" />
+
+											<arg value="--dest" />
+											<arg value="${jpackage.outputDir}" />
+
+											<arg value="--add-modules" />
+											<arg value="${jpackage.addModules}" />
+
+											<arg value="--icon" />
+											<arg value="${jpackage.icon}" />
+
+										</exec>
+
+									</target>
+								</configuration>
+							</execution>
+
 						</executions>
 					</plugin>
 				</plugins>
@@ -480,7 +576,7 @@
 				<jpackage.icon>${jpackage.inputDir}/icon.png</jpackage.icon>
 				<jpackage.add>${maven.multiModuleProjectDirectory}/app/linux</jpackage.add>
 				<jpackage.outputDir>${project.build.directory}/dist/linux</jpackage.outputDir>
-				<skipLinux>false</skipLinux>
+				<skipLinuxInstaller>false</skipLinuxInstaller>
 			</properties>
 		</profile>
 
@@ -491,14 +587,27 @@
 				<jpackage.icon>${jpackage.inputDir}/icon.ico</jpackage.icon>
 				<jpackage.add>${maven.multiModuleProjectDirectory}/app/windows</jpackage.add>
 				<jpackage.outputDir>${project.build.directory}/dist/windows</jpackage.outputDir>
-				<skipWindows>false</skipWindows>
+				<skipWindowsInstaller>false</skipWindowsInstaller>
 			</properties>
 		</profile>
 
 		<profile>
-			<id>portable</id>
+			<id>portable-windows</id>
 			<properties>
 				<jpackage.type>app-image</jpackage.type>
+				<skipLinuxInstaller>true</skipLinuxInstaller>
+				<skipWindowsInstaller>true</skipWindowsInstaller>
+				<skipWindowsPortable>false</skipWindowsPortable>
+			</properties>
+		</profile>
+		
+		<profile>
+			<id>portable-linux</id>
+			<properties>
+				<jpackage.type>app-image</jpackage.type>
+				<skipLinuxInstaller>true</skipLinuxInstaller>
+				<skipWindowsInstaller>true</skipWindowsInstaller>
+				<skipLinuxPortable>false</skipLinuxPortable>
 			</properties>
 		</profile>
 

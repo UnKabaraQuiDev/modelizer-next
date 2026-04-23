@@ -115,6 +115,25 @@ jobs:
           path: artifacts/release/linux/*
           if-no-files-found: error
 
+  build-linux-portable:
+    needs: [prepare, format]
+    runs-on: [self-hosted, linux]
+    env:
+      VERSION_OVERRIDE: ${{ needs.prepare.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 21
+      - name: Build Linux portable artifacts
+        run: bash ./script/build-release-linux-portable.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: release-linux-portable
+          path: artifacts/release/linux-portable/*
+          if-no-files-found: error
+
   build-windows:
     needs: [prepare, format]
     runs-on: [self-hosted, windows]
@@ -137,8 +156,30 @@ jobs:
           path: artifacts/release/windows/*
           if-no-files-found: error
 
+  build-windows-portable:
+    needs: [prepare, format]
+    runs-on: [self-hosted, windows]
+    env:
+      VERSION_OVERRIDE: ${{ needs.prepare.outputs.version }}
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 21
+      - name: Build Windows portable artifacts
+        run: bash ./script/build-release-windows-portable.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: release-windows-portable
+          path: artifacts/release/windows-portable/*
+          if-no-files-found: error
+
   publish:
-    needs: [prepare, build-shared, build-linux, build-windows]
+    needs: [prepare, build-shared, build-linux, build-linux-portable, build-windows, build-windows-portable]
     runs-on: [self-hosted, linux]
     env:
       VERSION: ${{ needs.prepare.outputs.version }}
@@ -169,7 +210,9 @@ jobs:
           mkdir -p release-assets
           cp collected/release-shared/* release-assets/
           cp collected/release-linux/* release-assets/
+          cp collected/release-linux-portable/* release-assets/
           cp collected/release-windows/* release-assets/
+          cp collected/release-windows-portable/* release-assets/
 
       - name: Create or update release release
         uses: softprops/action-gh-release@v2
