@@ -166,40 +166,31 @@ public class DiagramCanvas extends JPanel {
 
 	}
 
-	public Object findType(SelectedElement se) {
-		return switch (se.type()) {
-		case CLASS -> findClassById(se.classId());
-		case COMMENT -> findCommentById(se.commentId());
-		case FIELD -> findFieldById(se.classId(), se.fieldId());
-		case LINK -> findLinkById(se.linkId());
-		default -> null;
-		};
-	}
-
 	private static final long serialVersionUID = -3410889122837999151L;
+
 	private static final Font TITLE_FONT = new Font(Font.SANS_SERIF, Font.BOLD, 14);
 	private static final Font BODY_FONT = new Font(Font.SANS_SERIF, Font.PLAIN, 12);
-
 	private static final int CLASS_MIN_WIDTH = 140;
+
 	private static final int COMMENT_MIN_WIDTH = 120;
 	private static final int HEADER_HEIGHT = 28;
-
 	private static final int ROW_HEIGHT = 22;
+
 	private static final int PADDING = 8;
 	private static final int COMMENT_RESIZE_HANDLE_SIZE = 12;
-
 	private static final int COMMENT_MIN_HEIGHT = 40;
+
 	private static final int COMMENT_MIN_WIDTH_VALUE = 120;
 	private static final Color CANVAS_BACKGROUND_COLOR = new Color(0xF2F2F2);
 	private static final Color GRID_COLOR = new Color(0xE4E4E4);
 	private static final Color SELECTION_COLOR = new Color(0x2F7DFF);
-	private static final Color SELECTION_FILL_COLOR = new Color(SELECTION_COLOR.getRed(),
-			SELECTION_COLOR.getGreen(),
-			SELECTION_COLOR.getBlue(),
+	private static final Color SELECTION_FILL_COLOR = new Color(DiagramCanvas.SELECTION_COLOR.getRed(),
+			DiagramCanvas.SELECTION_COLOR.getGreen(),
+			DiagramCanvas.SELECTION_COLOR.getBlue(),
 			60);
 	private static final Color COMMENT_CONNECTOR_COLOR = new Color(0x777777);
-
 	private static final BasicStroke DEFAULT_STROKE = new BasicStroke(1.0f);
+
 	private static final BasicStroke FIELD_SELECTION_STROKE = new BasicStroke(2.0f);
 	private static final BasicStroke SELECTION_STROKE = new BasicStroke(2.5f);
 	private static final BasicStroke LINK_DEFAULT_STROKE = new BasicStroke(1.2f);
@@ -222,39 +213,38 @@ public class DiagramCanvas extends JPanel {
 			10.0f,
 			new float[] { 6.0f, 6.0f },
 			0.0f);
-
 	private static final double LINK_HIT_DISTANCE = 6.0;
-	private final ModelDocument document;
-	private final PanelType panelType;
-
-	private final CanvasEventListener eventListener;
-	private DraggedSelection draggedSelection;
-	private Point lastScreenPoint;
-
-	private boolean panning;
-	private LinkCreationState linkCreationState;
-	private SelectedElement linkPreviewTarget;
-	private Point2D.Double linkPreviewMousePoint;
-
-	private SelectedElement selectedElement;
-	private final LinkedHashSet<SelectedElement> selectedElements = new LinkedHashSet<>();
-	private ResizingComment resizingComment;
-
-	private StylePalette defaultPalette;
-
-	private SelectedElement pendingClickSelection;
-	private boolean pendingModifierSelection;
-	private boolean dragOccurred;
-
-	private Point2D.Double currentDragOffset = new Point2D.Double();
 
 	private static final double CONCEPTUAL_ANCHOR_SPACING = 18.0;
 	private static final double SELF_LINK_OUTSIDE_OFFSET = 40.0;
+	private final ModelDocument document;
+
+	private final PanelType panelType;
+	private final CanvasEventListener eventListener;
+	private DraggedSelection draggedSelection;
+
+	private Point lastScreenPoint;
+	private boolean panning;
+	private LinkCreationState linkCreationState;
+	private SelectedElement linkPreviewTarget;
+
+	private Point2D.Double linkPreviewMousePoint;
+	private SelectedElement selectedElement;
+	private final LinkedHashSet<SelectedElement> selectedElements = new LinkedHashSet<>();
+
+	private ResizingComment resizingComment;
+
+	private StylePalette defaultPalette;
+	private SelectedElement pendingClickSelection;
+	private boolean pendingModifierSelection;
+
+	private boolean dragOccurred;
+
+	private Point2D.Double currentDragOffset = new Point2D.Double();
 	private final Map<String, AnchorPair> conceptualAnchorCache = new HashMap<>();
 	private final Map<String, LinkAnchorPlacement> conceptualAnchorPlacements = new HashMap<>();
 	private final Map<ClassSideKey, List<String>> conceptualSideLinkCache = new HashMap<>();
 	private boolean conceptualAnchorCacheValid;
-
 	private final Comparator<ClassModel> comparator = (a, b) -> {
 		if (this.selectedElement == null || this.selectedElement.type() != SelectedType.CLASS) {
 			return 0;
@@ -316,21 +306,21 @@ public class DiagramCanvas extends JPanel {
 		commentModel.setVisibility(PanelType.CONCEPTUAL, PanelType.LOGICAL, PanelType.LOGICAL);
 		this.applyDefaultPaletteToComment(commentModel);
 
-		if (selectedElement != null && selectedElement.type() == SelectedType.COMMENT) {
-			final CommentModel cm = findCommentById(selectedElement.commentId());
+		if (this.selectedElement != null && this.selectedElement.type() == SelectedType.COMMENT) {
+			final CommentModel cm = this.findCommentById(this.selectedElement.commentId());
 			final CommentBinding cb = cm.getBinding();
 			if (cm.getKind() != CommentKind.STANDALONE) {
 				commentModel.setKind(CommentKind.BOUND);
 				commentModel.setBinding(new CommentBinding(cb.getTargetType(), cb.getTargetId()));
 			}
-		} else if (selectedElement != null && selectedElement.type() != SelectedType.COMMENT
-				&& selectedElement.type() != SelectedType.NONE) {
+		} else if (this.selectedElement != null && this.selectedElement.type() != SelectedType.COMMENT
+				&& this.selectedElement.type() != SelectedType.NONE) {
 			commentModel.setKind(CommentKind.BOUND);
-			commentModel.setBinding(switch (selectedElement.type()) {
-			case CLASS -> new CommentBinding(BoundTargetType.CLASS, selectedElement.classId());
-			case LINK -> new CommentBinding(BoundTargetType.LINK, selectedElement.linkId());
-			case FIELD -> new CommentBinding(BoundTargetType.CLASS, selectedElement.classId());
-			default -> throw new IllegalStateException("Cannot bind comment to: " + selectedElement);
+			commentModel.setBinding(switch (this.selectedElement.type()) {
+			case CLASS -> new CommentBinding(BoundTargetType.CLASS, this.selectedElement.classId());
+			case LINK -> new CommentBinding(BoundTargetType.LINK, this.selectedElement.linkId());
+			case FIELD -> new CommentBinding(BoundTargetType.CLASS, this.selectedElement.classId());
+			default -> throw new IllegalStateException("Cannot bind comment to: " + this.selectedElement);
 			});
 		}
 
@@ -551,6 +541,23 @@ public class DiagramCanvas extends JPanel {
 		this.repaint();
 	}
 
+	private void bindCommentToTarget(final String commentId, final SelectedElement target) {
+		final CommentModel commentModel = this.findCommentById(commentId);
+		if (commentModel == null || target == null) {
+			return;
+		}
+
+		commentModel.setKind(CommentKind.BOUND);
+		commentModel.setBinding(switch (target.type()) {
+		case CLASS, FIELD -> new CommentBinding(BoundTargetType.CLASS, target.classId());
+		case LINK -> new CommentBinding(BoundTargetType.LINK, target.linkId());
+		default -> throw new IllegalStateException("Cannot bind comment to: " + target);
+		});
+
+		this.select(SelectedElement.forComment(commentId));
+		this.notifyDocumentChanged();
+	}
+
 	private String blankToFallback(final String primary, final String secondary, final String fallback) {
 		if (primary != null && !primary.isBlank()) {
 			return primary;
@@ -563,6 +570,18 @@ public class DiagramCanvas extends JPanel {
 
 	private void buildDragRenderLayers(final DraggedSelection selection) {
 		this.currentDragOffset = new Point2D.Double();
+	}
+
+	private String buildForeignKeyFieldName(final ClassModel targetClass, final FieldModel targetField) {
+		final String className = this
+				.blankToFallback(targetClass.getNames().getTechnicalName(), targetClass.getNames().getConceptualName(), "target");
+		final String fieldName = this.blankToFallback(targetField.getNames().getTechnicalName(), targetField.getNames().getName(), "id");
+		return className + "_" + fieldName;
+	}
+
+	private String buildForeignKeyFieldTechnicalName(final ClassModel targetClass, final FieldModel targetField) {
+		final String rawName = this.buildForeignKeyFieldName(targetClass, targetField);
+		return rawName.trim().replaceAll("[^A-Za-z0-9_]+", "_").replaceAll("_+", "_").replaceAll("^_|_$", "").toLowerCase();
 	}
 
 	private String buildLinkPath(final LinkModel linkModel) {
@@ -713,6 +732,61 @@ public class DiagramCanvas extends JPanel {
 		return points;
 	}
 
+	private AnchorSidePair chooseBestConceptualSidePair(
+			final String fromClassId,
+			final Rectangle2D fromBounds,
+			final String toClassId,
+			final Rectangle2D toBounds) {
+
+		AnchorSidePair bestPair = new AnchorSidePair(AnchorSide.LEFT, AnchorSide.RIGHT);
+		double bestScore = Double.POSITIVE_INFINITY;
+
+		final List<AnchorSidePair> allowedPairs = List.of(new AnchorSidePair(AnchorSide.LEFT, AnchorSide.RIGHT),
+				new AnchorSidePair(AnchorSide.RIGHT, AnchorSide.LEFT),
+				new AnchorSidePair(AnchorSide.TOP, AnchorSide.BOTTOM),
+				new AnchorSidePair(AnchorSide.BOTTOM, AnchorSide.TOP));
+
+		for (final AnchorSidePair pair : allowedPairs) {
+			final Point2D fromCenter = this.computeConceptualSideCenter(fromBounds, pair.fromSide());
+			final Point2D toCenter = this.computeConceptualSideCenter(toBounds, pair.toSide());
+
+			final double distance = fromCenter.distance(toCenter);
+			final double loadPenalty = (this.getConceptualSideLinkCount(fromClassId, pair.fromSide())
+					+ this.getConceptualSideLinkCount(toClassId, pair.toSide())) * 12.0;
+
+			final double score = distance + loadPenalty;
+
+			if (score < bestScore) {
+				bestScore = score;
+				bestPair = pair;
+			}
+		}
+
+		return bestPair;
+	}
+
+	private AnchorSide chooseSelfLinkFromSide(final String classId) {
+		AnchorSide bestSide = AnchorSide.TOP;
+		int bestCount = Integer.MAX_VALUE;
+
+		for (final AnchorSide side : AnchorSide.values()) {
+			final int sideCount = this.getConceptualSideLinkCount(classId, side);
+			if (sideCount < bestCount) {
+				bestCount = sideCount;
+				bestSide = side;
+			}
+		}
+
+		return bestSide;
+	}
+
+	private AnchorSide chooseTechnicalSelfLinkSide(final Graphics2D g2, final LinkModel linkModel) {
+		final String classId = linkModel.getFrom().getClassId();
+		final int leftCount = this.getTechnicalSideLinkCount(g2, classId, AnchorSide.LEFT, linkModel.getId());
+		final int rightCount = this.getTechnicalSideLinkCount(g2, classId, AnchorSide.RIGHT, linkModel.getId());
+		return leftCount <= rightCount ? AnchorSide.LEFT : AnchorSide.RIGHT;
+	}
+
 	private double clamp(final double value, final double min, final double max) {
 		return Math.max(min, Math.min(max, value));
 	}
@@ -722,6 +796,15 @@ public class DiagramCanvas extends JPanel {
 		this.selectedElement = null;
 		this.notifySelectionChanged();
 		this.repaint();
+	}
+
+	private AnchorSide clockwise(final AnchorSide side) {
+		return switch (side) {
+		case TOP -> AnchorSide.RIGHT;
+		case RIGHT -> AnchorSide.BOTTOM;
+		case BOTTOM -> AnchorSide.LEFT;
+		case LEFT -> AnchorSide.TOP;
+		};
 	}
 
 	private Rectangle2D computeClassBounds(final Graphics2D g2, final ClassModel classModel, final NodeLayout layout) {
@@ -834,170 +917,6 @@ public class DiagramCanvas extends JPanel {
 		};
 	}
 
-	private AnchorSide clockwise(final AnchorSide side) {
-		return switch (side) {
-		case TOP -> AnchorSide.RIGHT;
-		case RIGHT -> AnchorSide.BOTTOM;
-		case BOTTOM -> AnchorSide.LEFT;
-		case LEFT -> AnchorSide.TOP;
-		};
-	}
-
-	private AnchorSide chooseSelfLinkFromSide(final String classId) {
-		AnchorSide bestSide = AnchorSide.TOP;
-		int bestCount = Integer.MAX_VALUE;
-
-		for (final AnchorSide side : AnchorSide.values()) {
-			final int sideCount = this.getConceptualSideLinkCount(classId, side);
-			if (sideCount < bestCount) {
-				bestCount = sideCount;
-				bestSide = side;
-			}
-		}
-
-		return bestSide;
-	}
-
-	private AnchorSidePair chooseBestConceptualSidePair(
-			final String fromClassId,
-			final Rectangle2D fromBounds,
-			final String toClassId,
-			final Rectangle2D toBounds) {
-
-		AnchorSidePair bestPair = new AnchorSidePair(AnchorSide.LEFT, AnchorSide.RIGHT);
-		double bestScore = Double.POSITIVE_INFINITY;
-
-		final List<AnchorSidePair> allowedPairs = List.of(new AnchorSidePair(AnchorSide.LEFT, AnchorSide.RIGHT),
-				new AnchorSidePair(AnchorSide.RIGHT, AnchorSide.LEFT),
-				new AnchorSidePair(AnchorSide.TOP, AnchorSide.BOTTOM),
-				new AnchorSidePair(AnchorSide.BOTTOM, AnchorSide.TOP));
-
-		for (final AnchorSidePair pair : allowedPairs) {
-			final Point2D fromCenter = this.computeConceptualSideCenter(fromBounds, pair.fromSide());
-			final Point2D toCenter = this.computeConceptualSideCenter(toBounds, pair.toSide());
-
-			final double distance = fromCenter.distance(toCenter);
-			final double loadPenalty = (this.getConceptualSideLinkCount(fromClassId, pair.fromSide())
-					+ this.getConceptualSideLinkCount(toClassId, pair.toSide())) * 12.0;
-
-			final double score = distance + loadPenalty;
-
-			if (score < bestScore) {
-				bestScore = score;
-				bestPair = pair;
-			}
-		}
-
-		return bestPair;
-	}
-
-	private int getConceptualSideLinkCount(final String classId, final AnchorSide side) {
-		final List<String> links = this.conceptualSideLinkCache.get(new ClassSideKey(classId, side));
-		return links == null ? 0 : links.size();
-	}
-
-	private void ensureConceptualAnchorCache(final Graphics2D g2) {
-		if (this.panelType != PanelType.CONCEPTUAL || this.conceptualAnchorCacheValid) {
-			return;
-		}
-
-		this.rebuildConceptualAnchorCache(g2);
-	}
-
-	private void invalidateConceptualAnchorCache() {
-		this.conceptualAnchorCache.clear();
-		this.conceptualAnchorPlacements.clear();
-		this.conceptualSideLinkCache.clear();
-		this.conceptualAnchorCacheValid = false;
-	}
-
-	private void rebuildConceptualAnchorCache(final Graphics2D g2) {
-		this.invalidateConceptualAnchorCache();
-
-		final Map<String, Rectangle2D> boundsByClassId = new HashMap<>();
-		final List<LinkModel> visibleLinks = new ArrayList<>();
-		final Map<String, AnchorSidePair> sidePairs = new HashMap<>();
-
-		for (final LinkModel linkModel : this.getActiveLinks()) {
-			final ClassModel fromClass = this.findClassById(linkModel.getFrom().getClassId());
-			final ClassModel toClass = this.findClassById(linkModel.getTo().getClassId());
-			if (fromClass == null || toClass == null || !this.isVisible(fromClass) || !this.isVisible(toClass)) {
-				continue;
-			}
-
-			final Rectangle2D fromBounds = boundsByClassId.computeIfAbsent(fromClass.getId(), classId -> {
-				final NodeLayout layout = this.resolveRenderLayout(this.findOrCreateNodeLayout(LayoutObjectType.CLASS, classId));
-				return this.computeClassBounds(g2, fromClass, layout);
-			});
-			final Rectangle2D toBounds = boundsByClassId.computeIfAbsent(toClass.getId(), classId -> {
-				final NodeLayout layout = this.resolveRenderLayout(this.findOrCreateNodeLayout(LayoutObjectType.CLASS, classId));
-				return this.computeClassBounds(g2, toClass, layout);
-			});
-
-			final AnchorSidePair sidePair;
-			if (linkModel.isSelfLinking()) {
-				final AnchorSide fromSide = this.chooseSelfLinkFromSide(fromClass.getId());
-				sidePair = new AnchorSidePair(fromSide, this.clockwise(fromSide));
-			} else {
-				sidePair = this.chooseBestConceptualSidePair(fromClass.getId(), fromBounds, toClass.getId(), toBounds);
-			}
-
-			sidePairs.put(linkModel.getId(), sidePair);
-			this.conceptualSideLinkCache.computeIfAbsent(new ClassSideKey(fromClass.getId(), sidePair.fromSide()), key -> new ArrayList<>())
-					.add(linkModel.getId());
-			this.conceptualSideLinkCache.computeIfAbsent(new ClassSideKey(toClass.getId(), sidePair.toSide()), key -> new ArrayList<>())
-					.add(linkModel.getId());
-			visibleLinks.add(linkModel);
-		}
-
-		final Map<ClassSideKey, Map<String, Integer>> indexByKey = new HashMap<>();
-		for (final Map.Entry<ClassSideKey, List<String>> entry : this.conceptualSideLinkCache.entrySet()) {
-			final ClassSideKey key = entry.getKey();
-			final List<String> linkIds = entry.getValue();
-			linkIds.sort(Comparator.comparingDouble(
-					(String linkId) -> this.computeConceptualSortValue(linkId, key.classId(), key.side(), boundsByClassId, sidePairs))
-					.thenComparing(linkId -> linkId));
-
-			final Map<String, Integer> indices = new HashMap<>();
-			for (int i = 0; i < linkIds.size(); i++) {
-				indices.put(linkIds.get(i), i);
-			}
-			indexByKey.put(key, indices);
-		}
-
-		for (final LinkModel linkModel : visibleLinks) {
-			final AnchorSidePair sidePair = sidePairs.get(linkModel.getId());
-			if (sidePair == null) {
-				continue;
-			}
-
-			final Rectangle2D fromBounds = boundsByClassId.get(linkModel.getFrom().getClassId());
-			final Rectangle2D toBounds = boundsByClassId.get(linkModel.getTo().getClassId());
-			if (fromBounds == null || toBounds == null) {
-				continue;
-			}
-
-			final ClassSideKey fromKey = new ClassSideKey(linkModel.getFrom().getClassId(), sidePair.fromSide());
-			final ClassSideKey toKey = new ClassSideKey(linkModel.getTo().getClassId(), sidePair.toSide());
-			final List<String> fromLinks = this.conceptualSideLinkCache.get(fromKey);
-			final List<String> toLinks = this.conceptualSideLinkCache.get(toKey);
-			if (fromLinks == null || toLinks == null) {
-				continue;
-			}
-
-			final int fromIndex = indexByKey.get(fromKey).get(linkModel.getId());
-			final int toIndex = indexByKey.get(toKey).get(linkModel.getId());
-			final Point2D fromPoint = this.computeConceptualAnchorPoint(fromBounds, sidePair.fromSide(), fromIndex, fromLinks.size());
-			final Point2D toPoint = this.computeConceptualAnchorPoint(toBounds, sidePair.toSide(), toIndex, toLinks.size());
-
-			this.conceptualAnchorCache.put(linkModel.getId(), new AnchorPair(fromPoint, toPoint));
-			this.conceptualAnchorPlacements.put(linkModel.getId(),
-					new LinkAnchorPlacement(sidePair.fromSide(), sidePair.toSide(), fromIndex, fromLinks.size(), toIndex, toLinks.size()));
-		}
-
-		this.conceptualAnchorCacheValid = true;
-	}
-
 	private Point2D computePolylineMiddlePoint(final List<Point2D> points) {
 		if (points == null || points.size() < 2) {
 			return null;
@@ -1088,6 +1007,20 @@ public class DiagramCanvas extends JPanel {
 		g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 	}
 
+	private void createConceptualLink(final String fromClassId, final String toClassId) {
+		final LinkModel linkModel = new LinkModel();
+		linkModel.setFrom(new LinkEnd(fromClassId, null));
+		linkModel.setTo(new LinkEnd(toClassId, null));
+		linkModel.setCardinalityFrom(Cardinality.ONE);
+		linkModel.setCardinalityTo(Cardinality.ZERO_OR_MANY);
+		this.applyDefaultPaletteToLink(linkModel);
+		this.document.getModel().getConceptualLinks().add(linkModel);
+
+		this.findOrCreateLinkLayout(linkModel.getId());
+		this.select(SelectedElement.forLink(linkModel.getId()));
+		this.notifyDocumentChanged();
+	}
+
 	private DraggedSelection createDraggedSelection(
 			final SelectedElement hitSelection,
 			final NodeLayout hitLayout,
@@ -1124,6 +1057,20 @@ public class DiagramCanvas extends JPanel {
 		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 		return g2;
+	}
+
+	private void createTechnicalLink(final SelectedElement fromEndpoint, final SelectedElement toEndpoint) {
+		final LinkModel linkModel = new LinkModel();
+		linkModel.setFrom(new LinkEnd(fromEndpoint.classId(), fromEndpoint.fieldId()));
+		linkModel.setTo(new LinkEnd(toEndpoint.classId(), toEndpoint.fieldId()));
+		linkModel.setCardinalityFrom(null);
+		linkModel.setCardinalityTo(null);
+		this.applyDefaultPaletteToLink(linkModel);
+		this.document.getModel().getTechnicalLinks().add(linkModel);
+
+		this.findOrCreateLinkLayout(linkModel.getId());
+		this.select(SelectedElement.forLink(linkModel.getId()));
+		this.notifyDocumentChanged();
 	}
 
 	private void deleteClass(final String classId) {
@@ -1357,6 +1304,23 @@ public class DiagramCanvas extends JPanel {
 		}
 	}
 
+	private void drawCommentConnector(final Graphics2D g2, final CommentModel commentModel, final Rectangle2D bounds) {
+		if (commentModel.getKind() != CommentKind.BOUND || commentModel.getBinding() == null) {
+			return;
+		}
+
+		final Point2D anchor = this.findBoundTargetAnchor(g2, commentModel);
+		if (anchor == null) {
+			return;
+		}
+
+		g2.setColor(this.isCommentSelected(commentModel.getId()) ? DiagramCanvas.SELECTION_COLOR : DiagramCanvas.COMMENT_CONNECTOR_COLOR);
+		g2.setStroke(this.isCommentSelected(commentModel.getId()) ? DiagramCanvas.COMMENT_CONNECTOR_SELECTION_STROKE
+				: DiagramCanvas.DEFAULT_STROKE);
+		g2.draw(new Line2D.Double(anchor.getX(), anchor.getY(), bounds.getCenterX(), bounds.getCenterY()));
+		g2.setStroke(DiagramCanvas.DEFAULT_STROKE);
+	}
+
 	private void drawComments(final Graphics2D g2) {
 		for (final CommentModel commentModel : this.document.getModel().getComments()) {
 			final String commentText = this.resolveCommentText(commentModel);
@@ -1391,23 +1355,6 @@ public class DiagramCanvas extends JPanel {
 						DiagramCanvas.COMMENT_RESIZE_HANDLE_SIZE));
 			}
 		}
-	}
-
-	private void drawCommentConnector(final Graphics2D g2, final CommentModel commentModel, final Rectangle2D bounds) {
-		if (commentModel.getKind() != CommentKind.BOUND || commentModel.getBinding() == null) {
-			return;
-		}
-
-		final Point2D anchor = this.findBoundTargetAnchor(g2, commentModel);
-		if (anchor == null) {
-			return;
-		}
-
-		g2.setColor(this.isCommentSelected(commentModel.getId()) ? DiagramCanvas.SELECTION_COLOR : DiagramCanvas.COMMENT_CONNECTOR_COLOR);
-		g2.setStroke(this.isCommentSelected(commentModel.getId()) ? DiagramCanvas.COMMENT_CONNECTOR_SELECTION_STROKE
-				: DiagramCanvas.DEFAULT_STROKE);
-		g2.draw(new Line2D.Double(anchor.getX(), anchor.getY(), bounds.getCenterX(), bounds.getCenterY()));
-		g2.setStroke(DiagramCanvas.DEFAULT_STROKE);
 	}
 
 	private void drawGrid(final Graphics2D g2) {
@@ -1832,6 +1779,27 @@ public class DiagramCanvas extends JPanel {
 		this.repaint();
 	}
 
+	@SuppressWarnings("incomplete-switch")
+	private void editSelected() {
+		if (this.selectedElement == null || this.selectedElement.type() == SelectedType.NONE) {
+			return;
+		}
+		switch (this.selectedElement.type()) {
+		case CLASS -> this.editClass(this.selectedElement.classId());
+		case FIELD -> this.editField(this.selectedElement.classId(), this.selectedElement.fieldId());
+		case COMMENT -> this.editComment(this.selectedElement.commentId());
+		case LINK -> this.editLink(this.selectedElement.linkId());
+		}
+	}
+
+	private void ensureConceptualAnchorCache(final Graphics2D g2) {
+		if (this.panelType != PanelType.CONCEPTUAL || this.conceptualAnchorCacheValid) {
+			return;
+		}
+
+		this.rebuildConceptualAnchorCache(g2);
+	}
+
 	private void ensureLayouts() {
 		for (final ClassModel classModel : this.document.getModel().getClasses()) {
 			if (this.isVisible(classModel)) {
@@ -1845,103 +1813,6 @@ public class DiagramCanvas extends JPanel {
 				this.findOrCreateNodeLayout(LayoutObjectType.COMMENT, commentModel.getId());
 			}
 		}
-	}
-
-	private Point2D findBoundTargetAnchor(final Graphics2D g2, final CommentModel commentModel) {
-		if (commentModel.getBinding() == null) {
-			return null;
-		}
-
-		if (commentModel.getBinding().getTargetType() == BoundTargetType.CLASS) {
-			final ClassModel classModel = this.findClassById(commentModel.getBinding().getTargetId());
-			if (classModel == null || !this.isVisible(classModel)) {
-				return null;
-			}
-
-			final NodeLayout layout = this.resolveRenderLayout(this.findOrCreateNodeLayout(LayoutObjectType.CLASS, classModel.getId()));
-			final Rectangle2D bounds = this.computeClassBounds(g2, classModel, layout);
-			return new Point2D.Double(bounds.getCenterX(), bounds.getCenterY());
-		}
-
-		final LinkModel linkModel = this.findLinkById(commentModel.getBinding().getTargetId());
-		final LinkGeometry geometry = linkModel == null ? null : this.resolveLinkGeometry(g2, linkModel);
-		return geometry == null ? null : geometry.middlePoint();
-	}
-
-	private void bindCommentToTarget(final String commentId, final SelectedElement target) {
-		final CommentModel commentModel = this.findCommentById(commentId);
-		if (commentModel == null || target == null) {
-			return;
-		}
-
-		commentModel.setKind(CommentKind.BOUND);
-		commentModel.setBinding(switch (target.type()) {
-		case CLASS, FIELD -> new CommentBinding(BoundTargetType.CLASS, target.classId());
-		case LINK -> new CommentBinding(BoundTargetType.LINK, target.linkId());
-		default -> throw new IllegalStateException("Cannot bind comment to: " + target);
-		});
-
-		this.select(SelectedElement.forComment(commentId));
-		this.notifyDocumentChanged();
-	}
-
-	private void createConceptualLink(final String fromClassId, final String toClassId) {
-		final LinkModel linkModel = new LinkModel();
-		linkModel.setFrom(new LinkEnd(fromClassId, null));
-		linkModel.setTo(new LinkEnd(toClassId, null));
-		linkModel.setCardinalityFrom(Cardinality.ONE);
-		linkModel.setCardinalityTo(Cardinality.ZERO_OR_MANY);
-		this.applyDefaultPaletteToLink(linkModel);
-		this.document.getModel().getConceptualLinks().add(linkModel);
-
-		this.findOrCreateLinkLayout(linkModel.getId());
-		this.select(SelectedElement.forLink(linkModel.getId()));
-		this.notifyDocumentChanged();
-	}
-
-	private void createTechnicalLink(final SelectedElement fromEndpoint, final SelectedElement toEndpoint) {
-		final LinkModel linkModel = new LinkModel();
-		linkModel.setFrom(new LinkEnd(fromEndpoint.classId(), fromEndpoint.fieldId()));
-		linkModel.setTo(new LinkEnd(toEndpoint.classId(), toEndpoint.fieldId()));
-		linkModel.setCardinalityFrom(null);
-		linkModel.setCardinalityTo(null);
-		this.applyDefaultPaletteToLink(linkModel);
-		this.document.getModel().getTechnicalLinks().add(linkModel);
-
-		this.findOrCreateLinkLayout(linkModel.getId());
-		this.select(SelectedElement.forLink(linkModel.getId()));
-		this.notifyDocumentChanged();
-	}
-
-	private SelectedElement getLinkCreationSource() {
-		return this.linkCreationState == null ? null : this.linkCreationState.toSelectedElement();
-	}
-
-	private FieldModel findPrimaryKeyField(final String classId) {
-		final ClassModel classModel = this.findClassById(classId);
-		if (classModel == null) {
-			return null;
-		}
-
-		for (final FieldModel fieldModel : classModel.getFields()) {
-			if (fieldModel.isPrimaryKey()) {
-				return fieldModel;
-			}
-		}
-
-		return null;
-	}
-
-	private String buildForeignKeyFieldName(final ClassModel targetClass, final FieldModel targetField) {
-		final String className = this
-				.blankToFallback(targetClass.getNames().getTechnicalName(), targetClass.getNames().getConceptualName(), "target");
-		final String fieldName = this.blankToFallback(targetField.getNames().getTechnicalName(), targetField.getNames().getName(), "id");
-		return className + "_" + fieldName;
-	}
-
-	private String buildForeignKeyFieldTechnicalName(final ClassModel targetClass, final FieldModel targetField) {
-		final String rawName = this.buildForeignKeyFieldName(targetClass, targetField);
-		return rawName.trim().replaceAll("[^A-Za-z0-9_]+", "_").replaceAll("_+", "_").replaceAll("^_|_$", "").toLowerCase();
 	}
 
 	private FieldModel ensureTechnicalSourceField(
@@ -1995,73 +1866,23 @@ public class DiagramCanvas extends JPanel {
 		return null;
 	}
 
-	private SelectedElement resolveTechnicalSourceEndpoint(final SelectedElement source, final SelectedElement target) {
-		if (source == null || target == null) {
+	private Point2D findBoundTargetAnchor(final Graphics2D g2, final CommentModel commentModel) {
+		if (commentModel.getBinding() == null) {
 			return null;
 		}
 
-		if (source.type() == SelectedType.FIELD) {
-			return source;
+		if (commentModel.getBinding().getTargetType() == BoundTargetType.CLASS) {
+			final ClassModel classModel = this.findClassById(commentModel.getBinding().getTargetId());
+			if (classModel == null || !this.isVisible(classModel)) {
+				return null;
+			}
+
+			final NodeLayout layout = this.resolveRenderLayout(this.findOrCreateNodeLayout(LayoutObjectType.CLASS, classModel.getId()));
+			final Rectangle2D bounds = this.computeClassBounds(g2, classModel, layout);
+			return new Point2D.Double(bounds.getCenterX(), bounds.getCenterY());
 		}
 
-		if (source.type() != SelectedType.CLASS) {
-			return null;
-		}
-
-		final SelectedElement targetEndpoint = this.resolveTechnicalTargetEndpoint(target);
-		if (targetEndpoint == null) {
-			return null;
-		}
-
-		final ClassModel sourceClass = this.findClassById(source.classId());
-		final ClassModel targetClass = this.findClassById(targetEndpoint.classId());
-		final FieldModel targetField = this.findFieldById(targetEndpoint.classId(), targetEndpoint.fieldId());
-		final FieldModel sourceField = this.ensureTechnicalSourceField(sourceClass, targetClass, targetField);
-		return sourceField == null ? null : SelectedElement.forField(sourceClass.getId(), sourceField.getId());
-	}
-
-	private SelectedElement resolveTechnicalTargetEndpoint(final SelectedElement target) {
-		if (target == null) {
-			return null;
-		}
-
-		if (target.type() == SelectedType.FIELD) {
-			final FieldModel fieldModel = this.findFieldById(target.classId(), target.fieldId());
-			return fieldModel != null && fieldModel.isPrimaryKey() ? target : null;
-		}
-
-		if (target.type() != SelectedType.CLASS) {
-			return null;
-		}
-
-		final FieldModel targetField = this.findPrimaryKeyField(target.classId());
-		return targetField == null ? null : SelectedElement.forField(target.classId(), targetField.getId());
-	}
-
-	private Point2D resolveClassCenterAnchor(final Graphics2D g2, final String classId) {
-		final ClassModel classModel = this.findClassById(classId);
-		if (classModel == null || !this.isVisible(classModel)) {
-			return null;
-		}
-
-		final NodeLayout layout = this.resolveRenderLayout(this.findOrCreateNodeLayout(LayoutObjectType.CLASS, classModel.getId()));
-		final Rectangle2D bounds = this.computeClassBounds(g2, classModel, layout);
-		return new Point2D.Double(bounds.getCenterX(), bounds.getCenterY());
-	}
-
-	private Point2D resolveCommentCenterAnchor(final Graphics2D g2, final String commentId) {
-		final CommentModel commentModel = this.findCommentById(commentId);
-		if (commentModel == null || !this.isCommentVisible(commentModel)) {
-			return null;
-		}
-
-		final NodeLayout layout = this.resolveRenderLayout(this.findOrCreateNodeLayout(LayoutObjectType.COMMENT, commentModel.getId()));
-		final Rectangle2D bounds = this.computeCommentBounds(g2, this.resolveCommentText(commentModel), layout);
-		return new Point2D.Double(bounds.getCenterX(), bounds.getCenterY());
-	}
-
-	private Point2D resolveLinkMiddleAnchor(final Graphics2D g2, final String linkId) {
-		final LinkModel linkModel = this.findLinkById(linkId);
+		final LinkModel linkModel = this.findLinkById(commentModel.getBinding().getTargetId());
 		final LinkGeometry geometry = linkModel == null ? null : this.resolveLinkGeometry(g2, linkModel);
 		return geometry == null ? null : geometry.middlePoint();
 	}
@@ -2174,29 +1995,6 @@ public class DiagramCanvas extends JPanel {
 		return layout;
 	}
 
-	private NodeLayout resolveRenderLayout(final NodeLayout layout) {
-		if (layout == null || !this.isDragRenderingActive()) {
-			return layout;
-		}
-
-		for (final DraggedLayout dragged : this.draggedSelection.layouts()) {
-			if (dragged.layout() == layout) {
-				final double zoom = this.getPanelState().getZoom();
-				final double dx = this.currentDragOffset.getX() / zoom;
-				final double dy = this.currentDragOffset.getY() / zoom;
-
-				final NodeLayout copy = new NodeLayout();
-				copy.setObjectType(layout.getObjectType());
-				copy.setObjectId(layout.getObjectId());
-				copy.setPosition(new Point2D.Double(dragged.startX() + dx, dragged.startY() + dy));
-				copy.setSize(new Size2D(layout.getSize().getWidth(), layout.getSize().getHeight()));
-				return copy;
-			}
-		}
-
-		return layout;
-	}
-
 	private ClassModel findOwnerClassOfField(final String fieldId) {
 		for (final ClassModel classModel : this.document.getModel().getClasses()) {
 			for (final FieldModel fieldModel : classModel.getFields()) {
@@ -2205,6 +2003,21 @@ public class DiagramCanvas extends JPanel {
 				}
 			}
 		}
+		return null;
+	}
+
+	private FieldModel findPrimaryKeyField(final String classId) {
+		final ClassModel classModel = this.findClassById(classId);
+		if (classModel == null) {
+			return null;
+		}
+
+		for (final FieldModel fieldModel : classModel.getFields()) {
+			if (fieldModel.isPrimaryKey()) {
+				return fieldModel;
+			}
+		}
+
 		return null;
 	}
 
@@ -2271,6 +2084,16 @@ public class DiagramCanvas extends JPanel {
 		return null;
 	}
 
+	public Object findType(final SelectedElement se) {
+		return switch (se.type()) {
+		case CLASS -> this.findClassById(se.classId());
+		case COMMENT -> this.findCommentById(se.commentId());
+		case FIELD -> this.findFieldById(se.classId(), se.fieldId());
+		case LINK -> this.findLinkById(se.linkId());
+		default -> null;
+		};
+	}
+
 	private void finishLinkCreation(final Point2D.Double worldPoint) {
 		if (this.linkCreationState == null) {
 			return;
@@ -2319,6 +2142,11 @@ public class DiagramCanvas extends JPanel {
 		return this.getActionMap().get(actionKey);
 	}
 
+	private int getConceptualSideLinkCount(final String classId, final AnchorSide side) {
+		final List<String> links = this.conceptualSideLinkCache.get(new ClassSideKey(classId, side));
+		return links == null ? 0 : links.size();
+	}
+
 	private String getEditableClassName(final ClassModel classModel) {
 		return this.panelType == PanelType.CONCEPTUAL ? classModel.getNames().getConceptualName()
 				: classModel.getNames().getTechnicalName();
@@ -2335,6 +2163,10 @@ public class DiagramCanvas extends JPanel {
 
 	private String getEditableFieldName(final FieldModel fieldModel) {
 		return this.panelType == PanelType.CONCEPTUAL ? fieldModel.getNames().getName() : fieldModel.getNames().getTechnicalName();
+	}
+
+	private SelectedElement getLinkCreationSource() {
+		return this.linkCreationState == null ? null : this.linkCreationState.toSelectedElement();
 	}
 
 	private PanelState getPanelState() {
@@ -2361,6 +2193,42 @@ public class DiagramCanvas extends JPanel {
 		case LINK -> StylePreviewType.LINK;
 		default -> StylePreviewType.NONE;
 		};
+	}
+
+	private int getTechnicalSideLinkCount(final Graphics2D g2, final String classId, final AnchorSide side, final String ignoredLinkId) {
+		if (classId == null || side != AnchorSide.LEFT && side != AnchorSide.RIGHT) {
+			return 0;
+		}
+
+		int count = 0;
+		for (final LinkModel linkModel : this.getActiveLinks()) {
+			if (linkModel == null || Objects.equals(linkModel.getId(), ignoredLinkId)) {
+				continue;
+			}
+			if (classId.equals(linkModel.getFrom().getClassId())) {
+				final AnchorSide endpointSide = this.resolveTechnicalEndpointSide(g2,
+						linkModel.getFrom().getClassId(),
+						linkModel.getFrom().getFieldId(),
+						linkModel.getTo().getClassId(),
+						linkModel.getTo().getFieldId(),
+						linkModel.isSelfLinking());
+				if (endpointSide == side) {
+					count++;
+				}
+			}
+			if (classId.equals(linkModel.getTo().getClassId())) {
+				final AnchorSide endpointSide = this.resolveTechnicalEndpointSide(g2,
+						linkModel.getTo().getClassId(),
+						linkModel.getTo().getFieldId(),
+						linkModel.getFrom().getClassId(),
+						linkModel.getFrom().getFieldId(),
+						linkModel.isSelfLinking());
+				if (endpointSide == side) {
+					count++;
+				}
+			}
+		}
+		return count;
 	}
 
 	private List<FieldModel> getVisibleFields(final ClassModel classModel) {
@@ -2624,17 +2492,11 @@ public class DiagramCanvas extends JPanel {
 						this::editSelected));
 	}
 
-	@SuppressWarnings("incomplete-switch")
-	private void editSelected() {
-		if (selectedElement == null || selectedElement.type() == SelectedType.NONE) {
-			return;
-		}
-		switch (selectedElement.type()) {
-		case CLASS -> editClass(selectedElement.classId());
-		case FIELD -> editField(selectedElement.classId(), selectedElement.fieldId());
-		case COMMENT -> editComment(selectedElement.commentId());
-		case LINK -> editLink(selectedElement.linkId());
-		}
+	private void invalidateConceptualAnchorCache() {
+		this.conceptualAnchorCache.clear();
+		this.conceptualAnchorPlacements.clear();
+		this.conceptualSideLinkCache.clear();
+		this.conceptualAnchorCacheValid = false;
 	}
 
 	private boolean isClassSelected(final String classId) {
@@ -2961,6 +2823,93 @@ public class DiagramCanvas extends JPanel {
 		g2.dispose();
 	}
 
+	private void rebuildConceptualAnchorCache(final Graphics2D g2) {
+		this.invalidateConceptualAnchorCache();
+
+		final Map<String, Rectangle2D> boundsByClassId = new HashMap<>();
+		final List<LinkModel> visibleLinks = new ArrayList<>();
+		final Map<String, AnchorSidePair> sidePairs = new HashMap<>();
+
+		for (final LinkModel linkModel : this.getActiveLinks()) {
+			final ClassModel fromClass = this.findClassById(linkModel.getFrom().getClassId());
+			final ClassModel toClass = this.findClassById(linkModel.getTo().getClassId());
+			if (fromClass == null || toClass == null || !this.isVisible(fromClass) || !this.isVisible(toClass)) {
+				continue;
+			}
+
+			final Rectangle2D fromBounds = boundsByClassId.computeIfAbsent(fromClass.getId(), classId -> {
+				final NodeLayout layout = this.resolveRenderLayout(this.findOrCreateNodeLayout(LayoutObjectType.CLASS, classId));
+				return this.computeClassBounds(g2, fromClass, layout);
+			});
+			final Rectangle2D toBounds = boundsByClassId.computeIfAbsent(toClass.getId(), classId -> {
+				final NodeLayout layout = this.resolveRenderLayout(this.findOrCreateNodeLayout(LayoutObjectType.CLASS, classId));
+				return this.computeClassBounds(g2, toClass, layout);
+			});
+
+			final AnchorSidePair sidePair;
+			if (linkModel.isSelfLinking()) {
+				final AnchorSide fromSide = this.chooseSelfLinkFromSide(fromClass.getId());
+				sidePair = new AnchorSidePair(fromSide, this.clockwise(fromSide));
+			} else {
+				sidePair = this.chooseBestConceptualSidePair(fromClass.getId(), fromBounds, toClass.getId(), toBounds);
+			}
+
+			sidePairs.put(linkModel.getId(), sidePair);
+			this.conceptualSideLinkCache.computeIfAbsent(new ClassSideKey(fromClass.getId(), sidePair.fromSide()), key -> new ArrayList<>())
+					.add(linkModel.getId());
+			this.conceptualSideLinkCache.computeIfAbsent(new ClassSideKey(toClass.getId(), sidePair.toSide()), key -> new ArrayList<>())
+					.add(linkModel.getId());
+			visibleLinks.add(linkModel);
+		}
+
+		final Map<ClassSideKey, Map<String, Integer>> indexByKey = new HashMap<>();
+		for (final Map.Entry<ClassSideKey, List<String>> entry : this.conceptualSideLinkCache.entrySet()) {
+			final ClassSideKey key = entry.getKey();
+			final List<String> linkIds = entry.getValue();
+			linkIds.sort(Comparator.comparingDouble(
+					(final String linkId) -> this.computeConceptualSortValue(linkId, key.classId(), key.side(), boundsByClassId, sidePairs))
+					.thenComparing(linkId -> linkId));
+
+			final Map<String, Integer> indices = new HashMap<>();
+			for (int i = 0; i < linkIds.size(); i++) {
+				indices.put(linkIds.get(i), i);
+			}
+			indexByKey.put(key, indices);
+		}
+
+		for (final LinkModel linkModel : visibleLinks) {
+			final AnchorSidePair sidePair = sidePairs.get(linkModel.getId());
+			if (sidePair == null) {
+				continue;
+			}
+
+			final Rectangle2D fromBounds = boundsByClassId.get(linkModel.getFrom().getClassId());
+			final Rectangle2D toBounds = boundsByClassId.get(linkModel.getTo().getClassId());
+			if (fromBounds == null || toBounds == null) {
+				continue;
+			}
+
+			final ClassSideKey fromKey = new ClassSideKey(linkModel.getFrom().getClassId(), sidePair.fromSide());
+			final ClassSideKey toKey = new ClassSideKey(linkModel.getTo().getClassId(), sidePair.toSide());
+			final List<String> fromLinks = this.conceptualSideLinkCache.get(fromKey);
+			final List<String> toLinks = this.conceptualSideLinkCache.get(toKey);
+			if (fromLinks == null || toLinks == null) {
+				continue;
+			}
+
+			final int fromIndex = indexByKey.get(fromKey).get(linkModel.getId());
+			final int toIndex = indexByKey.get(toKey).get(linkModel.getId());
+			final Point2D fromPoint = this.computeConceptualAnchorPoint(fromBounds, sidePair.fromSide(), fromIndex, fromLinks.size());
+			final Point2D toPoint = this.computeConceptualAnchorPoint(toBounds, sidePair.toSide(), toIndex, toLinks.size());
+
+			this.conceptualAnchorCache.put(linkModel.getId(), new AnchorPair(fromPoint, toPoint));
+			this.conceptualAnchorPlacements.put(linkModel.getId(),
+					new LinkAnchorPlacement(sidePair.fromSide(), sidePair.toSide(), fromIndex, fromLinks.size(), toIndex, toLinks.size()));
+		}
+
+		this.conceptualAnchorCacheValid = true;
+	}
+
 	private void removeFromSelection(final SelectedElement element) {
 		if (element == null) {
 			return;
@@ -3064,12 +3013,34 @@ public class DiagramCanvas extends JPanel {
 		this.repaint();
 	}
 
+	private Point2D resolveClassCenterAnchor(final Graphics2D g2, final String classId) {
+		final ClassModel classModel = this.findClassById(classId);
+		if (classModel == null || !this.isVisible(classModel)) {
+			return null;
+		}
+
+		final NodeLayout layout = this.resolveRenderLayout(this.findOrCreateNodeLayout(LayoutObjectType.CLASS, classModel.getId()));
+		final Rectangle2D bounds = this.computeClassBounds(g2, classModel, layout);
+		return new Point2D.Double(bounds.getCenterX(), bounds.getCenterY());
+	}
+
 	private String resolveClassTitle(final ClassModel classModel) {
 		if (this.panelType == PanelType.CONCEPTUAL) {
 			return this
 					.blankToFallback(classModel.getNames().getConceptualName(), classModel.getNames().getTechnicalName(), "Unnamed class");
 		}
 		return this.blankToFallback(classModel.getNames().getTechnicalName(), classModel.getNames().getConceptualName(), "Unnamed class");
+	}
+
+	private Point2D resolveCommentCenterAnchor(final Graphics2D g2, final String commentId) {
+		final CommentModel commentModel = this.findCommentById(commentId);
+		if (commentModel == null || !this.isCommentVisible(commentModel)) {
+			return null;
+		}
+
+		final NodeLayout layout = this.resolveRenderLayout(this.findOrCreateNodeLayout(LayoutObjectType.COMMENT, commentModel.getId()));
+		final Rectangle2D bounds = this.computeCommentBounds(g2, this.resolveCommentText(commentModel), layout);
+		return new Point2D.Double(bounds.getCenterX(), bounds.getCenterY());
 	}
 
 	private String resolveCommentText(final CommentModel commentModel) {
@@ -3204,6 +3175,12 @@ public class DiagramCanvas extends JPanel {
 		return new LinkGeometry(fromPoint, toPoint, labelPoint, middlePoint, labelAngle, points);
 	}
 
+	private Point2D resolveLinkMiddleAnchor(final Graphics2D g2, final String linkId) {
+		final LinkModel linkModel = this.findLinkById(linkId);
+		final LinkGeometry geometry = linkModel == null ? null : this.resolveLinkGeometry(g2, linkModel);
+		return geometry == null ? null : geometry.middlePoint();
+	}
+
 	private NodeLayout resolveNodeLayoutForSelection(final SelectedElement element, final NodeLayout fallbackLayout) {
 		if (element == null) {
 			return fallbackLayout;
@@ -3328,47 +3305,27 @@ public class DiagramCanvas extends JPanel {
 		return this.resolveTechnicalFieldAnchor(g2, target.classId(), target.fieldId(), source.classId(), source.fieldId());
 	}
 
-	private AnchorSide chooseTechnicalSelfLinkSide(final Graphics2D g2, final LinkModel linkModel) {
-		final String classId = linkModel.getFrom().getClassId();
-		final int leftCount = this.getTechnicalSideLinkCount(g2, classId, AnchorSide.LEFT, linkModel.getId());
-		final int rightCount = this.getTechnicalSideLinkCount(g2, classId, AnchorSide.RIGHT, linkModel.getId());
-		return leftCount <= rightCount ? AnchorSide.LEFT : AnchorSide.RIGHT;
-	}
-
-	private int getTechnicalSideLinkCount(final Graphics2D g2, final String classId, final AnchorSide side, final String ignoredLinkId) {
-		if (classId == null || (side != AnchorSide.LEFT && side != AnchorSide.RIGHT)) {
-			return 0;
+	private NodeLayout resolveRenderLayout(final NodeLayout layout) {
+		if (layout == null || !this.isDragRenderingActive()) {
+			return layout;
 		}
 
-		int count = 0;
-		for (final LinkModel linkModel : this.getActiveLinks()) {
-			if (linkModel == null || Objects.equals(linkModel.getId(), ignoredLinkId)) {
-				continue;
-			}
-			if (classId.equals(linkModel.getFrom().getClassId())) {
-				final AnchorSide endpointSide = this.resolveTechnicalEndpointSide(g2,
-						linkModel.getFrom().getClassId(),
-						linkModel.getFrom().getFieldId(),
-						linkModel.getTo().getClassId(),
-						linkModel.getTo().getFieldId(),
-						linkModel.isSelfLinking());
-				if (endpointSide == side) {
-					count++;
-				}
-			}
-			if (classId.equals(linkModel.getTo().getClassId())) {
-				final AnchorSide endpointSide = this.resolveTechnicalEndpointSide(g2,
-						linkModel.getTo().getClassId(),
-						linkModel.getTo().getFieldId(),
-						linkModel.getFrom().getClassId(),
-						linkModel.getFrom().getFieldId(),
-						linkModel.isSelfLinking());
-				if (endpointSide == side) {
-					count++;
-				}
+		for (final DraggedLayout dragged : this.draggedSelection.layouts()) {
+			if (dragged.layout() == layout) {
+				final double zoom = this.getPanelState().getZoom();
+				final double dx = this.currentDragOffset.getX() / zoom;
+				final double dy = this.currentDragOffset.getY() / zoom;
+
+				final NodeLayout copy = new NodeLayout();
+				copy.setObjectType(layout.getObjectType());
+				copy.setObjectId(layout.getObjectId());
+				copy.setPosition(new Point2D.Double(dragged.startX() + dx, dragged.startY() + dy));
+				copy.setSize(new Size2D(layout.getSize().getWidth(), layout.getSize().getHeight()));
+				return copy;
 			}
 		}
-		return count;
+
+		return layout;
 	}
 
 	private AnchorSide resolveTechnicalEndpointSide(
@@ -3410,34 +3367,6 @@ public class DiagramCanvas extends JPanel {
 		}
 
 		return oppositeReference.getX() <= centerX ? AnchorSide.LEFT : AnchorSide.RIGHT;
-	}
-
-	private Point2D resolveTechnicalSelfLinkAnchor(final Graphics2D g2, final String classId, final String fieldId, final AnchorSide side) {
-		final ClassModel classModel = this.findClassById(classId);
-		if (classModel == null || !this.isVisible(classModel)) {
-			return null;
-		}
-
-		final NodeLayout layout = this.resolveRenderLayout(this.findOrCreateNodeLayout(LayoutObjectType.CLASS, classId));
-		final Rectangle2D classBounds = this.computeClassBounds(g2, classModel, layout);
-		final double x = side == AnchorSide.LEFT ? classBounds.getX() : classBounds.getMaxX();
-
-		if (fieldId == null) {
-			return new Point2D.Double(x, classBounds.getCenterY());
-		}
-
-		final List<FieldModel> visibleFields = this.getVisibleFields(classModel);
-		for (int i = 0; i < visibleFields.size(); i++) {
-			if (visibleFields.get(i).getId().equals(fieldId)) {
-				final Rectangle2D fieldBounds = new Rectangle2D.Double(classBounds.getX(),
-						classBounds.getY() + DiagramCanvas.HEADER_HEIGHT + i * DiagramCanvas.ROW_HEIGHT,
-						classBounds.getWidth(),
-						DiagramCanvas.ROW_HEIGHT);
-				return new Point2D.Double(x, fieldBounds.getCenterY());
-			}
-		}
-
-		return new Point2D.Double(x, classBounds.getCenterY());
 	}
 
 	private Point2D resolveTechnicalFieldAnchor(
@@ -3517,6 +3446,77 @@ public class DiagramCanvas extends JPanel {
 		final Point2D left = new Point2D.Double(classBounds.getX(), classBounds.getCenterY());
 		final Point2D right = new Point2D.Double(classBounds.getMaxX(), classBounds.getCenterY());
 		return left.distance(oppositeReference) <= right.distance(oppositeReference) ? left : right;
+	}
+
+	private Point2D resolveTechnicalSelfLinkAnchor(final Graphics2D g2, final String classId, final String fieldId, final AnchorSide side) {
+		final ClassModel classModel = this.findClassById(classId);
+		if (classModel == null || !this.isVisible(classModel)) {
+			return null;
+		}
+
+		final NodeLayout layout = this.resolveRenderLayout(this.findOrCreateNodeLayout(LayoutObjectType.CLASS, classId));
+		final Rectangle2D classBounds = this.computeClassBounds(g2, classModel, layout);
+		final double x = side == AnchorSide.LEFT ? classBounds.getX() : classBounds.getMaxX();
+
+		if (fieldId == null) {
+			return new Point2D.Double(x, classBounds.getCenterY());
+		}
+
+		final List<FieldModel> visibleFields = this.getVisibleFields(classModel);
+		for (int i = 0; i < visibleFields.size(); i++) {
+			if (visibleFields.get(i).getId().equals(fieldId)) {
+				final Rectangle2D fieldBounds = new Rectangle2D.Double(classBounds.getX(),
+						classBounds.getY() + DiagramCanvas.HEADER_HEIGHT + i * DiagramCanvas.ROW_HEIGHT,
+						classBounds.getWidth(),
+						DiagramCanvas.ROW_HEIGHT);
+				return new Point2D.Double(x, fieldBounds.getCenterY());
+			}
+		}
+
+		return new Point2D.Double(x, classBounds.getCenterY());
+	}
+
+	private SelectedElement resolveTechnicalSourceEndpoint(final SelectedElement source, final SelectedElement target) {
+		if (source == null || target == null) {
+			return null;
+		}
+
+		if (source.type() == SelectedType.FIELD) {
+			return source;
+		}
+
+		if (source.type() != SelectedType.CLASS) {
+			return null;
+		}
+
+		final SelectedElement targetEndpoint = this.resolveTechnicalTargetEndpoint(target);
+		if (targetEndpoint == null) {
+			return null;
+		}
+
+		final ClassModel sourceClass = this.findClassById(source.classId());
+		final ClassModel targetClass = this.findClassById(targetEndpoint.classId());
+		final FieldModel targetField = this.findFieldById(targetEndpoint.classId(), targetEndpoint.fieldId());
+		final FieldModel sourceField = this.ensureTechnicalSourceField(sourceClass, targetClass, targetField);
+		return sourceField == null ? null : SelectedElement.forField(sourceClass.getId(), sourceField.getId());
+	}
+
+	private SelectedElement resolveTechnicalTargetEndpoint(final SelectedElement target) {
+		if (target == null) {
+			return null;
+		}
+
+		if (target.type() == SelectedType.FIELD) {
+			final FieldModel fieldModel = this.findFieldById(target.classId(), target.fieldId());
+			return fieldModel != null && fieldModel.isPrimaryKey() ? target : null;
+		}
+
+		if (target.type() != SelectedType.CLASS) {
+			return null;
+		}
+
+		final FieldModel targetField = this.findPrimaryKeyField(target.classId());
+		return targetField == null ? null : SelectedElement.forField(target.classId(), targetField.getId());
 	}
 
 	private Point2D.Double screenToWorld(final Point point) {

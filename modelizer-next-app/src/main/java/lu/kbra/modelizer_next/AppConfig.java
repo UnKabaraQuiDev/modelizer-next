@@ -16,15 +16,15 @@ public class AppConfig {
 		return this.defaultPaletteName;
 	}
 
-	public String getSelectedPaletteName() {
-		return this.selectedPaletteName;
-	}
-
 	public List<String> getPinnedPaletteNames() {
 		if (this.pinnedPaletteNames == null) {
 			this.pinnedPaletteNames = new ArrayList<>();
 		}
 		return this.pinnedPaletteNames;
+	}
+
+	public String getSelectedPaletteName() {
+		return this.selectedPaletteName;
 	}
 
 	public String getSkippedUpdateVersion() {

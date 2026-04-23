@@ -101,7 +101,7 @@ public class StylePalette {
 
 	@Override
 	public String toString() {
-		return "StylePalette [name=" + name + "]";
+		return "StylePalette [name=" + this.name + "]";
 	}
 
 }

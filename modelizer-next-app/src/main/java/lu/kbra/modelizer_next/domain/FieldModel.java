@@ -44,6 +44,10 @@ public class FieldModel {
 		return this.style;
 	}
 
+	public String getType() {
+		return this.type;
+	}
+
 	public boolean isNotConceptual() {
 		return this.notConceptual;
 	}
@@ -88,16 +92,12 @@ public class FieldModel {
 		this.style = style;
 	}
 
-	public void setUnique(final boolean unique) {
-		this.unique = unique;
-	}
-
-	public String getType() {
-		return this.type;
-	}
-
 	public void setType(final String type) {
 		this.type = type;
+	}
+
+	public void setUnique(final boolean unique) {
+		this.unique = unique;
 	}
 
 	@Override

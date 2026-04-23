@@ -72,8 +72,8 @@ public class ClassModel {
 
 	@Override
 	public String toString() {
-		return "ClassModel [id=" + id + ", names=" + names + ", group=" + group + ", visibility=" + visibility + ", style=" + style
-				+ ", fields=" + fields + "]";
+		return "ClassModel [id=" + this.id + ", names=" + this.names + ", group=" + this.group + ", visibility=" + this.visibility
+				+ ", style=" + this.style + ", fields=" + this.fields + "]";
 	}
 
 }

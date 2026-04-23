@@ -72,6 +72,71 @@ public class MainFrame extends JFrame {
 	}
 
 	private static final long serialVersionUID = 6643164008640695591L;
+
+	public static boolean confirmModernDocumentVersion(final Component parent, final ModelDocument loadedDocument) {
+		final String fileVersion = loadedDocument.getMeta() == null ? null : loadedDocument.getMeta().getApplicationVersion();
+
+		if (fileVersion != null && !fileVersion.isBlank() && VersionComparator.COMPARATOR.compare(fileVersion, App.VERSION) > 0) {
+			final int choice = JOptionPane.showConfirmDialog(parent,
+					"This file was created with a newer version of the application (" + fileVersion
+							+ ").\nDo you want to try to load the file anyways ?",
+					"Newer file version",
+					JOptionPane.YES_NO_OPTION,
+					JOptionPane.WARNING_MESSAGE);
+			return choice == JOptionPane.YES_OPTION;
+		}
+
+		return true;
+	}
+
+	public static Optional<DocumentSession> createDocument(final Component parent, final File selectedFile) {
+		final String extension = PCUtils.getFileExtension(selectedFile.getName());
+
+		try {
+			final ModelDocument loadedDocument;
+			final File openedFile;
+
+			switch (extension) {
+			case "mod" -> {
+				final int choice = JOptionPane.showConfirmDialog(parent,
+						"This file comes from an older version of Modelizer.\nThere may be errors or unsupported elements during import.\nDo you want to continue?",
+						"Legacy Modelizer import",
+						JOptionPane.YES_NO_OPTION,
+						JOptionPane.WARNING_MESSAGE);
+				if (choice != JOptionPane.YES_OPTION) {
+					return Optional.empty();
+				}
+
+				loadedDocument = LegacyModelizerImporter.importFile(selectedFile);
+				openedFile = null;
+			}
+			case "mdlz" -> {
+				loadedDocument = OnlineModelizerImporter.importFile(selectedFile);
+				openedFile = null;
+			}
+			case "mn" -> {
+				loadedDocument = ModernModelizerImporter.importFile(selectedFile);
+				if (!MainFrame.confirmModernDocumentVersion(parent, loadedDocument)) {
+					return Optional.empty();
+				}
+				openedFile = selectedFile;
+			}
+			default -> throw new IOException("Unsupported file extension: ." + extension);
+			}
+
+			if (loadedDocument == null) {
+				return Optional.empty();
+			}
+
+			loadedDocument.setSource(selectedFile.getPath());
+
+			return Optional.of(new DocumentSession(loadedDocument, openedFile));
+		} catch (final IOException ex) {
+			JOptionPane.showMessageDialog(parent, "Failed to load file:\n" + ex.getMessage(), "Load error", JOptionPane.ERROR_MESSAGE);
+			return Optional.empty();
+		}
+	}
+
 	private final DocumentSession session;
 	private final ModelDocument document;
 	private final JLabel statusLabel;
@@ -80,6 +145,7 @@ public class MainFrame extends JFrame {
 	private final DiagramCanvas conceptualCanvas;
 	private final DiagramCanvas logicalCanvas;
 	private final DiagramCanvas physicalCanvas;
+
 	private final JToolBar toolBar;
 	private final JPanel pinnedStylesPanel;
 
@@ -87,6 +153,7 @@ public class MainFrame extends JFrame {
 	private List<StylePalette> palettes;
 
 	private JMenuItem undoMenuItem;
+
 	private JMenuItem redoMenuItem;
 
 	public MainFrame(final DocumentSession session) {
@@ -142,7 +209,7 @@ public class MainFrame extends JFrame {
 		this.pinnedStylesPanel.setOpaque(false);
 
 		this.toolBar = this.createToolBar();
-		toolBar.add(this.pinnedStylesPanel, BorderLayout.EAST);
+		this.toolBar.add(this.pinnedStylesPanel, BorderLayout.EAST);
 		this.add(this.toolBar, BorderLayout.NORTH);
 
 		final JPanel statusPanel = new JPanel(new BorderLayout(12, 0));
@@ -163,13 +230,6 @@ public class MainFrame extends JFrame {
 
 	public MainFrame(final ModelDocument document) {
 		this(new DocumentSession(document));
-	}
-
-	private void setDefaultPaletteToCanvases() {
-		final StylePalette palette = this.findPaletteByName(this.appConfig.getDefaultPaletteName());
-		this.conceptualCanvas.setDefaultPalette(palette);
-		this.logicalCanvas.setDefaultPalette(palette);
-		this.physicalCanvas.setDefaultPalette(palette);
 	}
 
 	public void applyDefaultPaletteToCanvases() {
@@ -279,22 +339,6 @@ public class MainFrame extends JFrame {
 		}
 
 		return choice != JOptionPane.YES_OPTION || this.saveDocument();
-	}
-
-	public static boolean confirmModernDocumentVersion(final Component parent, final ModelDocument loadedDocument) {
-		final String fileVersion = loadedDocument.getMeta() == null ? null : loadedDocument.getMeta().getApplicationVersion();
-
-		if (fileVersion != null && !fileVersion.isBlank() && VersionComparator.COMPARATOR.compare(fileVersion, App.VERSION) > 0) {
-			final int choice = JOptionPane.showConfirmDialog(parent,
-					"This file was created with a newer version of the application (" + fileVersion
-							+ ").\nDo you want to try to load the file anyways ?",
-					"Newer file version",
-					JOptionPane.YES_NO_OPTION,
-					JOptionPane.WARNING_MESSAGE);
-			return choice == JOptionPane.YES_OPTION;
-		}
-
-		return true;
 	}
 
 	private JMenuItem createCanvasMenuItem(final String text, final String actionKey, final KeyStroke keyStroke) {
@@ -451,6 +495,34 @@ public class MainFrame extends JFrame {
 		return chooser;
 	}
 
+	private JButton createPinnedStyleButton(final StylePalette palette, final DiagramCanvas.StylePreviewType previewType) {
+		final JButton button = new JButton(palette.getName());
+		button.setFocusable(false);
+		button.setFocusPainted(false);
+		button.setMargin(new Insets(3, 10, 3, 10));
+
+		final StatusStyleAppearance appearance = this.resolvePinnedStyleAppearance(palette, previewType);
+		button.setForeground(appearance.foreground());
+		button.setBackground(appearance.background());
+		button.setOpaque(true);
+		button.setContentAreaFilled(true);
+		button.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(appearance.border(), 2),
+				BorderFactory.createEmptyBorder(2, 4, 2, 4)));
+		button.setToolTipText("Apply style to the current selection");
+		button.addActionListener(event -> {
+			final DiagramCanvas canvas = this.getActiveCanvas();
+			if (canvas == null) {
+				return;
+			}
+
+			canvas.applyPalette(palette);
+			canvas.requestFocusInWindow();
+			this.appConfig.setSelectedPaletteName(palette.getName());
+			App.saveConfig(this.appConfig);
+		});
+		return button;
+	}
+
 	private JFileChooser createSaveFileChooser() {
 		final JFileChooser chooser = new JFileChooser();
 		chooser.setFileFilter(new FileNameExtensionFilter("Modelizer Next (*.mn)", "mn"));
@@ -531,142 +603,6 @@ public class MainFrame extends JFrame {
 		return null;
 	}
 
-	private JButton createPinnedStyleButton(final StylePalette palette, final DiagramCanvas.StylePreviewType previewType) {
-		final JButton button = new JButton(palette.getName());
-		button.setFocusable(false);
-		button.setFocusPainted(false);
-		button.setMargin(new Insets(3, 10, 3, 10));
-
-		final StatusStyleAppearance appearance = this.resolvePinnedStyleAppearance(palette, previewType);
-		button.setForeground(appearance.foreground());
-		button.setBackground(appearance.background());
-		button.setOpaque(true);
-		button.setContentAreaFilled(true);
-		button.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(appearance.border(), 2),
-				BorderFactory.createEmptyBorder(2, 4, 2, 4)));
-		button.setToolTipText("Apply style to the current selection");
-		button.addActionListener(event -> {
-			final DiagramCanvas canvas = this.getActiveCanvas();
-			if (canvas == null) {
-				return;
-			}
-
-			canvas.applyPalette(palette);
-			canvas.requestFocusInWindow();
-			this.appConfig.setSelectedPaletteName(palette.getName());
-			App.saveConfig(this.appConfig);
-		});
-		return button;
-	}
-
-	private Color mixWithWhite(final Color color, final double amount) {
-		if (color == null) {
-			return Color.WHITE;
-		}
-
-		final double clampedAmount = Math.max(0.0, Math.min(1.0, amount));
-		final int red = (int) Math.round(color.getRed() + (255 - color.getRed()) * clampedAmount);
-		final int green = (int) Math.round(color.getGreen() + (255 - color.getGreen()) * clampedAmount);
-		final int blue = (int) Math.round(color.getBlue() + (255 - color.getBlue()) * clampedAmount);
-		return new Color(red, green, blue);
-	}
-
-	private void refreshPinnedStylesPanel() {
-		this.sanitizePinnedPaletteNames();
-		this.pinnedStylesPanel.removeAll();
-
-		final DiagramCanvas canvas = this.getActiveCanvas();
-		final DiagramCanvas.StylePreviewType previewType = canvas == null ? DiagramCanvas.StylePreviewType.NONE
-				: canvas.getStylePreviewType();
-
-		for (final String paletteName : this.appConfig.getPinnedPaletteNames()) {
-			final StylePalette palette = this.findPaletteByName(paletteName);
-			if (palette != null) {
-				this.pinnedStylesPanel.add(this.createPinnedStyleButton(palette, previewType));
-			}
-		}
-
-		this.pinnedStylesPanel.setVisible(this.pinnedStylesPanel.getComponentCount() > 0);
-		this.pinnedStylesPanel.revalidate();
-		this.pinnedStylesPanel.repaint();
-	}
-
-	private void replacePinnedPaletteName(final String oldName, final String newName) {
-		if (oldName == null || newName == null || oldName.equals(newName)) {
-			return;
-		}
-
-		final List<String> updatedNames = new ArrayList<>();
-		final LinkedHashSet<String> seen = new LinkedHashSet<>();
-		boolean changed = false;
-
-		for (final String paletteName : this.appConfig.getPinnedPaletteNames()) {
-			final String resolvedName = oldName.equals(paletteName) ? newName : paletteName;
-			changed |= !resolvedName.equals(paletteName);
-			if (seen.add(resolvedName)) {
-				updatedNames.add(resolvedName);
-			}
-		}
-
-		if (!changed) {
-			return;
-		}
-
-		this.appConfig.setPinnedPaletteNames(updatedNames);
-		App.saveConfig(this.appConfig);
-	}
-
-	private StatusStyleAppearance resolvePinnedStyleAppearance(
-			final StylePalette palette,
-			final DiagramCanvas.StylePreviewType previewType) {
-		if (palette == null) {
-			return new StatusStyleAppearance(Color.BLACK, Color.WHITE, Color.GRAY);
-		}
-
-		return switch (previewType) {
-		case FIELD ->
-			new StatusStyleAppearance(palette.getFieldTextColor(), palette.getFieldBackgroundColor(), palette.getFieldTextColor());
-		case COMMENT ->
-			new StatusStyleAppearance(palette.getCommentTextColor(), palette.getCommentBackgroundColor(), palette.getCommentBorderColor());
-		case LINK ->
-			new StatusStyleAppearance(palette.getLinkColor(), this.mixWithWhite(palette.getLinkColor(), 0.88), palette.getLinkColor());
-		case NONE, CLASS ->
-			new StatusStyleAppearance(palette.getClassTextColor(), palette.getClassBackgroundColor(), palette.getClassBorderColor());
-		};
-	}
-
-	private void sanitizePinnedPaletteNames() {
-		final List<String> currentNames = new ArrayList<>(this.appConfig.getPinnedPaletteNames());
-		final List<String> sanitizedNames = new ArrayList<>();
-		final LinkedHashSet<String> seen = new LinkedHashSet<>();
-
-		for (final String paletteName : currentNames) {
-			if (this.findPaletteByName(paletteName) != null && seen.add(paletteName)) {
-				sanitizedNames.add(paletteName);
-			}
-		}
-
-		if (sanitizedNames.equals(currentNames)) {
-			return;
-		}
-
-		this.appConfig.setPinnedPaletteNames(sanitizedNames);
-		App.saveConfig(this.appConfig);
-	}
-
-	private void setPalettePinned(final String paletteName, final boolean pinned) {
-		final LinkedHashSet<String> names = new LinkedHashSet<>(this.appConfig.getPinnedPaletteNames());
-		if (pinned) {
-			names.add(paletteName);
-		} else {
-			names.remove(paletteName);
-		}
-
-		this.appConfig.setPinnedPaletteNames(new ArrayList<>(names));
-		App.saveConfig(this.appConfig);
-		this.refreshPinnedStylesPanel();
-	}
-
 	private String findShortcutText(final DiagramCanvas canvas, final String actionKey) {
 		for (final KeyStroke keyStroke : canvas.getInputMap(JComponent.WHEN_FOCUSED).allKeys()) {
 			if (keyStroke == null) {
@@ -725,56 +661,20 @@ public class MainFrame extends JFrame {
 
 		final File selectedFile = chooser.getSelectedFile();
 
-		final Optional<DocumentSession> model = createDocument(this, selectedFile);
+		final Optional<DocumentSession> model = MainFrame.createDocument(this, selectedFile);
 		model.ifPresent(this::openInNewFrame);
 	}
 
-	public static Optional<DocumentSession> createDocument(Component parent, File selectedFile) {
-		final String extension = PCUtils.getFileExtension(selectedFile.getName());
-
-		try {
-			final ModelDocument loadedDocument;
-			final File openedFile;
-
-			switch (extension) {
-			case "mod" -> {
-				final int choice = JOptionPane.showConfirmDialog(parent,
-						"This file comes from an older version of Modelizer.\nThere may be errors or unsupported elements during import.\nDo you want to continue?",
-						"Legacy Modelizer import",
-						JOptionPane.YES_NO_OPTION,
-						JOptionPane.WARNING_MESSAGE);
-				if (choice != JOptionPane.YES_OPTION) {
-					return Optional.empty();
-				}
-
-				loadedDocument = LegacyModelizerImporter.importFile(selectedFile);
-				openedFile = null;
-			}
-			case "mdlz" -> {
-				loadedDocument = OnlineModelizerImporter.importFile(selectedFile);
-				openedFile = null;
-			}
-			case "mn" -> {
-				loadedDocument = ModernModelizerImporter.importFile(selectedFile);
-				if (!confirmModernDocumentVersion(parent, loadedDocument)) {
-					return Optional.empty();
-				}
-				openedFile = selectedFile;
-			}
-			default -> throw new IOException("Unsupported file extension: ." + extension);
-			}
-
-			if (loadedDocument == null) {
-				return Optional.empty();
-			}
-
-			loadedDocument.setSource(selectedFile.getPath());
-
-			return Optional.of(new DocumentSession(loadedDocument, openedFile));
-		} catch (final IOException ex) {
-			JOptionPane.showMessageDialog(parent, "Failed to load file:\n" + ex.getMessage(), "Load error", JOptionPane.ERROR_MESSAGE);
-			return Optional.empty();
+	private Color mixWithWhite(final Color color, final double amount) {
+		if (color == null) {
+			return Color.WHITE;
 		}
+
+		final double clampedAmount = Math.max(0.0, Math.min(1.0, amount));
+		final int red = (int) Math.round(color.getRed() + (255 - color.getRed()) * clampedAmount);
+		final int green = (int) Math.round(color.getGreen() + (255 - color.getGreen()) * clampedAmount);
+		final int blue = (int) Math.round(color.getBlue() + (255 - color.getBlue()) * clampedAmount);
+		return new Color(red, green, blue);
 	}
 
 	private void newDocument() {
@@ -938,6 +838,26 @@ public class MainFrame extends JFrame {
 		this.setTitle(App.title(source + (this.session.isDirty() ? " *" : "")));
 	}
 
+	private void refreshPinnedStylesPanel() {
+		this.sanitizePinnedPaletteNames();
+		this.pinnedStylesPanel.removeAll();
+
+		final DiagramCanvas canvas = this.getActiveCanvas();
+		final DiagramCanvas.StylePreviewType previewType = canvas == null ? DiagramCanvas.StylePreviewType.NONE
+				: canvas.getStylePreviewType();
+
+		for (final String paletteName : this.appConfig.getPinnedPaletteNames()) {
+			final StylePalette palette = this.findPaletteByName(paletteName);
+			if (palette != null) {
+				this.pinnedStylesPanel.add(this.createPinnedStyleButton(palette, previewType));
+			}
+		}
+
+		this.pinnedStylesPanel.setVisible(this.pinnedStylesPanel.getComponentCount() > 0);
+		this.pinnedStylesPanel.revalidate();
+		this.pinnedStylesPanel.repaint();
+	}
+
 	private void refreshToolbarLabels() {
 		for (int i = 0; i < this.toolBar.getComponentCount(); i++) {
 			if (this.toolBar.getComponent(i) instanceof final JButton button) {
@@ -965,6 +885,69 @@ public class MainFrame extends JFrame {
 		});
 	}
 
+	private void replacePinnedPaletteName(final String oldName, final String newName) {
+		if (oldName == null || newName == null || oldName.equals(newName)) {
+			return;
+		}
+
+		final List<String> updatedNames = new ArrayList<>();
+		final LinkedHashSet<String> seen = new LinkedHashSet<>();
+		boolean changed = false;
+
+		for (final String paletteName : this.appConfig.getPinnedPaletteNames()) {
+			final String resolvedName = oldName.equals(paletteName) ? newName : paletteName;
+			changed |= !resolvedName.equals(paletteName);
+			if (seen.add(resolvedName)) {
+				updatedNames.add(resolvedName);
+			}
+		}
+
+		if (!changed) {
+			return;
+		}
+
+		this.appConfig.setPinnedPaletteNames(updatedNames);
+		App.saveConfig(this.appConfig);
+	}
+
+	private StatusStyleAppearance resolvePinnedStyleAppearance(
+			final StylePalette palette,
+			final DiagramCanvas.StylePreviewType previewType) {
+		if (palette == null) {
+			return new StatusStyleAppearance(Color.BLACK, Color.WHITE, Color.GRAY);
+		}
+
+		return switch (previewType) {
+		case FIELD ->
+			new StatusStyleAppearance(palette.getFieldTextColor(), palette.getFieldBackgroundColor(), palette.getFieldTextColor());
+		case COMMENT ->
+			new StatusStyleAppearance(palette.getCommentTextColor(), palette.getCommentBackgroundColor(), palette.getCommentBorderColor());
+		case LINK ->
+			new StatusStyleAppearance(palette.getLinkColor(), this.mixWithWhite(palette.getLinkColor(), 0.88), palette.getLinkColor());
+		case NONE, CLASS ->
+			new StatusStyleAppearance(palette.getClassTextColor(), palette.getClassBackgroundColor(), palette.getClassBorderColor());
+		};
+	}
+
+	private void sanitizePinnedPaletteNames() {
+		final List<String> currentNames = new ArrayList<>(this.appConfig.getPinnedPaletteNames());
+		final List<String> sanitizedNames = new ArrayList<>();
+		final LinkedHashSet<String> seen = new LinkedHashSet<>();
+
+		for (final String paletteName : currentNames) {
+			if (this.findPaletteByName(paletteName) != null && seen.add(paletteName)) {
+				sanitizedNames.add(paletteName);
+			}
+		}
+
+		if (sanitizedNames.equals(currentNames)) {
+			return;
+		}
+
+		this.appConfig.setPinnedPaletteNames(sanitizedNames);
+		App.saveConfig(this.appConfig);
+	}
+
 	private boolean saveDocument() {
 		if (this.session.getCurrentFile() == null) {
 			return this.saveDocumentAs();
@@ -988,6 +971,26 @@ public class MainFrame extends JFrame {
 		}
 
 		return this.writeDocument(selectedFile);
+	}
+
+	private void setDefaultPaletteToCanvases() {
+		final StylePalette palette = this.findPaletteByName(this.appConfig.getDefaultPaletteName());
+		this.conceptualCanvas.setDefaultPalette(palette);
+		this.logicalCanvas.setDefaultPalette(palette);
+		this.physicalCanvas.setDefaultPalette(palette);
+	}
+
+	private void setPalettePinned(final String paletteName, final boolean pinned) {
+		final LinkedHashSet<String> names = new LinkedHashSet<>(this.appConfig.getPinnedPaletteNames());
+		if (pinned) {
+			names.add(paletteName);
+		} else {
+			names.remove(paletteName);
+		}
+
+		this.appConfig.setPinnedPaletteNames(new ArrayList<>(names));
+		App.saveConfig(this.appConfig);
+		this.refreshPinnedStylesPanel();
 	}
 
 	private void undo() {

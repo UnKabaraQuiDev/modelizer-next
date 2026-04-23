@@ -17,7 +17,7 @@ import lu.kbra.modelizer_next.ui.MainFrame;
 public class ModelizerAppEntryPoint implements AppMain {
 
 	@Override
-	public void start(String[] args) {
+	public void start(final String[] args) {
 		try {
 			App.init();
 			System.out.println(App.NAME + " / " + App.VERSION + " [" + App.DISTRIBUTOR + "]");

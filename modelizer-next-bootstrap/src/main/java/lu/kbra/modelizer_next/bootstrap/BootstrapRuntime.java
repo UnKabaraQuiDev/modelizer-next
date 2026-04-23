@@ -41,33 +41,20 @@ public class BootstrapRuntime implements UpdateRuntime {
 		return runtime;
 	}
 
-	public static synchronized BootstrapRuntime getInstance() {
-		return (BootstrapRuntime) UpdateRuntimes.getInstance();
-	}
-
-	public static boolean isActive() {
-		return UpdateRuntimes.isActive();
-	}
-
-	private final BootstrapConfiguration configuration;
-	private final ApplicationInventory inventory;
-	private final RemoteUpdateService remoteUpdateService;
-	private final JarApplicationLauncher applicationLauncher;
-	private final boolean automaticUpdatesEnabled;
-
-	private InstalledApplication currentApplication;
-
-	private BootstrapRuntime(
-			final BootstrapConfiguration configuration,
-			final ApplicationInventory inventory,
-			final RemoteUpdateService remoteUpdateService,
-			final JarApplicationLauncher applicationLauncher,
-			final boolean automaticUpdatesEnabled) {
-		this.configuration = configuration;
-		this.inventory = inventory;
-		this.remoteUpdateService = remoteUpdateService;
-		this.applicationLauncher = applicationLauncher;
-		this.automaticUpdatesEnabled = automaticUpdatesEnabled;
+	private static String buildFirstLaunchMessage(final RemoteUpdateService.UpdateManifest manifest) {
+		final StringBuilder builder = new StringBuilder();
+		builder.append("Choose the update channel to subscribe to.\n\n");
+		builder.append("Latest known versions:\n");
+		builder.append("• ")
+				.append(BootstrapRuntime.describeChannelOption(UpdateChannel.RELEASE, manifest == null ? null : manifest.release))
+				.append('\n');
+		builder.append("• ")
+				.append(BootstrapRuntime.describeChannelOption(UpdateChannel.SNAPSHOT, manifest == null ? null : manifest.snapshot))
+				.append('\n');
+		builder.append("• ")
+				.append(BootstrapRuntime.describeChannelOption(UpdateChannel.NIGHTLY, manifest == null ? null : manifest.nightly))
+				.append('\n');
+		return builder.toString();
 	}
 
 	private static String describeChannelOption(final UpdateChannel channel, final RemoteUpdateService.UpdateRelease release) {
@@ -83,22 +70,6 @@ public class BootstrapRuntime implements UpdateRuntime {
 		if (publishedAt != null) {
 			builder.append(" (").append(publishedAt).append(")");
 		}
-		return builder.toString();
-	}
-
-	private static String buildFirstLaunchMessage(final RemoteUpdateService.UpdateManifest manifest) {
-		final StringBuilder builder = new StringBuilder();
-		builder.append("Choose the update channel to subscribe to.\n\n");
-		builder.append("Latest known versions:\n");
-		builder.append("• ")
-				.append(BootstrapRuntime.describeChannelOption(UpdateChannel.RELEASE, manifest == null ? null : manifest.release))
-				.append('\n');
-		builder.append("• ")
-				.append(BootstrapRuntime.describeChannelOption(UpdateChannel.SNAPSHOT, manifest == null ? null : manifest.snapshot))
-				.append('\n');
-		builder.append("• ")
-				.append(BootstrapRuntime.describeChannelOption(UpdateChannel.NIGHTLY, manifest == null ? null : manifest.nightly))
-				.append('\n');
 		return builder.toString();
 	}
 
@@ -126,43 +97,36 @@ public class BootstrapRuntime implements UpdateRuntime {
 		}
 	}
 
-	private void promptForInitialChannelSelection() throws IOException {
-		RemoteUpdateService.UpdateManifest manifest = null;
-		try {
-			manifest = this.remoteUpdateService.fetchManifest();
-		} catch (final InterruptedException ex) {
-			Thread.currentThread().interrupt();
-			throw new IOException("Interrupted while fetching available channels.", ex);
-		} catch (final IOException ex) {
-			ex.printStackTrace();
-		}
+	public static synchronized BootstrapRuntime getInstance() {
+		return (BootstrapRuntime) UpdateRuntimes.getInstance();
+	}
 
-		final Object[] options = {
-				UpdateChannel.RELEASE.displayName(),
-				UpdateChannel.SNAPSHOT.displayName(),
-				UpdateChannel.NIGHTLY.displayName() };
+	public static boolean isActive() {
+		return UpdateRuntimes.isActive();
+	}
 
-		final int choice = JOptionPane.showOptionDialog(null,
-				BootstrapRuntime.buildFirstLaunchMessage(manifest),
-				"Choose update channel",
-				JOptionPane.DEFAULT_OPTION,
-				JOptionPane.QUESTION_MESSAGE,
-				null,
-				options,
-				options[0]);
+	private final BootstrapConfiguration configuration;
+	private final ApplicationInventory inventory;
 
-		final UpdateChannel selectedChannel = switch (choice) {
-		case 0 -> UpdateChannel.RELEASE;
-		case 1 -> UpdateChannel.SNAPSHOT;
-		case 2 -> UpdateChannel.NIGHTLY;
-		default -> null;
-		};
+	private final RemoteUpdateService remoteUpdateService;
 
-		if (selectedChannel == null) {
-			throw new IOException("Initial setup was cancelled.");
-		}
+	private final JarApplicationLauncher applicationLauncher;
 
-		this.configuration.setUpdateChannel(selectedChannel);
+	private final boolean automaticUpdatesEnabled;
+
+	private InstalledApplication currentApplication;
+
+	private BootstrapRuntime(
+			final BootstrapConfiguration configuration,
+			final ApplicationInventory inventory,
+			final RemoteUpdateService remoteUpdateService,
+			final JarApplicationLauncher applicationLauncher,
+			final boolean automaticUpdatesEnabled) {
+		this.configuration = configuration;
+		this.inventory = inventory;
+		this.remoteUpdateService = remoteUpdateService;
+		this.applicationLauncher = applicationLauncher;
+		this.automaticUpdatesEnabled = automaticUpdatesEnabled;
 	}
 
 	@Override
@@ -174,6 +138,16 @@ public class BootstrapRuntime implements UpdateRuntime {
 			Thread.currentThread().interrupt();
 			throw new IOException("Interrupted while checking for updates.", ex);
 		}
+	}
+
+	@Override
+	public BootstrapConfig getBootstrapConfig() {
+		return BootstrapApp.BOOTSTRAP_CONFIG;
+	}
+
+	@Override
+	public JsonNode getBootstrapJson() {
+		return BootstrapApp.JSON;
 	}
 
 	@Override
@@ -262,6 +236,45 @@ public class BootstrapRuntime implements UpdateRuntime {
 		this.applicationLauncher.launch(args, this.currentApplication);
 	}
 
+	private void promptForInitialChannelSelection() throws IOException {
+		RemoteUpdateService.UpdateManifest manifest = null;
+		try {
+			manifest = this.remoteUpdateService.fetchManifest();
+		} catch (final InterruptedException ex) {
+			Thread.currentThread().interrupt();
+			throw new IOException("Interrupted while fetching available channels.", ex);
+		} catch (final IOException ex) {
+			ex.printStackTrace();
+		}
+
+		final Object[] options = {
+				UpdateChannel.RELEASE.displayName(),
+				UpdateChannel.SNAPSHOT.displayName(),
+				UpdateChannel.NIGHTLY.displayName() };
+
+		final int choice = JOptionPane.showOptionDialog(null,
+				BootstrapRuntime.buildFirstLaunchMessage(manifest),
+				"Choose update channel",
+				JOptionPane.DEFAULT_OPTION,
+				JOptionPane.QUESTION_MESSAGE,
+				null,
+				options,
+				options[0]);
+
+		final UpdateChannel selectedChannel = switch (choice) {
+		case 0 -> UpdateChannel.RELEASE;
+		case 1 -> UpdateChannel.SNAPSHOT;
+		case 2 -> UpdateChannel.NIGHTLY;
+		default -> null;
+		};
+
+		if (selectedChannel == null) {
+			throw new IOException("Initial setup was cancelled.");
+		}
+
+		this.configuration.setUpdateChannel(selectedChannel);
+	}
+
 	private AvailableUpdate requireInstallableUpdate(final UpdateChannel channel, final String currentVersion) throws IOException {
 		try {
 			final AvailableUpdate update = this.remoteUpdateService.findLatest(channel, currentVersion);
@@ -286,16 +299,6 @@ public class BootstrapRuntime implements UpdateRuntime {
 	public void setSelectedChannel(final UpdateChannel updateChannel) {
 		this.configuration.setUpdateChannel(updateChannel);
 		BootstrapApp.saveConfiguration(this.configuration);
-	}
-
-	@Override
-	public JsonNode getBootstrapJson() {
-		return BootstrapApp.JSON;
-	}
-
-	@Override
-	public BootstrapConfig getBootstrapConfig() {
-		return BootstrapApp.BOOTSTRAP_CONFIG;
 	}
 
 }

@@ -16,6 +16,16 @@ public final class UpdateRuntimes {
 		}
 
 		@Override
+		public BootstrapConfig getBootstrapConfig() {
+			return null;
+		}
+
+		@Override
+		public JsonNode getBootstrapJson() {
+			return null;
+		}
+
+		@Override
 		public String getCurrentApplicationVersion() {
 			return null;
 		}
@@ -54,16 +64,6 @@ public final class UpdateRuntimes {
 
 		@Override
 		public void setSelectedChannel(final UpdateChannel updateChannel) {
-		}
-
-		@Override
-		public JsonNode getBootstrapJson() {
-			return null;
-		}
-
-		@Override
-		public BootstrapConfig getBootstrapConfig() {
-			return null;
 		}
 
 	}

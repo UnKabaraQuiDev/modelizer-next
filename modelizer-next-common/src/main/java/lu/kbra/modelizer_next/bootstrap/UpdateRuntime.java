@@ -14,6 +14,10 @@ public interface UpdateRuntime {
 
 	AvailableUpdate checkForUpdates() throws IOException;
 
+	BootstrapConfig getBootstrapConfig();
+
+	JsonNode getBootstrapJson();
+
 	String getCurrentApplicationVersion();
 
 	UpdateChannel getSelectedChannel();
@@ -29,9 +33,5 @@ public interface UpdateRuntime {
 	void setAutoCheckUpdates(boolean enabled);
 
 	void setSelectedChannel(UpdateChannel updateChannel);
-
-	JsonNode getBootstrapJson();
-
-	BootstrapConfig getBootstrapConfig();
 
 }

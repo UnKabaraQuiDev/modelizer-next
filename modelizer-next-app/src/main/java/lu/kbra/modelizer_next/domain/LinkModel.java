@@ -50,6 +50,14 @@ public class LinkModel {
 		return this.id;
 	}
 
+	public String getLabelFrom() {
+		return this.labelFrom;
+	}
+
+	public String getLabelTo() {
+		return this.labelTo;
+	}
+
 	public Color getLineColor() {
 		return this.lineColor;
 	}
@@ -60,6 +68,10 @@ public class LinkModel {
 
 	public LinkEnd getTo() {
 		return this.to;
+	}
+
+	public boolean isSelfLinking() {
+		return Objects.equals(this.to.getClassId(), this.from.getClassId());
 	}
 
 	public void setAssociationClassId(final String associationClassId) {
@@ -82,6 +94,14 @@ public class LinkModel {
 		this.id = id;
 	}
 
+	public void setLabelFrom(final String nameFrom) {
+		this.labelFrom = nameFrom;
+	}
+
+	public void setLabelTo(final String nameTo) {
+		this.labelTo = nameTo;
+	}
+
 	public void setLineColor(final Color lineColor) {
 		this.lineColor = lineColor;
 	}
@@ -94,31 +114,11 @@ public class LinkModel {
 		this.to = to;
 	}
 
-	public boolean isSelfLinking() {
-		return Objects.equals(to.getClassId(), from.getClassId());
-	}
-
-	public String getLabelFrom() {
-		return labelFrom;
-	}
-
-	public void setLabelFrom(String nameFrom) {
-		this.labelFrom = nameFrom;
-	}
-
-	public String getLabelTo() {
-		return labelTo;
-	}
-
-	public void setLabelTo(String nameTo) {
-		this.labelTo = nameTo;
-	}
-
 	@Override
 	public String toString() {
-		return "LinkModel [id=" + id + ", name=" + name + ", from=" + from + ", to=" + to + ", cardinalityFrom=" + cardinalityFrom
-				+ ", cardinalityTo=" + cardinalityTo + ", associationClassId=" + associationClassId + ", lineColor=" + lineColor
-				+ ", labelFrom=" + labelFrom + ", labelTo=" + labelTo + "]";
+		return "LinkModel [id=" + this.id + ", name=" + this.name + ", from=" + this.from + ", to=" + this.to + ", cardinalityFrom="
+				+ this.cardinalityFrom + ", cardinalityTo=" + this.cardinalityTo + ", associationClassId=" + this.associationClassId
+				+ ", lineColor=" + this.lineColor + ", labelFrom=" + this.labelFrom + ", labelTo=" + this.labelTo + "]";
 	}
 
 }

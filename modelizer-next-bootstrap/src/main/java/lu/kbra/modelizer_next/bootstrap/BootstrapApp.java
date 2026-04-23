@@ -73,7 +73,12 @@ public final class BootstrapApp {
 				.asText("https://raw.githubusercontent.com/UnKabaraQuiDev/modelizer-next/refs/heads/registry/registry/versions.json");
 		BootstrapApp.DISTRIBUTOR = BootstrapApp.JSON.path("distributor").asText();
 
-		BootstrapApp.BOOTSTRAP_CONFIG = new BootstrapConfig(NAME, VERSION, REPOSITORY_URL, RELEASES_URL, UPDATES_MANIFEST_URL, DISTRIBUTOR);
+		BootstrapApp.BOOTSTRAP_CONFIG = new BootstrapConfig(BootstrapApp.NAME,
+				BootstrapApp.VERSION,
+				BootstrapApp.REPOSITORY_URL,
+				BootstrapApp.RELEASES_URL,
+				BootstrapApp.UPDATES_MANIFEST_URL,
+				BootstrapApp.DISTRIBUTOR);
 
 		BootstrapApp.ensureDirectories();
 	}

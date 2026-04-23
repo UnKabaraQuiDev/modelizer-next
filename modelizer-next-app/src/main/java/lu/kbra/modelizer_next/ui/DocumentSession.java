@@ -58,13 +58,14 @@ public final class DocumentSession {
 		return this.undoRedoManager.redo(this.document);
 	}
 
-	boolean undo() {
-		return this.undoRedoManager.undo(this.document);
-	}
-
 	@Override
 	public String toString() {
-		return "DocumentSession@" + System.identityHashCode(this) + " [document=" + document + ", currentFile=" + currentFile + "]";
+		return "DocumentSession@" + System.identityHashCode(this) + " [document=" + this.document + ", currentFile=" + this.currentFile
+				+ "]";
+	}
+
+	boolean undo() {
+		return this.undoRedoManager.undo(this.document);
 	}
 
 }

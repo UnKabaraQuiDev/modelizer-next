@@ -37,45 +37,66 @@ final class DiagramCanvasActionRegistrar {
 		final InputMap inputMap = component.getInputMap(JComponent.WHEN_FOCUSED);
 		final ActionMap actionMap = component.getActionMap();
 
-		bind(inputMap, actionMap, KeyStroke.getKeyStroke(KeyEvent.VK_F2, 0), "renameSelection", actions.renameSelection());
-		bind(inputMap,
+		DiagramCanvasActionRegistrar
+				.bind(inputMap, actionMap, KeyStroke.getKeyStroke(KeyEvent.VK_F2, 0), "renameSelection", actions.renameSelection());
+		DiagramCanvasActionRegistrar.bind(inputMap,
 				actionMap,
 				KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0),
 				"selectFieldUp",
 				() -> actions.moveFieldSelection().accept(-1));
-		bind(inputMap,
+		DiagramCanvasActionRegistrar.bind(inputMap,
 				actionMap,
 				KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0),
 				"selectFieldDown",
 				() -> actions.moveFieldSelection().accept(1));
-		bind(inputMap,
+		DiagramCanvasActionRegistrar.bind(inputMap,
 				actionMap,
 				KeyStroke.getKeyStroke(KeyEvent.VK_UP, InputEvent.ALT_DOWN_MASK),
 				"moveFieldUp",
 				() -> actions.moveSelectedFieldInList().accept(-1));
-		bind(inputMap,
+		DiagramCanvasActionRegistrar.bind(inputMap,
 				actionMap,
 				KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, InputEvent.ALT_DOWN_MASK),
 				"moveFieldDown",
 				() -> actions.moveSelectedFieldInList().accept(1));
-		bind(inputMap, actionMap, KeyStroke.getKeyStroke(KeyEvent.VK_T, InputEvent.CTRL_DOWN_MASK), "addTable", actions.addTable());
-		bind(inputMap, actionMap, KeyStroke.getKeyStroke(KeyEvent.VK_F, InputEvent.CTRL_DOWN_MASK), "addField", actions.addField());
-		bind(inputMap, actionMap, KeyStroke.getKeyStroke(KeyEvent.VK_W, InputEvent.CTRL_DOWN_MASK), "addComment", actions.addComment());
-		bind(inputMap, actionMap, KeyStroke.getKeyStroke(KeyEvent.VK_E, InputEvent.CTRL_DOWN_MASK), "edit", actions.edit());
-		bind(inputMap, actionMap, KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0), "deleteSelection", actions.deleteSelection());
-		bind(inputMap,
+		DiagramCanvasActionRegistrar.bind(inputMap,
+				actionMap,
+				KeyStroke.getKeyStroke(KeyEvent.VK_T, InputEvent.CTRL_DOWN_MASK),
+				"addTable",
+				actions.addTable());
+		DiagramCanvasActionRegistrar.bind(inputMap,
+				actionMap,
+				KeyStroke.getKeyStroke(KeyEvent.VK_F, InputEvent.CTRL_DOWN_MASK),
+				"addField",
+				actions.addField());
+		DiagramCanvasActionRegistrar.bind(inputMap,
+				actionMap,
+				KeyStroke.getKeyStroke(KeyEvent.VK_W, InputEvent.CTRL_DOWN_MASK),
+				"addComment",
+				actions.addComment());
+		DiagramCanvasActionRegistrar
+				.bind(inputMap, actionMap, KeyStroke.getKeyStroke(KeyEvent.VK_E, InputEvent.CTRL_DOWN_MASK), "edit", actions.edit());
+		DiagramCanvasActionRegistrar
+				.bind(inputMap, actionMap, KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0), "deleteSelection", actions.deleteSelection());
+		DiagramCanvasActionRegistrar.bind(inputMap,
 				actionMap,
 				KeyStroke.getKeyStroke(KeyEvent.VK_X, InputEvent.SHIFT_DOWN_MASK),
 				"deleteSelection",
 				actions.deleteSelection());
-		bind(inputMap,
+		DiagramCanvasActionRegistrar.bind(inputMap,
 				actionMap,
 				KeyStroke.getKeyStroke(KeyEvent.VK_D, InputEvent.CTRL_DOWN_MASK),
 				"duplicateSelection",
 				actions.duplicateSelection());
-		bind(inputMap, actionMap, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "clearSelection", actions.clearSelection());
-		bind(inputMap, actionMap, KeyStroke.getKeyStroke(KeyEvent.VK_L, InputEvent.CTRL_DOWN_MASK), "addLink", actions.addLink());
-		bind(inputMap, actionMap, KeyStroke.getKeyStroke(KeyEvent.VK_A, InputEvent.CTRL_DOWN_MASK), "selectAll", actions.selectAll());
+		DiagramCanvasActionRegistrar
+				.bind(inputMap, actionMap, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "clearSelection", actions.clearSelection());
+		DiagramCanvasActionRegistrar
+				.bind(inputMap, actionMap, KeyStroke.getKeyStroke(KeyEvent.VK_L, InputEvent.CTRL_DOWN_MASK), "addLink", actions.addLink());
+		DiagramCanvasActionRegistrar.bind(inputMap,
+				actionMap,
+				KeyStroke.getKeyStroke(KeyEvent.VK_A, InputEvent.CTRL_DOWN_MASK),
+				"selectAll",
+				actions.selectAll());
 	}
 
 	private DiagramCanvasActionRegistrar() {

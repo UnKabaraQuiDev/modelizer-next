@@ -50,21 +50,6 @@ final class RemoteUpdateService {
 			.followRedirects(HttpClient.Redirect.NORMAL)
 			.build();
 
-	UpdateManifest fetchManifest() throws IOException, InterruptedException {
-		final HttpRequest request = HttpRequest.newBuilder(URI.create(BootstrapApp.UPDATES_MANIFEST_URL))
-				.header("Accept", "application/json")
-				.header("User-Agent", BootstrapApp.NAME + "/" + BootstrapApp.VERSION)
-				.timeout(Duration.ofSeconds(20))
-				.GET()
-				.build();
-
-		final HttpResponse<String> response = this.httpClient.send(request, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
-		if (response.statusCode() < 200 || response.statusCode() >= 300) {
-			throw new IOException("Failed to fetch versions manifest: HTTP " + response.statusCode());
-		}
-		return this.mapper.readValue(response.body(), UpdateManifest.class);
-	}
-
 	void download(final AvailableUpdate update, final Path destination, final ProgressListener listener) throws IOException {
 		if (update == null || update.downloadUri() == null) {
 			throw new IOException("No downloadable update is available.");
@@ -102,6 +87,21 @@ final class RemoteUpdateService {
 			Thread.currentThread().interrupt();
 			throw new IOException("Interrupted while downloading update.", ex);
 		}
+	}
+
+	UpdateManifest fetchManifest() throws IOException, InterruptedException {
+		final HttpRequest request = HttpRequest.newBuilder(URI.create(BootstrapApp.UPDATES_MANIFEST_URL))
+				.header("Accept", "application/json")
+				.header("User-Agent", BootstrapApp.NAME + "/" + BootstrapApp.VERSION)
+				.timeout(Duration.ofSeconds(20))
+				.GET()
+				.build();
+
+		final HttpResponse<String> response = this.httpClient.send(request, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
+		if (response.statusCode() < 200 || response.statusCode() >= 300) {
+			throw new IOException("Failed to fetch versions manifest: HTTP " + response.statusCode());
+		}
+		return this.mapper.readValue(response.body(), UpdateManifest.class);
 	}
 
 	AvailableUpdate findLatest(final UpdateChannel channel, final String currentVersion) throws IOException, InterruptedException {
