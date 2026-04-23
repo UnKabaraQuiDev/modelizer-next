@@ -17,7 +17,9 @@ for path in sorted(assets_dir.iterdir()):
     name = path.name
     platform = 'linux' if '-linux-' in name else 'windows' if '-windows-' in name else 'standalone'
     kind = 'bootstrap'
-    if name.startswith('modelizer-next-app-standalone-'):
+    if name.startswith('modelizer-next-app-portable-'):
+        kind = 'app-portable-native'
+    elif name.startswith('modelizer-next-app-standalone-'):
         kind = 'app-standalone-native'
     elif name.startswith('modelizer-next-app-') and name.endswith('.jar'):
         kind = 'app-standalone-jar'
