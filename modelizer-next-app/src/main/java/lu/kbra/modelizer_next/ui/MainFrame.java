@@ -158,7 +158,7 @@ public class MainFrame extends JFrame {
 		this.logicalCanvas.setDefaultPalette(palette);
 		this.physicalCanvas.setDefaultPalette(palette);
 	}
-	
+
 	public void applyDefaultPaletteToCanvases() {
 		final StylePalette palette = this.findPaletteByName(this.appConfig.getDefaultPaletteName());
 		this.conceptualCanvas.applyPalette(palette);

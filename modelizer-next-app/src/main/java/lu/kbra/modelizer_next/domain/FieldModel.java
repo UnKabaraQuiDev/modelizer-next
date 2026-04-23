@@ -4,8 +4,7 @@ import java.util.UUID;
 
 public class FieldModel {
 
-	public static final String[] SQL_TYPES = { null, "INT", "BIGINT", "TEXT", "BOOLEAN", "TINYINT", "DATE",
-			"TIMESTAMP" };
+	public static final String[] SQL_TYPES = { null, "INT", "BIGINT", "TEXT", "BOOLEAN", "TINYINT", "DATE", "TIMESTAMP" };
 
 	private String id;
 	private FieldNames names;
@@ -103,10 +102,9 @@ public class FieldModel {
 
 	@Override
 	public String toString() {
-		return "FieldModel@" + System.identityHashCode(this) + " [id=" + this.id + ", names=" + this.names
-				+ ", notConceptual=" + this.notConceptual + ", comment=" + this.comment + ", style=" + this.style
-				+ ", primaryKey=" + this.primaryKey + ", unique=" + this.unique + ", notNull=" + this.notNull
-				+ ", type=" + this.type + "]";
+		return "FieldModel@" + System.identityHashCode(this) + " [id=" + this.id + ", names=" + this.names + ", notConceptual="
+				+ this.notConceptual + ", comment=" + this.comment + ", style=" + this.style + ", primaryKey=" + this.primaryKey
+				+ ", unique=" + this.unique + ", notNull=" + this.notNull + ", type=" + this.type + "]";
 	}
 
 }

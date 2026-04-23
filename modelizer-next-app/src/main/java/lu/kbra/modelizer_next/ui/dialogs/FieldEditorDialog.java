@@ -33,13 +33,19 @@ public final class FieldEditorDialog {
 		private Result result;
 	}
 
-	public record Result(String name, String technicalName, boolean primaryKey, boolean unique, boolean notNull,
-			Color textColor, Color backgroundColor, int moveDelta, String type) {
+	public record Result(String name, String technicalName, boolean primaryKey, boolean unique, boolean notNull, Color textColor,
+			Color backgroundColor, int moveDelta, String type) {
 	}
 
-	private static void applyFieldValues(final FieldModel fieldModel, final JTextField nameField,
-			final JTextField technicalNameField, final JCheckBox primaryKeyBox, final JCheckBox uniqueBox,
-			final JCheckBox notNullBox, final ColorButton textColorButton, final ColorButton backgroundColorButton,
+	private static void applyFieldValues(
+			final FieldModel fieldModel,
+			final JTextField nameField,
+			final JTextField technicalNameField,
+			final JCheckBox primaryKeyBox,
+			final JCheckBox uniqueBox,
+			final JCheckBox notNullBox,
+			final ColorButton textColorButton,
+			final ColorButton backgroundColorButton,
 			final JComboBox<String> typeField) {
 		fieldModel.getNames().setName(nameField.getText());
 		fieldModel.getNames().setTechnicalName(technicalNameField.getText());
@@ -60,8 +66,7 @@ public final class FieldEditorDialog {
 		return row;
 	}
 
-	public static Result showDialog(final Component parent, final FieldModel fieldModel,
-			final IntConsumer moveCallback) {
+	public static Result showDialog(final Component parent, final FieldModel fieldModel, final IntConsumer moveCallback) {
 		final Window owner = parent == null ? null : SwingUtilities.getWindowAncestor(parent);
 		final JDialog dialog = new JDialog(owner, "Edit field", Dialog.ModalityType.APPLICATION_MODAL);
 
@@ -77,8 +82,7 @@ public final class FieldEditorDialog {
 		final JCheckBox notNullBox = new JCheckBox("NN", fieldModel.isNotNull());
 
 		final ColorButton textColorButton = new ColorButton("Text color", fieldModel.getStyle().getTextColor());
-		final ColorButton backgroundColorButton = new ColorButton("Background color",
-				fieldModel.getStyle().getBackgroundColor());
+		final ColorButton backgroundColorButton = new ColorButton("Background color", fieldModel.getStyle().getBackgroundColor());
 
 		final Holder holder = new Holder();
 
@@ -107,22 +111,41 @@ public final class FieldEditorDialog {
 		final JButton cancelButton = new JButton("Cancel");
 
 		saveButton.addActionListener(event -> {
-			holder.result = new Result(nameField.getText(), technicalNameField.getText(), primaryKeyBox.isSelected(),
-					uniqueBox.isSelected(), notNullBox.isSelected(), textColorButton.getSelectedColor(),
-					backgroundColorButton.getSelectedColor(), 0,
+			holder.result = new Result(nameField.getText(),
+					technicalNameField.getText(),
+					primaryKeyBox.isSelected(),
+					uniqueBox.isSelected(),
+					notNullBox.isSelected(),
+					textColorButton.getSelectedColor(),
+					backgroundColorButton.getSelectedColor(),
+					0,
 					sqlTypeBox.getSelectedItem() == null ? null : sqlTypeBox.getSelectedItem().toString());
 			dialog.dispose();
 		});
 		upButton.addActionListener(event -> {
-			FieldEditorDialog.applyFieldValues(fieldModel, nameField, technicalNameField, primaryKeyBox, uniqueBox,
-					notNullBox, textColorButton, backgroundColorButton, sqlTypeBox);
+			FieldEditorDialog.applyFieldValues(fieldModel,
+					nameField,
+					technicalNameField,
+					primaryKeyBox,
+					uniqueBox,
+					notNullBox,
+					textColorButton,
+					backgroundColorButton,
+					sqlTypeBox);
 			if (moveCallback != null) {
 				moveCallback.accept(-1);
 			}
 		});
 		downButton.addActionListener(event -> {
-			FieldEditorDialog.applyFieldValues(fieldModel, nameField, technicalNameField, primaryKeyBox, uniqueBox,
-					notNullBox, textColorButton, backgroundColorButton, sqlTypeBox);
+			FieldEditorDialog.applyFieldValues(fieldModel,
+					nameField,
+					technicalNameField,
+					primaryKeyBox,
+					uniqueBox,
+					notNullBox,
+					textColorButton,
+					backgroundColorButton,
+					sqlTypeBox);
 			if (moveCallback != null) {
 				moveCallback.accept(1);
 			}
