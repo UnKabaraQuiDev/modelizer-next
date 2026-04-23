@@ -19,6 +19,7 @@ public class App {
 	public static String DESCRIPTION;
 	public static String VERSION;
 	public static String DISTRIBUTOR;
+	public static boolean PORTABLE;
 
 	public static String REPOSITORY_URL = "https://github.com/UnKabaraQuiDev/modelizer-next";
 	public static String RELEASES_URL = App.REPOSITORY_URL + "/releases";
@@ -36,6 +37,10 @@ public class App {
 		final String override = System.getProperty(App.APP_DIR_PROPERTY);
 		if (override != null && !override.isBlank()) {
 			return new File(override);
+		}
+
+		if (PORTABLE) {
+			return new File(".");
 		}
 
 		final String os = System.getProperty("os.name", "").toLowerCase();
@@ -74,6 +79,7 @@ public class App {
 		App.UPDATES_MANIFEST_URL = App.JSON.path("updatesManifest").asText(App.UPDATES_MANIFEST_URL);
 		App.ISSUES_URL = App.JSON.path("issues").asText(App.ISSUES_URL);
 		App.ENTRY_POINT = App.JSON.path("entryPoint").asText();
+		App.PORTABLE = App.JSON.path("portable").asBoolean(false);
 
 		App.ensureDirsExists();
 	}

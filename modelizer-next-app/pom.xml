@@ -18,6 +18,7 @@
 		<app.mainClass>lu.kbra.modelizer_next.MNMain</app.mainClass>
 		<jpackage.name>Modelizer Next App</jpackage.name>
 		<common.scope>provided</common.scope>
+		<portable>false</portable>
 	</properties>
 
 	<dependencies>
@@ -56,6 +57,13 @@
 			<id>standalone</id>
 			<properties>
 				<common.scope>compile</common.scope>
+			</properties>
+		</profile>
+
+		<profile>
+			<id>portable</id>
+			<properties>
+				<portable>true</portable>
 			</properties>
 		</profile>
 	</profiles>

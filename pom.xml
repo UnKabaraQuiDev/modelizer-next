@@ -592,21 +592,24 @@
 		</profile>
 
 		<profile>
-			<id>portable-windows</id>
+			<id>portable</id>
 			<properties>
 				<jpackage.type>app-image</jpackage.type>
 				<skipLinuxInstaller>true</skipLinuxInstaller>
 				<skipWindowsInstaller>true</skipWindowsInstaller>
+			</properties>
+		</profile>
+
+		<profile>
+			<id>portable-windows</id>
+			<properties>
 				<skipWindowsPortable>false</skipWindowsPortable>
 			</properties>
 		</profile>
-		
+
 		<profile>
 			<id>portable-linux</id>
 			<properties>
-				<jpackage.type>app-image</jpackage.type>
-				<skipLinuxInstaller>true</skipLinuxInstaller>
-				<skipWindowsInstaller>true</skipWindowsInstaller>
 				<skipLinuxPortable>false</skipLinuxPortable>
 			</properties>
 		</profile>

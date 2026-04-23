@@ -8,5 +8,6 @@
 	"releases": "@modelizer.releasesUrl@",
 	"updatesManifest": "@modelizer.updatesManifestUrl@",
 	"issues": "@modelizer.issuesUrl@",
-	"entryPoint": "lu.kbra.modelizer_next.ModelizerAppEntryPoint"
+	"entryPoint": "lu.kbra.modelizer_next.ModelizerAppEntryPoint",
+	"portable": @portable@
 }

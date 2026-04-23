@@ -7,7 +7,7 @@ public class AppConfig {
 
 	private ThemeMode themeMode = ThemeMode.SYSTEM;
 	private String selectedPaletteName = "Default";
-	private String defaultPaletteName;
+	private String defaultPaletteName = "Default";
 	private List<String> pinnedPaletteNames = new ArrayList<>();
 	private boolean autoCheckUpdates = true;
 	private String skippedUpdateVersion;
