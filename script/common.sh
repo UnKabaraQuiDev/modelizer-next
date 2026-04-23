@@ -223,7 +223,7 @@ stage_portable_artifacts() {
   archive_name="modelizer-next-app-portable-${platform}-${VERSION}.zip"
   (
     cd "$(dirname "${source_dir}")"
-    zip -r "${out_dir}/${archive_name}" "$(basename "${source_dir}")"
+    jar --create --file "${out_dir}/${archive_name}" "$(basename "${source_dir}")"
   )
 }
 
@@ -253,13 +253,13 @@ run_platform_build() {
   case "${build_kind}" in
     standalone)
       echo "Starting ${platform} ${channel} standalone installer build"
-      mvn_args=(-pl modelizer-next-app -am -DskipLinuxInstaller=true -DskipWindowsInstaller=true)
+      mvn_args=(-pl modelizer-next-app -am)
       extra_profiles="standalone,native-${platform}"
       ;;
 
     portable)
       echo "Starting ${platform} ${channel} portable build"
-      mvn_args=(-pl modelizer-next-app -am -DskipLinuxInstaller=true -DskipWindowsInstaller=true)
+      mvn_args=(-pl modelizer-next-app -am)
       extra_profiles="portable-${platform},native-${platform}"
       ;;
 
@@ -275,7 +275,7 @@ run_platform_build() {
   esac
 
   echo "Version [$(channel_upper "${channel}")]: ${VERSION} (${BASE_VERSION}) = ${APP_VERSION}"
-
+	echo "profiles: native,${extra_profiles}"
   mvn -B -DskipTests -Drevision="${VERSION}" -DappVersion="${APP_VERSION}" \
     -Ddistributor="Automated ${channel} build ${BUILD_TIMESTAMP} (${platform}-${build_kind})" \
     "${mvn_args[@]}" \
