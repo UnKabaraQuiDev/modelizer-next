@@ -519,10 +519,6 @@ public class DiagramCanvas extends JPanel {
 					classModel.getStyle().setTextColor(palette.getClassTextColor());
 					classModel.getStyle().setBackgroundColor(palette.getClassBackgroundColor());
 					classModel.getStyle().setBorderColor(palette.getClassBorderColor());
-					classModel.getFields().forEach(fieldModel -> {
-						fieldModel.getStyle().setTextColor(palette.getFieldTextColor());
-						fieldModel.getStyle().setBackgroundColor(palette.getFieldBackgroundColor());
-					});
 				}
 			}
 			case FIELD -> {
@@ -1872,6 +1868,204 @@ public class DiagramCanvas extends JPanel {
 		return geometry == null ? null : geometry.middlePoint();
 	}
 
+	private void bindCommentToTarget(final String commentId, final SelectedElement target) {
+		final CommentModel commentModel = this.findCommentById(commentId);
+		if (commentModel == null || target == null) {
+			return;
+		}
+
+		commentModel.setKind(CommentKind.BOUND);
+		commentModel.setBinding(switch (target.type()) {
+		case CLASS, FIELD -> new CommentBinding(BoundTargetType.CLASS, target.classId());
+		case LINK -> new CommentBinding(BoundTargetType.LINK, target.linkId());
+		default -> throw new IllegalStateException("Cannot bind comment to: " + target);
+		});
+
+		this.select(SelectedElement.forComment(commentId));
+		this.notifyDocumentChanged();
+	}
+
+	private void createConceptualLink(final String fromClassId, final String toClassId) {
+		final LinkModel linkModel = new LinkModel();
+		linkModel.setFrom(new LinkEnd(fromClassId, null));
+		linkModel.setTo(new LinkEnd(toClassId, null));
+		linkModel.setCardinalityFrom(Cardinality.ONE);
+		linkModel.setCardinalityTo(Cardinality.ZERO_OR_MANY);
+		this.applyDefaultPaletteToLink(linkModel);
+		this.document.getModel().getConceptualLinks().add(linkModel);
+
+		this.findOrCreateLinkLayout(linkModel.getId());
+		this.select(SelectedElement.forLink(linkModel.getId()));
+		this.notifyDocumentChanged();
+	}
+
+	private void createTechnicalLink(final SelectedElement fromEndpoint, final SelectedElement toEndpoint) {
+		final LinkModel linkModel = new LinkModel();
+		linkModel.setFrom(new LinkEnd(fromEndpoint.classId(), fromEndpoint.fieldId()));
+		linkModel.setTo(new LinkEnd(toEndpoint.classId(), toEndpoint.fieldId()));
+		linkModel.setCardinalityFrom(null);
+		linkModel.setCardinalityTo(null);
+		this.applyDefaultPaletteToLink(linkModel);
+		this.document.getModel().getTechnicalLinks().add(linkModel);
+
+		this.findOrCreateLinkLayout(linkModel.getId());
+		this.select(SelectedElement.forLink(linkModel.getId()));
+		this.notifyDocumentChanged();
+	}
+
+	private SelectedElement getLinkCreationSource() {
+		return this.linkCreationState == null ? null : this.linkCreationState.toSelectedElement();
+	}
+
+	private FieldModel findPrimaryKeyField(final String classId) {
+		final ClassModel classModel = this.findClassById(classId);
+		if (classModel == null) {
+			return null;
+		}
+
+		for (final FieldModel fieldModel : classModel.getFields()) {
+			if (fieldModel.isPrimaryKey()) {
+				return fieldModel;
+			}
+		}
+
+		return null;
+	}
+
+	private String buildForeignKeyFieldName(final ClassModel targetClass, final FieldModel targetField) {
+		final String className = this
+				.blankToFallback(targetClass.getNames().getTechnicalName(), targetClass.getNames().getConceptualName(), "target");
+		final String fieldName = this.blankToFallback(targetField.getNames().getTechnicalName(), targetField.getNames().getName(), "id");
+		return className + "_" + fieldName;
+	}
+
+	private String buildForeignKeyFieldTechnicalName(final ClassModel targetClass, final FieldModel targetField) {
+		final String rawName = this.buildForeignKeyFieldName(targetClass, targetField);
+		return rawName.trim().replaceAll("[^A-Za-z0-9_]+", "_").replaceAll("_+", "_").replaceAll("^_|_$", "").toLowerCase();
+	}
+
+	private FieldModel ensureTechnicalSourceField(
+			final ClassModel sourceClass,
+			final ClassModel targetClass,
+			final FieldModel targetField) {
+		if (sourceClass == null || targetClass == null || targetField == null) {
+			return null;
+		}
+
+		final String baseTechnicalName = this.buildForeignKeyFieldTechnicalName(targetClass, targetField);
+		final String baseDisplayName = this.buildForeignKeyFieldName(targetClass, targetField);
+
+		for (int suffix = 1; suffix < 1000; suffix++) {
+			final String technicalName = suffix == 1 ? baseTechnicalName : baseTechnicalName + "_" + suffix;
+			final String displayName = suffix == 1 ? baseDisplayName : baseDisplayName + "_" + suffix;
+
+			FieldModel matchingField = null;
+			for (final FieldModel fieldModel : sourceClass.getFields()) {
+				if (fieldModel.isPrimaryKey()) {
+					continue;
+				}
+
+				if (technicalName.equalsIgnoreCase(fieldModel.getNames().getTechnicalName())
+						|| displayName.equalsIgnoreCase(fieldModel.getNames().getName())) {
+					matchingField = fieldModel;
+					break;
+				}
+			}
+
+			if (matchingField != null) {
+				if (!this.hasOutgoingTechnicalLink(sourceClass.getId(), matchingField.getId())) {
+					return matchingField;
+				}
+				continue;
+			}
+
+			final FieldModel fieldModel = new FieldModel();
+			fieldModel.getNames().setName(displayName);
+			fieldModel.getNames().setTechnicalName(technicalName.isBlank() ? displayName : technicalName);
+			fieldModel.setNotConceptual(true);
+			fieldModel.setPrimaryKey(false);
+			fieldModel.setUnique(false);
+			fieldModel.setNotNull(false);
+			fieldModel.setType(targetField.getType());
+			this.applyDefaultPaletteToField(fieldModel);
+			sourceClass.getFields().add(fieldModel);
+			return fieldModel;
+		}
+
+		return null;
+	}
+
+	private SelectedElement resolveTechnicalSourceEndpoint(final SelectedElement source, final SelectedElement target) {
+		if (source == null || target == null) {
+			return null;
+		}
+
+		if (source.type() == SelectedType.FIELD) {
+			return source;
+		}
+
+		if (source.type() != SelectedType.CLASS) {
+			return null;
+		}
+
+		final SelectedElement targetEndpoint = this.resolveTechnicalTargetEndpoint(target);
+		if (targetEndpoint == null) {
+			return null;
+		}
+
+		final ClassModel sourceClass = this.findClassById(source.classId());
+		final ClassModel targetClass = this.findClassById(targetEndpoint.classId());
+		final FieldModel targetField = this.findFieldById(targetEndpoint.classId(), targetEndpoint.fieldId());
+		final FieldModel sourceField = this.ensureTechnicalSourceField(sourceClass, targetClass, targetField);
+		return sourceField == null ? null : SelectedElement.forField(sourceClass.getId(), sourceField.getId());
+	}
+
+	private SelectedElement resolveTechnicalTargetEndpoint(final SelectedElement target) {
+		if (target == null) {
+			return null;
+		}
+
+		if (target.type() == SelectedType.FIELD) {
+			final FieldModel fieldModel = this.findFieldById(target.classId(), target.fieldId());
+			return fieldModel != null && fieldModel.isPrimaryKey() ? target : null;
+		}
+
+		if (target.type() != SelectedType.CLASS) {
+			return null;
+		}
+
+		final FieldModel targetField = this.findPrimaryKeyField(target.classId());
+		return targetField == null ? null : SelectedElement.forField(target.classId(), targetField.getId());
+	}
+
+	private Point2D resolveClassCenterAnchor(final Graphics2D g2, final String classId) {
+		final ClassModel classModel = this.findClassById(classId);
+		if (classModel == null || !this.isVisible(classModel)) {
+			return null;
+		}
+
+		final NodeLayout layout = this.resolveRenderLayout(this.findOrCreateNodeLayout(LayoutObjectType.CLASS, classModel.getId()));
+		final Rectangle2D bounds = this.computeClassBounds(g2, classModel, layout);
+		return new Point2D.Double(bounds.getCenterX(), bounds.getCenterY());
+	}
+
+	private Point2D resolveCommentCenterAnchor(final Graphics2D g2, final String commentId) {
+		final CommentModel commentModel = this.findCommentById(commentId);
+		if (commentModel == null || !this.isCommentVisible(commentModel)) {
+			return null;
+		}
+
+		final NodeLayout layout = this.resolveRenderLayout(this.findOrCreateNodeLayout(LayoutObjectType.COMMENT, commentModel.getId()));
+		final Rectangle2D bounds = this.computeCommentBounds(g2, this.resolveCommentText(commentModel), layout);
+		return new Point2D.Double(bounds.getCenterX(), bounds.getCenterY());
+	}
+
+	private Point2D resolveLinkMiddleAnchor(final Graphics2D g2, final String linkId) {
+		final LinkModel linkModel = this.findLinkById(linkId);
+		final LinkGeometry geometry = linkModel == null ? null : this.resolveLinkGeometry(g2, linkModel);
+		return geometry == null ? null : geometry.middlePoint();
+	}
+
 	private ClassModel findClassById(final String id) {
 		for (final ClassModel classModel : this.document.getModel().getClasses()) {
 			if (classModel.getId().equals(id)) {
@@ -2114,51 +2308,6 @@ public class DiagramCanvas extends JPanel {
 		}
 
 		this.createTechnicalLink(fromEndpoint, toEndpoint);
-	}
-
-	private void createConceptualLink(final String fromClassId, final String toClassId) {
-		final LinkModel linkModel = new LinkModel();
-		linkModel.setFrom(new LinkEnd(fromClassId, null));
-		linkModel.setTo(new LinkEnd(toClassId, null));
-		linkModel.setCardinalityFrom(Cardinality.ONE);
-		linkModel.setCardinalityTo(Cardinality.ZERO_OR_MANY);
-		this.applyDefaultPaletteToLink(linkModel);
-		this.document.getModel().getConceptualLinks().add(linkModel);
-
-		this.findOrCreateLinkLayout(linkModel.getId());
-		this.select(SelectedElement.forLink(linkModel.getId()));
-		this.notifyDocumentChanged();
-	}
-
-	private void createTechnicalLink(final SelectedElement fromEndpoint, final SelectedElement toEndpoint) {
-		final LinkModel linkModel = new LinkModel();
-		linkModel.setFrom(new LinkEnd(fromEndpoint.classId(), fromEndpoint.fieldId()));
-		linkModel.setTo(new LinkEnd(toEndpoint.classId(), toEndpoint.fieldId()));
-		linkModel.setCardinalityFrom(null);
-		linkModel.setCardinalityTo(null);
-		this.applyDefaultPaletteToLink(linkModel);
-		this.document.getModel().getTechnicalLinks().add(linkModel);
-
-		this.findOrCreateLinkLayout(linkModel.getId());
-		this.select(SelectedElement.forLink(linkModel.getId()));
-		this.notifyDocumentChanged();
-	}
-
-	private void bindCommentToTarget(final String commentId, final SelectedElement target) {
-		final CommentModel commentModel = this.findCommentById(commentId);
-		if (commentModel == null || target == null) {
-			return;
-		}
-
-		commentModel.setKind(CommentKind.BOUND);
-		commentModel.setBinding(switch (target.type()) {
-		case CLASS, FIELD -> new CommentBinding(BoundTargetType.CLASS, target.classId());
-		case LINK -> new CommentBinding(BoundTargetType.LINK, target.linkId());
-		default -> throw new IllegalStateException("Cannot bind comment to: " + target);
-		});
-
-		this.select(SelectedElement.forComment(commentId));
-		this.notifyDocumentChanged();
 	}
 
 	private List<LinkModel> getActiveLinks() {
@@ -2441,19 +2590,6 @@ public class DiagramCanvas extends JPanel {
 		this.repaint();
 	}
 
-	private SelectedElement normalizeConnectionSourceSelection(final SelectedElement selection) {
-		if (selection == null) {
-			return null;
-		}
-
-		return switch (selection.type()) {
-		case COMMENT -> SelectedElement.forComment(selection.commentId());
-		case CLASS -> SelectedElement.forClass(selection.classId());
-		case FIELD -> this.panelType == PanelType.CONCEPTUAL ? SelectedElement.forClass(selection.classId()) : selection;
-		default -> null;
-		};
-	}
-
 	private boolean hasAssociationClass(final LinkModel linkModel) {
 		return linkModel != null && linkModel.getAssociationClassId() != null && !linkModel.getAssociationClassId().isBlank();
 	}
@@ -2486,38 +2622,6 @@ public class DiagramCanvas extends JPanel {
 						this::addLink,
 						this::selectAll,
 						this::editSelected));
-	}
-
-	private SelectedElement normalizeConnectionTargetSelection(final SelectedElement selection) {
-		if (selection == null || this.linkCreationState == null) {
-			return null;
-		}
-
-		final SelectedElement source = this.getLinkCreationSource();
-		if (source == null) {
-			return null;
-		}
-
-		if (source.type() == SelectedType.COMMENT) {
-			return switch (selection.type()) {
-			case CLASS, FIELD -> SelectedElement.forClass(selection.classId());
-			case LINK -> SelectedElement.forLink(selection.linkId());
-			default -> null;
-			};
-		}
-
-		if (this.panelType == PanelType.CONCEPTUAL) {
-			return switch (selection.type()) {
-			case CLASS, FIELD -> SelectedElement.forClass(selection.classId());
-			default -> null;
-			};
-		}
-
-		return switch (selection.type()) {
-		case FIELD -> SelectedElement.forField(selection.classId(), selection.fieldId());
-		case CLASS -> SelectedElement.forClass(selection.classId());
-		default -> null;
-		};
 	}
 
 	@SuppressWarnings("incomplete-switch")
@@ -2634,131 +2738,6 @@ public class DiagramCanvas extends JPanel {
 	private boolean isSelfLink(final LinkModel linkModel) {
 		return linkModel.getFrom() != null && linkModel.getTo() != null
 				&& Objects.equals(linkModel.getFrom().getClassId(), linkModel.getTo().getClassId());
-	}
-
-	private SelectedElement getLinkCreationSource() {
-		return this.linkCreationState == null ? null : this.linkCreationState.toSelectedElement();
-	}
-
-	private SelectedElement resolveTechnicalSourceEndpoint(final SelectedElement source, final SelectedElement target) {
-		if (source == null || target == null) {
-			return null;
-		}
-
-		if (source.type() == SelectedType.FIELD) {
-			return source;
-		}
-
-		if (source.type() != SelectedType.CLASS) {
-			return null;
-		}
-
-		final SelectedElement targetEndpoint = this.resolveTechnicalTargetEndpoint(target);
-		if (targetEndpoint == null) {
-			return null;
-		}
-
-		final ClassModel sourceClass = this.findClassById(source.classId());
-		final ClassModel targetClass = this.findClassById(targetEndpoint.classId());
-		final FieldModel targetField = this.findFieldById(targetEndpoint.classId(), targetEndpoint.fieldId());
-		final FieldModel sourceField = this.ensureTechnicalSourceField(sourceClass, targetClass, targetField);
-		return sourceField == null ? null : SelectedElement.forField(sourceClass.getId(), sourceField.getId());
-	}
-
-	private String buildForeignKeyFieldTechnicalName(final ClassModel targetClass, final FieldModel targetField) {
-		final String rawName = this.buildForeignKeyFieldName(targetClass, targetField);
-		return rawName.trim().replaceAll("[^A-Za-z0-9_]+", "_").replaceAll("_+", "_").replaceAll("^_|_$", "").toLowerCase();
-	}
-
-	private String buildForeignKeyFieldName(final ClassModel targetClass, final FieldModel targetField) {
-		final String className = this
-				.blankToFallback(targetClass.getNames().getTechnicalName(), targetClass.getNames().getConceptualName(), "target");
-		final String fieldName = this.blankToFallback(targetField.getNames().getTechnicalName(), targetField.getNames().getName(), "id");
-		return className + "_" + fieldName;
-	}
-
-	private FieldModel ensureTechnicalSourceField(
-			final ClassModel sourceClass,
-			final ClassModel targetClass,
-			final FieldModel targetField) {
-		if (sourceClass == null || targetClass == null || targetField == null) {
-			return null;
-		}
-
-		final String baseTechnicalName = this.buildForeignKeyFieldTechnicalName(targetClass, targetField);
-		final String baseDisplayName = this.buildForeignKeyFieldName(targetClass, targetField);
-
-		for (int suffix = 1; suffix < 1000; suffix++) {
-			final String technicalName = suffix == 1 ? baseTechnicalName : baseTechnicalName + "_" + suffix;
-			final String displayName = suffix == 1 ? baseDisplayName : baseDisplayName + "_" + suffix;
-
-			FieldModel matchingField = null;
-			for (final FieldModel fieldModel : sourceClass.getFields()) {
-				if (fieldModel.isPrimaryKey()) {
-					continue;
-				}
-
-				if (technicalName.equalsIgnoreCase(fieldModel.getNames().getTechnicalName())
-						|| displayName.equalsIgnoreCase(fieldModel.getNames().getName())) {
-					matchingField = fieldModel;
-					break;
-				}
-			}
-
-			if (matchingField != null) {
-				if (!this.hasOutgoingTechnicalLink(sourceClass.getId(), matchingField.getId())) {
-					return matchingField;
-				}
-				continue;
-			}
-
-			final FieldModel fieldModel = new FieldModel();
-			fieldModel.getNames().setName(displayName);
-			fieldModel.getNames().setTechnicalName(technicalName.isBlank() ? displayName : technicalName);
-			fieldModel.setNotConceptual(true);
-			fieldModel.setPrimaryKey(false);
-			fieldModel.setUnique(false);
-			fieldModel.setNotNull(false);
-			fieldModel.setType(targetField.getType());
-			this.applyDefaultPaletteToField(fieldModel);
-			sourceClass.getFields().add(fieldModel);
-			return fieldModel;
-		}
-
-		return null;
-	}
-
-	private SelectedElement resolveTechnicalTargetEndpoint(final SelectedElement target) {
-		if (target == null) {
-			return null;
-		}
-
-		if (target.type() == SelectedType.FIELD) {
-			final FieldModel fieldModel = this.findFieldById(target.classId(), target.fieldId());
-			return fieldModel != null && fieldModel.isPrimaryKey() ? target : null;
-		}
-
-		if (target.type() != SelectedType.CLASS) {
-			return null;
-		}
-
-		final FieldModel targetField = this.findPrimaryKeyField(target.classId());
-		return targetField == null ? null : SelectedElement.forField(target.classId(), targetField.getId());
-	}
-
-	private FieldModel findPrimaryKeyField(final String classId) {
-		final ClassModel classModel = this.findClassById(classId);
-		if (classModel == null) {
-			return null;
-		}
-
-		for (final FieldModel fieldModel : classModel.getFields()) {
-			if (fieldModel.isPrimaryKey()) {
-				return fieldModel;
-			}
-		}
-
-		return null;
 	}
 
 	private boolean isValidPreviewTarget(final SelectedElement target) {
@@ -2884,20 +2863,49 @@ public class DiagramCanvas extends JPanel {
 		this.repaint();
 	}
 
-	private SelectedElement normalizeLinkEndpointSelection(final SelectedElement selection) {
+	private SelectedElement normalizeConnectionSourceSelection(final SelectedElement selection) {
 		if (selection == null) {
 			return null;
 		}
 
-		if (this.panelType == PanelType.CONCEPTUAL) {
+		return switch (selection.type()) {
+		case COMMENT -> SelectedElement.forComment(selection.commentId());
+		case CLASS -> SelectedElement.forClass(selection.classId());
+		case FIELD -> this.panelType == PanelType.CONCEPTUAL ? SelectedElement.forClass(selection.classId()) : selection;
+		default -> null;
+		};
+	}
+
+	private SelectedElement normalizeConnectionTargetSelection(final SelectedElement selection) {
+		if (selection == null || this.linkCreationState == null) {
+			return null;
+		}
+
+		final SelectedElement source = this.getLinkCreationSource();
+		if (source == null) {
+			return null;
+		}
+
+		if (source.type() == SelectedType.COMMENT) {
 			return switch (selection.type()) {
-			case CLASS -> SelectedElement.forClass(selection.classId());
-			case FIELD -> SelectedElement.forClass(selection.classId());
+			case CLASS, FIELD -> SelectedElement.forClass(selection.classId());
+			case LINK -> SelectedElement.forLink(selection.linkId());
 			default -> null;
 			};
 		}
 
-		return selection.type() == SelectedType.FIELD ? selection : null;
+		if (this.panelType == PanelType.CONCEPTUAL) {
+			return switch (selection.type()) {
+			case CLASS, FIELD -> SelectedElement.forClass(selection.classId());
+			default -> null;
+			};
+		}
+
+		return switch (selection.type()) {
+		case FIELD -> SelectedElement.forField(selection.classId(), selection.fieldId());
+		case CLASS -> SelectedElement.forClass(selection.classId());
+		default -> null;
+		};
 	}
 
 	private void notifyDocumentChanged() {
@@ -3128,8 +3136,11 @@ public class DiagramCanvas extends JPanel {
 			flags.add("NN");
 		}
 
-		return baseName + (flags.isEmpty() ? "" : " [" + String.join(", ", flags) + "]")
-				+ (fieldModel.getType() == null ? "" : " - " + fieldModel.getType());
+		if (flags.isEmpty()) {
+			return baseName;
+		}
+
+		return baseName + " [" + String.join(", ", flags) + "] - " + (fieldModel.getType() == null ? "No type" : fieldModel.getType());
 	}
 
 	private LinkGeometry resolveLinkGeometry(final Graphics2D g2, final LinkModel linkModel) {
@@ -3235,10 +3246,19 @@ public class DiagramCanvas extends JPanel {
 			return null;
 		}
 
+		final SelectedElement source = this.getLinkCreationSource();
+		if (source == null) {
+			return null;
+		}
+
+		if (source.type() == SelectedType.COMMENT) {
+			return this.resolveCommentCenterAnchor(g2, source.commentId());
+		}
+
 		if (this.panelType == PanelType.CONCEPTUAL) {
 			final Point2D reference = this.linkPreviewTarget != null ? this.resolvePreviewTargetAnchor(g2, this.linkPreviewTarget)
 					: this.linkPreviewMousePoint;
-			return this.resolveConceptualPreviewAnchor(g2, this.linkCreationState.classId(), reference);
+			return this.resolveConceptualPreviewAnchor(g2, source.classId(), reference);
 		}
 
 		final Point2D reference = this.linkPreviewTarget != null ? this.resolvePreviewTargetAnchor(g2, this.linkPreviewTarget)
@@ -3248,14 +3268,10 @@ public class DiagramCanvas extends JPanel {
 		final String oppositeFieldId = this.linkPreviewTarget == null ? null : this.linkPreviewTarget.fieldId();
 
 		if (oppositeClassId != null) {
-			return this.resolveTechnicalFieldAnchor(g2,
-					this.linkCreationState.classId(),
-					this.linkCreationState.fieldId(),
-					oppositeClassId,
-					oppositeFieldId);
+			return this.resolveTechnicalFieldAnchor(g2, source.classId(), source.fieldId(), oppositeClassId, oppositeFieldId);
 		}
 
-		return this.resolveTechnicalFieldAnchor(g2, this.linkCreationState.classId(), this.linkCreationState.fieldId(), reference);
+		return this.resolveTechnicalFieldAnchor(g2, source.classId(), source.fieldId(), reference);
 	}
 
 	private Point2D resolvePreviewSourceAnchorReference(final Graphics2D g2) {
@@ -3263,8 +3279,17 @@ public class DiagramCanvas extends JPanel {
 			return this.linkPreviewMousePoint;
 		}
 
+		final SelectedElement source = this.getLinkCreationSource();
+		if (source == null) {
+			return this.linkPreviewMousePoint;
+		}
+
+		if (source.type() == SelectedType.COMMENT) {
+			return this.resolveCommentCenterAnchor(g2, source.commentId());
+		}
+
 		if (this.panelType == PanelType.CONCEPTUAL) {
-			final ClassModel classModel = this.findClassById(this.linkCreationState.classId());
+			final ClassModel classModel = this.findClassById(source.classId());
 			if (classModel == null || !this.isVisible(classModel)) {
 				return this.linkPreviewMousePoint;
 			}
@@ -3274,7 +3299,7 @@ public class DiagramCanvas extends JPanel {
 			return new Point2D.Double(bounds.getCenterX(), bounds.getCenterY());
 		}
 
-		return this.resolveOppositeReferencePoint(g2, this.linkCreationState.classId(), this.linkCreationState.fieldId());
+		return this.resolveOppositeReferencePoint(g2, source.classId(), source.fieldId());
 	}
 
 	private Point2D resolvePreviewTargetAnchor(final Graphics2D g2, final SelectedElement target) {
@@ -3282,16 +3307,25 @@ public class DiagramCanvas extends JPanel {
 			return null;
 		}
 
+		final SelectedElement source = this.getLinkCreationSource();
+		if (source == null) {
+			return null;
+		}
+
+		if (source.type() == SelectedType.COMMENT) {
+			return switch (target.type()) {
+			case CLASS -> this.resolveClassCenterAnchor(g2, target.classId());
+			case LINK -> this.resolveLinkMiddleAnchor(g2, target.linkId());
+			default -> null;
+			};
+		}
+
 		if (this.panelType == PanelType.CONCEPTUAL) {
 			final Point2D reference = this.resolvePreviewSourceAnchorReference(g2);
 			return this.resolveConceptualPreviewAnchor(g2, target.classId(), reference);
 		}
 
-		return this.resolveTechnicalFieldAnchor(g2,
-				target.classId(),
-				target.fieldId(),
-				this.linkCreationState.classId(),
-				this.linkCreationState.fieldId());
+		return this.resolveTechnicalFieldAnchor(g2, target.classId(), target.fieldId(), source.classId(), source.fieldId());
 	}
 
 	private AnchorSide chooseTechnicalSelfLinkSide(final Graphics2D g2, final LinkModel linkModel) {
