@@ -222,8 +222,8 @@ stage_portable_artifacts() {
 
   archive_name="modelizer-next-app-portable-${platform}-${VERSION}.zip"
   (
-    cd "$(dirname "${source_dir}")"
-    jar --create --file "${out_dir}/${archive_name}" "$(basename "${source_dir}")"
+    cd "${source_dir}"
+    zip -r "${out_dir}/${archive_name}" .
   )
 }
 
