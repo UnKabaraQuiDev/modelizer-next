@@ -28,7 +28,7 @@
 			https://github.com/UnKabaraQuiDev/modelizer-next</modelizer.repositoryUrl>
 		<modelizer.releasesUrl>${modelizer.repositoryUrl}/releases</modelizer.releasesUrl>
 		<modelizer.updatesManifestUrl>
-			https://raw.githubusercontent.com/UnKabaraQuiDev/modelizer-next/refs/heads/main/registry/versions.json</modelizer.updatesManifestUrl>
+			https://raw.githubusercontent.com/UnKabaraQuiDev/modelizer-next/refs/heads/registry/registry/versions.json</modelizer.updatesManifestUrl>
 		<modelizer.issuesUrl>${modelizer.repositoryUrl}/issues</modelizer.issuesUrl>
 		<jpackage.addModules>
 			java.base,java.desktop,java.logging,java.net.http,jdk.unsupported,jdk.crypto.ec</jpackage.addModules>
