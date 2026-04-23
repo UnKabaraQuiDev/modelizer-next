@@ -155,10 +155,10 @@ find_single_file() {
   echo "${file}"
 }
 
-stage_platform_artifacts() {
+stage_bootstrap_artifacts() {
   local channel="$1"
   local platform="$2"
-  local out_dir="${ARTIFACTS_ROOT}/${channel}/${platform}"
+  local out_dir="${ARTIFACTS_ROOT}/${channel}/${platform}-bootstrap"
 
   rm -rf "${out_dir}"
   mkdir -p "${out_dir}"
@@ -166,18 +166,29 @@ stage_platform_artifacts() {
   if [ "${platform}" = "windows" ]; then
     local bootstrap_exe
     bootstrap_exe="$(find_single_file "modelizer-next-bootstrap/target/dist/windows" '*.exe')"
-    local app_exe
-    app_exe="$(find_single_file "modelizer-next-app/target/dist/windows" '*.exe')"
-
     cp "${bootstrap_exe}" "${out_dir}/modelizer-next-bootstrap-${platform}-${VERSION}.exe"
-    cp "${app_exe}" "${out_dir}/modelizer-next-app-standalone-${platform}-${VERSION}.exe"
   else
     local bootstrap_exe
     bootstrap_exe="$(find_single_file "modelizer-next-bootstrap/target/dist/linux" '*.deb')"
+    cp "${bootstrap_exe}" "${out_dir}/modelizer-next-bootstrap-${platform}-${VERSION}.deb"
+  fi
+}
+
+stage_standalone_artifacts() {
+  local channel="$1"
+  local platform="$2"
+  local out_dir="${ARTIFACTS_ROOT}/${channel}/${platform}-standalone"
+
+  rm -rf "${out_dir}"
+  mkdir -p "${out_dir}"
+
+  if [ "${platform}" = "windows" ]; then
+    local app_exe
+    app_exe="$(find_single_file "modelizer-next-app/target/dist/windows" '*.exe')"
+    cp "${app_exe}" "${out_dir}/modelizer-next-app-standalone-${platform}-${VERSION}.exe"
+  else
     local app_exe
     app_exe="$(find_single_file "modelizer-next-app/target/dist/linux" '*.deb')"
-
-    cp "${bootstrap_exe}" "${out_dir}/modelizer-next-bootstrap-${platform}-${VERSION}.deb"
     cp "${app_exe}" "${out_dir}/modelizer-next-app-standalone-${platform}-${VERSION}.deb"
   fi
 }
@@ -212,7 +223,7 @@ stage_portable_artifacts() {
   archive_name="modelizer-next-app-portable-${platform}-${VERSION}.zip"
   (
     cd "$(dirname "${source_dir}")"
-    jar --create --file "${out_dir}/${archive_name}" "$(basename "${source_dir}")"
+    zip -r "${out_dir}/${archive_name}" "$(basename "${source_dir}")"
   )
 }
 
@@ -241,7 +252,7 @@ run_platform_build() {
 
   case "${build_kind}" in
     standalone)
-      echo "Starting ${platform} ${channel} standalone build"
+      echo "Starting ${platform} ${channel} standalone installer build"
       mvn_args=(-pl modelizer-next-app -am -DskipLinuxInstaller=true -DskipWindowsInstaller=true)
       extra_profiles="standalone,native-${platform}"
       ;;
@@ -253,7 +264,7 @@ run_platform_build() {
       ;;
 
     installer|normal)
-      echo "Starting ${platform} ${channel} native installer build"
+      echo "Starting ${platform} ${channel} bootstrap installer build"
       extra_profiles="native-${platform}"
       ;;
 
@@ -271,11 +282,14 @@ run_platform_build() {
     -Pnative,${extra_profiles} clean package
 
   case "${build_kind}" in
+    standalone)
+      stage_standalone_artifacts "${channel}" "${platform}"
+      ;;
     portable)
       stage_portable_artifacts "${channel}" "${platform}"
       ;;
     *)
-      stage_platform_artifacts "${channel}" "${platform}"
+      stage_bootstrap_artifacts "${channel}" "${platform}"
       ;;
   esac
 }

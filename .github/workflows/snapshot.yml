@@ -50,25 +50,19 @@ jobs:
   format:
     needs: prepare
     runs-on: [self-hosted, linux]
-
     if: needs.prepare.outputs.should_format == 'true'
-
     permissions:
       contents: write
-
     steps:
       - uses: actions/checkout@v4
         with:
           ref: ${{ github.event.inputs.tag || github.ref }}
-
       - uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: 21
-
       - name: Apply formatting
         run: mvn -B -Pformat clean compile spotless:apply
-
       - name: Commit & push if needed
         run: |
           git config user.name "github-actions"
@@ -96,7 +90,7 @@ jobs:
           path: artifacts/snapshot/shared/*
           if-no-files-found: error
 
-  build-linux:
+  build-linux-bootstrap:
     needs: [prepare, format]
     runs-on: [self-hosted, linux]
     env:
@@ -107,12 +101,31 @@ jobs:
         with:
           distribution: temurin
           java-version: 21
-      - name: Build Linux snapshot artifacts
+      - name: Build Linux bootstrap installer
         run: bash ./script/build-snapshot-linux.sh
       - uses: actions/upload-artifact@v4
         with:
-          name: snapshot-linux
-          path: artifacts/snapshot/linux/*
+          name: snapshot-linux-bootstrap
+          path: artifacts/snapshot/linux-bootstrap/*
+          if-no-files-found: error
+
+  build-linux-standalone:
+    needs: [prepare, format]
+    runs-on: [self-hosted, linux]
+    env:
+      VERSION_OVERRIDE: ${{ needs.prepare.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 21
+      - name: Build Linux standalone app installer
+        run: bash ./script/build-snapshot-linux-standalone.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: snapshot-linux-standalone
+          path: artifacts/snapshot/linux-standalone/*
           if-no-files-found: error
 
   build-linux-portable:
@@ -126,7 +139,7 @@ jobs:
         with:
           distribution: temurin
           java-version: 21
-      - name: Build Linux portable artifacts
+      - name: Build Linux portable app
         run: bash ./script/build-snapshot-linux-portable.sh
       - uses: actions/upload-artifact@v4
         with:
@@ -134,7 +147,7 @@ jobs:
           path: artifacts/snapshot/linux-portable/*
           if-no-files-found: error
 
-  build-windows:
+  build-windows-bootstrap:
     needs: [prepare, format]
     runs-on: [self-hosted, windows]
     env:
@@ -148,12 +161,34 @@ jobs:
         with:
           distribution: temurin
           java-version: 21
-      - name: Build Windows snapshot artifacts
+      - name: Build Windows bootstrap installer
         run: bash ./script/build-snapshot-windows.sh
       - uses: actions/upload-artifact@v4
         with:
-          name: snapshot-windows
-          path: artifacts/snapshot/windows/*
+          name: snapshot-windows-bootstrap
+          path: artifacts/snapshot/windows-bootstrap/*
+          if-no-files-found: error
+
+  build-windows-standalone:
+    needs: [prepare, format]
+    runs-on: [self-hosted, windows]
+    env:
+      VERSION_OVERRIDE: ${{ needs.prepare.outputs.version }}
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 21
+      - name: Build Windows standalone app installer
+        run: bash ./script/build-snapshot-windows-standalone.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: snapshot-windows-standalone
+          path: artifacts/snapshot/windows-standalone/*
           if-no-files-found: error
 
   build-windows-portable:
@@ -170,7 +205,7 @@ jobs:
         with:
           distribution: temurin
           java-version: 21
-      - name: Build Windows portable artifacts
+      - name: Build Windows portable app
         run: bash ./script/build-snapshot-windows-portable.sh
       - uses: actions/upload-artifact@v4
         with:
@@ -179,7 +214,7 @@ jobs:
           if-no-files-found: error
 
   publish:
-    needs: [prepare, build-shared, build-linux, build-linux-portable, build-windows, build-windows-portable]
+    needs: [prepare, build-shared, build-linux-bootstrap, build-linux-standalone, build-linux-portable, build-windows-bootstrap, build-windows-standalone, build-windows-portable]
     runs-on: [self-hosted, linux]
     env:
       VERSION: ${{ needs.prepare.outputs.version }}
@@ -209,9 +244,11 @@ jobs:
         run: |
           mkdir -p release-assets
           cp collected/snapshot-shared/* release-assets/
-          cp collected/snapshot-linux/* release-assets/
+          cp collected/snapshot-linux-bootstrap/* release-assets/
+          cp collected/snapshot-linux-standalone/* release-assets/
           cp collected/snapshot-linux-portable/* release-assets/
-          cp collected/snapshot-windows/* release-assets/
+          cp collected/snapshot-windows-bootstrap/* release-assets/
+          cp collected/snapshot-windows-standalone/* release-assets/
           cp collected/snapshot-windows-portable/* release-assets/
 
       - name: Create or update snapshot release
@@ -238,7 +275,7 @@ jobs:
 
           [ -f registry/release.json ] || echo '{"channel":"release","entries":[]}' > registry/release.json
           [ -f registry/snapshot.json ] || echo '{"channel":"snapshot","entries":[]}' > registry/snapshot.json
-          [ -f registry/snapshot.json ] || echo '{"channel":"snapshot","entries":[]}' > registry/snapshot.json
+          [ -f registry/nightly.json ] || echo '{"channel":"nightly","entries":[]}' > registry/nightly.json
 
           bash "$GITHUB_WORKSPACE/script/update-channel-registry.sh" registry/snapshot.json snapshot "$VERSION" "$RELEASE_TAG" \
             "https://github.com/${{ github.repository }}/releases/tag/$RELEASE_TAG" \
@@ -247,6 +284,6 @@ jobs:
 
           bash "$GITHUB_WORKSPACE/script/rebuild-versions-manifest.sh" registry registry/versions.json
 
-          git add -A script .gitignore registry/snapshot.json registry/release.json registry/snapshot.json registry/versions.json
+          git add -A script .gitignore registry/release.json registry/snapshot.json registry/nightly.json registry/versions.json
           git commit -m "[bot] Sync scripts from main and update snapshot registry to $VERSION" || exit 0
           git push origin HEAD:registry
