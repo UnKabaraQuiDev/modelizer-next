@@ -14,10 +14,10 @@
     "tag": "0.2-SNAPSHOT-159562"
   },
   "nightly": {
-    "version": "0.2-NIGHTLY-160598",
-    "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/0.2-NIGHTLY-160598/modelizer-next-app-0.2-NIGHTLY-160598.jar",
-    "releaseUrl": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/tag/0.2-NIGHTLY-160598",
+    "version": "0.2-NIGHTLY-161704",
+    "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/0.2-NIGHTLY-161704/modelizer-next-app-0.2-NIGHTLY-161704.jar",
+    "releaseUrl": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/tag/0.2-NIGHTLY-161704",
     "notes": "Latest nightly build.",
-    "tag": "0.2-NIGHTLY-160598"
+    "tag": "0.2-NIGHTLY-161704"
   }
 }
