@@ -236,6 +236,7 @@ run_shared_build() {
 
   mvn -B -DskipTests -Drevision="${VERSION}" -DappVersion="${APP_VERSION}" \
     -Ddistributor="Automated ${channel} build ${BUILD_TIMESTAMP} (shared)" \
+    -pl modelizer-next-app -am \
     clean package
 
   stage_shared_artifacts "${channel}"
