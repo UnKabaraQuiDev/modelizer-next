@@ -136,9 +136,6 @@ stage_shared_artifacts() {
   rm -rf "${out_dir}"
   mkdir -p "${out_dir}"
 
-  local bootstrap_src="modelizer-next-bootstrap/target/modelizer-next-bootstrap-${VERSION}-with-dependencies.jar"
-  cp "${bootstrap_src}" "${out_dir}/modelizer-next-bootstrap-${VERSION}.jar"
-
   local app_src="modelizer-next-app/target/modelizer-next-app-${VERSION}-with-dependencies.jar"
   cp "${app_src}" "${out_dir}/modelizer-next-app-${VERSION}.jar"
 }
