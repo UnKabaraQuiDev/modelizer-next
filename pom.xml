@@ -32,16 +32,21 @@
 		<modelizer.issuesUrl>${modelizer.repositoryUrl}/issues</modelizer.issuesUrl>
 		<jpackage.addModules>
 			java.base,java.desktop,java.logging,java.net.http,jdk.unsupported,jdk.crypto.ec</jpackage.addModules>
+		<jpackage.group>Programming</jpackage.group>
 		<jpackage.category>Programming,Utilities</jpackage.category>
-		<jpackage.dir>${maven.multiModuleProjectDirectory}/app</jpackage.dir>
-		<jpackage.icon>${jpackage.dir}/icon.png</jpackage.icon>
-		<jpackage.fa1>${jpackage.dir}/FAmod.properties</jpackage.fa1>
-		<jpackage.fa2>${jpackage.dir}/FAmn.properties</jpackage.fa2>
-		<jpackage.fa3>${jpackage.dir}/FAmdlz.properties</jpackage.fa3>
+		<jpackage.icon>filled in by profiles</jpackage.icon>
+		<jpackage.outputDir>filled in by profiles</jpackage.outputDir>
+		<jpackage.inputDir>${project.build.directory}/jpackage-input/</jpackage.inputDir>
+		<jpackage.inputJar>${project.build.finalName}.jar</jpackage.inputJar>
+		<jpackage.fa1>${jpackage.inputDir}/FAmod.properties</jpackage.fa1>
+		<jpackage.fa2>${jpackage.inputDir}/FAmn.properties</jpackage.fa2>
+		<jpackage.fa3>${jpackage.inputDir}/FAmdlz.properties</jpackage.fa3>
 		<jpackage.name>filled in by modules</jpackage.name>
-		<jpackage.type.windows>exe</jpackage.type.windows>
-		<jpackage.type.linux>deb</jpackage.type.linux>
+		<jpackage.vendor>${project.groupId}</jpackage.vendor>
+		<jpackage.type>filled in by profiles</jpackage.type>
 		<app.mainClass>filled in by modules</app.mainClass>
+		<skipLinux>true</skipLinux>
+		<skipWindows>true</skipWindows>
 	</properties>
 
 	<repositories>
@@ -152,27 +157,6 @@
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-antrun-plugin</artifactId>
 					<version>3.2.0</version>
-					<executions>
-						<execution>
-							<id>copy-shaded-jar</id>
-							<phase>package</phase>
-							<configuration>
-								<target>
-									<mkdir
-										dir="${project.build.directory}/jpackage-input" />
-									<copy
-										file="${project.build.directory}/${project.build.finalName}-with-dependencies.jar"
-										tofile="${project.build.directory}/jpackage-input/${project.build.finalName}.jar" />
-									<copy
-										file="${jpackage.icon}"
-										tofile="${project.build.directory}/jpackage-input/icon.png" />
-								</target>
-							</configuration>
-							<goals>
-								<goal>run</goal>
-							</goals>
-						</execution>
-					</executions>
 				</plugin>
 			</plugins>
 		</pluginManagement>
@@ -313,5 +297,206 @@
 				</plugins>
 			</build>
 		</profile>
+
+		<profile>
+			<id>native-module</id>
+			<activation>
+				<file>
+					<exists>${project.basedir}/native-module.flag</exists>
+				</file>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-antrun-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>copy-shaded-jar</id>
+								<phase>package</phase>
+								<goals>
+									<goal>run</goal>
+								</goals>
+
+								<configuration>
+									<target>
+										<mkdir
+											dir="${jpackage.inputDir}" />
+										<copy
+											file="${project.build.directory}/${project.build.finalName}-with-dependencies.jar"
+											tofile="${jpackage.inputDir}/${project.build.finalName}.jar" />
+										<copy
+											todir="${jpackage.inputDir}">
+											<fileset dir="${jpackage.add}" />
+										</copy>
+									</target>
+								</configuration>
+							</execution>
+
+							<execution>
+								<id>package-app-linux</id>
+								<phase>package</phase>
+								<goals>
+									<goal>run</goal>
+								</goals>
+
+								<configuration>
+									<skip>${skipLinux}</skip>
+									<target>
+
+										<exec executable="jpackage"
+											failonerror="true">
+
+											<arg value="--type" />
+											<arg value="${jpackage.type}" />
+
+											<arg value="--name" />
+											<arg value="${jpackage.name}" />
+
+											<arg value="--vendor" />
+											<arg value="${jpackage.vendor}" />
+
+											<arg value="--app-version" />
+											<arg value="${appVersion}" />
+
+											<arg value="--input" />
+											<arg value="${jpackage.inputDir}" />
+
+											<arg value="--main-jar" />
+											<arg value="${jpackage.inputJar}" />
+
+											<arg value="--dest" />
+											<arg value="${jpackage.outputDir}" />
+
+											<arg value="--add-modules" />
+											<arg value="${jpackage.addModules}" />
+
+											<arg value="--linux-app-category" />
+											<arg value="${jpackage.category}" />
+
+											<arg value="--linux-menu-group" />
+											<arg value="${jpackage.group}" />
+
+											<arg value="--icon" />
+											<arg value="${jpackage.icon}" />
+
+											<arg value="--file-associations" />
+											<arg value="${jpackage.fa1}" />
+
+											<arg value="--file-associations" />
+											<arg value="${jpackage.fa2}" />
+
+											<arg value="--file-associations" />
+											<arg value="${jpackage.fa3}" />
+
+										</exec>
+
+									</target>
+								</configuration>
+							</execution>
+							<execution>
+								<id>package-app-windows</id>
+								<phase>package</phase>
+								<goals>
+									<goal>run</goal>
+								</goals>
+
+								<configuration>
+									<skip>${skipWindows}</skip>
+									<target>
+
+										<exec executable="jpackage"
+											failonerror="true">
+
+											<arg value="--type" />
+											<arg
+												value="${jpackage.type}" />
+
+											<arg value="--name" />
+											<arg value="${jpackage.name}" />
+
+											<arg value="--vendor" />
+											<arg value="${jpackage.vendor}" />
+
+											<arg value="--app-version" />
+											<arg value="${appVersion}" />
+
+											<arg value="--input" />
+											<arg value="${jpackage.inputDir}" />
+
+											<arg value="--main-jar" />
+											<arg value="${jpackage.inputJar}" />
+
+											<arg value="--dest" />
+											<arg value="${jpackage.outputDir}" />
+
+											<arg value="--add-modules" />
+											<arg value="${jpackage.addModules}" />
+
+											<arg value="--win-menu-group" />
+											<arg value="${jpackage.group}" />
+
+											<arg value="--win-menu" />
+											<arg value="--win-shortcut" />
+
+											<arg value="--win-per-user-install" />
+
+											<arg value="--icon" />
+											<arg value="${jpackage.icon}" />
+
+											<arg value="--file-associations" />
+											<arg value="${jpackage.fa1}" />
+
+											<arg value="--file-associations" />
+											<arg value="${jpackage.fa2}" />
+
+											<arg value="--file-associations" />
+											<arg value="${jpackage.fa3}" />
+
+										</exec>
+
+									</target>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+
+		<profile>
+			<id>native</id>
+		</profile>
+
+		<profile>
+			<id>native-linux</id>
+			<properties>
+				<jpackage.type>deb</jpackage.type>
+				<jpackage.icon>${jpackage.inputDir}/icon.png</jpackage.icon>
+				<jpackage.add>${maven.multiModuleProjectDirectory}/app/linux</jpackage.add>
+				<jpackage.outputDir>${project.build.directory}/dist/linux</jpackage.outputDir>
+				<skipLinux>false</skipLinux>
+			</properties>
+		</profile>
+
+		<profile>
+			<id>native-windows</id>
+			<properties>
+				<jpackage.type>exe</jpackage.type>
+				<jpackage.icon>${jpackage.inputDir}/icon.ico</jpackage.icon>
+				<jpackage.add>${maven.multiModuleProjectDirectory}/app/windows</jpackage.add>
+				<jpackage.outputDir>${project.build.directory}/dist/windows</jpackage.outputDir>
+				<skipWindows>false</skipWindows>
+			</properties>
+		</profile>
+
+		<profile>
+			<id>portable</id>
+			<properties>
+				<jpackage.type>app-image</jpackage.type>
+			</properties>
+		</profile>
+
 	</profiles>
+
 </project>
