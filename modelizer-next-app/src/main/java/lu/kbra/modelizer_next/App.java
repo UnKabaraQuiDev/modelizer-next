@@ -39,7 +39,7 @@ public class App {
 			return new File(override);
 		}
 
-		if (PORTABLE) {
+		if (App.PORTABLE) {
 			return new File(".");
 		}
 

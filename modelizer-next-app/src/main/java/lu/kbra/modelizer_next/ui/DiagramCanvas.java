@@ -64,10 +64,6 @@ public class DiagramCanvas extends JPanel {
 		RIGHT
 	}
 
-	private static final double PASTE_OFFSET = 30.0;
-
-	private static ClipboardSnapshot clipboardSnapshot;
-
 	private record ClipboardSnapshot(PanelType panelType, List<CopiedClass> classes, List<CopiedField> fields, List<CopiedComment> comments,
 			List<CopiedLink> links) {
 
@@ -170,6 +166,7 @@ public class DiagramCanvas extends JPanel {
 	}
 
 	private record SelectedElement(SelectedType type, String classId, String fieldId, String commentId, String linkId) {
+
 		private static SelectedElement forClass(final String classId) {
 			return new SelectedElement(SelectedType.CLASS, classId, null, null, null);
 		}
@@ -202,6 +199,10 @@ public class DiagramCanvas extends JPanel {
 		}
 
 	}
+
+	private static final double PASTE_OFFSET = 30.0;
+
+	private static ClipboardSnapshot clipboardSnapshot;
 
 	private static final long serialVersionUID = -3410889122837999151L;
 
@@ -340,7 +341,7 @@ public class DiagramCanvas extends JPanel {
 		final CommentModel commentModel = new CommentModel();
 		commentModel.setKind(CommentKind.STANDALONE);
 		commentModel.setText("New comment");
-		commentModel.setVisibility(PanelType.CONCEPTUAL, PanelType.LOGICAL, PanelType.LOGICAL);
+		commentModel.setVisibility(this.panelType);
 		this.applyDefaultPaletteToComment(commentModel);
 
 		if (this.selectedElement != null && this.selectedElement.type() == SelectedType.COMMENT) {
@@ -496,6 +497,13 @@ public class DiagramCanvas extends JPanel {
 		this.repaint();
 	}
 
+	private String appendSuffix(final String value, final String suffix) {
+		if (value == null || value.isBlank()) {
+			return value;
+		}
+		return value + suffix;
+	}
+
 	private void applyDefaultPaletteToClass(final ClassModel classModel) {
 		if (this.defaultPalette == null || classModel == null) {
 			return;
@@ -531,6 +539,52 @@ public class DiagramCanvas extends JPanel {
 		}
 
 		linkModel.setLineColor(this.defaultPalette.getLinkColor());
+	}
+
+	private void applyLinkLayout(final String linkId, final CopiedLinkLayout copiedLayout, final double offset) {
+
+		final LinkLayout linkLayout = this.findOrCreateLinkLayout(linkId);
+
+		linkLayout.getBendPoints().clear();
+
+		for (final Point2D.Double bendPoint : copiedLayout.bendPoints()) {
+			linkLayout.getBendPoints().add(new Point2D.Double(bendPoint.getX() + offset, bendPoint.getY() + offset));
+		}
+
+		if (copiedLayout.nameLabelPosition() != null) {
+			linkLayout.setNameLabelPosition(
+					new Point2D.Double(copiedLayout.nameLabelPosition().getX() + offset, copiedLayout.nameLabelPosition().getY() + offset));
+		}
+	}
+
+	private void applyLinkLayout(final String linkId, final CopiedLinkLayout copiedLayout, final double deltaX, final double deltaY) {
+
+		final LinkLayout linkLayout = this.findOrCreateLinkLayout(linkId);
+
+		linkLayout.getBendPoints().clear();
+
+		for (final Point2D.Double bendPoint : copiedLayout.bendPoints()) {
+			linkLayout.getBendPoints().add(new Point2D.Double(bendPoint.getX() + deltaX, bendPoint.getY() + deltaY));
+		}
+
+		if (copiedLayout.nameLabelPosition() != null) {
+			linkLayout.setNameLabelPosition(
+					new Point2D.Double(copiedLayout.nameLabelPosition().getX() + deltaX, copiedLayout.nameLabelPosition().getY() + deltaY));
+		}
+	}
+
+	private void applyNodeLayout(
+			final LayoutObjectType type,
+			final String objectId,
+			final CopiedNodeLayout copiedLayout,
+			final double deltaX,
+			final double deltaY) {
+
+		final NodeLayout layout = this.findOrCreateNodeLayout(type, objectId);
+
+		layout.setPosition(new Point2D.Double(copiedLayout.x() + deltaX, copiedLayout.y() + deltaY));
+
+		layout.setSize(new Size2D(copiedLayout.width(), copiedLayout.height()));
 	}
 
 	public void applyPalette(final StylePalette palette) {
@@ -769,6 +823,101 @@ public class DiagramCanvas extends JPanel {
 		return points;
 	}
 
+	private CopiedClass captureClass(final ClassModel classModel) {
+		final List<CopiedField> fields = new ArrayList<>();
+
+		for (final FieldModel fieldModel : classModel.getFields()) {
+			fields.add(this.captureField(classModel.getId(), fieldModel));
+		}
+
+		return new CopiedClass(classModel.getId(),
+				classModel.getNames().getConceptualName(),
+				classModel.getNames().getTechnicalName(),
+				classModel.getGroup(),
+				classModel.getVisibility().isConceptual(),
+				classModel.getVisibility().isLogical(),
+				classModel.getVisibility().isPhysical(),
+				classModel.getStyle().getTextColor(),
+				classModel.getStyle().getBackgroundColor(),
+				classModel.getStyle().getBorderColor(),
+				List.copyOf(fields),
+				this.captureNodeLayout(LayoutObjectType.CLASS, classModel.getId()));
+	}
+
+	private CopiedComment captureComment(final CommentModel commentModel) {
+		final CommentBinding binding = commentModel.getBinding();
+
+		return new CopiedComment(commentModel.getId(),
+				commentModel.getKind(),
+				commentModel.getText(),
+				commentModel.getTextColor(),
+				commentModel.getBackgroundColor(),
+				commentModel.getBorderColor(),
+				commentModel.isVisibleInConceptual(),
+				commentModel.isVisibleInLogical(),
+				commentModel.isVisibleInPhysical(),
+				binding == null ? null : binding.getTargetType(),
+				binding == null ? null : binding.getTargetId(),
+				this.captureNodeLayout(LayoutObjectType.COMMENT, commentModel.getId()));
+	}
+
+	private CopiedField captureField(final String ownerClassId, final FieldModel fieldModel) {
+		return new CopiedField(ownerClassId,
+				fieldModel.getId(),
+				fieldModel.getNames().getName(),
+				fieldModel.getNames().getTechnicalName(),
+				fieldModel.isNotConceptual(),
+				fieldModel.getComment(),
+				fieldModel.isPrimaryKey(),
+				fieldModel.isUnique(),
+				fieldModel.isNotNull(),
+				fieldModel.getType(),
+				fieldModel.getStyle().getTextColor(),
+				fieldModel.getStyle().getBackgroundColor());
+	}
+
+	private CopiedLink captureLink(final LinkModel linkModel) {
+		final LinkEnd from = linkModel.getFrom();
+		final LinkEnd to = linkModel.getTo();
+
+		return new CopiedLink(linkModel.getId(),
+				linkModel.getName(),
+				linkModel.getLineColor(),
+				linkModel.getAssociationClassId(),
+				from == null ? null : from.getClassId(),
+				from == null ? null : from.getFieldId(),
+				to == null ? null : to.getClassId(),
+				to == null ? null : to.getFieldId(),
+				linkModel.getCardinalityFrom(),
+				linkModel.getCardinalityTo(),
+				linkModel.getLabelFrom(),
+				linkModel.getLabelTo(),
+				this.captureLinkLayout(linkModel.getId()));
+	}
+
+	private CopiedLinkLayout captureLinkLayout(final String linkId) {
+		final LinkLayout linkLayout = this.findOrCreateLinkLayout(linkId);
+		final List<Point2D.Double> bendPoints = new ArrayList<>();
+
+		for (final Point2D.Double bendPoint : linkLayout.getBendPoints()) {
+			bendPoints.add(new Point2D.Double(bendPoint.getX(), bendPoint.getY()));
+		}
+
+		final Point2D.Double labelPosition = linkLayout.getNameLabelPosition() == null ? null
+				: new Point2D.Double(linkLayout.getNameLabelPosition().getX(), linkLayout.getNameLabelPosition().getY());
+
+		return new CopiedLinkLayout(List.copyOf(bendPoints), labelPosition);
+	}
+
+	private CopiedNodeLayout captureNodeLayout(final LayoutObjectType type, final String objectId) {
+		final NodeLayout layout = this.findOrCreateNodeLayout(type, objectId);
+
+		return new CopiedNodeLayout(layout.getPosition().getX(),
+				layout.getPosition().getY(),
+				layout.getSize().getWidth(),
+				layout.getSize().getHeight());
+	}
+
 	private AnchorSidePair chooseBestConceptualSidePair(
 			final String fromClassId,
 			final Rectangle2D fromBounds,
@@ -869,6 +1018,38 @@ public class DiagramCanvas extends JPanel {
 				layout.getPosition().getY(),
 				Math.max(width, layout.getSize().getWidth()),
 				height);
+	}
+
+	private Rectangle2D.Double computeClipboardBounds(final ClipboardSnapshot clipboard) {
+		Rectangle2D.Double bounds = null;
+
+		for (final CopiedClass copiedClass : clipboard.classes()) {
+			final CopiedNodeLayout layout = copiedClass.layout();
+			bounds = this.expandBounds(bounds, layout.x(), layout.y(), layout.width(), layout.height());
+		}
+
+		for (final CopiedComment copiedComment : clipboard.comments()) {
+			final CopiedNodeLayout layout = copiedComment.layout();
+			bounds = this.expandBounds(bounds, layout.x(), layout.y(), layout.width(), layout.height());
+		}
+
+		if (bounds != null) {
+			return bounds;
+		}
+
+		for (final CopiedLink copiedLink : clipboard.links()) {
+			final CopiedLinkLayout layout = copiedLink.layout();
+
+			for (final Point2D.Double bendPoint : layout.bendPoints()) {
+				bounds = this.expandBounds(bounds, bendPoint.getX(), bendPoint.getY(), 1.0, 1.0);
+			}
+
+			if (layout.nameLabelPosition() != null) {
+				bounds = this.expandBounds(bounds, layout.nameLabelPosition().getX(), layout.nameLabelPosition().getY(), 1.0, 1.0);
+			}
+		}
+
+		return bounds;
 	}
 
 	private Rectangle2D computeCommentBounds(final Graphics2D g2, final String text, final NodeLayout layout) {
@@ -989,6 +1170,58 @@ public class DiagramCanvas extends JPanel {
 		return new Point2D.Double(last.getX(), last.getY());
 	}
 
+	private Rectangle2D.Double computeSelectionBounds(final List<SelectedElement> selection) {
+		Rectangle2D.Double bounds = null;
+		final Set<String> seenNodeLayouts = new HashSet<>();
+
+		for (final SelectedElement element : selection) {
+			if (element == null) {
+				continue;
+			}
+
+			if (element.type() == SelectedType.CLASS || element.type() == SelectedType.FIELD) {
+				final String key = LayoutObjectType.CLASS + ":" + element.classId();
+
+				if (!seenNodeLayouts.add(key)) {
+					continue;
+				}
+
+				final NodeLayout layout = this.findOrCreateNodeLayout(LayoutObjectType.CLASS, element.classId());
+				bounds = this.expandBounds(bounds,
+						layout.getPosition().getX(),
+						layout.getPosition().getY(),
+						layout.getSize().getWidth(),
+						layout.getSize().getHeight());
+			} else if (element.type() == SelectedType.COMMENT) {
+				final String key = LayoutObjectType.COMMENT + ":" + element.commentId();
+
+				if (!seenNodeLayouts.add(key)) {
+					continue;
+				}
+
+				final NodeLayout layout = this.findOrCreateNodeLayout(LayoutObjectType.COMMENT, element.commentId());
+				bounds = this.expandBounds(bounds,
+						layout.getPosition().getX(),
+						layout.getPosition().getY(),
+						layout.getSize().getWidth(),
+						layout.getSize().getHeight());
+			} else if (element.type() == SelectedType.LINK) {
+				final LinkLayout layout = this.findOrCreateLinkLayout(element.linkId());
+
+				for (final Point2D.Double bendPoint : layout.getBendPoints()) {
+					bounds = this.expandBounds(bounds, bendPoint.getX(), bendPoint.getY(), 1.0, 1.0);
+				}
+
+				if (layout.getNameLabelPosition() != null) {
+					bounds = this
+							.expandBounds(bounds, layout.getNameLabelPosition().getX(), layout.getNameLabelPosition().getY(), 1.0, 1.0);
+				}
+			}
+		}
+
+		return bounds;
+	}
+
 	private double computeUprightAngleAtMiddle(final List<Point2D> points) {
 		if (points == null || points.size() < 2) {
 			return 0.0;
@@ -1044,6 +1277,113 @@ public class DiagramCanvas extends JPanel {
 		g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 	}
 
+	private void copySelection() {
+		if (this.selectedElements.isEmpty()) {
+			return;
+		}
+
+		final List<SelectedElement> snapshot = new ArrayList<>(this.selectedElements);
+
+		final Set<String> selectedClassIds = new LinkedHashSet<>();
+		final Set<String> selectedFieldIds = new LinkedHashSet<>();
+		final Set<String> selectedCommentIds = new LinkedHashSet<>();
+		final Set<String> selectedLinkIds = new LinkedHashSet<>();
+
+		for (final SelectedElement element : snapshot) {
+			if (element.type() == SelectedType.CLASS) {
+				selectedClassIds.add(element.classId());
+			}
+		}
+
+		for (final SelectedElement element : snapshot) {
+			switch (element.type()) {
+			case FIELD -> {
+				if (!selectedClassIds.contains(element.classId())) {
+					selectedFieldIds.add(element.fieldId());
+				}
+			}
+			case COMMENT -> selectedCommentIds.add(element.commentId());
+			case LINK -> selectedLinkIds.add(element.linkId());
+			default -> {
+			}
+			}
+		}
+
+		final List<CopiedClass> copiedClasses = new ArrayList<>();
+		final List<CopiedField> copiedFields = new ArrayList<>();
+		final List<CopiedComment> copiedComments = new ArrayList<>();
+		final List<CopiedLink> copiedLinks = new ArrayList<>();
+
+		final Set<String> copiedFieldIds = new HashSet<>();
+
+		for (final String classId : selectedClassIds) {
+			final ClassModel classModel = this.findClassById(classId);
+			if (classModel == null) {
+				continue;
+			}
+
+			for (final FieldModel fieldModel : classModel.getFields()) {
+				copiedFieldIds.add(fieldModel.getId());
+			}
+
+			copiedClasses.add(this.captureClass(classModel));
+		}
+
+		for (final String fieldId : selectedFieldIds) {
+			final ClassModel owner = this.findOwnerClassOfField(fieldId);
+			if (owner == null) {
+				continue;
+			}
+
+			final FieldModel fieldModel = this.findFieldById(owner.getId(), fieldId);
+			if (fieldModel == null) {
+				continue;
+			}
+
+			copiedFieldIds.add(fieldModel.getId());
+			copiedFields.add(this.captureField(owner.getId(), fieldModel));
+		}
+
+		final Set<String> linksToCopy = new LinkedHashSet<>(selectedLinkIds);
+
+		for (final LinkModel linkModel : this.getActiveLinks()) {
+			if (linkModel == null || linkModel.getFrom() == null || linkModel.getTo() == null) {
+				continue;
+			}
+
+			final boolean touchesCopiedClass = selectedClassIds.contains(linkModel.getFrom().getClassId())
+					|| selectedClassIds.contains(linkModel.getTo().getClassId())
+					|| selectedClassIds.contains(linkModel.getAssociationClassId());
+
+			final boolean touchesCopiedField = copiedFieldIds.contains(linkModel.getFrom().getFieldId())
+					|| copiedFieldIds.contains(linkModel.getTo().getFieldId());
+
+			if (touchesCopiedClass || touchesCopiedField) {
+				linksToCopy.add(linkModel.getId());
+			}
+		}
+
+		for (final String linkId : linksToCopy) {
+			final LinkModel linkModel = this.findLinkById(linkId);
+			if (linkModel != null) {
+				copiedLinks.add(this.captureLink(linkModel));
+			}
+		}
+
+		for (final String commentId : selectedCommentIds) {
+			final CommentModel commentModel = this.findCommentById(commentId);
+			if (commentModel != null) {
+				copiedComments.add(this.captureComment(commentModel));
+			}
+		}
+
+		DiagramCanvas.clipboardSnapshot = new ClipboardSnapshot(this.panelType,
+				List.copyOf(copiedClasses),
+				List.copyOf(copiedFields),
+				List.copyOf(copiedComments),
+				List.copyOf(copiedLinks));
+	}
+
 	private void createConceptualLink(final String fromClassId, final String toClassId) {
 		final LinkModel linkModel = new LinkModel();
 		linkModel.setFrom(new LinkEnd(fromClassId, null));
@@ -1088,12 +1428,88 @@ public class DiagramCanvas extends JPanel {
 		return selection;
 	}
 
+	private FieldModel createFieldFromClipboard(final CopiedField copiedField, final boolean rename) {
+		final FieldModel fieldCopy = new FieldModel();
+
+		fieldCopy.getNames().setName(rename ? this.appendSuffix(copiedField.name(), " Copy") : copiedField.name());
+		fieldCopy.getNames()
+				.setTechnicalName(rename ? this.appendSuffix(copiedField.technicalName(), "_COPY") : copiedField.technicalName());
+
+		fieldCopy.setNotConceptual(copiedField.notConceptual());
+		fieldCopy.setComment(copiedField.comment());
+		fieldCopy.setPrimaryKey(copiedField.primaryKey());
+		fieldCopy.setUnique(copiedField.unique());
+		fieldCopy.setNotNull(copiedField.notNull());
+		fieldCopy.setType(copiedField.type());
+
+		fieldCopy.getStyle().setTextColor(copiedField.textColor());
+		fieldCopy.getStyle().setBackgroundColor(copiedField.backgroundColor());
+
+		return fieldCopy;
+	}
+
 	private Graphics2D createGraphicsContext() {
 		final BufferedImage image = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
 		final Graphics2D g2 = image.createGraphics();
 		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 		return g2;
+	}
+
+	private LinkModel createLinkFromClipboard(
+			final CopiedLink copiedLink,
+			final Map<String, String> classIdMap,
+			final Map<String, String> fieldIdMap) {
+
+		final String fromClassId = this.mapId(classIdMap, copiedLink.fromClassId());
+		final String fromFieldId = this.mapId(fieldIdMap, copiedLink.fromFieldId());
+		final String toClassId = this.mapId(classIdMap, copiedLink.toClassId());
+		final String toFieldId = this.mapId(fieldIdMap, copiedLink.toFieldId());
+
+		if (!this.linkEndpointExists(fromClassId, fromFieldId) || !this.linkEndpointExists(toClassId, toFieldId)) {
+			return null;
+		}
+
+		String associationClassId = this.mapId(classIdMap, copiedLink.associationClassId());
+		if (associationClassId != null && this.findClassById(associationClassId) == null) {
+			associationClassId = null;
+		}
+
+		final LinkModel linkCopy = new LinkModel();
+
+		linkCopy.setName(copiedLink.name());
+		linkCopy.setLineColor(copiedLink.lineColor());
+		linkCopy.setAssociationClassId(associationClassId);
+		linkCopy.setFrom(new LinkEnd(fromClassId, fromFieldId));
+		linkCopy.setTo(new LinkEnd(toClassId, toFieldId));
+		linkCopy.setCardinalityFrom(copiedLink.cardinalityFrom());
+		linkCopy.setCardinalityTo(copiedLink.cardinalityTo());
+		linkCopy.setLabelFrom(copiedLink.labelFrom());
+		linkCopy.setLabelTo(copiedLink.labelTo());
+
+		return linkCopy;
+	}
+
+	private CommentBinding createRemappedCommentBinding(
+			final CopiedComment copiedComment,
+			final Map<String, String> classIdMap,
+			final Map<String, String> linkIdMap) {
+
+		if (copiedComment.bindingTargetType() == null || copiedComment.bindingTargetId() == null) {
+			return null;
+		}
+
+		final String targetId = switch (copiedComment.bindingTargetType()) {
+		case CLASS -> this.mapId(classIdMap, copiedComment.bindingTargetId());
+		case LINK -> this.mapId(linkIdMap, copiedComment.bindingTargetId());
+		};
+
+		if ((copiedComment.bindingTargetType() == BoundTargetType.CLASS && this.findClassById(targetId) == null)
+				|| (copiedComment.bindingTargetType() == BoundTargetType.LINK && this.findLinkById(targetId) == null)) {
+			return null;
+		}
+
+		return new CommentBinding(copiedComment.bindingTargetType(), targetId);
 	}
 
 	private void createTechnicalLink(final SelectedElement fromEndpoint, final SelectedElement toEndpoint) {
@@ -1108,6 +1524,11 @@ public class DiagramCanvas extends JPanel {
 		this.findOrCreateLinkLayout(linkModel.getId());
 		this.select(SelectedElement.forLink(linkModel.getId()));
 		this.notifyDocumentChanged();
+	}
+
+	private void cutSelection() {
+		this.copySelection();
+		this.deleteSelection();
 	}
 
 	private void deleteClass(final String classId) {
@@ -1720,123 +2141,6 @@ public class DiagramCanvas extends JPanel {
 		this.repaint();
 	}
 
-	private Point2D.Double mouseWorldOrViewportCenter() {
-		final Point mousePoint = this.getMousePosition();
-
-		if (mousePoint == null) {
-			return this.viewportCenterWorld();
-		}
-
-		return this.screenToWorld(mousePoint);
-	}
-
-	private Rectangle2D.Double expandBounds(
-			final Rectangle2D.Double bounds,
-			final double x,
-			final double y,
-			final double width,
-			final double height) {
-
-		final double safeWidth = Math.max(1.0, width);
-		final double safeHeight = Math.max(1.0, height);
-
-		if (bounds == null) {
-			return new Rectangle2D.Double(x, y, safeWidth, safeHeight);
-		}
-
-		final double minX = Math.min(bounds.getMinX(), x);
-		final double minY = Math.min(bounds.getMinY(), y);
-		final double maxX = Math.max(bounds.getMaxX(), x + safeWidth);
-		final double maxY = Math.max(bounds.getMaxY(), y + safeHeight);
-
-		bounds.setRect(minX, minY, maxX - minX, maxY - minY);
-		return bounds;
-	}
-
-	private Rectangle2D.Double computeClipboardBounds(final ClipboardSnapshot clipboard) {
-		Rectangle2D.Double bounds = null;
-
-		for (final CopiedClass copiedClass : clipboard.classes()) {
-			final CopiedNodeLayout layout = copiedClass.layout();
-			bounds = this.expandBounds(bounds, layout.x(), layout.y(), layout.width(), layout.height());
-		}
-
-		for (final CopiedComment copiedComment : clipboard.comments()) {
-			final CopiedNodeLayout layout = copiedComment.layout();
-			bounds = this.expandBounds(bounds, layout.x(), layout.y(), layout.width(), layout.height());
-		}
-
-		if (bounds != null) {
-			return bounds;
-		}
-
-		for (final CopiedLink copiedLink : clipboard.links()) {
-			final CopiedLinkLayout layout = copiedLink.layout();
-
-			for (final Point2D.Double bendPoint : layout.bendPoints()) {
-				bounds = this.expandBounds(bounds, bendPoint.getX(), bendPoint.getY(), 1.0, 1.0);
-			}
-
-			if (layout.nameLabelPosition() != null) {
-				bounds = this.expandBounds(bounds, layout.nameLabelPosition().getX(), layout.nameLabelPosition().getY(), 1.0, 1.0);
-			}
-		}
-
-		return bounds;
-	}
-
-	private Rectangle2D.Double computeSelectionBounds(final List<SelectedElement> selection) {
-		Rectangle2D.Double bounds = null;
-		final Set<String> seenNodeLayouts = new HashSet<>();
-
-		for (final SelectedElement element : selection) {
-			if (element == null) {
-				continue;
-			}
-
-			if (element.type() == SelectedType.CLASS || element.type() == SelectedType.FIELD) {
-				final String key = LayoutObjectType.CLASS + ":" + element.classId();
-
-				if (!seenNodeLayouts.add(key)) {
-					continue;
-				}
-
-				final NodeLayout layout = this.findOrCreateNodeLayout(LayoutObjectType.CLASS, element.classId());
-				bounds = this.expandBounds(bounds,
-						layout.getPosition().getX(),
-						layout.getPosition().getY(),
-						layout.getSize().getWidth(),
-						layout.getSize().getHeight());
-			} else if (element.type() == SelectedType.COMMENT) {
-				final String key = LayoutObjectType.COMMENT + ":" + element.commentId();
-
-				if (!seenNodeLayouts.add(key)) {
-					continue;
-				}
-
-				final NodeLayout layout = this.findOrCreateNodeLayout(LayoutObjectType.COMMENT, element.commentId());
-				bounds = this.expandBounds(bounds,
-						layout.getPosition().getX(),
-						layout.getPosition().getY(),
-						layout.getSize().getWidth(),
-						layout.getSize().getHeight());
-			} else if (element.type() == SelectedType.LINK) {
-				final LinkLayout layout = this.findOrCreateLinkLayout(element.linkId());
-
-				for (final Point2D.Double bendPoint : layout.getBendPoints()) {
-					bounds = this.expandBounds(bounds, bendPoint.getX(), bendPoint.getY(), 1.0, 1.0);
-				}
-
-				if (layout.getNameLabelPosition() != null) {
-					bounds = this
-							.expandBounds(bounds, layout.getNameLabelPosition().getX(), layout.getNameLabelPosition().getY(), 1.0, 1.0);
-				}
-			}
-		}
-
-		return bounds;
-	}
-
 	private void editClass(final String classId) {
 		final ClassModel classModel = this.findClassById(classId);
 		if (classModel == null) {
@@ -2026,6 +2330,29 @@ public class DiagramCanvas extends JPanel {
 		}
 
 		return null;
+	}
+
+	private Rectangle2D.Double expandBounds(
+			final Rectangle2D.Double bounds,
+			final double x,
+			final double y,
+			final double width,
+			final double height) {
+
+		final double safeWidth = Math.max(1.0, width);
+		final double safeHeight = Math.max(1.0, height);
+
+		if (bounds == null) {
+			return new Rectangle2D.Double(x, y, safeWidth, safeHeight);
+		}
+
+		final double minX = Math.min(bounds.getMinX(), x);
+		final double minY = Math.min(bounds.getMinY(), y);
+		final double maxX = Math.max(bounds.getMaxX(), x + safeWidth);
+		final double maxY = Math.max(bounds.getMaxY(), y + safeHeight);
+
+		bounds.setRect(minX, minY, maxX - minX, maxY - minY);
+		return bounds;
 	}
 
 	private Point2D findBoundTargetAnchor(final Graphics2D g2, final CommentModel commentModel) {
@@ -2657,500 +2984,11 @@ public class DiagramCanvas extends JPanel {
 						this::pasteSelection));
 	}
 
-	private void cutSelection() {
-		copySelection();
-		deleteSelection();
-	}
-
-	private void copySelection() {
-		if (this.selectedElements.isEmpty()) {
-			return;
-		}
-
-		final List<SelectedElement> snapshot = new ArrayList<>(this.selectedElements);
-
-		final Set<String> selectedClassIds = new LinkedHashSet<>();
-		final Set<String> selectedFieldIds = new LinkedHashSet<>();
-		final Set<String> selectedCommentIds = new LinkedHashSet<>();
-		final Set<String> selectedLinkIds = new LinkedHashSet<>();
-
-		for (final SelectedElement element : snapshot) {
-			if (element.type() == SelectedType.CLASS) {
-				selectedClassIds.add(element.classId());
-			}
-		}
-
-		for (final SelectedElement element : snapshot) {
-			switch (element.type()) {
-			case FIELD -> {
-				if (!selectedClassIds.contains(element.classId())) {
-					selectedFieldIds.add(element.fieldId());
-				}
-			}
-			case COMMENT -> selectedCommentIds.add(element.commentId());
-			case LINK -> selectedLinkIds.add(element.linkId());
-			default -> {
-			}
-			}
-		}
-
-		final List<CopiedClass> copiedClasses = new ArrayList<>();
-		final List<CopiedField> copiedFields = new ArrayList<>();
-		final List<CopiedComment> copiedComments = new ArrayList<>();
-		final List<CopiedLink> copiedLinks = new ArrayList<>();
-
-		final Set<String> copiedFieldIds = new HashSet<>();
-
-		for (final String classId : selectedClassIds) {
-			final ClassModel classModel = this.findClassById(classId);
-			if (classModel == null) {
-				continue;
-			}
-
-			for (final FieldModel fieldModel : classModel.getFields()) {
-				copiedFieldIds.add(fieldModel.getId());
-			}
-
-			copiedClasses.add(this.captureClass(classModel));
-		}
-
-		for (final String fieldId : selectedFieldIds) {
-			final ClassModel owner = this.findOwnerClassOfField(fieldId);
-			if (owner == null) {
-				continue;
-			}
-
-			final FieldModel fieldModel = this.findFieldById(owner.getId(), fieldId);
-			if (fieldModel == null) {
-				continue;
-			}
-
-			copiedFieldIds.add(fieldModel.getId());
-			copiedFields.add(this.captureField(owner.getId(), fieldModel));
-		}
-
-		final Set<String> linksToCopy = new LinkedHashSet<>(selectedLinkIds);
-
-		for (final LinkModel linkModel : this.getActiveLinks()) {
-			if (linkModel == null || linkModel.getFrom() == null || linkModel.getTo() == null) {
-				continue;
-			}
-
-			final boolean touchesCopiedClass = selectedClassIds.contains(linkModel.getFrom().getClassId())
-					|| selectedClassIds.contains(linkModel.getTo().getClassId())
-					|| selectedClassIds.contains(linkModel.getAssociationClassId());
-
-			final boolean touchesCopiedField = copiedFieldIds.contains(linkModel.getFrom().getFieldId())
-					|| copiedFieldIds.contains(linkModel.getTo().getFieldId());
-
-			if (touchesCopiedClass || touchesCopiedField) {
-				linksToCopy.add(linkModel.getId());
-			}
-		}
-
-		for (final String linkId : linksToCopy) {
-			final LinkModel linkModel = this.findLinkById(linkId);
-			if (linkModel != null) {
-				copiedLinks.add(this.captureLink(linkModel));
-			}
-		}
-
-		for (final String commentId : selectedCommentIds) {
-			final CommentModel commentModel = this.findCommentById(commentId);
-			if (commentModel != null) {
-				copiedComments.add(this.captureComment(commentModel));
-			}
-		}
-
-		DiagramCanvas.clipboardSnapshot = new ClipboardSnapshot(this.panelType,
-				List.copyOf(copiedClasses),
-				List.copyOf(copiedFields),
-				List.copyOf(copiedComments),
-				List.copyOf(copiedLinks));
-	}
-
-	private void pasteSelection() {
-		final ClipboardSnapshot clipboard = DiagramCanvas.clipboardSnapshot;
-
-		if (clipboard == null || clipboard.isEmpty()) {
-			return;
-		}
-
-		final Rectangle2D.Double clipboardBounds = this.computeClipboardBounds(clipboard);
-		final Point2D.Double pasteTarget = this.mouseWorldOrViewportCenter();
-
-		final double deltaX = clipboardBounds == null ? DiagramCanvas.PASTE_OFFSET : pasteTarget.getX() - clipboardBounds.getCenterX();
-
-		final double deltaY = clipboardBounds == null ? DiagramCanvas.PASTE_OFFSET : pasteTarget.getY() - clipboardBounds.getCenterY();
-
-		final Map<String, String> pastedClassIds = new HashMap<>();
-		final Map<String, String> pastedFieldIds = new HashMap<>();
-		final Map<String, String> pastedLinkIds = new HashMap<>();
-
-		final LinkedHashSet<SelectedElement> newSelection = new LinkedHashSet<>();
-
-		for (final CopiedClass copiedClass : clipboard.classes()) {
-			final ClassModel classCopy = new ClassModel();
-
-			classCopy.getNames().setConceptualName(this.appendSuffix(copiedClass.conceptualName(), " Copy"));
-			classCopy.getNames().setTechnicalName(this.appendSuffix(copiedClass.technicalName(), "_COPY"));
-			classCopy.setGroup(copiedClass.group());
-
-			classCopy.getVisibility().setConceptual(copiedClass.visibleInConceptual());
-			classCopy.getVisibility().setLogical(copiedClass.visibleInLogical());
-			classCopy.getVisibility().setPhysical(copiedClass.visibleInPhysical());
-
-			classCopy.getStyle().setTextColor(copiedClass.textColor());
-			classCopy.getStyle().setBackgroundColor(copiedClass.backgroundColor());
-			classCopy.getStyle().setBorderColor(copiedClass.borderColor());
-
-			for (final CopiedField copiedField : copiedClass.fields()) {
-				final FieldModel fieldCopy = this.createFieldFromClipboard(copiedField, false);
-				classCopy.getFields().add(fieldCopy);
-				pastedFieldIds.put(copiedField.sourceId(), fieldCopy.getId());
-			}
-
-			this.document.getModel().getClasses().add(classCopy);
-			pastedClassIds.put(copiedClass.sourceId(), classCopy.getId());
-
-			this.applyNodeLayout(LayoutObjectType.CLASS, classCopy.getId(), copiedClass.layout(), deltaX, deltaY);
-
-			newSelection.add(SelectedElement.forClass(classCopy.getId()));
-		}
-
-		for (final CopiedField copiedField : clipboard.fields()) {
-			final String ownerClassId = this.mapId(pastedClassIds, copiedField.ownerClassId());
-			final ClassModel owner = this.findClassById(ownerClassId);
-
-			if (owner == null) {
-				continue;
-			}
-
-			final FieldModel fieldCopy = this.createFieldFromClipboard(copiedField, true);
-
-			int insertIndex = -1;
-			for (int i = 0; i < owner.getFields().size(); i++) {
-				if (Objects.equals(owner.getFields().get(i).getId(), copiedField.sourceId())) {
-					insertIndex = i;
-					break;
-				}
-			}
-
-			if (insertIndex < 0) {
-				owner.getFields().add(fieldCopy);
-			} else {
-				owner.getFields().add(insertIndex + 1, fieldCopy);
-			}
-
-			pastedFieldIds.put(copiedField.sourceId(), fieldCopy.getId());
-			newSelection.add(SelectedElement.forField(owner.getId(), fieldCopy.getId()));
-		}
-
-		if (clipboard.panelType() == this.panelType) {
-			for (final CopiedLink copiedLink : clipboard.links()) {
-				final LinkModel linkCopy = this.createLinkFromClipboard(copiedLink, pastedClassIds, pastedFieldIds);
-
-				if (linkCopy == null) {
-					continue;
-				}
-
-				this.getActiveLinks().add(linkCopy);
-				pastedLinkIds.put(copiedLink.sourceId(), linkCopy.getId());
-
-				this.applyLinkLayout(linkCopy.getId(), copiedLink.layout(), deltaX, deltaY);
-
-				newSelection.add(SelectedElement.forLink(linkCopy.getId()));
-			}
-		}
-
-		for (final CopiedComment copiedComment : clipboard.comments()) {
-			final CommentModel commentCopy = new CommentModel();
-
-			commentCopy.setKind(copiedComment.kind());
-			commentCopy.setText(copiedComment.text());
-			commentCopy.setTextColor(copiedComment.textColor());
-			commentCopy.setBackgroundColor(copiedComment.backgroundColor());
-			commentCopy.setBorderColor(copiedComment.borderColor());
-
-			commentCopy.setVisibleInConceptual(copiedComment.visibleInConceptual());
-			commentCopy.setVisibleInLogical(copiedComment.visibleInLogical());
-			commentCopy.setVisibleInPhysical(copiedComment.visibleInPhysical());
-
-			final CommentBinding binding = this.createRemappedCommentBinding(copiedComment, pastedClassIds, pastedLinkIds);
-			if (binding != null) {
-				commentCopy.setBinding(binding);
-			} else if (copiedComment.kind() == CommentKind.BOUND) {
-				commentCopy.setKind(CommentKind.STANDALONE);
-			}
-
-			this.document.getModel().getComments().add(commentCopy);
-			this.applyNodeLayout(LayoutObjectType.COMMENT, commentCopy.getId(), copiedComment.layout(), deltaX, deltaY);
-
-			newSelection.add(SelectedElement.forComment(commentCopy.getId()));
-		}
-
-		if (newSelection.isEmpty()) {
-			return;
-		}
-
-		this.selectedElements.clear();
-		this.selectedElements.addAll(newSelection);
-		this.selectedElement = this.selectedElements.getLast();
-
-		this.document.getModel().getClasses().sort(this.comparator);
-
-		this.notifySelectionChanged();
-		this.notifyDocumentChanged();
-		this.repaint();
-	}
-
 	private void invalidateConceptualAnchorCache() {
 		this.conceptualAnchorCache.clear();
 		this.conceptualAnchorPlacements.clear();
 		this.conceptualSideLinkCache.clear();
 		this.conceptualAnchorCacheValid = false;
-	}
-
-	private String appendSuffix(final String value, final String suffix) {
-		if (value == null || value.isBlank()) {
-			return value;
-		}
-		return value + suffix;
-	}
-
-	private String mapId(final Map<String, String> idMap, final String oldId) {
-		if (oldId == null) {
-			return null;
-		}
-		return idMap.getOrDefault(oldId, oldId);
-	}
-
-	private CopiedNodeLayout captureNodeLayout(final LayoutObjectType type, final String objectId) {
-		final NodeLayout layout = this.findOrCreateNodeLayout(type, objectId);
-
-		return new CopiedNodeLayout(layout.getPosition().getX(),
-				layout.getPosition().getY(),
-				layout.getSize().getWidth(),
-				layout.getSize().getHeight());
-	}
-
-	private CopiedClass captureClass(final ClassModel classModel) {
-		final List<CopiedField> fields = new ArrayList<>();
-
-		for (final FieldModel fieldModel : classModel.getFields()) {
-			fields.add(this.captureField(classModel.getId(), fieldModel));
-		}
-
-		return new CopiedClass(classModel.getId(),
-				classModel.getNames().getConceptualName(),
-				classModel.getNames().getTechnicalName(),
-				classModel.getGroup(),
-				classModel.getVisibility().isConceptual(),
-				classModel.getVisibility().isLogical(),
-				classModel.getVisibility().isPhysical(),
-				classModel.getStyle().getTextColor(),
-				classModel.getStyle().getBackgroundColor(),
-				classModel.getStyle().getBorderColor(),
-				List.copyOf(fields),
-				this.captureNodeLayout(LayoutObjectType.CLASS, classModel.getId()));
-	}
-
-	private CopiedField captureField(final String ownerClassId, final FieldModel fieldModel) {
-		return new CopiedField(ownerClassId,
-				fieldModel.getId(),
-				fieldModel.getNames().getName(),
-				fieldModel.getNames().getTechnicalName(),
-				fieldModel.isNotConceptual(),
-				fieldModel.getComment(),
-				fieldModel.isPrimaryKey(),
-				fieldModel.isUnique(),
-				fieldModel.isNotNull(),
-				fieldModel.getType(),
-				fieldModel.getStyle().getTextColor(),
-				fieldModel.getStyle().getBackgroundColor());
-	}
-
-	private CopiedComment captureComment(final CommentModel commentModel) {
-		final CommentBinding binding = commentModel.getBinding();
-
-		return new CopiedComment(commentModel.getId(),
-				commentModel.getKind(),
-				commentModel.getText(),
-				commentModel.getTextColor(),
-				commentModel.getBackgroundColor(),
-				commentModel.getBorderColor(),
-				commentModel.isVisibleInConceptual(),
-				commentModel.isVisibleInLogical(),
-				commentModel.isVisibleInPhysical(),
-				binding == null ? null : binding.getTargetType(),
-				binding == null ? null : binding.getTargetId(),
-				this.captureNodeLayout(LayoutObjectType.COMMENT, commentModel.getId()));
-	}
-
-	private CopiedLink captureLink(final LinkModel linkModel) {
-		final LinkEnd from = linkModel.getFrom();
-		final LinkEnd to = linkModel.getTo();
-
-		return new CopiedLink(linkModel.getId(),
-				linkModel.getName(),
-				linkModel.getLineColor(),
-				linkModel.getAssociationClassId(),
-				from == null ? null : from.getClassId(),
-				from == null ? null : from.getFieldId(),
-				to == null ? null : to.getClassId(),
-				to == null ? null : to.getFieldId(),
-				linkModel.getCardinalityFrom(),
-				linkModel.getCardinalityTo(),
-				linkModel.getLabelFrom(),
-				linkModel.getLabelTo(),
-				this.captureLinkLayout(linkModel.getId()));
-	}
-
-	private CopiedLinkLayout captureLinkLayout(final String linkId) {
-		final LinkLayout linkLayout = this.findOrCreateLinkLayout(linkId);
-		final List<Point2D.Double> bendPoints = new ArrayList<>();
-
-		for (final Point2D.Double bendPoint : linkLayout.getBendPoints()) {
-			bendPoints.add(new Point2D.Double(bendPoint.getX(), bendPoint.getY()));
-		}
-
-		final Point2D.Double labelPosition = linkLayout.getNameLabelPosition() == null ? null
-				: new Point2D.Double(linkLayout.getNameLabelPosition().getX(), linkLayout.getNameLabelPosition().getY());
-
-		return new CopiedLinkLayout(List.copyOf(bendPoints), labelPosition);
-	}
-
-	private FieldModel createFieldFromClipboard(final CopiedField copiedField, final boolean rename) {
-		final FieldModel fieldCopy = new FieldModel();
-
-		fieldCopy.getNames().setName(rename ? this.appendSuffix(copiedField.name(), " Copy") : copiedField.name());
-		fieldCopy.getNames()
-				.setTechnicalName(rename ? this.appendSuffix(copiedField.technicalName(), "_COPY") : copiedField.technicalName());
-
-		fieldCopy.setNotConceptual(copiedField.notConceptual());
-		fieldCopy.setComment(copiedField.comment());
-		fieldCopy.setPrimaryKey(copiedField.primaryKey());
-		fieldCopy.setUnique(copiedField.unique());
-		fieldCopy.setNotNull(copiedField.notNull());
-		fieldCopy.setType(copiedField.type());
-
-		fieldCopy.getStyle().setTextColor(copiedField.textColor());
-		fieldCopy.getStyle().setBackgroundColor(copiedField.backgroundColor());
-
-		return fieldCopy;
-	}
-
-	private LinkModel createLinkFromClipboard(
-			final CopiedLink copiedLink,
-			final Map<String, String> classIdMap,
-			final Map<String, String> fieldIdMap) {
-
-		final String fromClassId = this.mapId(classIdMap, copiedLink.fromClassId());
-		final String fromFieldId = this.mapId(fieldIdMap, copiedLink.fromFieldId());
-		final String toClassId = this.mapId(classIdMap, copiedLink.toClassId());
-		final String toFieldId = this.mapId(fieldIdMap, copiedLink.toFieldId());
-
-		if (!this.linkEndpointExists(fromClassId, fromFieldId) || !this.linkEndpointExists(toClassId, toFieldId)) {
-			return null;
-		}
-
-		String associationClassId = this.mapId(classIdMap, copiedLink.associationClassId());
-		if (associationClassId != null && this.findClassById(associationClassId) == null) {
-			associationClassId = null;
-		}
-
-		final LinkModel linkCopy = new LinkModel();
-
-		linkCopy.setName(copiedLink.name());
-		linkCopy.setLineColor(copiedLink.lineColor());
-		linkCopy.setAssociationClassId(associationClassId);
-		linkCopy.setFrom(new LinkEnd(fromClassId, fromFieldId));
-		linkCopy.setTo(new LinkEnd(toClassId, toFieldId));
-		linkCopy.setCardinalityFrom(copiedLink.cardinalityFrom());
-		linkCopy.setCardinalityTo(copiedLink.cardinalityTo());
-		linkCopy.setLabelFrom(copiedLink.labelFrom());
-		linkCopy.setLabelTo(copiedLink.labelTo());
-
-		return linkCopy;
-	}
-
-	private boolean linkEndpointExists(final String classId, final String fieldId) {
-		if (classId == null || this.findClassById(classId) == null) {
-			return false;
-		}
-
-		return fieldId == null || this.findFieldById(classId, fieldId) != null;
-	}
-
-	private CommentBinding createRemappedCommentBinding(
-			final CopiedComment copiedComment,
-			final Map<String, String> classIdMap,
-			final Map<String, String> linkIdMap) {
-
-		if (copiedComment.bindingTargetType() == null || copiedComment.bindingTargetId() == null) {
-			return null;
-		}
-
-		final String targetId = switch (copiedComment.bindingTargetType()) {
-		case CLASS -> this.mapId(classIdMap, copiedComment.bindingTargetId());
-		case LINK -> this.mapId(linkIdMap, copiedComment.bindingTargetId());
-		};
-
-		if (copiedComment.bindingTargetType() == BoundTargetType.CLASS && this.findClassById(targetId) == null) {
-			return null;
-		}
-
-		if (copiedComment.bindingTargetType() == BoundTargetType.LINK && this.findLinkById(targetId) == null) {
-			return null;
-		}
-
-		return new CommentBinding(copiedComment.bindingTargetType(), targetId);
-	}
-
-	private void applyNodeLayout(
-			final LayoutObjectType type,
-			final String objectId,
-			final CopiedNodeLayout copiedLayout,
-			final double deltaX,
-			final double deltaY) {
-
-		final NodeLayout layout = this.findOrCreateNodeLayout(type, objectId);
-
-		layout.setPosition(new Point2D.Double(copiedLayout.x() + deltaX, copiedLayout.y() + deltaY));
-
-		layout.setSize(new Size2D(copiedLayout.width(), copiedLayout.height()));
-	}
-
-	private void applyLinkLayout(final String linkId, final CopiedLinkLayout copiedLayout, final double deltaX, final double deltaY) {
-
-		final LinkLayout linkLayout = this.findOrCreateLinkLayout(linkId);
-
-		linkLayout.getBendPoints().clear();
-
-		for (final Point2D.Double bendPoint : copiedLayout.bendPoints()) {
-			linkLayout.getBendPoints().add(new Point2D.Double(bendPoint.getX() + deltaX, bendPoint.getY() + deltaY));
-		}
-
-		if (copiedLayout.nameLabelPosition() != null) {
-			linkLayout.setNameLabelPosition(
-					new Point2D.Double(copiedLayout.nameLabelPosition().getX() + deltaX, copiedLayout.nameLabelPosition().getY() + deltaY));
-		}
-	}
-
-	private void applyLinkLayout(final String linkId, final CopiedLinkLayout copiedLayout, final double offset) {
-
-		final LinkLayout linkLayout = this.findOrCreateLinkLayout(linkId);
-
-		linkLayout.getBendPoints().clear();
-
-		for (final Point2D.Double bendPoint : copiedLayout.bendPoints()) {
-			linkLayout.getBendPoints().add(new Point2D.Double(bendPoint.getX() + offset, bendPoint.getY() + offset));
-		}
-
-		if (copiedLayout.nameLabelPosition() != null) {
-			linkLayout.setNameLabelPosition(
-					new Point2D.Double(copiedLayout.nameLabelPosition().getX() + offset, copiedLayout.nameLabelPosition().getY() + offset));
-		}
 	}
 
 	private boolean isClassSelected(final String classId) {
@@ -3283,6 +3121,31 @@ public class DiagramCanvas extends JPanel {
 		case LOGICAL -> classModel.getVisibility().isLogical();
 		case PHYSICAL -> classModel.getVisibility().isPhysical();
 		};
+	}
+
+	private boolean linkEndpointExists(final String classId, final String fieldId) {
+		if (classId == null || this.findClassById(classId) == null) {
+			return false;
+		}
+
+		return fieldId == null || this.findFieldById(classId, fieldId) != null;
+	}
+
+	private String mapId(final Map<String, String> idMap, final String oldId) {
+		if (oldId == null) {
+			return null;
+		}
+		return idMap.getOrDefault(oldId, oldId);
+	}
+
+	private Point2D.Double mouseWorldOrViewportCenter() {
+		final Point mousePoint = this.getMousePosition();
+
+		if (mousePoint == null) {
+			return this.viewportCenterWorld();
+		}
+
+		return this.screenToWorld(mousePoint);
 	}
 
 	private void moveFieldSelection(final int delta) {
@@ -3461,6 +3324,141 @@ public class DiagramCanvas extends JPanel {
 
 		g2.setTransform(oldTransform);
 		g2.dispose();
+	}
+
+	private void pasteSelection() {
+		final ClipboardSnapshot clipboard = DiagramCanvas.clipboardSnapshot;
+
+		if (clipboard == null || clipboard.isEmpty()) {
+			return;
+		}
+
+		final Rectangle2D.Double clipboardBounds = this.computeClipboardBounds(clipboard);
+		final Point2D.Double pasteTarget = this.mouseWorldOrViewportCenter();
+
+		final double deltaX = clipboardBounds == null ? DiagramCanvas.PASTE_OFFSET : pasteTarget.getX() - clipboardBounds.getCenterX();
+
+		final double deltaY = clipboardBounds == null ? DiagramCanvas.PASTE_OFFSET : pasteTarget.getY() - clipboardBounds.getCenterY();
+
+		final Map<String, String> pastedClassIds = new HashMap<>();
+		final Map<String, String> pastedFieldIds = new HashMap<>();
+		final Map<String, String> pastedLinkIds = new HashMap<>();
+
+		final LinkedHashSet<SelectedElement> newSelection = new LinkedHashSet<>();
+
+		for (final CopiedClass copiedClass : clipboard.classes()) {
+			final ClassModel classCopy = new ClassModel();
+
+			classCopy.getNames().setConceptualName(this.appendSuffix(copiedClass.conceptualName(), " Copy"));
+			classCopy.getNames().setTechnicalName(this.appendSuffix(copiedClass.technicalName(), "_COPY"));
+			classCopy.setGroup(copiedClass.group());
+
+			classCopy.getVisibility().setConceptual(copiedClass.visibleInConceptual());
+			classCopy.getVisibility().setLogical(copiedClass.visibleInLogical());
+			classCopy.getVisibility().setPhysical(copiedClass.visibleInPhysical());
+
+			classCopy.getStyle().setTextColor(copiedClass.textColor());
+			classCopy.getStyle().setBackgroundColor(copiedClass.backgroundColor());
+			classCopy.getStyle().setBorderColor(copiedClass.borderColor());
+
+			for (final CopiedField copiedField : copiedClass.fields()) {
+				final FieldModel fieldCopy = this.createFieldFromClipboard(copiedField, false);
+				classCopy.getFields().add(fieldCopy);
+				pastedFieldIds.put(copiedField.sourceId(), fieldCopy.getId());
+			}
+
+			this.document.getModel().getClasses().add(classCopy);
+			pastedClassIds.put(copiedClass.sourceId(), classCopy.getId());
+
+			this.applyNodeLayout(LayoutObjectType.CLASS, classCopy.getId(), copiedClass.layout(), deltaX, deltaY);
+
+			newSelection.add(SelectedElement.forClass(classCopy.getId()));
+		}
+
+		for (final CopiedField copiedField : clipboard.fields()) {
+			final String ownerClassId = this.mapId(pastedClassIds, copiedField.ownerClassId());
+			final ClassModel owner = this.findClassById(ownerClassId);
+
+			if (owner == null) {
+				continue;
+			}
+
+			final FieldModel fieldCopy = this.createFieldFromClipboard(copiedField, true);
+
+			int insertIndex = -1;
+			for (int i = 0; i < owner.getFields().size(); i++) {
+				if (Objects.equals(owner.getFields().get(i).getId(), copiedField.sourceId())) {
+					insertIndex = i;
+					break;
+				}
+			}
+
+			if (insertIndex < 0) {
+				owner.getFields().add(fieldCopy);
+			} else {
+				owner.getFields().add(insertIndex + 1, fieldCopy);
+			}
+
+			pastedFieldIds.put(copiedField.sourceId(), fieldCopy.getId());
+			newSelection.add(SelectedElement.forField(owner.getId(), fieldCopy.getId()));
+		}
+
+		if (clipboard.panelType() == this.panelType) {
+			for (final CopiedLink copiedLink : clipboard.links()) {
+				final LinkModel linkCopy = this.createLinkFromClipboard(copiedLink, pastedClassIds, pastedFieldIds);
+
+				if (linkCopy == null) {
+					continue;
+				}
+
+				this.getActiveLinks().add(linkCopy);
+				pastedLinkIds.put(copiedLink.sourceId(), linkCopy.getId());
+
+				this.applyLinkLayout(linkCopy.getId(), copiedLink.layout(), deltaX, deltaY);
+
+				newSelection.add(SelectedElement.forLink(linkCopy.getId()));
+			}
+		}
+
+		for (final CopiedComment copiedComment : clipboard.comments()) {
+			final CommentModel commentCopy = new CommentModel();
+
+			commentCopy.setKind(copiedComment.kind());
+			commentCopy.setText(copiedComment.text());
+			commentCopy.setTextColor(copiedComment.textColor());
+			commentCopy.setBackgroundColor(copiedComment.backgroundColor());
+			commentCopy.setBorderColor(copiedComment.borderColor());
+
+			commentCopy.setVisibleInConceptual(copiedComment.visibleInConceptual());
+			commentCopy.setVisibleInLogical(copiedComment.visibleInLogical());
+			commentCopy.setVisibleInPhysical(copiedComment.visibleInPhysical());
+
+			final CommentBinding binding = this.createRemappedCommentBinding(copiedComment, pastedClassIds, pastedLinkIds);
+			if (binding != null) {
+				commentCopy.setBinding(binding);
+			} else if (copiedComment.kind() == CommentKind.BOUND) {
+				commentCopy.setKind(CommentKind.STANDALONE);
+			}
+
+			this.document.getModel().getComments().add(commentCopy);
+			this.applyNodeLayout(LayoutObjectType.COMMENT, commentCopy.getId(), copiedComment.layout(), deltaX, deltaY);
+
+			newSelection.add(SelectedElement.forComment(commentCopy.getId()));
+		}
+
+		if (newSelection.isEmpty()) {
+			return;
+		}
+
+		this.selectedElements.clear();
+		this.selectedElements.addAll(newSelection);
+		this.selectedElement = this.selectedElements.getLast();
+
+		this.document.getModel().getClasses().sort(this.comparator);
+
+		this.notifySelectionChanged();
+		this.notifyDocumentChanged();
+		this.repaint();
 	}
 
 	private void rebuildConceptualAnchorCache(final Graphics2D g2) {

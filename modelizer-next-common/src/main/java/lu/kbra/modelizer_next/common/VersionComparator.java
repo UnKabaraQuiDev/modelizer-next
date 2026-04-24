@@ -7,20 +7,19 @@ import java.util.Locale;
 
 public class VersionComparator implements Comparator<String> {
 
-	private record ParsedVersion(List<Integer> numbers, int channelRank, long buildNumber) {
+	record ParsedVersion(List<Integer> numbers, int channelRank, long buildNumber) {
 	}
 
 	private static final int CHANNEL_NIGHTLY = 0;
 	private static final int CHANNEL_SNAPSHOT = 1;
-
 	private static final int CHANNEL_RELEASE = 2;
 
 	public static final VersionComparator COMPARATOR = new VersionComparator();
 
 	@Override
 	public int compare(final String left, final String right) {
-		final ParsedVersion a = this.parse(left);
-		final ParsedVersion b = this.parse(right);
+		final ParsedVersion a = VersionComparator.parse(left);
+		final ParsedVersion b = VersionComparator.parse(right);
 
 		final int len = Math.max(a.numbers().size(), b.numbers().size());
 		for (int i = 0; i < len; i++) {
@@ -38,12 +37,13 @@ public class VersionComparator implements Comparator<String> {
 		return Long.compare(a.buildNumber(), b.buildNumber());
 	}
 
-	private ParsedVersion parse(final String version) {
+	static ParsedVersion parse(final String version) {
 		if (version == null || version.isBlank()) {
 			return new ParsedVersion(List.of(0), VersionComparator.CHANNEL_RELEASE, 0L);
 		}
 
-		final String normalized = version.trim().startsWith("v") || version.trim().startsWith("V") ? version.trim().substring(1)
+		final String normalized = version.trim().startsWith("v") || version.trim().startsWith("V")
+				? version.trim().substring(1)
 				: version.trim();
 		final String[] tokens = normalized.split("-");
 		final List<Integer> numbers = new ArrayList<>();
@@ -60,7 +60,7 @@ public class VersionComparator implements Comparator<String> {
 		int channelIndex = -1;
 		int channelRank = VersionComparator.CHANNEL_RELEASE;
 		for (int i = 1; i < tokens.length; i++) {
-			final int candidate = this.parseChannelRank(tokens[i]);
+			final int candidate = VersionComparator.parseChannelRank(tokens[i]);
 			if (candidate >= 0) {
 				channelIndex = i;
 				channelRank = candidate;
@@ -85,7 +85,7 @@ public class VersionComparator implements Comparator<String> {
 		return new ParsedVersion(numbers, channelRank, buildNumber);
 	}
 
-	private int parseChannelRank(final String token) {
+	private static int parseChannelRank(final String token) {
 		return switch (token.toUpperCase(Locale.ROOT)) {
 		case "NIGHTLY" -> VersionComparator.CHANNEL_NIGHTLY;
 		case "SNAPSHOT" -> VersionComparator.CHANNEL_SNAPSHOT;
