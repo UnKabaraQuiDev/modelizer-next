@@ -1,0 +1,578 @@
+<!doctype html>
+<html lang="en"data-theme="light">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport"content="width=device-width, initial-scale=1">
+    <meta name="theme-color"content="#f8fafc">
+    <meta name="description"content="Modelizer Next is a modern, clean drop-in replacement for Modelizer, built for relational database modeling.">
+    <meta property="og:title"content="Modelizer Next">
+    <meta property="og:description"content="A modern drop-in replacement for Modelizer with intuitive controls and a clean UI.">
+    <meta property="og:type"content="website">
+    <meta property="og:url"content="https://modelizer.kbra.lu/">
+    <title>Modelizer Next — Modern Modelizer replacement</title>
+    <style>:root {
+    --bg: #f8fafc;
+    --bg2:#eef2ff;
+    --text: #0f172a;
+    --muted: #475569;
+    --soft: #64748b;
+    --card: rgba(255, 255, 255, .84);
+    --card2:#fff;
+    --line: rgba(15, 23, 42, .12);
+    --shadow: 0 24px 80px rgba(15, 23, 42, .14);
+    --a: #2563eb;
+    --b: #7c3aed;
+    --ok: #16a34a;
+    --r: 24px;
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    color-scheme: light
+    }
+    html[data-theme="dark"] {
+    --bg: #08111f;
+    --bg2:#0f172a;
+    --text: #f8fafc;
+    --muted: #cbd5e1;
+    --soft: #94a3b8;
+    --card: rgba(255, 255, 255, .08);
+    --card2:rgba(255, 255, 255, .13);
+    --line: rgba(255, 255, 255, .16);
+    --shadow: 0 24px 80px rgba(0, 0, 0, .35);
+    --a: #60a5fa;
+    --b: #a78bfa;
+    --ok: #34d399;
+    color-scheme: dark
+    }
+    * {
+    box-sizing: border-box
+    }
+    html {
+    scroll-behavior: smooth
+    }
+    body {
+    margin: 0;
+    background: radial-gradient(circle at 12% 0, color-mix(in srgb, var(--b) 22%, transparent), transparent 27rem), radial-gradient(circle at 88% 6%, color-mix(in srgb, var(--a) 18%, transparent), transparent 28rem), linear-gradient(180deg, var(--bg), var(--bg2));
+    color: var(--text);
+    line-height: 1.6;
+    min-height: 100vh
+    }
+    a {
+    color: inherit;
+    text-decoration: none
+    }
+    .container {
+    width: min(1300px, calc(100% - 40px));
+    margin: auto
+    }
+    .skip {
+    position: absolute;
+    left: 16px;
+    top: -80px;
+    background: var(--text);
+    color: var(--bg);
+    padding: 10px 14px;
+    border-radius: 999px
+    }
+    .skip:focus {
+    top: 16px
+    }
+    header {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: color-mix(in srgb, var(--bg) 80%, transparent);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--line)
+    }
+    nav {
+    min-height: 72px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px
+    }
+    .brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-weight: 850;
+    letter-spacing: -.03em
+    }
+    .logo {
+    width: 42px;
+    height: 42px;
+    border-radius: 13px;
+    box-shadow: 0 12px 30px rgba(37, 99, 235, .18)
+    }
+    .link {
+    border-bottom: 1px dotted #000;
+    text-decoration: none;    }
+    .links {
+    display: flex;
+    gap: 8px;
+    align-items: center
+    }
+    .links a, .theme {
+    padding: 8px 12px;
+    border-radius: 999px;
+    color: var(--muted);
+    font-size: .95rem;
+    border: 0;
+    background: transparent;
+    font: inherit;
+    cursor: pointer
+    }
+    .links a:hover, .links a:focus, .theme:hover, .theme:focus {
+    background: var(--card);
+    color: var(--text);
+    outline: 0
+    }
+    .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 46px;
+    padding: 0 18px;
+    border-radius: 999px;
+    border: 1px solid var(--line);
+    background: var(--card);
+    font-weight: 750;
+    transition: .16s ease
+    }
+    .btn:hover, .btn:focus {
+    transform: translateY(-2px);
+    background: var(--card2);
+    outline: 0
+    }
+    .btn.primary {
+    border: 0;
+    background: linear-gradient(135deg, var(--a), var(--b));
+    color: white
+    }
+    .hero {
+    padding: 88px 0 52px
+    }
+    .hero-grid {
+    display: grid;
+    grid-template-columns: 1fr minmax(360px, .92fr);
+    gap: 56px;
+    align-items: center
+    }
+    .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 18px;
+    padding: 7px 12px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: var(--card);
+    color: var(--muted);
+    font-size: .92rem;
+    font-weight: 750
+    }
+    .pulse {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: var(--ok);
+    box-shadow: 0 0 0 6px color-mix(in srgb, var(--ok) 18%, transparent)
+    }
+    h1, h2, h3, p {
+    margin-top: 0
+    }
+    h1 {
+    max-width: 780px;
+    margin-bottom: 22px;
+    font-size: clamp(3rem, 8vw, 6.4rem);
+    line-height: .94;
+    letter-spacing: -.075em
+    }
+    .grad {
+    background: linear-gradient(135deg, var(--text), var(--a) 48%, var(--b));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent
+    }
+    .lead {
+    max-width: 700px;
+    color: var(--muted);
+    font-size: clamp(1.08rem, 2vw, 1.3rem)
+    }
+    .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    margin-top: 30px
+    }
+    .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 26px;
+    color: var(--soft);
+    font-size: .95rem
+    }
+    .tag {
+    padding: 8px 12px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: var(--card)
+    }
+    .screenshot {
+    overflow: hidden;
+    border: 1px solid var(--line);
+    border-radius: 28px;
+    background: var(--card2);
+    box-shadow: var(--shadow)
+    }
+    .screen-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 17px;
+    border-bottom: 1px solid var(--line);
+    background: var(--card)
+    }
+    .dots {
+    display: flex;
+    gap: 7px
+    }
+    .dot {
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    background: var(--soft);
+    opacity: .5
+    }
+    .screen-img {
+    display: block;
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+    background: linear-gradient(135deg, color-mix(in srgb, var(--a) 14%, transparent), color-mix(in srgb, var(--b) 10%, transparent))
+    }
+    .shot-note {
+    padding: 12px 16px;
+    color: var(--soft);
+    font-size: .9rem;
+    border-top: 1px solid var(--line)
+    }
+    section {
+    padding: 76px 0
+    }
+    .heading {
+    max-width: 780px;
+    margin-bottom: 28px
+    }
+    h2 {
+    font-size: clamp(2rem, 5vw, 3.1rem);
+    line-height: 1.04;
+    letter-spacing: -.055em
+    }
+    .heading p, .card p, .download p, .step p, .callout p {
+    color: var(--muted)
+    }
+    .grid3 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px
+    }
+    .card, .download, .step, .callout, .compat {
+    border: 1px solid var(--line);
+    border-radius: var(--r);
+    background: var(--card);
+    box-shadow: 0 16px 50px rgba(15, 23, 42, .08)
+    }
+    .card {
+    padding: 24px
+    }
+    .icon {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    margin-bottom: 18px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, var(--a), var(--b));
+    color: #fff;
+    font-size: 1.3rem
+    }
+    h3 {
+    margin-bottom: 9px;
+    font-size: 1.2rem;
+    letter-spacing: -.025em
+    }
+    .compat {
+    display: grid;
+    grid-template-columns: .9fr 1.1fr;
+    gap: 22px;
+    align-items: center;
+    padding: 30px;
+    background: linear-gradient(135deg, color-mix(in srgb, var(--a) 10%, var(--card)), color-mix(in srgb, var(--b) 8%, var(--card)))
+    }
+    .compat-list {
+    display: grid;
+    gap: 12px
+    }
+    .compat-item {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    padding: 14px;
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    background: var(--card2)
+    }
+    .check {
+    display: grid;
+    place-items: center;
+    flex: 0 0 26px;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: var(--ok);
+    color: white;
+    font-weight: 900
+    }
+    .split {
+    display: grid;
+    grid-template-columns: .9fr 1.1fr;
+    gap: 18px
+    }
+    .download {
+    display: grid;
+    gap: 18px;
+    padding: 28px;
+    background: linear-gradient(135deg, color-mix(in srgb, var(--a) 12%, var(--card)), color-mix(in srgb, var(--b) 8%, var(--card)))
+    }
+    .steps {
+    display: grid;
+    gap: 12px
+    }
+    .step {
+    display: grid;
+    grid-template-columns: 42px 1fr;
+    gap: 14px;
+    padding: 18px
+    }
+    .num {
+    display: grid;
+    place-items: center;
+    width: 42px;
+    height: 42px;
+    border-radius: 15px;
+    background: color-mix(in srgb, var(--a) 14%, var(--card2));
+    font-weight: 900
+    }
+    code {
+    padding: 2px 7px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--card2);
+    color: var(--a)
+    }
+    .callout {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 24px;
+    padding: 30px
+    }
+    .callout p {
+    margin-bottom: 0
+    }
+    footer {
+    padding: 34px 0 46px;
+    color: var(--soft);
+    border-top: 1px solid var(--line)
+    }
+    .foot {
+    display: flex;
+    justify-content: space-between;
+    gap: 18px;
+    flex-wrap: wrap
+    }
+    .foot-links {
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap
+    }
+    .foot a {
+    color: var(--muted)
+    }
+    .guide {
+    display: grid;
+    grid-template-columns: .9fr 1.1fr;
+    gap: 22px;
+    align-items: stretch
+    }
+    .guide-panel, .quick-card, .shortcuts-panel, .modal-card {
+    border: 1px solid var(--line);
+    border-radius: var(--r);
+    background: var(--card);
+    box-shadow: 0 16px 50px rgba(15, 23, 42, .08)
+    }
+    .guide-panel {
+    padding: 30px;
+    background: linear-gradient(135deg, color-mix(in srgb, var(--a) 10%, var(--card)), color-mix(in srgb, var(--b) 8%, var(--card)))
+    }
+    .quick-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px
+    }
+    .quick-card {
+    padding: 18px;
+    background: var(--card2)
+    }
+    .quick-card strong {
+    display: block;
+    margin-bottom: 6px
+    }
+    .shortcut-layout {
+    display: grid;
+    grid-template-columns: 1.1fr .9fr;
+    gap: 18px;
+    align-items: start
+    }
+    .shortcuts-panel, .modal-card {
+    padding: 24px
+    }
+    .shortcut-grid {
+    display: grid;
+    gap: 10px;
+    margin-top: 18px
+    }
+    .shortcut-row {
+    display: grid;
+    grid-template-columns: minmax(120px, 180px) 1fr;
+    gap: 12px;
+    align-items: center;
+    padding: 12px;
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    background: var(--card2)
+    }
+    kbd {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: fit-content;
+    min-width: 38px;
+    padding: 5px 9px;
+    border: 1px solid var(--line);
+    border-bottom-width: 3px;
+    border-radius: 10px;
+    background: var(--bg);
+    color: var(--text);
+    font: 750 .9rem ui-monospace, SFMono-Regular, Menlo, Consolas, monospace
+    }
+    .kbd-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px
+    }
+    .modal-list {
+    display: grid;
+    gap: 12px;
+    margin-top: 18px
+    }
+    .modal-card {
+    background: var(--card2)
+    }
+    .modal-card h3 {
+    margin-bottom: 4px
+    }
+    @media(max-width:900px) {
+    .hero-grid, .split, .compat, .guide, .shortcut-layout {
+    grid-template-columns: 1fr
+    }
+    .hero {
+    padding-top: 64px
+    }
+    .grid3, .quick-grid {
+    grid-template-columns: 1fr
+    }
+    .screenshot {
+    max-width: 1000px
+    }
+    }
+    @media(max-width:680px) {
+    .container {
+    width: min(100% - 28px, 1300px)
+    }
+    nav {
+    padding: 14px 0;
+    min-height: auto
+    }
+    .links a {
+    display: none
+    }
+    .actions, .callout {
+    align-items: stretch;
+    flex-direction: column
+    }
+    .btn {
+    width: 100%
+    }
+    .shortcut-row {
+    grid-template-columns: 1fr
+    }
+    }
+    }
+    </style>
+  </head>
+  <body>
+    <a class="skip"href="#main">Skip to content</a>
+    <header>
+      <div class="container">
+        <nav aria-label="Main navigation">
+          <a class="brand"href="#top"><img class="logo"src="https://raw.githubusercontent.com/UnKabaraQuiDev/modelizer-next/main/app/icon.svg"alt="Modelizer Next logo"><span>Modelizer Next</span></a>
+          <div class="links">
+            <a href="#new-here">New here?</a><a href="#replacement">Replacement</a><a href="#features">Features</a><a href="#shortcuts">Shortcuts</a><a href="#download">Download</a><a href="https://github.com/UnKabaraQuiDev/modelizer-next"rel="noopener">GitHub</a><button class="theme"type="button"id="themeButton"aria-label="Toggle light and dark mode">Dark mode</button>
+          </div>
+        </nav>
+      </div>
+    </header>
+    <main id="main">
+      <section id="top"class="hero">
+        <div class="container hero-grid">
+          <div>
+            <h1><span class="grad">A modern, easy-to-use database modelizing tool</span></h1>
+            <p class="lead">Modelizer Next, the database modelling tool made for you. Fast, clean & intuitive</p>
+            <p class="eyebrow"><span class="pulse"aria-hidden="true"></span> By the community, for the community.</p>
+            <div class="actions"><a class="btn primary"href="https://github.com/UnKabaraQuiDev/modelizer-next/releases/latest"rel="noopener">Download latest release</a><a class="btn"href="#new-here">New here?</a><a class="btn"href="#replacement">Why switch?</a></div>
+          </div>
+          <figure class="screenshot"aria-label="Modelizer Next screenshot">
+            <div class="screen-top"><div class="dots"aria-hidden="true"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div><span class="title">Modelizer Next</span></div>
+            <img class="screen-img" src="img/screenshot.webp"alt="Screenshot of the Modelizer Next interface">
+          </figure>
+        </div>
+      </section>
+      <section id="new-here"><div class="container guide"><div class="guide-panel"><p class="eyebrow"><span class="pulse"aria-hidden="true"></span> New here?</p><h2>Modelizer Next helps you plan a database before you build it.</h2><p>Instead of jumping straight into SQL, you draw the structure first. Add tables, add fields, connect related data, and move between conceptual, logical, and physical views as your idea gets more precise.</p><div class="actions"><a class="btn primary"href="https://github.com/UnKabaraQuiDev/modelizer-next/releases/latest"rel="noopener">Get started</a><a class="btn"href="#shortcuts">See controls</a></div></div><div class="quick-grid"><article class="quick-card"><strong>1. Create or open a model</strong><p>Start a new file or import an existing <code>.mn</code>, <code>.mod</code>, or <code>.mdlz</code> model.</p></article><article class="quick-card"><strong>2. Add tables and fields</strong><p>Use the toolbar or shortcuts to build the database shape piece by piece.</p></article><article class="quick-card"><strong>3. Link related data</strong><p>Create links between tables to show how records connect.</p></article><article class="quick-card"><strong>4. Save and continue later</strong><p>Keep your model as a file, share it, or use it as a base for implementation.</p></article></div></div></section>
+      <section id="replacement"><div class="container compat"><div><p class="eyebrow"><span class="pulse"aria-hidden="true"></span> Built for existing Modelizer users</p><h2>Move over without changing the way you model.</h2><p>Modelizer Next is made as a direct replacement for the classic Modelizer tools such as <a href="http://modelizer.fisch.lu/"class="link"target="_BLANK">Modzlier</a> or <a href="http://modelizer.lu/"class="link"target="_BLANK">modelizer.lu</a>. It supports existing model formats, keeps the core database modeling ideas, and removes the old, clunky UI feeling.</p></div><div class="compat-list"><div class="compat-item"><span class="check">✓</span><div><h3>Open existing work</h3><p>Load modern Modelizer Next files, legacy Modelizer files, and online Modelizer files:<code>.mn</code>, <code>.mod</code>, and <code>.mdlz</code>.</p></div></div><div class="compat-item"><span class="check">✓</span><div><h3>No clunky UI</h3><p>Use clear actions, visible controls, keyboard shortcuts, drag and drop, zoom, pan, and right-drag link creation.</p></div></div><div class="compat-item"><span class="check">✓</span><div><h3>Modern look</h3><p>Work in a clean desktop interface with light mode, dark mode, style palettes, and separate conceptual, logical, and physical views.</p></div></div></div></div></section>
+      <section id="features"><div class="container"><div class="heading"><h2>Everything you need for fast relational database design.</h2><p>Build schemas with less friction. Add tables, fields, comments, and links from a simple toolbar or keyboard shortcuts.</p></div><div class="grid3"><article class="card"><div class="icon"aria-hidden="true">▦</div><h3>Tables and fields</h3><p>Create structured models that stay easy to read while your schema grows.</p></article><article class="card"><div class="icon"aria-hidden="true">↔</div><h3>Intuitive links</h3><p>Create links with direct mouse gestures instead of digging through menus.</p></article><article class="card"><div class="icon"aria-hidden="true">◫</div><h3>Three model views</h3><p>Use conceptual, logical, and physical tabs to keep each level clear.</p></article></div></div></section>
+      <section id="shortcuts"><div class="container"><div class="heading"><p class="eyebrow"><span class="pulse"aria-hidden="true"></span> Controls, shortcuts, and dialogs</p><h2>Fast actions without hunting through menus.</h2><p>The app keeps common actions close to the keyboard and mouse. Use the toolbar when you want buttons, or shortcuts when you want speed.</p></div><div class="shortcut-layout"><div class="shortcuts-panel"><h3>Keyboard shortcuts</h3><div class="shortcut-grid"><div class="shortcut-row"><span class="kbd-group"><kbd>Ctrl</kbd><kbd>N</kbd></span><span>New document</span></div><div class="shortcut-row"><span class="kbd-group"><kbd>Ctrl</kbd><kbd>O</kbd></span><span>Load a model file</span></div><div class="shortcut-row"><span class="kbd-group"><kbd>Ctrl</kbd><kbd>S</kbd></span><span>Save</span></div><div class="shortcut-row"><span class="kbd-group"><kbd>Ctrl</kbd><kbd>Shift</kbd><kbd>S</kbd></span><span>Save as</span></div><div class="shortcut-row"><span class="kbd-group"><kbd>Ctrl</kbd><kbd>Z</kbd></span><span>Undo</span></div><div class="shortcut-row"><span class="kbd-group"><kbd>Ctrl</kbd><kbd>Shift</kbd><kbd>Z</kbd></span><span>Redo</span></div><div class="shortcut-row"><span class="kbd-group"><kbd>Ctrl</kbd><kbd>T</kbd></span><span>Add table</span></div><div class="shortcut-row"><span class="kbd-group"><kbd>Ctrl</kbd><kbd>F</kbd></span><span>Add field</span></div><div class="shortcut-row"><span class="kbd-group"><kbd>Shift</kbd><kbd>C</kbd></span><span>Add comment</span></div><div class="shortcut-row"><span class="kbd-group"><kbd>Ctrl</kbd><kbd>L</kbd></span><span>Add link</span></div><div class="shortcut-row"><span class="kbd-group"><kbd>F2</kbd></span><span>Rename selected item</span></div><div class="shortcut-row"><span class="kbd-group"><kbd>Ctrl</kbd><kbd>E</kbd></span><span>Edit selected item</span></div><div class="shortcut-row"><span class="kbd-group"><kbd>Delete</kbd></span><span>Delete selected item</span></div><div class="shortcut-row"><span class="kbd-group"><kbd>Ctrl</kbd><kbd>D</kbd></span><span>Duplicate selected item</span></div><div class="shortcut-row"><span class="kbd-group"><kbd>Esc</kbd></span><span>Clear selection</span></div><div class="shortcut-row"><span class="kbd-group"><kbd>Ctrl</kbd><kbd>A</kbd></span><span>Select all</span></div><div class="shortcut-row"><span class="kbd-group"><kbd>Ctrl</kbd><kbd>C</kbd></span><span>Copy selection</span></div><div class="shortcut-row"><span class="kbd-group"><kbd>Ctrl</kbd><kbd>X</kbd></span><span>Cut selection</span></div><div class="shortcut-row"><span class="kbd-group"><kbd>Ctrl</kbd><kbd>V</kbd></span><span>Paste selection</span></div><div class="shortcut-row"><span class="kbd-group"><kbd>↑</kbd><kbd>↓</kbd></span><span>Move through fields</span></div><div class="shortcut-row"><span class="kbd-group"><kbd>Alt</kbd><kbd>↑</kbd><kbd>Alt</kbd><kbd>↓</kbd></span><span>Move a selected field in the list</span></div></div></div><div><div class="modal-list"><article class="modal-card"><h3>Mouse controls</h3><p>Left drag moves objects. Middle drag pans the canvas. The mouse wheel zooms. Right drag creates a link between any objects.</p></article><article class="modal-card"><h3>File dialogs</h3><p>Open, save, save as, and file drop dialogs keep model files simple.<br>Supported files: <code>.mn</code>, <code>.mod</code>, and <code>.mdlz</code>.</p></article><article class="modal-card"><h3>Appearance</h3><p>Switch between light, dark, and system theme modes. Manage style palettes from the Styles menu.</p></article><article class="modal-card"></article></div></div></div></div></section>
+      <section id="download"><div class="container split"><div class="download"><div><p class="eyebrow"><span class="pulse"aria-hidden="true"></span> Get Modelizer Next</p><h2>Download the latest build from GitHub Releases.</h2><p>Pick the package for your system. Windows and Linux builds are supported by the project setup.</p></div><div class="actions"><a class="btn primary"href="https://github.com/UnKabaraQuiDev/modelizer-next/releases/latest"rel="noopener">Open latest release</a><a class="btn"href="https://github.com/UnKabaraQuiDev/modelizer-next/issues"rel="noopener">Report an issue</a></div></div><div class="steps"><article class="step"><div class="num">1</div><div><h3>Download</h3><p>Open the release page and choose the right file for your platform.</p></div></article><article class="step"><div class="num">2</div><div><h3>Open or import</h3><p>Create a new model or load <code>.mn</code>, <code>.mod</code>, or <code>.mdlz</code>.</p></div></article><article class="step"><div class="num">3</div><div><h3>Model faster</h3><p>Use the modern UI, shortcuts, drag and drop, zoom, pan, and quick links.</p></div></article></div></div></section>
+      <section id="source"><div class="container"><div class="callout"><div><h2>Open source and ready to inspect.</h2><p>Modelizer Next is published on GitHub under the GPL-3.0 license.</p></div><a class="btn"href="https://github.com/UnKabaraQuiDev/modelizer-next"rel="noopener">Browse repository</a></div></div></section>
+    </main>
+    <footer><div class="container foot"><span>© <span id="year"></span> Modelizer Next</span><div class="foot-links"><a href="https://github.com/UnKabaraQuiDev/modelizer-next/releases/latest"rel="noopener">Releases</a><a href="https://github.com/UnKabaraQuiDev/modelizer-next/issues"rel="noopener">Issues</a><a href="https://github.com/UnKabaraQuiDev/modelizer-next/blob/main/LICENSE"rel="noopener">License</a></div></div></footer>
+    <script>
+    const root=document.documentElement, btn=document.getElementById('themeButton'), saved=localStorage.getItem('theme');
+    if(saved) root.dataset.theme=saved;
+    function sync() {
+    const dark=root.dataset.theme==='dark';
+    btn.textContent=dark?'Light mode':'Dark mode';
+    document.querySelector('meta[name="theme-color"]').setAttribute('content', dark?'#08111f':'#f8fafc')
+    }
+    btn.addEventListener('click', ()=> {
+    root.dataset.theme=root.dataset.theme==='dark'?'light':'dark';
+    localStorage.setItem('theme', root.dataset.theme);
+    sync()
+    }
+    );
+    document.getElementById('year').textContent=new Date().getFullYear();
+    sync();
+    </script>
+  </body>
+</html>
