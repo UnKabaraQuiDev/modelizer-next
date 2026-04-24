@@ -1,165 +1,592 @@
 <!doctype html>
 <html lang="en" data-theme="light">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#f8fafc">
-  <meta name="description" content="Modelizer Next is a modern, clean drop-in replacement for Modelizer, built for relational database modeling.">
-  <meta property="og:title" content="Modelizer Next">
-  <meta property="og:description" content="A modern drop-in replacement for Modelizer with intuitive controls and a clean UI.">
-  <meta property="og:type" content="website">
-  <meta property="og:url" content="https://modelizer.kbra.lu/">
-  <title>Modelizer Next — Modern Modelizer replacement</title>
-  <style>
-    :root{--bg:#f8fafc;--bg2:#eef2ff;--text:#0f172a;--muted:#475569;--soft:#64748b;--card:rgba(255,255,255,.84);--card2:#fff;--line:rgba(15,23,42,.12);--shadow:0 24px 80px rgba(15,23,42,.14);--a:#2563eb;--b:#7c3aed;--ok:#16a34a;--r:24px;color-scheme:light;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+  <head>
+    <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#f8fafc">
+          <meta name="description" content="Modelizer Next is a modern, clean drop-in replacement for Modelizer, built for relational database modeling.">
+            <meta property="og:title" content="Modelizer Next">
+              <meta property="og:description" content="A modern drop-in replacement for Modelizer with intuitive controls and a clean UI.">
+                <meta property="og:type" content="website">
+                  <meta property="og:url" content="https://modelizer.kbra.lu/">
+                    <title>Modelizer Next — Modern Modelizer replacement</title>
+                    <style>:root{--bg:#f8fafc;--bg2:#eef2ff;--text:#0f172a;--muted:#475569;--soft:#64748b;--card:rgba(255,255,255,.84);--card2:#fff;--line:rgba(15,23,42,.12);--shadow:0 24px 80px rgba(15,23,42,.14);--a:#2563eb;--b:#7c3aed;--ok:#16a34a;--r:24px;color-scheme:light;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
     html[data-theme="dark"]{--bg:#08111f;--bg2:#0f172a;--text:#f8fafc;--muted:#cbd5e1;--soft:#94a3b8;--card:rgba(255,255,255,.08);--card2:rgba(255,255,255,.13);--line:rgba(255,255,255,.16);--shadow:0 24px 80px rgba(0,0,0,.35);--a:#60a5fa;--b:#a78bfa;--ok:#34d399;color-scheme:dark}
-    *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;min-height:100vh;color:var(--text);line-height:1.6;background:radial-gradient(circle at 12% 0,color-mix(in srgb,var(--b) 22%,transparent),transparent 27rem),radial-gradient(circle at 88% 6%,color-mix(in srgb,var(--a) 18%,transparent),transparent 28rem),linear-gradient(180deg,var(--bg),var(--bg2))}a{color:inherit;text-decoration:none}.container{width:min(1300px,calc(100% - 40px));margin:auto}.skip{position:absolute;left:16px;top:-80px;background:var(--text);color:var(--bg);padding:10px 14px;border-radius:999px}.skip:focus{top:16px}header{position:sticky;top:0;z-index:10;background:color-mix(in srgb,var(--bg) 80%,transparent);backdrop-filter:blur(16px);border-bottom:1px solid var(--line)}nav{min-height:72px;display:flex;align-items:center;justify-content:space-between;gap:18px}.brand{display:flex;align-items:center;gap:12px;font-weight:850;letter-spacing:-.03em}.logo{width:42px;height:42px;border-radius:13px;box-shadow:0 12px 30px rgba(37,99,235,.18)}.links{display:flex;gap:8px;align-items:center}.links a{padding:8px 12px;border-radius:999px;color:var(--muted);font-size:.95rem}.links a:hover,.links a:focus{background:var(--card);color:var(--text);outline:0}.theme-toggle{position:relative;display:inline-flex;align-items:center;gap:9px;min-height:38px;padding:4px 8px 4px 4px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--muted);font:inherit;cursor:pointer}.toggle-track{position:relative;width:52px;height:30px;border-radius:999px;background:color-mix(in srgb,var(--a) 16%,var(--card2));border:1px solid var(--line)}.toggle-thumb{position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,var(--a),var(--b));transition:transform .18s ease;box-shadow:0 6px 18px rgba(0,0,0,.2)}html[data-theme="dark"] .toggle-thumb{transform:translateX(22px)}.btn{display:inline-flex;align-items:center;justify-content:center;min-height:46px;padding:0 18px;border-radius:999px;border:1px solid var(--line);background:var(--card);font-weight:750;transition:.16s ease}.btn:hover,.btn:focus{transform:translateY(-2px);background:var(--card2);outline:0}.btn.primary{border:0;background:linear-gradient(135deg,var(--a),var(--b));color:white}.hero{padding:88px 0 52px}.hero-grid{display:grid;grid-template-columns:1fr minmax(360px,.92fr);gap:56px;align-items:center}.eyebrow{display:inline-flex;align-items:center;gap:8px;margin:0 0 18px;padding:7px 12px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--muted);font-size:.92rem;font-weight:750}.pulse{width:9px;height:9px;border-radius:50%;background:var(--ok);box-shadow:0 0 0 6px color-mix(in srgb,var(--ok) 18%,transparent)}h1,h2,h3,p{margin-top:0}h1{max-width:780px;margin-bottom:22px;font-size:clamp(3rem,8vw,6.4rem);line-height:.94;letter-spacing:-.075em}h2{font-size:clamp(2rem,5vw,3.1rem);line-height:1.04;letter-spacing:-.055em}h3{margin-bottom:9px;font-size:1.2rem;letter-spacing:-.025em}.grad{background:linear-gradient(135deg,var(--text),var(--a) 48%,var(--b));-webkit-background-clip:text;background-clip:text;color:transparent}.lead{max-width:700px;color:var(--muted);font-size:clamp(1.08rem,2vw,1.3rem)}.actions{display:flex;flex-wrap:wrap;gap:14px;margin-top:30px}.screenshot{overflow:hidden;border:1px solid var(--line);border-radius:28px;background:var(--card2);box-shadow:var(--shadow)}.screen-top{display:flex;justify-content:space-between;align-items:center;padding:14px 17px;border-bottom:1px solid var(--line);background:var(--card)}.dots{display:flex;gap:7px}.dot{width:11px;height:11px;border-radius:50%;background:var(--soft);opacity:.5}.screen-img{display:block;width:100%;height:auto;object-fit:cover;background:linear-gradient(135deg,color-mix(in srgb,var(--a) 14%,transparent),color-mix(in srgb,var(--b) 10%,transparent))}section{padding:76px 0}.heading{max-width:780px;margin-bottom:28px}.heading p,.card p,.download p,.step p,.callout p,.quick-card p,.modal-card p,.shortcut-group p{color:var(--muted)}.link{border-bottom:1px dotted currentColor}.card,.download,.step,.callout,.guide-panel,.quick-card,.shortcuts-panel,.modal-card,.download-option{border:1px solid var(--line);border-radius:var(--r);background:var(--card);box-shadow:0 16px 50px rgba(15,23,42,.08)}.guide{display:grid;grid-template-columns:.92fr 1.08fr;gap:22px;align-items:stretch}.guide-panel{padding:30px;background:linear-gradient(135deg,color-mix(in srgb,var(--a) 10%,var(--card)),color-mix(in srgb,var(--b) 8%,var(--card)))}.quick-grid{display:flex;flex-direction: column;gap:12px}.quick-card{padding:18px;background:var(--card2);min-height:180px}.quick-card strong{display:block;margin-bottom:6px}.quick-card img{display:block;width:100%;object-fit:cover;margin-top:14px;border-radius:14px;border:1px solid var(--line);background:linear-gradient(135deg,color-mix(in srgb,var(--a) 16%,transparent),color-mix(in srgb,var(--b) 12%,transparent))}.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}.card{padding:24px}.icon{display:grid;place-items:center;width:44px;height:44px;margin-bottom:18px;border-radius:16px;background:linear-gradient(135deg,var(--a),var(--b));color:#fff;font-size:1.3rem}.shortcut-layout{display:block;gap:18px;align-items:start}.shortcuts-panel,.modal-card{padding:24px}.shortcut-sections{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:18px}.shortcut-group{border:1px solid var(--line);border-radius:18px;background:var(--card2);padding:16px}.shortcut-group h3{margin-bottom:12px}.shortcut-grid{display:grid;gap:8px}.shortcut-row{display:grid;grid-template-columns:minmax(120px,170px) 1fr;gap:12px;align-items:center;padding:10px;border:1px solid var(--line);border-radius:14px;background:color-mix(in srgb,var(--bg) 55%,var(--card2))}kbd{display:inline-flex;align-items:center;justify-content:center;width:fit-content;min-width:36px;padding:5px 9px;border:1px solid var(--line);border-bottom-width:3px;border-radius:10px;background:var(--bg);color:var(--text);font:750 .86rem ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}.kbd-group{display:flex;flex-wrap:wrap;gap:6px}.modal-list{display:grid;gap:12px;margin-top:18px}.modal-card{background:var(--card2)}.modal-card h3{margin-bottom:4px}.download-layout{display:grid;grid-template-columns:.85fr 1.15fr;gap:18px;align-items:start}.download{display:grid;gap:18px;padding:28px;background:linear-gradient(135deg,color-mix(in srgb,var(--a) 12%,var(--card)),color-mix(in srgb,var(--b) 8%,var(--card)))}.selector-card{display:grid;gap:18px}.selector-group{display:grid;gap:10px}.choice-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.choice{display:grid;gap:4px;text-align:left;border:1px solid var(--line);border-radius:16px;padding:14px;background:var(--card2);color:var(--text);cursor:pointer;font:inherit}.choice[aria-pressed="true"]{outline:3px solid color-mix(in srgb,var(--a) 30%,transparent);border-color:color-mix(in srgb,var(--a) 60%,var(--line))}.choice span{color:var(--muted);font-size:.92rem}.download-option{padding:24px;background:var(--card2)}.download-summary{display:grid;gap:10px;margin:14px 0 18px}.summary-row{display:flex;justify-content:space-between;gap:14px;padding:10px 0;border-bottom:1px solid var(--line);color:var(--muted)}.summary-row strong{color:var(--text)}code{padding:2px 7px;border:1px solid var(--line);border-radius:8px;background:var(--card2);color:var(--a)}.steps{display:grid;gap:12px}.step{display:grid;grid-template-columns:42px 1fr;gap:14px;padding:18px}.num{display:grid;place-items:center;width:42px;height:42px;border-radius:15px;background:color-mix(in srgb,var(--a) 14%,var(--card2));font-weight:900}.callout{display:flex;justify-content:space-between;align-items:center;gap:24px;padding:30px}.callout p{margin-bottom:0}footer{padding:34px 0 46px;color:var(--soft);border-top:1px solid var(--line)}.foot{display:flex;justify-content:space-between;gap:18px;flex-wrap:wrap}.foot-links{display:flex;gap:14px;flex-wrap:wrap}.foot a{color:var(--muted)}@media(max-width:1000px){.hero-grid,.guide,.shortcut-layout,.download-layout{grid-template-columns:1fr}.grid3,.quick-grid{grid-template-columns:1fr}.screenshot{max-width:1000px}}@media(max-width:760px){.container{width:min(100% - 28px,1300px)}nav{padding:14px 0;min-height:auto}.links a{display:none}.actions,.callout{align-items:stretch;flex-direction:column}.btn{width:100%}.shortcut-sections,.choice-grid{grid-template-columns:1fr}.shortcut-row{grid-template-columns:1fr}.theme-label{display:none}}
+    *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;min-height:100vh;color:var(--text);line-height:1.6;background:radial-gradient(circle at 12% 0,color-mix(in srgb,var(--b) 22%,transparent),transparent 27rem),radial-gradient(circle at 88% 6%,color-mix(in srgb,var(--a) 18%,transparent),transparent 28rem),linear-gradient(180deg,var(--bg),var(--bg2))}a{color:inherit;text-decoration:none}.container{width:min(1300px,calc(100% - 40px));margin:auto}.skip{position:absolute;left:16px;top:-80px;background:var(--text);color:var(--bg);padding:10px 14px;border-radius:999px}.skip:focus{top:16px}header{position:sticky;top:0;z-index:10;background:color-mix(in srgb,var(--bg) 80%,transparent);backdrop-filter:blur(16px);border-bottom:1px solid var(--line)}nav{min-height:72px;display:flex;align-items:center;justify-content:space-between;gap:18px}.brand{display:flex;align-items:center;gap:12px;font-weight:850;letter-spacing:-.03em}.logo{width:42px;height:42px;border-radius:13px;box-shadow:0 12px 30px rgba(37,99,235,.18)}.links{display:flex;gap:8px;align-items:center}.links a{padding:8px 12px;border-radius:999px;color:var(--muted);font-size:.95rem}.links a:hover,.links a:focus{background:var(--card);color:var(--text);outline:0}.theme-toggle{position:relative;display:inline-flex;align-items:center;gap:9px;min-height:38px;padding:4px 8px 4px 4px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--muted);font:inherit;cursor:pointer}.toggle-track{position:relative;width:52px;height:30px;border-radius:999px;background:color-mix(in srgb,var(--a) 16%,var(--card2));border:1px solid var(--line)}.toggle-thumb{position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,var(--a),var(--b));transition:transform .18s ease;box-shadow:0 6px 18px rgba(0,0,0,.2)}html[data-theme="dark"] .toggle-thumb{transform:translateX(22px)}.btn{display:inline-flex;align-items:center;justify-content:center;min-height:46px;padding:0 18px;border-radius:999px;border:1px solid var(--line);background:var(--card);font-weight:750;transition:.16s ease}.btn:hover,.btn:focus{transform:translateY(-2px);background:var(--card2);outline:0}.btn.primary{border:0;background:linear-gradient(135deg,var(--a),var(--b));color:white}.hero{padding:88px 0 52px}.hero-grid{display:grid;grid-template-columns:1fr minmax(360px,1.4fr);gap:56px;align-items:center}.eyebrow{display:inline-flex;align-items:center;gap:8px;margin:0 0 18px;padding:7px 12px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--muted);font-size:.92rem;font-weight:750}.pulse{width:9px;height:9px;border-radius:50%;background:var(--ok);box-shadow:0 0 0 6px color-mix(in srgb,var(--ok) 18%,transparent)}h1,h2,h3,p{margin-top:0}h1{max-width:780px;margin-bottom:22px;font-size:clamp(3rem,8vw,6.4rem);line-height:.94;letter-spacing:-.075em}h2{font-size:clamp(2rem,5vw,3.1rem);line-height:1.04;letter-spacing:-.055em}h3{margin-bottom:9px;font-size:1.2rem;letter-spacing:-.025em}.grad{background:linear-gradient(135deg,var(--text),var(--a) 48%,var(--b));-webkit-background-clip:text;background-clip:text;color:transparent}.lead{max-width:700px;color:var(--muted);font-size:clamp(1.08rem,2vw,1.3rem)}.actions{display:flex;flex-wrap:wrap;gap:14px;margin-top:30px}.screenshot{overflow:hidden;border:1px solid var(--line);border-radius:28px;background:var(--card2);box-shadow:var(--shadow)}.screen-top{display:flex;justify-content:space-between;align-items:center;padding:14px 17px;border-bottom:1px solid var(--line);background:var(--card)}.dots{display:flex;gap:7px}.dot{width:11px;height:11px;border-radius:50%;background:var(--soft);opacity:.5}.screen-img{display:block;width:100%;height:auto;object-fit:cover;background:linear-gradient(135deg,color-mix(in srgb,var(--a) 14%,transparent),color-mix(in srgb,var(--b) 10%,transparent))}section{padding:76px 0}.heading{max-width:780px;margin-bottom:28px}.heading p,.card p,.download p,.step p,.callout p,.quick-card p,.modal-card p,.shortcut-group p{color:var(--muted)}.link{border-bottom:1px dotted currentColor}.card,.download,.step,.callout,.guide-panel,.quick-card,.shortcuts-panel,.modal-card,.download-option{border:1px solid var(--line);border-radius:var(--r);background:var(--card);box-shadow:0 16px 50px rgba(15,23,42,.08)}.guide{display:grid;grid-template-columns:.92fr 1.08fr;gap:22px;align-items:stretch}.guide-panel{padding:30px;background:linear-gradient(135deg,color-mix(in srgb,var(--a) 10%,var(--card)),color-mix(in srgb,var(--b) 8%,var(--card)))}.quick-grid{display:flex;flex-direction: column;gap:12px}.quick-card{padding:18px;background:var(--card2);}.quick-card strong{display:block;margin-bottom:6px}.quick-card img{display:block;width:100%;object-fit:cover;margin-top:14px;border-radius:14px;border:1px solid var(--line);background:linear-gradient(135deg,color-mix(in srgb,var(--a) 16%,transparent),color-mix(in srgb,var(--b) 12%,transparent))}.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}.card{padding:24px}.icon{display:grid;place-items:center;width:44px;height:44px;margin-bottom:18px;border-radius:16px;background:linear-gradient(135deg,var(--a),var(--b));color:#fff;font-size:1.3rem}.shortcut-layout{display:block;gap:18px;align-items:start}.shortcuts-panel,.modal-card{padding:24px}.shortcut-sections{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:18px}.shortcut-group{border:1px solid var(--line);border-radius:18px;background:var(--card2);padding:16px}.shortcut-group h3{margin-bottom:12px}.shortcut-grid{display:grid;gap:8px}.shortcut-row{display:grid;grid-template-columns:minmax(120px,170px) 1fr;gap:12px;align-items:center;padding:10px;border:1px solid var(--line);border-radius:14px;background:color-mix(in srgb,var(--bg) 55%,var(--card2))}kbd{display:inline-flex;align-items:center;justify-content:center;width:fit-content;min-width:36px;padding:5px 9px;border:1px solid var(--line);border-bottom-width:3px;border-radius:10px;background:var(--bg);color:var(--text);font:750 .86rem ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}.kbd-group{display:flex;flex-wrap:wrap;gap:6px}.modal-list{display:grid;gap:12px;margin-top:18px}.modal-card{background:var(--card2)}.modal-card h3{margin-bottom:4px}.download-layout{display:grid;grid-template-columns:.85fr 1.15fr;gap:18px;align-items:start}.download{display:grid;gap:18px;padding:28px;background:linear-gradient(135deg,color-mix(in srgb,var(--a) 12%,var(--card)),color-mix(in srgb,var(--b) 8%,var(--card)))}.selector-card{display:grid;gap:18px}.selector-group{display:grid;gap:10px}.choice-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.choice{display:grid;gap:4px;text-align:left;border:1px solid var(--line);border-radius:16px;padding:14px;background:var(--card2);color:var(--text);cursor:pointer;font:inherit}.choice[aria-pressed="true"]{outline:3px solid color-mix(in srgb,var(--a) 30%,transparent);border-color:color-mix(in srgb,var(--a) 60%,var(--line))}.choice span{color:var(--muted);font-size:.92rem}.download-option{padding:24px;background:var(--card2)}.download-summary{display:grid;gap:10px;margin:14px 0 18px}.summary-row{display:flex;justify-content:space-between;gap:14px;padding:10px 0;border-bottom:1px solid var(--line);color:var(--muted)}.summary-row strong{color:var(--text)}code{padding:2px 7px;border:1px solid var(--line);border-radius:8px;background:var(--card2);color:var(--a)}.steps{display:grid;gap:12px}.step{display:grid;grid-template-columns:42px 1fr;gap:14px;padding:18px}.num{display:grid;place-items:center;width:42px;height:42px;border-radius:15px;background:color-mix(in srgb,var(--a) 14%,var(--card2));font-weight:900}.callout{display:flex;justify-content:space-between;align-items:center;gap:24px;padding:30px}.callout p{margin-bottom:0}footer{padding:34px 0 46px;color:var(--soft);border-top:1px solid var(--line)}.foot{display:flex;justify-content:space-between;gap:18px;flex-wrap:wrap}.foot-links{display:flex;gap:14px;flex-wrap:wrap}.foot a{color:var(--muted)}@media(max-width:1000px){.hero-grid,.guide,.shortcut-layout,.download-layout{grid-template-columns:1fr}.grid3,.quick-grid{grid-template-columns:1fr}.screenshot{max-width:1000px}}@media(max-width:760px){.container{width:min(100% - 28px,1300px)}nav{padding:14px 0;min-height:auto}.links a{display:none}.actions,.callout{align-items:stretch;flex-direction:column}.btn{width:100%}.shortcut-sections,.choice-grid{grid-template-columns:1fr}.shortcut-row{grid-template-columns:1fr}.theme-label{display:none}}
     .palette-grid {
-      display: grid;
-      grid-template-columns: auto auto;
-      gap: 20px;
-    }
-  </style>
-</head>
-<body>
-  <a class="skip" href="#main">Skip to content</a>
-  <header><div class="container"><nav aria-label="Main navigation"><a class="brand" href="#top"><img class="logo" src="https://raw.githubusercontent.com/UnKabaraQuiDev/modelizer-next/main/app/icon.svg" alt="Modelizer Next logo"><span>Modelizer Next</span></a><div class="links"><a href="#new-here">New here?</a><a href="#features">Features</a><a href="#shortcuts">Shortcuts</a><a href="#download">Download</a><a href="https://github.com/UnKabaraQuiDev/modelizer-next" rel="noopener">GitHub</a><button class="theme-toggle" type="button" id="themeButton" aria-label="Toggle light and dark mode"><span class="toggle-track" aria-hidden="true"><span class="toggle-thumb"></span></span><span class="theme-label">Dark</span></button></div></nav></div></header>
-  <main id="main">
-    <section id="top" class="hero"><div class="container hero-grid"><div><h1><span class="grad">A modern, easy-to-use database modelizing tool</span></h1><p class="lead">Modelizer Next, the database modelling tool made for you. Fast, clean & intuitive.</p><p class="eyebrow"><span class="pulse" aria-hidden="true"></span> By the community, for the community.</p><div class="actions"><a class="btn primary" href="https://github.com/UnKabaraQuiDev/modelizer-next/releases/latest" rel="noopener">Download latest release</a><a class="btn" href="#new-here">New here?</a></div></div><figure class="screenshot" aria-label="Modelizer Next screenshot"><div class="screen-top"><div class="dots" aria-hidden="true"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div><span class="title">Modelizer Next</span></div><img class="screen-img" src="img/screenshot.webp" alt="Screenshot of the Modelizer Next interface"></figure></div></section>
-    <section id="new-here"><div class="container guide"><div class="guide-panel"><p class="eyebrow"><span class="pulse" aria-hidden="true"></span> New here?</p><h2>Plan your database visually, then move to implementation with confidence.</h2><p>Modelizer Next helps you draw the structure of a database before you build it. Add tables, add fields, connect related data, and switch between conceptual, logical, and physical views as your model gets more precise.</p><p>It is also built as a drop-in replacement for classic Modelizer tools such as <a href="http://modelizer.fisch.lu/" class="link" target="_BLANK">Modelizer</a> and <a href="http://modelizer.lu/" class="link" target="_BLANK">modelizer.lu</a>. You can keep the workflow you know, open existing work, and use a cleaner, more modern interface.</p><div class="actions"><a class="btn primary" href="https://github.com/UnKabaraQuiDev/modelizer-next/releases/latest" rel="noopener">Get started</a><a class="btn" href="#shortcuts">See controls</a></div></div><div class="quick-grid"><article class="quick-card"><strong>1. Create or open a model</strong><p>Start a new file or import an existing <code>.mn</code>, <code>.mod</code>, or <code>.mdlz</code> model.</p></article><article class="quick-card"><strong>2. Build the structure</strong><p>Add tables, fields, comments, and links. Use the toolbar, shortcuts, or direct mouse gestures.</p></article><article class="quick-card"><strong>3. Style your diagrams</strong><p>Use Style Palettes to keep diagrams readable and consistent. Add screenshots here to show up to four palette examples.</p><div class="palette-grid"><img src="img/palette-1.webp" alt="Example Style Palette preview"><img src="img/palette-2.webp" alt="Second Style Palette preview"></div></article><article class="quick-card"><strong>4. Switch without friction</strong><p>Open existing Modelizer work, avoid the clunky UI feeling, and keep working in a clean desktop app.</p></article></div></div></section>
-    <section id="features"><div class="container"><div class="heading"><h2>Everything you need for fast relational database design.</h2><p>Build schemas with less friction. Add tables, fields, comments, and links from a simple toolbar or keyboard shortcuts.</p></div><div class="grid3"><article class="card"><div class="icon" aria-hidden="true">▦</div><h3>Tables and fields</h3><p>Create structured models that stay easy to read while your schema grows.</p></article><article class="card"><div class="icon" aria-hidden="true">↔</div><h3>Intuitive links</h3><p>Create links with direct mouse gestures instead of digging through menus.</p></article><article class="card"><div class="icon" aria-hidden="true">◫</div><h3>Three model views</h3><p>Use conceptual, logical, and physical tabs to keep each level clear.</p></article></div></div></section>
-    <section id="shortcuts"><div class="container"><div class="heading"><p class="eyebrow"><span class="pulse" aria-hidden="true"></span> Controls, shortcuts, and gestures</p><h2>Fast actions without hunting through menus.</h2><p>The app keeps common actions close to the keyboard and mouse. Use the toolbar when you want buttons, or shortcuts when you want speed.</p></div><div class="shortcut-layout"><div class="shortcuts-panel"><h3>Keyboard shortcuts</h3><div class="shortcut-sections"><div class="shortcut-group"><h3>File loading, creating, saving</h3><div class="shortcut-grid"><div class="shortcut-row"><span class="kbd-group"><kbd>Ctrl</kbd><kbd>N</kbd></span><span>New document</span></div><div class="shortcut-row"><span class="kbd-group"><kbd>Ctrl</kbd><kbd>O</kbd></span><span>Load a model file</span></div><div class="shortcut-row"><span class="kbd-group"><kbd>Ctrl</kbd><kbd>S</kbd></span><span>Save</span></div><div class="shortcut-row"><span class="kbd-group"><kbd>Ctrl</kbd><kbd>Shift</kbd><kbd>S</kbd></span><span>Save as</span></div></div></div><div class="shortcut-group"><h3>Add table, field, comment, link</h3><div class="shortcut-grid"><div class="shortcut-row"><span class="kbd-group"><kbd>Ctrl</kbd><kbd>T</kbd></span><span>Add table</span></div><div class="shortcut-row"><span class="kbd-group"><kbd>Ctrl</kbd><kbd>F</kbd></span><span>Add field</span></div><div class="shortcut-row"><span class="kbd-group"><kbd>Shift</kbd><kbd>C</kbd></span><span>Add comment</span></div><div class="shortcut-row"><span class="kbd-group"><kbd>Ctrl</kbd><kbd>L</kbd></span><span>Add link</span></div></div></div><div class="shortcut-group"><h3>Edit, rename, delete</h3><div class="shortcut-grid"><div class="shortcut-row"><span class="kbd-group"><kbd>Ctrl</kbd><kbd>E</kbd></span><span>Edit selected item</span></div><div class="shortcut-row"><span class="kbd-group"><kbd>F2</kbd></span><span>Rename selected item</span></div><div class="shortcut-row"><span class="kbd-group"><kbd>Delete</kbd></span><span>Delete selected item</span></div><div class="shortcut-row"><span class="kbd-group"><kbd>Ctrl</kbd><kbd>D</kbd></span><span>Duplicate selected item</span></div></div></div><div class="shortcut-group"><h3>Copy, paste, undo</h3><div class="shortcut-grid"><div class="shortcut-row"><span class="kbd-group"><kbd>Ctrl</kbd><kbd>Z</kbd></span><span>Undo</span></div><div class="shortcut-row"><span class="kbd-group"><kbd>Ctrl</kbd><kbd>Shift</kbd><kbd>Z</kbd></span><span>Redo</span></div><div class="shortcut-row"><span class="kbd-group"><kbd>Ctrl</kbd><kbd>C</kbd></span><span>Copy selection</span></div><div class="shortcut-row"><span class="kbd-group"><kbd>Ctrl</kbd><kbd>X</kbd></span><span>Cut selection</span></div><div class="shortcut-row"><span class="kbd-group"><kbd>Ctrl</kbd><kbd>V</kbd></span><span>Paste selection</span></div></div></div><div class="shortcut-group"><h3>Others</h3><div class="shortcut-grid"><div class="shortcut-row"><span class="kbd-group"><kbd>Ctrl</kbd><kbd>A</kbd></span><span>Select all</span></div><div class="shortcut-row"><span class="kbd-group"><kbd>Esc</kbd></span><span>Clear selection</span></div><div class="shortcut-row"><span class="kbd-group"><kbd>↑</kbd><kbd>↓</kbd></span><span>Move through fields</span></div><div class="shortcut-row"><span class="kbd-group"><kbd>Alt</kbd><kbd>↑</kbd><kbd>Alt</kbd><kbd>↓</kbd></span><span>Move a selected field in the list</span></div></div></div></div></div>
-          </div>
-        </div>
-      </div>
-    </section>
-    <section id="download"><div class="container download-layout"><div class="download"><div><p class="eyebrow"><span class="pulse" aria-hidden="true"></span> Get Modelizer Next</p><h2>Choose the build that fits your setup.</h2><p>Select your operating system and build type. The button updates to the exact file for your choice.</p></div><div class="selector-card"><div class="selector-group"><h3>Operating system</h3><div class="choice-grid" id="osChoices">
-                <button class="choice has-icon" type="button" data-value="Windows" data-key="windows" aria-pressed="true"><img class="choice-icon" src="img/windows.svg" alt=""><span class="choice-content"><strong>Windows</strong><br><span>Best for most classroom and desktop PCs.</span></span></button>
-                <button class="choice has-icon" type="button" data-value="Linux" data-key="linux" aria-pressed="false"><img class="choice-icon" src="img/debian.svg" alt=""><span class="choice-content"><strong>Linux</strong><br><span>Debian-based installations using <code>.deb</code> packages.</span></span></button>
-              </div>
-            </div>
-
-            <div class="selector-group">
-              <h3>Build type</h3>
-              <div class="choice-grid build-list" id="buildChoices">
-                <button class="choice" type="button" data-value="Portable" data-key="portable" aria-pressed="true"><strong>Portable</strong><span>Run without a full install. Good for testing or carrying the app with you.</span></button>
-                <button class="choice" type="button" data-value="Standalone installer" data-key="standalone" aria-pressed="false"><strong>Standalone installer</strong><span>Installs the app, but does not include the updater.</span></button>
-                <button class="choice" type="button" data-value="Updater installer" data-key="updater" aria-pressed="false"><strong>Updater installer</strong><span>Recommended for normal use. Includes update support.</span></button>
-              </div></div></div></div><div class="download-option"><h3>Your selection</h3><div class="download-summary"><div class="summary-row"><span>Operating system</span><strong id="selectedOs">Windows</strong></div><div class="summary-row"><span>Build type</span><strong id="selectedBuild">Portable</strong></div><div class="summary-row">
-              <span>Download</span>
-              <strong id="selectedHint">Windows portable ZIP</strong>
-            </div>
-            <div class="summary-row" id="selectedFileRow">
-              <span>File</span>
-              <strong><span id="selectedFile">modelizer-next-app-portable-windows-???.zip</span></strong>
-            </div>
-            </div><div class="actions"><a class="btn primary" id="downloadButton" href="https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/???/modelizer-next-app-portable-windows-???.zip" rel="noopener">Download selected build</a><a class="btn" href="https://github.com/UnKabaraQuiDev/modelizer-next/issues" rel="noopener">Report an issue</a></div><div class="steps" style="margin-top:18px"><article class="step"><div class="num">1</div><div><h3>Pick your build</h3><p>Use the selector to decide between portable, standalone installer, or updater installer.</p></div></article><article class="step"><div class="num">2</div><div><h3>Download directly</h3><p>Click the direct download button. It points to the exact asset for your selected OS and build type.</p></div></article><article class="step"><div class="num">3</div><div><h3>Start modeling</h3><p>Create a new model or open an existing <code>.mn</code>, <code>.mod</code>, or <code>.mdlz</code> file.</p></div></article></div></div></div></section>
-    <section id="source"><div class="container"><div class="callout"><div><h2>Open source and ready to inspect.</h2><p>Modelizer Next is published on GitHub under the GPL-3.0 license.</p></div><a class="btn" href="https://github.com/UnKabaraQuiDev/modelizer-next" rel="noopener">Browse repository</a></div></div></section>
-  </main>
-  <footer><div class="container foot"><span>© <span id="year"></span> Modelizer Next</span><div class="foot-links"><a href="https://github.com/UnKabaraQuiDev/modelizer-next/releases/latest" rel="noopener">Releases</a><a href="https://github.com/UnKabaraQuiDev/modelizer-next/issues" rel="noopener">Issues</a><a href="https://github.com/UnKabaraQuiDev/modelizer-next/blob/main/LICENSE" rel="noopener">License</a></div></div></footer>
-  <script>
-    const root = document.documentElement;
-    const themeButton = document.getElementById('themeButton');
-    const themeLabel = themeButton.querySelector('.theme-label');
-    const savedTheme = localStorage.getItem('theme');
-
-    let downloadMetadata = null;
-
-    if (savedTheme) root.dataset.theme = savedTheme;
-
-    function syncTheme() {
-      const dark = root.dataset.theme === 'dark';
-      themeLabel.textContent = dark ? 'Light' : 'Dark';
-      document.querySelector('meta[name="theme-color"]').setAttribute('content', dark ? '#08111f' : '#f8fafc');
-    }
-
-    themeButton.addEventListener('click', () => {
-      root.dataset.theme = root.dataset.theme === 'dark' ? 'light' : 'dark';
-      localStorage.setItem('theme', root.dataset.theme);
-      syncTheme();
-    });
-
-    function selectedButton(groupId) {
-      return document.querySelector(`#${groupId} .choice[aria-pressed="true"]`);
-    }
-
-    function selectedKey(groupId) {
-      return selectedButton(groupId)?.dataset.key || "";
-    }
-
-    function setupChoices(groupId, outputId) {
-      const group = document.getElementById(groupId);
-      const output = document.getElementById(outputId);
-
-      const initial = selectedButton(groupId);
-      if (initial) {
-        output.textContent = initial.dataset.value;
-        output.dataset.key = initial.dataset.key;
-      }
-
-      group.addEventListener('click', event => {
-        const button = event.target.closest('.choice');
-        if (!button) return;
-
-        group.querySelectorAll('.choice').forEach(choice => choice.setAttribute('aria-pressed', 'false'));
-        button.setAttribute('aria-pressed', 'true');
-
-        output.textContent = button.dataset.value;
-        output.dataset.key = button.dataset.key;
-
-        updateDownloadFromMetadata();
-      });
-    }
-
-    async function loadDownloadMetadata() {
-      try {
-        const response = await fetch('metadata.json', { cache: 'no-store' });
-        if (!response.ok) throw new Error(`metadata.json returned ${response.status}`);
-        downloadMetadata = await response.json();
-      } catch (error) {
-        downloadMetadata = null;
-      }
-
-      updateDownloadFromMetadata();
-    }
-
-    function findAsset(osKey, buildKey) {
-      if (!downloadMetadata || !downloadMetadata.assets) return null;
-      return downloadMetadata.assets?.[osKey]?.[buildKey] || null;
-    }
-
-    function setDownloadUnavailable(message) {
-      const button = document.getElementById('downloadButton');
-      document.getElementById('selectedHint').textContent = message;
-      document.getElementById('selectedFile').textContent = 'Not available, please download manually below.';
-      button.href = 'https://github.com/UnKabaraQuiDev/modelizer-next/releases';
-      button.textContent = 'Open releases';
-    }
-
-    function updateDownloadFromMetadata() {
-      const osKey = selectedKey('osChoices');
-      const buildKey = selectedKey('buildChoices');
-      const asset = findAsset(osKey, buildKey);
-
-      if (!asset) {
-        setDownloadUnavailable(downloadMetadata ? 'No matching file found in metadata.json.' : 'Could not load metadata.json.');
-        return;
-      }
-
-      document.getElementById('selectedHint').textContent = asset.label || `${document.getElementById('selectedOs').textContent} ${document.getElementById('selectedBuild').textContent}`;
-      document.getElementById('selectedFile').textContent = asset.file || asset.url || 'Download file';
-      const button = document.getElementById('downloadButton');
-      button.href = asset.url;
-      button.textContent = 'Download selected build';
-    }
-
-    setupChoices('osChoices', 'selectedOs');
-    setupChoices('buildChoices', 'selectedBuild');
-
-    document.getElementById('year').textContent = new Date().getFullYear();
-
-    syncTheme();
-    loadDownloadMetadata();
-  </script>
-</body>
-</html>
+    display: grid;
+    grid-template-columns: auto auto;
+    gap: 20px;
+    }</style>
+                  </head>
+                  <body>
+                    <a class="skip" href="#main">Skip to content</a>
+                    <header>
+                      <div class="container">
+                        <nav aria-label="Main navigation">
+                          <a class="brand" href="#top">
+                            <img class="logo" src="https://raw.githubusercontent.com/UnKabaraQuiDev/modelizer-next/main/app/icon.svg" alt="Modelizer Next logo">
+                              <span>Modelizer Next</span>
+                            </a>
+                            <div class="links">
+                              <a href="#new-here">New here?</a>
+                              <a href="#features">Features</a>
+                              <a href="#shortcuts">Shortcuts</a>
+                              <a href="#download">Download</a>
+                              <a href="https://github.com/UnKabaraQuiDev/modelizer-next" rel="noopener">GitHub</a>
+                              <button class="theme-toggle" type="button" id="themeButton" aria-label="Toggle light and dark mode">
+                                <span class="toggle-track" aria-hidden="true">
+                                  <span class="toggle-thumb"></span>
+                                </span>
+                                <span class="theme-label">Dark</span>
+                              </button>
+                            </div>
+                          </nav>
+                        </div>
+                      </header>
+                      <main id="main">
+                        <section id="top" class="hero">
+                          <div class="container hero-grid">
+                            <div>
+                              <h1>
+                                <span class="grad">A modern, easy-to-use database modelizing tool</span>
+                              </h1>
+                              <p class="lead">Modelizer Next, the database modelling tool made for you. Fast, clean & intuitive.</p>
+                              <p class="eyebrow">
+                                <span class="pulse" aria-hidden="true"></span>By the community, for the community.
+                              </p>
+                              <div class="actions">
+                                <a class="btn primary" href="https://github.com/UnKabaraQuiDev/modelizer-next/releases/latest" rel="noopener">Download latest release</a>
+                                <a class="btn" href="#new-here">New here?</a>
+                              </div>
+                            </div>
+                            <figure class="screenshot" aria-label="Modelizer Next screenshot">
+                              <div class="screen-top">
+                                <div class="dots" aria-hidden="true">
+                                  <span class="dot"></span>
+                                  <span class="dot"></span>
+                                  <span class="dot"></span>
+                                </div>
+                              </div>
+                              <img class="screen-img" src="img/screenshot.webp" alt="Screenshot of the Modelizer Next interface"></figure>
+                            </div>
+                          </section>
+                          <section id="new-here">
+                            <div class="container guide">
+                              <div class="guide-panel">
+                                <p class="eyebrow">
+                                  <span class="pulse" aria-hidden="true"></span>New here?
+                                </p>
+                                <h2>Plan your database visually, then move to implementation with confidence.</h2>
+                                <p>Modelizer Next helps you draw the structure of a database before you build it. Add tables, add fields, connect related data, and switch between conceptual, logical, and physical views as your model gets more precise.</p>
+                                <p>It is also built as a drop-in replacement for classic Modelizer tools such as
+                                  <a href="http://modelizer.fisch.lu/" class="link" target="_BLANK">Modelizer</a>and
+                                  <a href="http://modelizer.lu/" class="link" target="_BLANK">modelizer.lu</a>. You can keep the workflow you know, open existing work, and use a cleaner, more modern interface.
+                                </p>
+                                <div class="actions">
+                                  <a class="btn primary" href="https://github.com/UnKabaraQuiDev/modelizer-next/releases/latest" rel="noopener">Get started</a>
+                                  <a class="btn" href="#shortcuts">See controls</a>
+                                </div>
+                              </div>
+                              <div class="quick-grid">
+                                <article class="quick-card">
+                                  <strong>1. Create or open a model</strong>
+                                  <p>Start a new file or import an existing
+                                    <code>.mn</code>,
+                                    <code>.mod</code>, or
+                                    <code>.mdlz</code>model.
+                                  </p>
+                                </article>
+                                <article class="quick-card">
+                                  <strong>2. Build the structure</strong>
+                                  <p>Add tables, fields, comments, and links. Use the toolbar, shortcuts, or direct mouse gestures.</p>
+                                </article>
+                                <article class="quick-card">
+                                  <strong>3. Style your diagrams</strong>
+                                  <p>Use Style Palettes to quickly style your elements and keep diagrams readable and consistent.</p>
+                                  <div class="palette-grid">
+                                    <img src="img/palette-1.webp" alt="Example Style Palette preview">
+                                      <img src="img/palette-2.webp" alt="Second Style Palette preview"></div>
+                                    </article>
+                                    <article class="quick-card">
+                                      <strong>4. Switch without friction</strong>
+                                      <p>Open existing Modelizer work, avoid the clunky UI feeling, and keep working in a clean desktop app.</p>
+                                    </article>
+                                  </div>
+                                </div>
+                              </section>
+                              <section id="features">
+                                <div class="container">
+                                  <div class="heading">
+                                    <h2>Everything you need for fast relational database design.</h2>
+                                    <p>Build schemas with less friction. Add tables, fields, comments, and links from a simple toolbar or keyboard shortcuts.</p>
+                                  </div>
+                                  <div class="grid3">
+                                    <article class="card">
+                                      <div class="icon" aria-hidden="true">▦</div>
+                                      <h3>Tables and fields</h3>
+                                      <p>Create structured models that stay easy to read while your schema grows.</p>
+                                    </article>
+                                    <article class="card">
+                                      <div class="icon" aria-hidden="true">↔</div>
+                                      <h3>Intuitive links</h3>
+                                      <p>Create links with direct mouse gestures instead of digging through menus.</p>
+                                    </article>
+                                    <article class="card">
+                                      <div class="icon" aria-hidden="true">◫</div>
+                                      <h3>Three model views</h3>
+                                      <p>Use conceptual, logical, and physical tabs to keep each level clear.</p>
+                                    </article>
+                                  </div>
+                                </div>
+                              </section>
+                              <section id="shortcuts">
+                                <div class="container">
+                                  <div class="heading">
+                                    <p class="eyebrow">
+                                      <span class="pulse" aria-hidden="true"></span>Controls, shortcuts, and gestures
+                                    </p>
+                                    <h2>Fast actions without hunting through menus.</h2>
+                                    <p>The app keeps common actions close to the keyboard and mouse. Use the toolbar when you want buttons, or shortcuts when you want speed.</p>
+                                  </div>
+                                  <div class="shortcut-layout">
+                                    <div class="shortcuts-panel">
+                                      <h3>Keyboard shortcuts</h3>
+                                      <div class="shortcut-sections">
+                                        <div class="shortcut-group">
+                                          <h3>File loading, creating, saving</h3>
+                                          <div class="shortcut-grid">
+                                            <div class="shortcut-row">
+                                              <span class="kbd-group">
+                                                <kbd>Ctrl</kbd>
+                                                <kbd>N</kbd>
+                                              </span>
+                                              <span>New document</span>
+                                            </div>
+                                            <div class="shortcut-row">
+                                              <span class="kbd-group">
+                                                <kbd>Ctrl</kbd>
+                                                <kbd>O</kbd>
+                                              </span>
+                                              <span>Load a model file</span>
+                                            </div>
+                                            <div class="shortcut-row">
+                                              <span class="kbd-group">
+                                                <kbd>Ctrl</kbd>
+                                                <kbd>S</kbd>
+                                              </span>
+                                              <span>Save</span>
+                                            </div>
+                                            <div class="shortcut-row">
+                                              <span class="kbd-group">
+                                                <kbd>Ctrl</kbd>
+                                                <kbd>Shift</kbd>
+                                                <kbd>S</kbd>
+                                              </span>
+                                              <span>Save as</span>
+                                            </div>
+                                          </div>
+                                        </div>
+                                        <div class="shortcut-group">
+                                          <h3>Add table, field, comment, link</h3>
+                                          <div class="shortcut-grid">
+                                            <div class="shortcut-row">
+                                              <span class="kbd-group">
+                                                <kbd>Ctrl</kbd>
+                                                <kbd>T</kbd>
+                                              </span>
+                                              <span>Add table</span>
+                                            </div>
+                                            <div class="shortcut-row">
+                                              <span class="kbd-group">
+                                                <kbd>Ctrl</kbd>
+                                                <kbd>F</kbd>
+                                              </span>
+                                              <span>Add field</span>
+                                            </div>
+                                            <div class="shortcut-row">
+                                              <span class="kbd-group">
+                                                <kbd>Shift</kbd>
+                                                <kbd>C</kbd>
+                                              </span>
+                                              <span>Add comment</span>
+                                            </div>
+                                            <div class="shortcut-row">
+                                              <span class="kbd-group">
+                                                <kbd>Ctrl</kbd>
+                                                <kbd>L</kbd>
+                                              </span>
+                                              <span>Add link</span>
+                                            </div>
+                                          </div>
+                                        </div>
+                                        <div class="shortcut-group">
+                                          <h3>Others</h3>
+                                          <div class="shortcut-grid">
+                                            <div class="shortcut-row">
+                                              <span class="kbd-group">
+                                                <kbd>Ctrl</kbd>
+                                                <kbd>A</kbd>
+                                              </span>
+                                              <span>Select all</span>
+                                            </div>
+                                            <div class="shortcut-row">
+                                              <span class="kbd-group">
+                                                <kbd>Esc</kbd>
+                                              </span>
+                                              <span>Clear selection</span>
+                                            </div>
+                                            <div class="shortcut-row">
+                                              <span class="kbd-group">
+                                                <kbd>↑</kbd>
+                                                <kbd>↓</kbd>
+                                              </span>
+                                              <span>Move through fields</span>
+                                            </div>
+                                            <div class="shortcut-row">
+                                              <span class="kbd-group">
+                                                <div>
+                                                <kbd>Alt</kbd>
+                                                <kbd>↑</kbd></div><div>
+                                                <kbd>Alt</kbd>
+                                                <kbd>↓</kbd></div>
+                                              </span>
+                                              <span>Move a selected field in the list</span>
+                                            </div>
+                                          </div>
+                                        </div>
+                                        <div class="shortcut-group">
+                                          <h3>Copy, paste, undo</h3>
+                                          <div class="shortcut-grid">
+                                            <div class="shortcut-row">
+                                              <span class="kbd-group">
+                                                <kbd>Ctrl</kbd>
+                                                <kbd>Z</kbd>
+                                              </span>
+                                              <span>Undo</span>
+                                            </div>
+                                            <div class="shortcut-row">
+                                              <span class="kbd-group">
+                                                <kbd>Ctrl</kbd>
+                                                <kbd>Shift</kbd>
+                                                <kbd>Z</kbd>
+                                              </span>
+                                              <span>Redo</span>
+                                            </div>
+                                            <div class="shortcut-row">
+                                              <span class="kbd-group">
+                                                <kbd>Ctrl</kbd>
+                                                <kbd>C</kbd>
+                                              </span>
+                                              <span>Copy selection</span>
+                                            </div>
+                                            <div class="shortcut-row">
+                                              <span class="kbd-group">
+                                                <kbd>Ctrl</kbd>
+                                                <kbd>X</kbd>
+                                              </span>
+                                              <span>Cut selection</span>
+                                            </div>
+                                            <div class="shortcut-row">
+                                              <span class="kbd-group">
+                                                <kbd>Ctrl</kbd>
+                                                <kbd>V</kbd>
+                                              </span>
+                                              <span>Paste selection</span>
+                                            </div>
+                                          </div>
+                                        </div>
+                                        <div class="shortcut-group">
+                                          <h3>Edit, rename, delete</h3>
+                                          <div class="shortcut-grid">
+                                            <div class="shortcut-row">
+                                              <span class="kbd-group">
+                                                <div>
+                                                <kbd>Ctrl</kbd>
+                                                <kbd>E</kbd></div><div>
+                                                <span>Double left click</span></div>
+                                              </span>
+                                              <span>Edit selected item</span>
+                                            </div>
+                                            <div class="shortcut-row">
+                                              <span class="kbd-group">
+                                                <kbd>F2</kbd>
+                                              </span>
+                                              <span>Rename selected item</span>
+                                            </div>
+                                            <div class="shortcut-row">
+                                              <span class="kbd-group">
+                                                <div>
+                                                <kbd>Delete</kbd></div>
+                                                <div>
+                                                <kbd>Shift</kbd>
+                                                <kbd>X</kbd></div>
+                                              </span>
+                                              <span>Delete selected item</span>
+                                            </div>
+                                            <div class="shortcut-row">
+                                              <span class="kbd-group">
+                                                <kbd>Ctrl</kbd>
+                                                <kbd>D</kbd>
+                                              </span>
+                                              <span>Duplicate selected elements</span>
+                                            </div>
+                                          </div>
+                                        </div>
+                                        <div class="shortcut-group">
+                                          <h3>Gestures</h3>
+                                          <div class="shortcut-grid">
+                                            <div class="shortcut-row">
+                                              <span class="kbd-group">
+                                                <div>
+                                                Drag right click</div>
+                                              </span>
+                                              <span><strong>Connect elements</strong>, creates a link between classes. Attaches a comment to another element.</span>
+                                            </div>
+                                            <div class="shortcut-row">
+                                              <span class="kbd-group">
+                                                Drag middle click
+                                              </span>
+                                              <span><strong>Pan the view</strong></span>
+                                            </div>
+                                            <div class="shortcut-row">
+                                              <span class="kbd-group">
+                                                Scroll wheel
+                                              </span>
+                                              <span><strong>Zoom in/out</strong></span>
+                                            </div>
+                                            <div class="shortcut-row">
+                                              <span class="kbd-group">
+                                                Drag left click
+                                              </span>
+                                              <span><strong>Move selected elements</strong></span>
+                                            </div>
+                                            <div class="shortcut-row">
+                                              <span class="kbd-group">
+                                                Double left click
+                                              </span>
+                                              <span><strong>Edit element</strong></span>
+                                            </div>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </section>
+                            <section id="download">
+                              <div class="container download-layout">
+                                <div class="download">
+                                  <div>
+                                    <p class="eyebrow">
+                                      <span class="pulse" aria-hidden="true"></span>Get Modelizer Next
+                                    </p>
+                                    <h2>Choose the build that fits your setup.</h2>
+                                    <p>Select your operating system and build type. The button updates to the exact file for your choice.</p>
+                                  </div>
+                                  <div class="selector-card">
+                                    <div class="selector-group">
+                                      <h3>Operating system</h3>
+                                      <div class="choice-grid" id="osChoices">
+                                        <button class="choice has-icon" type="button" data-value="Windows" data-key="windows" aria-pressed="true">
+                                          <img class="choice-icon" src="img/windows.svg" alt="">
+                                            <span class="choice-content">
+                                              <strong>Windows</strong>
+                                              <br>
+                                                <span>Best for most classroom and desktop PCs.</span>
+                                              </span>
+                                            </button>
+                                            <button class="choice has-icon" type="button" data-value="Linux" data-key="linux" aria-pressed="false">
+                                              <img class="choice-icon" src="img/debian.svg" alt="">
+                                                <span class="choice-content">
+                                                  <strong>Linux</strong>
+                                                  <br>
+                                                    <span>Debian-based installations using
+                                                      <code>.deb</code>packages.
+                                                    </span>
+                                                  </span>
+                                                </button>
+                                              </div>
+                                            </div>
+                                            <div class="selector-group">
+                                              <h3>Build type</h3>
+                                              <div class="choice-grid build-list" id="buildChoices">
+                                                <button class="choice" type="button" data-value="Portable" data-key="portable" aria-pressed="true">
+                                                  <strong>Portable</strong>
+                                                  <span>Run without a full install. Good for testing or carrying the app with you.</span>
+                                                </button>
+                                                <button class="choice" type="button" data-value="Standalone installer" data-key="standalone" aria-pressed="false">
+                                                  <strong>Standalone installer</strong>
+                                                  <span>Installs the app, but does not include the updater.</span>
+                                                </button>
+                                                <button class="choice" type="button" data-value="Updater installer" data-key="updater" aria-pressed="false">
+                                                  <strong>Updater installer</strong>
+                                                  <span>Recommended for normal use. Includes update support.</span>
+                                                </button>
+                                              </div>
+                                            </div>
+                                          </div>
+                                        </div>
+                                        <div class="download-option">
+                                          <h3>Your selection</h3>
+                                          <div class="download-summary">
+                                            <div class="summary-row">
+                                              <span>Operating system</span>
+                                              <strong id="selectedOs">Windows</strong>
+                                            </div>
+                                            <div class="summary-row">
+                                              <span>Build type</span>
+                                              <strong id="selectedBuild">Portable</strong>
+                                            </div>
+                                            <div class="summary-row">
+                                              <span>Download</span>
+                                              <strong id="selectedHint">Windows portable ZIP</strong>
+                                            </div>
+                                            <div class="summary-row" id="selectedFileRow">
+                                              <span>File</span>
+                                              <strong>
+                                                <span id="selectedFile">modelizer-next-app-portable-windows-???.zip</span>
+                                              </strong>
+                                            </div>
+                                          </div>
+                                          <div class="actions">
+                                            <a class="btn primary" id="downloadButton" href="https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/???/modelizer-next-app-portable-windows-???.zip" rel="noopener">Download selected build</a>
+                                            <a class="btn" href="https://github.com/UnKabaraQuiDev/modelizer-next/issues" rel="noopener">Report an issue</a>
+                                          </div>
+                                          <div class="steps" style="margin-top:18px">
+                                            <article class="step">
+                                              <div class="num">1</div>
+                                              <div>
+                                                <h3>Pick your build</h3>
+                                                <p>Use the selector to decide between portable, standalone installer, or updater installer.</p>
+                                              </div>
+                                            </article>
+                                            <article class="step">
+                                              <div class="num">2</div>
+                                              <div>
+                                                <h3>Download directly</h3>
+                                                <p>Click the direct download button. It points to the exact asset for your selected OS and build type.</p>
+                                              </div>
+                                            </article>
+                                            <article class="step">
+                                              <div class="num">3</div>
+                                              <div>
+                                                <h3>Start modeling</h3>
+                                                <p>Create a new model or open an existing
+                                                  <code>.mn</code>,
+                                                  <code>.mod</code>, or
+                                                  <code>.mdlz</code>file.
+                                                </p>
+                                              </div>
+                                            </article>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </section>
+                                    <section id="source">
+                                      <div class="container">
+                                        <div class="callout">
+                                          <div>
+                                            <h2>Open source and ready to inspect.</h2>
+                                            <p>Modelizer Next is published on GitHub under the GPL-3.0 license.</p>
+                                          </div>
+                                          <a class="btn" href="https://github.com/UnKabaraQuiDev/modelizer-next" rel="noopener">Browse repository</a>
+                                        </div>
+                                      </div>
+                                    </section>
+                                  </main>
+                                  <footer>
+                                    <div class="container foot">
+                                      <span>©
+                                        <span id="year"></span>Modelizer Next
+                                      </span>
+                                      <div class="foot-links">
+                                        <a href="https://github.com/UnKabaraQuiDev/modelizer-next/releases/latest" rel="noopener">Releases</a>
+                                        <a href="https://github.com/UnKabaraQuiDev/modelizer-next/issues" rel="noopener">Issues</a>
+                                        <a href="https://github.com/UnKabaraQuiDev/modelizer-next/blob/main/LICENSE" rel="noopener">License</a>
+                                      </div>
+                                    </div>
+                                  </footer>
+                                  <script>const root = document.documentElement;
+const themeButton = document.getElementById('themeButton');
+const themeLabel = themeButton.querySelector('.theme-label');
+const savedTheme = localStorage.getItem('theme');
+let downloadMetadata = null;
+if (savedTheme) root.dataset.theme = savedTheme;
+function syncTheme() {
+const dark = root.dataset.theme === 'dark';
+themeLabel.textContent = dark ? 'Light' : 'Dark';
+document.querySelector('meta[name="theme-color"]').setAttribute('content', dark ? '#08111f' : '#f8fafc');
+}
+themeButton.addEventListener('click', () => {
+root.dataset.theme = root.dataset.theme === 'dark' ? 'light' : 'dark';
+localStorage.setItem('theme', root.dataset.theme);
+syncTheme();
+});
+function selectedButton(groupId) {
+return document.querySelector(`#${groupId} .choice[aria-pressed="true"]`);
+}
+function selectedKey(groupId) {
+return selectedButton(groupId)?.dataset.key || "";
+}
+function setupChoices(groupId, outputId) {
+const group = document.getElementById(groupId);
+const output = document.getElementById(outputId);
+const initial = selectedButton(groupId);
+if (initial) {
+output.textContent = initial.dataset.value;
+output.dataset.key = initial.dataset.key;
+}
+group.addEventListener('click', event => {
+const button = event.target.closest('.choice');
+if (!button) return;
+group.querySelectorAll('.choice').forEach(choice => choice.setAttribute('aria-pressed', 'false'));
+button.setAttribute('aria-pressed', 'true');
+output.textContent = button.dataset.value;
+output.dataset.key = button.dataset.key;
+updateDownloadFromMetadata();
+});
+}
+async function loadDownloadMetadata() {
+try {
+const response = await fetch('metadata.json', { cache: 'no-store' });
+if (!response.ok) throw new Error(`metadata.json returned ${response.status}`);
+downloadMetadata = await response.json();
+} catch (error) {
+downloadMetadata = null;
+}
+updateDownloadFromMetadata();
+}
+function findAsset(osKey, buildKey) {
+if (!downloadMetadata || !downloadMetadata.assets) return null;
+return downloadMetadata.assets?.[osKey]?.[buildKey] || null;
+}
+function setDownloadUnavailable(message) {
+const button = document.getElementById('downloadButton');
+document.getElementById('selectedHint').textContent = message;
+document.getElementById('selectedFile').textContent = 'Not available, please download manually below.';
+button.href = 'https://github.com/UnKabaraQuiDev/modelizer-next/releases';
+button.textContent = 'Open releases';
+}
+function updateDownloadFromMetadata() {
+const osKey = selectedKey('osChoices');
+const buildKey = selectedKey('buildChoices');
+const asset = findAsset(osKey, buildKey);
+if (!asset) {
+setDownloadUnavailable(downloadMetadata ? 'No matching file found in metadata.json.' : 'Could not load metadata.json.');
+return;
+}
+document.getElementById('selectedHint').textContent = asset.label || `${document.getElementById('selectedOs').textContent} ${document.getElementById('selectedBuild').textContent}`;
+document.getElementById('selectedFile').textContent = asset.file || asset.url || 'Download file';
+const button = document.getElementById('downloadButton');
+button.href = asset.url;
+button.textContent = 'Download selected build';
+}
+setupChoices('osChoices', 'selectedOs');
+setupChoices('buildChoices', 'selectedBuild');
+document.getElementById('year').textContent = new Date().getFullYear();
+syncTheme();
+loadDownloadMetadata();</script>
+                                </body>
+                              </html>
