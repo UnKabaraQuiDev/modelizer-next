@@ -54,7 +54,6 @@ public final class FieldEditorDialog {
 		fieldModel.setNotNull(notNullBox.isSelected());
 		fieldModel.getStyle().setTextColor(textColorButton.getSelectedColor());
 		fieldModel.getStyle().setBackgroundColor(backgroundColorButton.getSelectedColor());
-		System.err.println(typeField.getSelectedItem());
 		fieldModel.setType(typeField.getSelectedItem() == null ? null : typeField.getSelectedItem().toString().trim());
 	}
 
