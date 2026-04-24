@@ -1,55 +1,48 @@
 {
   "version": 1,
-  "generatedAt": "2026-04-24",
   "repository": "UnKabaraQuiDev/modelizer-next",
+  "releaseTag": "0.2-RELEASE-163803",
   "assets": {
     "windows": {
       "portable": {
         "label": "Windows portable ZIP",
-        "tag": "0.1-RELEASE-159546",
-        "file": "modelizer-next-app-portable-windows-0.1-RELEASE-159546.zip",
-        "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/0.1-RELEASE-159546/modelizer-next-app-portable-windows-0.1-RELEASE-159546.zip"
+        "tag": "0.2-RELEASE-163803",
+        "file": "modelizer-next-app-portable-windows-0.2-RELEASE-163803.zip",
+        "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/0.2-RELEASE-163803/modelizer-next-app-portable-windows-0.2-RELEASE-163803.zip"
       },
       "standalone": {
         "label": "Windows standalone installer",
-        "tag": "0.1-RELEASE-159546",
-        "file": "modelizer-next-app-standalone-windows-0.1-RELEASE-159546.exe",
-        "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/0.1-RELEASE-159546/modelizer-next-app-standalone-windows-0.1-RELEASE-159546.exe"
+        "tag": "0.2-RELEASE-163803",
+        "file": "modelizer-next-app-standalone-windows-0.2-RELEASE-163803.exe",
+        "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/0.2-RELEASE-163803/modelizer-next-app-standalone-windows-0.2-RELEASE-163803.exe"
       },
       "updater": {
         "label": "Windows updater installer",
-        "tag": "0.1-RELEASE-159546",
-        "file": "modelizer-next-bootstrap-windows-0.1-RELEASE-159546.exe",
-        "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/0.1-RELEASE-159546/modelizer-next-bootstrap-windows-0.1-RELEASE-159546.exe"
+        "tag": "0.2-RELEASE-163803",
+        "file": "modelizer-next-bootstrap-windows-0.2-RELEASE-163803.exe",
+        "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/0.2-RELEASE-163803/modelizer-next-bootstrap-windows-0.2-RELEASE-163803.exe"
       }
     },
     "linux": {
       "portable": {
         "label": "Linux portable ZIP",
-        "tag": "0.1-RELEASE-159546",
-        "file": "modelizer-next-app-portable-linux-0.1-RELEASE-159546.zip",
-        "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/0.1-RELEASE-159546/modelizer-next-app-portable-linux-0.1-RELEASE-159546.zip"
+        "tag": "0.2-RELEASE-163803",
+        "file": "modelizer-next-app-portable-linux-0.2-RELEASE-163803.zip",
+        "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/0.2-RELEASE-163803/modelizer-next-app-portable-linux-0.2-RELEASE-163803.zip"
       },
       "standalone": {
         "label": "Linux standalone .deb",
-        "tag": "0.1-RELEASE-159546",
-        "file": "modelizer-next-app-standalone-linux-0.1-RELEASE-159546.deb",
-        "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/0.1-RELEASE-159546/modelizer-next-app-standalone-linux-0.1-RELEASE-159546.deb"
+        "tag": "0.2-RELEASE-163803",
+        "file": "modelizer-next-app-standalone-linux-0.2-RELEASE-163803.deb",
+        "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/0.2-RELEASE-163803/modelizer-next-app-standalone-linux-0.2-RELEASE-163803.deb"
       },
       "updater": {
         "label": "Linux updater .deb",
-        "tag": "0.1-RELEASE-159546",
-        "file": "modelizer-next-bootstrap-linux-0.1-RELEASE-159546.deb",
-        "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/0.1-RELEASE-159546/modelizer-next-bootstrap-linux-0.1-RELEASE-159546.deb"
+        "tag": "0.2-RELEASE-163803",
+        "file": "modelizer-next-bootstrap-linux-0.2-RELEASE-163803.deb",
+        "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/0.2-RELEASE-163803/modelizer-next-bootstrap-linux-0.2-RELEASE-163803.deb"
       }
     },
-    "other": {
-      "updater": {
-        "label": "Cross-platform bootstrap JAR",
-        "tag": "0.1-RELEASE-159546",
-        "file": "modelizer-next-bootstrap-0.1-RELEASE-159546.jar",
-        "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/0.1-RELEASE-159546/modelizer-next-bootstrap-0.1-RELEASE-159546.jar"
-      }
-    }
+    "other": {}
   }
 }
