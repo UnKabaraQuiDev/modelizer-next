@@ -6,9 +6,9 @@
     "windows": {
       "portable": {
         "label": "Windows portable ZIP",
-        "tag": "0.2-NIGHTLY-163248",
-        "file": "modelizer-next-app-portable-windows-0.2-NIGHTLY-163248.zip",
-        "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/0.2-NIGHTLY-163248/modelizer-next-app-portable-windows-0.2-NIGHTLY-163248.zip"
+        "tag": "0.1-RELEASE-159546",
+        "file": "modelizer-next-app-portable-windows-0.1-RELEASE-159546.zip",
+        "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/0.1-RELEASE-159546/modelizer-next-app-portable-windows-0.1-RELEASE-159546.zip"
       },
       "standalone": {
         "label": "Windows standalone installer",
@@ -26,9 +26,9 @@
     "linux": {
       "portable": {
         "label": "Linux portable ZIP",
-        "tag": "0.2-NIGHTLY-163248",
-        "file": "modelizer-next-app-portable-linux-0.2-NIGHTLY-163248.zip",
-        "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/0.2-NIGHTLY-163248/modelizer-next-app-portable-linux-0.2-NIGHTLY-163248.zip"
+        "tag": "0.1-RELEASE-159546",
+        "file": "modelizer-next-app-portable-linux-0.1-RELEASE-159546.zip",
+        "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/0.1-RELEASE-159546/modelizer-next-app-portable-linux-0.1-RELEASE-159546.zip"
       },
       "standalone": {
         "label": "Linux standalone .deb",
