@@ -228,6 +228,8 @@ jobs:
 
       - name: Sync script files and .gitignore from main into registry
         run: |
+          set -euo pipefail
+          
           git fetch origin main registry
           git checkout -B registry origin/registry
 
@@ -242,6 +244,8 @@ jobs:
 
       - name: Prepare release assets
         run: |
+          set -euo pipefail
+
           mkdir -p release-assets
           cp collected/release-shared/* release-assets/
           cp collected/release-linux-bootstrap/* release-assets/
@@ -265,6 +269,8 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
+          set -euo pipefail
+
           REPOSITORY="${{ github.repository }}" RELEASE_TAG="$RELEASE_TAG" \
             python3 "$GITHUB_WORKSPACE/script/generate-assets-json.py" release-assets > assets.json
 
@@ -287,3 +293,81 @@ jobs:
           git add -A script .gitignore registry/release.json registry/snapshot.json registry/nightly.json registry/versions.json
           git commit -m "[bot] Sync scripts from main and update release registry to $VERSION" || exit 0
           git push origin HEAD:registry
+
+      - name: Update pages download metadata
+        env:
+          REPOSITORY: ${{ github.repository }}
+          RELEASE_TAG: ${{ env.RELEASE_TAG }}
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
+
+          rm -rf pages-worktree
+          git fetch origin pages
+          git worktree add pages-worktree origin/pages
+
+          python3 <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          repository = os.environ["REPOSITORY"]
+          release_tag = os.environ["RELEASE_TAG"]
+
+          base_url = f"https://github.com/{repository}/releases/download/{release_tag}"
+          assets_dir = Path("release-assets")
+
+          metadata = {
+              "version": 1,
+              "repository": repository,
+              "releaseTag": release_tag,
+              "assets": {
+                  "windows": {},
+                  "linux": {},
+                  "other": {}
+              }
+          }
+
+          def add_asset(os_name, build_type, file_path, label):
+              metadata["assets"][os_name][build_type] = {
+                  "label": label,
+                  "tag": release_tag,
+                  "file": file_path.name,
+                  "url": f"{base_url}/{file_path.name}"
+              }
+
+          for file_path in sorted(assets_dir.iterdir()):
+              name = file_path.name.lower()
+
+              if "portable-windows" in name and name.endswith(".zip"):
+                  add_asset("windows", "portable", file_path, "Windows portable ZIP")
+
+              elif "portable-linux" in name and name.endswith(".zip"):
+                  add_asset("linux", "portable", file_path, "Linux portable ZIP")
+
+              elif "app-standalone-windows" in name and name.endswith(".exe"):
+                  add_asset("windows", "standalone", file_path, "Windows standalone installer")
+
+              elif "app-standalone-linux" in name and name.endswith(".deb"):
+                  add_asset("linux", "standalone", file_path, "Linux standalone .deb")
+
+              elif "bootstrap-windows" in name and name.endswith(".exe"):
+                  add_asset("windows", "updater", file_path, "Windows updater installer")
+
+              elif "bootstrap-linux" in name and name.endswith(".deb"):
+                  add_asset("linux", "updater", file_path, "Linux updater .deb")
+
+              elif "bootstrap" in name and name.endswith(".jar"):
+                  add_asset("other", "updater", file_path, "Cross-platform bootstrap JAR")
+
+          output = Path("pages-worktree/metadata.json")
+          output.write_text(json.dumps(metadata, indent=2) + "\n", encoding="utf-8")
+          PY
+
+          cd pages-worktree
+          git add metadata.json
+          git commit -m "[bot] Update pages download metadata to $RELEASE_TAG" || exit 0
+          git push origin HEAD:pages
