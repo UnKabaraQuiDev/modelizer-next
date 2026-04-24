@@ -258,7 +258,7 @@ run_platform_build() {
     portable)
       echo "Starting ${platform} ${channel} portable build"
       mvn_args=(-pl modelizer-next-app -am)
-      extra_profiles="portable,portable-${platform},native-${platform}"
+      extra_profiles="standaline,portable,portable-${platform},native-${platform}"
       ;;
 
     installer|normal)

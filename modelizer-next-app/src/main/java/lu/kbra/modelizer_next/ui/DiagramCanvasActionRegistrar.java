@@ -15,7 +15,8 @@ final class DiagramCanvasActionRegistrar {
 
 	record DiagramCanvasActions(Runnable renameSelection, IntConsumer moveFieldSelection, IntConsumer moveSelectedFieldInList,
 			Runnable addTable, Runnable addField, Runnable addComment, Runnable deleteSelection, Runnable duplicateSelection,
-			Runnable clearSelection, Runnable addLink, Runnable selectAll, Runnable edit) {
+			Runnable clearSelection, Runnable addLink, Runnable selectAll, Runnable edit, Runnable copySelection, Runnable cutSelection,
+			Runnable pasteSelection) {
 	}
 
 	private static void bind(
@@ -71,7 +72,7 @@ final class DiagramCanvasActionRegistrar {
 				actions.addField());
 		DiagramCanvasActionRegistrar.bind(inputMap,
 				actionMap,
-				KeyStroke.getKeyStroke(KeyEvent.VK_W, InputEvent.CTRL_DOWN_MASK),
+				KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.SHIFT_DOWN_MASK),
 				"addComment",
 				actions.addComment());
 		DiagramCanvasActionRegistrar
@@ -97,6 +98,21 @@ final class DiagramCanvasActionRegistrar {
 				KeyStroke.getKeyStroke(KeyEvent.VK_A, InputEvent.CTRL_DOWN_MASK),
 				"selectAll",
 				actions.selectAll());
+		DiagramCanvasActionRegistrar.bind(inputMap,
+				actionMap,
+				KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK),
+				"copySelection",
+				actions.copySelection());
+		DiagramCanvasActionRegistrar.bind(inputMap,
+				actionMap,
+				KeyStroke.getKeyStroke(KeyEvent.VK_X, InputEvent.CTRL_DOWN_MASK),
+				"cutSelection",
+				actions.cutSelection());
+		DiagramCanvasActionRegistrar.bind(inputMap,
+				actionMap,
+				KeyStroke.getKeyStroke(KeyEvent.VK_V, InputEvent.CTRL_DOWN_MASK),
+				"pasteSelection",
+				actions.pasteSelection());
 	}
 
 	private DiagramCanvasActionRegistrar() {

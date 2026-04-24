@@ -2489,7 +2489,23 @@ public class DiagramCanvas extends JPanel {
 						this::clearSelection,
 						this::addLink,
 						this::selectAll,
-						this::editSelected));
+						this::editSelected,
+						this::copySelection,
+						this::cutSelection,
+						this::pasteSelection));
+	}
+
+	private void copySelection() {
+
+	}
+
+	private void cutSelection() {
+		copySelection();
+		deleteSelection();
+	}
+
+	private void pasteSelection() {
+
 	}
 
 	private void invalidateConceptualAnchorCache() {
