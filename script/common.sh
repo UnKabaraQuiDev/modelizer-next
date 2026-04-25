@@ -326,7 +326,6 @@ run_platform_build() {
     installer|normal)
       echo "Starting ${platform} ${channel} bootstrap installer build"
       extra_profiles="native-${platform}"
-      mvn_args=""
       ;;
 
     *)
