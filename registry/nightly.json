@@ -9,7 +9,7 @@
     "unknown"
   ],
   "notes": "Latest nightly build.",
-  "updatedAt": "2026-04-25T18:46:56Z",
+  "updatedAt": "2026-04-25T19:21:12Z",
   "entries": [
     {
       "version": "4-NIGHTLY-136",
@@ -21,7 +21,7 @@
         "unknown"
       ],
       "notes": "Latest nightly build.",
-      "publishedAt": "2026-04-25T18:46:56Z",
+      "publishedAt": "2026-04-25T19:21:12Z",
       "assets": [
         {
           "name": "modelizer-next-app-4-NIGHTLY-136.jar",
