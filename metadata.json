@@ -55,7 +55,14 @@
         "tag": "3-RELEASE-129",
         "file": "modelizer-next-app-standalone-macos-3-RELEASE-129.dmg",
         "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/3-RELEASE-129/modelizer-next-app-standalone-macos-3-RELEASE-129.dmg"
+      },
+      "updater": {
+        "label": "MacOS Updater .dmg",
+        "tag": "3-RELEASE-129",
+        "file": "modelizer-next-bootstrap-macos-3-RELEASE-129.dmg",
+        "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/3-RELEASE-129/modelizer-next-bootstrap-macos-3-RELEASE-129.dmg"
       }
+
     }
   }
 }
