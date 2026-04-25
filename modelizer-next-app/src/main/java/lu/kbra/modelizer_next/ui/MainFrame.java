@@ -586,7 +586,7 @@ public class MainFrame extends JFrame {
 
 	private JButton createToolbarButton(final String icon, final String description, final String actionKey) {
 		final JButton button = new JButton();
-		final ImageIcon rawIcon = new ImageIcon(PCUtils.readPackagedBytesFile("/icons/" + icon));
+		final ImageIcon rawIcon = new ImageIcon(PCUtils.readPackagedBytesFile(this.getClass(), "/icons/" + icon));
 		final Image scaled = rawIcon.getImage().getScaledInstance(34, 34, Image.SCALE_SMOOTH);
 		button.setIcon(new ImageIcon(scaled));
 		button.putClientProperty("baseText", description);
