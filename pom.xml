@@ -17,7 +17,7 @@
 	</modules>
 
 	<properties>
-		<revision>0.3-SNAPSHOT</revision>
+		<revision>3-SNAPSHOT</revision>
 
 		<java.version>21</java.version>
 		<maven.compiler.source>${java.version}</maven.compiler.source>
@@ -25,7 +25,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
 		<distributor>Manual build</distributor>
-		<appVersion>0.1</appVersion>
+		<appVersion>3</appVersion>
 
 		<modelizer.repositoryUrl>
 			https://github.com/UnKabaraQuiDev/modelizer-next</modelizer.repositoryUrl>
