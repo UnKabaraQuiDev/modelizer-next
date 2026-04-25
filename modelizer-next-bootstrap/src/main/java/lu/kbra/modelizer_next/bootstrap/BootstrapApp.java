@@ -2,7 +2,6 @@ package lu.kbra.modelizer_next.bootstrap;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -29,9 +28,9 @@ public final class BootstrapApp {
 	public static BootstrapConfig BOOTSTRAP_CONFIG;
 
 	public static void ensureDirectories() throws IOException {
-		Files.createDirectories(BootstrapApp.getHomeDirectory().toPath());
-		Files.createDirectories(BootstrapApp.getApplicationsDirectory().toPath());
-		Files.createDirectories(BootstrapApp.getTempDirectory().toPath());
+		BootstrapApp.getHomeDirectory().mkdirs();
+		BootstrapApp.getApplicationsDirectory().mkdirs();
+		BootstrapApp.getTempDirectory().mkdirs();
 	}
 
 	public static File getApplicationsDirectory() {
@@ -43,19 +42,24 @@ public final class BootstrapApp {
 	}
 
 	public static File getHomeDirectory() {
-		final String override = System.getProperty(BootstrapApp.APP_DIR_PROPERTY);
+		final String override = System.getProperty(APP_DIR_PROPERTY);
 		if (override != null && !override.isBlank()) {
 			return new File(override);
 		}
 
 		final String os = System.getProperty("os.name", "").toLowerCase();
+		final String home = System.getProperty("user.home");
+
 		if (os.contains("win")) {
 			final String appData = System.getenv("APPDATA");
 			if (appData != null && !appData.isBlank()) {
-				return new File(appData, BootstrapApp.APP_FOLDER_NAME);
+				return new File(appData, APP_FOLDER_NAME);
 			}
+		} else if (os.contains("mac")) {
+			return new File(home, "Library/Application Support/" + APP_FOLDER_NAME);
 		}
-		return new File(System.getProperty("user.home"), "." + BootstrapApp.APP_FOLDER_NAME);
+
+		return new File(home, "." + APP_FOLDER_NAME);
 	}
 
 	public static File getTempDirectory() {
@@ -67,17 +71,16 @@ public final class BootstrapApp {
 
 		BootstrapApp.NAME = BootstrapApp.JSON.path("name").asText("Modelizer Next Bootstrap");
 		BootstrapApp.VERSION = BootstrapApp.JSON.path("version").asText("0.0.0");
-		BootstrapApp.REPOSITORY_URL = BootstrapApp.JSON.path("repository").asText("https://github.com/UnKabaraQuiDev/modelizer-next");
-		BootstrapApp.RELEASES_URL = BootstrapApp.JSON.path("releases").asText(BootstrapApp.REPOSITORY_URL + "/releases");
-		BootstrapApp.UPDATES_MANIFEST_URL = BootstrapApp.JSON.path("updatesManifest")
-				.asText("https://raw.githubusercontent.com/UnKabaraQuiDev/modelizer-next/refs/heads/registry/registry/versions.json");
+		BootstrapApp.REPOSITORY_URL = BootstrapApp.JSON.path("repository")
+				.asText("https://github.com/UnKabaraQuiDev/modelizer-next");
+		BootstrapApp.RELEASES_URL = BootstrapApp.JSON.path("releases")
+				.asText(BootstrapApp.REPOSITORY_URL + "/releases");
+		BootstrapApp.UPDATES_MANIFEST_URL = BootstrapApp.JSON.path("updatesManifest").asText(
+				"https://raw.githubusercontent.com/UnKabaraQuiDev/modelizer-next/refs/heads/registry/registry/versions.json");
 		BootstrapApp.DISTRIBUTOR = BootstrapApp.JSON.path("distributor").asText();
 
-		BootstrapApp.BOOTSTRAP_CONFIG = new BootstrapConfig(BootstrapApp.NAME,
-				BootstrapApp.VERSION,
-				BootstrapApp.REPOSITORY_URL,
-				BootstrapApp.RELEASES_URL,
-				BootstrapApp.UPDATES_MANIFEST_URL,
+		BootstrapApp.BOOTSTRAP_CONFIG = new BootstrapConfig(BootstrapApp.NAME, BootstrapApp.VERSION,
+				BootstrapApp.REPOSITORY_URL, BootstrapApp.RELEASES_URL, BootstrapApp.UPDATES_MANIFEST_URL,
 				BootstrapApp.DISTRIBUTOR);
 
 		BootstrapApp.ensureDirectories();
@@ -102,7 +105,8 @@ public final class BootstrapApp {
 	public static void saveConfiguration(final BootstrapConfiguration configuration) {
 		try {
 			BootstrapApp.ensureDirectories();
-			BootstrapApp.MAPPER.writerWithDefaultPrettyPrinter().writeValue(BootstrapApp.getBootstrapConfigFile(), configuration);
+			BootstrapApp.MAPPER.writerWithDefaultPrettyPrinter().writeValue(BootstrapApp.getBootstrapConfigFile(),
+					configuration);
 		} catch (final IOException ex) {
 			ex.printStackTrace();
 		}

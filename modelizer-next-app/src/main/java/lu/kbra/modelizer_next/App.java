@@ -44,14 +44,18 @@ public class App {
 		}
 
 		final String os = System.getProperty("os.name", "").toLowerCase();
+		final String home = System.getProperty("user.home");
+
 		if (os.contains("win")) {
 			final String appData = System.getenv("APPDATA");
 			if (appData != null && !appData.isBlank()) {
 				return new File(appData, App.APP_FOLDER_NAME);
 			}
+		} else if (os.contains("mac")) {
+			return new File(home, "Library/Application Support/" + App.APP_FOLDER_NAME);
 		}
 
-		return new File(System.getProperty("user.home"), "." + App.APP_FOLDER_NAME);
+		return new File(home, "." + App.APP_FOLDER_NAME);
 	}
 
 	public static File getConfigFile() {
