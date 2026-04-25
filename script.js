@@ -21,7 +21,7 @@ function selectedButton(groupId) {
 }
 
 function selectedKey(groupId) {
-  return selectedButton(groupId) ? .dataset.key || "";
+  return selectedButton(groupId)?.dataset.key || "";
 }
 
 function setupChoices(groupId, outputId) {
@@ -57,7 +57,7 @@ async function loadDownloadMetadata() {
 
 function findAsset(osKey, buildKey) {
   if (!downloadMetadata || !downloadMetadata.assets) return null;
-  return downloadMetadata.assets ? .[osKey] ? .[buildKey] || null;
+  return downloadMetadata.assets?.[osKey]?.[buildKey] || null;
 }
 
 function setDownloadUnavailable(message) {
