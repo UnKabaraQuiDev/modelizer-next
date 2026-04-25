@@ -1,4 +1,4 @@
-name: Nightly Build
+name: Nightly Shared Build
 
 on:
   workflow_dispatch:
@@ -47,7 +47,7 @@ jobs:
           emit_github_outputs "$GITHUB_OUTPUT"
 
   build-shared:
-    needs: [prepare, format]
+    needs: [prepare]
     if: needs.prepare.outputs.should_run == 'true'
     runs-on: [self-hosted, linux]
     env:
