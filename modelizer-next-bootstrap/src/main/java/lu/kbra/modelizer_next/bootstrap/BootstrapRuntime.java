@@ -1,11 +1,13 @@
 package lu.kbra.modelizer_next.bootstrap;
 
 import java.awt.Component;
+import java.io.File;
 import java.io.IOException;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
+import java.util.Queue;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -208,7 +210,7 @@ public class BootstrapRuntime implements UpdateRuntime {
 		return true;
 	}
 
-	public void launch(final String[] args) throws Exception {
+	public void launch(final String[] args, Queue<File> toBeOpened) throws Exception {
 		final BootstrapLoadingFrame loadingFrame = new BootstrapLoadingFrame();
 		loadingFrame.setVisible(true);
 		try {
@@ -233,7 +235,7 @@ public class BootstrapRuntime implements UpdateRuntime {
 		} finally {
 			loadingFrame.dispose();
 		}
-		this.applicationLauncher.launch(args, this.currentApplication);
+		this.applicationLauncher.launch(args, toBeOpened, this.currentApplication);
 	}
 
 	private void promptForInitialChannelSelection() throws IOException {

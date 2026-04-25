@@ -1,8 +1,11 @@
 package lu.kbra.modelizer_next;
 
+import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.Optional;
+import java.util.Queue;
 
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
@@ -17,7 +20,7 @@ import lu.kbra.modelizer_next.ui.MainFrame;
 public class ModelizerAppEntryPoint implements AppMain {
 
 	@Override
-	public void start(final String[] args) {
+	public void start(final String[] args, final Queue<File> toBeOpened) {
 		try {
 			App.init();
 			System.out.println(App.NAME + " / " + App.VERSION + " [" + App.DISTRIBUTOR + "]");
@@ -34,8 +37,18 @@ public class ModelizerAppEntryPoint implements AppMain {
 
 		SwingUtilities.invokeLater(() -> {
 			MNMain.applyConfiguredLookAndFeel();
+			System.out.println("Args: " + Arrays.toString(args));
+			System.err.println("Files: " + toBeOpened);
 			Optional<DocumentSession> document = Optional.empty();
-			if (args.length > 0) {
+			if (toBeOpened != null && !toBeOpened.isEmpty()) {
+				while (document.isEmpty()) {
+					final File f = toBeOpened.poll();
+					if (f == null || !f.exists()) {
+						break;
+					}
+					document = MainFrame.createDocument(null, f);
+				}
+			} else if (args.length > 0) {
 				final Path file = Path.of(args[0]);
 
 				if (Files.exists(file)) {

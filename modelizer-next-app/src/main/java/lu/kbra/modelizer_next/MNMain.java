@@ -12,6 +12,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.formdev.flatlaf.FlatDarkLaf;
 import com.formdev.flatlaf.FlatLightLaf;
 
+import lu.kbra.modelizer_next.common.FileOpenBridge;
 import lu.kbra.modelizer_next.common.SystemThemeDetector;
 import lu.kbra.modelizer_next.json.ColorModule;
 
@@ -60,7 +61,8 @@ public class MNMain {
 	}
 
 	public static void main(final String[] args) {
-		new ModelizerAppEntryPoint().start(args);
+		FileOpenBridge.installFileHandler();
+		new ModelizerAppEntryPoint().start(args, FileOpenBridge.TO_BE_OPENED);
 	}
 
 }

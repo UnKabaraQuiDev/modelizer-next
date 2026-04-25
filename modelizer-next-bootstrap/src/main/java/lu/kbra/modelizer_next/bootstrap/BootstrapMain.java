@@ -6,17 +6,17 @@ import javax.swing.SwingUtilities;
 import com.formdev.flatlaf.FlatDarkLaf;
 import com.formdev.flatlaf.FlatLightLaf;
 
+import lu.kbra.modelizer_next.common.FileOpenBridge;
 import lu.kbra.modelizer_next.common.SystemThemeDetector;
 
 public final class BootstrapMain {
 
 	public static void applyConfiguredLookAndFeel() {
 		try {
-			if (SystemThemeDetector.isDark()) {
+			if (SystemThemeDetector.isDark())
 				FlatDarkLaf.setup();
-			} else {
+			else
 				FlatLightLaf.setup();
-			}
 		} catch (final Exception ignored) {
 			ignored.printStackTrace();
 		}
@@ -25,8 +25,9 @@ public final class BootstrapMain {
 	public static void main(final String[] args) {
 		try {
 			BootstrapMain.applyConfiguredLookAndFeel();
+			FileOpenBridge.installFileHandler();
 			final BootstrapRuntime runtime = BootstrapRuntime.bootstrap();
-			runtime.launch(args);
+			runtime.launch(args, FileOpenBridge.TO_BE_OPENED);
 		} catch (final Exception ex) {
 			ex.printStackTrace();
 			SwingUtilities.invokeLater(() -> {
