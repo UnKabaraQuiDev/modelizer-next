@@ -141,8 +141,10 @@ compute_build_metadata() {
   local app_version_base
   app_version_base="$(sanitize_base_for_app_version "${base_version}")"
 
-  local app_version="${app_version_base}.$(channel_code "${channel}").${minutes_since_epoch}"
-  local prerelease="$(channel_prerelease "${channel}")"
+  local branch_code
+  branch_code="$(channel_code "${channel}")"
+  branch_code="$(printf "%02d" "${branch_code}")"
+  local app_version="${app_version_base}.${branch_code}${minutes_since_epoch}"  local prerelease="$(channel_prerelease "${channel}")"
 
   BUILD_DATE="${timestamp_date}"
   BUILD_TIME="${timestamp_time}"
