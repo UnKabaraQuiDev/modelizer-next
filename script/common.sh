@@ -54,14 +54,29 @@ channel_prerelease() {
 }
 
 detect_date_cmd() {
-  if date -u -d "2024-01-01" +%s >/dev/null 2>&1; then
+  if command -v date >/dev/null 2>&1 && date -u -d "2024-01-01" +%s >/dev/null 2>&1; then
     echo "date"
-  elif command -v gdate >/dev/null 2>&1; then
-    echo "gdate"
-  else
-    echo "ERROR: GNU date not found (install coreutils on macOS: brew install coreutils)" >&2
-    exit 1
+    return
   fi
+
+  if command -v gdate >/dev/null 2>&1; then
+    echo "gdate"
+    return
+  fi
+
+  # fallback common macOS brew paths
+  if [ -x "/opt/homebrew/bin/gdate" ]; then
+    echo "/opt/homebrew/bin/gdate"
+    return
+  fi
+
+  if [ -x "/usr/local/bin/gdate" ]; then
+    echo "/usr/local/bin/gdate"
+    return
+  fi
+
+  echo "ERROR: no GNU date found" >&2
+  exit 1
 }
 
 DATE_CMD="$(detect_date_cmd)"
