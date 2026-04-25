@@ -101,47 +101,38 @@ compute_build_metadata() {
   local timestamp_date
   local timestamp_time
   local channel_name
-  local epoch_timestamp
-  local build_timestamp_seconds
-  local minutes_since_epoch
+  local commit_count
 
   channel_name="$(channel_upper "${channel}")"
-
-  epoch_timestamp="$(date_to_epoch "2026-01-01 00:00:00")"
 
   if [[ -n "${version_override}" ]]; then
     if [[ "${version_override}" =~ ^([0-9]+(\.[0-9]+)*)-(${channel_name})-([0-9]+)$ ]]; then
       base_version="${BASH_REMATCH[1]}"
       raw_base_version="${BASH_REMATCH[1]}"
-      minutes_since_epoch="${BASH_REMATCH[4]}"
+      commit_count="${BASH_REMATCH[4]}"
     else
-      echo "Version '${version_override}' does not match expected format '<x.y>-${channel_name}-<minutes>'" >&2
+      echo "Version '${version_override}' does not match expected format '<x.y>-${channel_name}-<commits>'" >&2
       exit 1
     fi
   else
     raw_base_version="$(mvn -B help:evaluate -Dexpression=project.version -q -DforceStdout)"
     base_version="$(sanitize_base_for_public_version "${raw_base_version}")"
 
-    build_timestamp_seconds="$("$DATE_CMD" -u +%s)"
+    commit_count="$(git rev-list --count HEAD)"
 
-    if (( build_timestamp_seconds < epoch_timestamp )); then
-      echo "Current time is before 2026-01-01 00:00:00 UTC" >&2
-      exit 1
-    fi
-
-    minutes_since_epoch="$(( (build_timestamp_seconds - epoch_timestamp) / 60 ))"
-    version_override="${base_version}-${channel_name}-${minutes_since_epoch}"
+    version_override="${base_version}-${channel_name}-${commit_count}"
   fi
 
-  build_timestamp_seconds="$(( epoch_timestamp + minutes_since_epoch * 60 ))"
+  local ts
+  ts="$("$DATE_CMD" -u +%s)"
 
-  timestamp_date="$(epoch_to_datetime "${build_timestamp_seconds}" +%Y-%m-%d)"
-  timestamp_time="$(epoch_to_datetime "${build_timestamp_seconds}" +%H-%M-%S)"
+  timestamp_date="$(epoch_to_datetime "${ts}" +%Y-%m-%d)"
+  timestamp_time="$(epoch_to_datetime "${ts}" +%H-%M-%S)"
 
   local app_version_base
   app_version_base="$(sanitize_base_for_app_version "${base_version}")"
 
-  local app_version="${app_version_base}.$(channel_code "${channel}").${minutes_since_epoch}"
+  local app_version="${app_version_base}.$(channel_code "${channel}").${commit_count}"
   local prerelease="$(channel_prerelease "${channel}")"
 
   BUILD_DATE="${timestamp_date}"
