@@ -82,8 +82,41 @@ function updateDownloadFromMetadata() {
   button.href = asset.url;
   button.textContent = 'Download selected build';
 }
+
+function selectSystemBuild() {
+  const ua = navigator.userAgent.toLowerCase();
+  let os = "windows";
+  if (ua.includes("mac")) {
+      os = "macos";
+  } else if (ua.includes("linux")) {
+      os = "linux";
+  } else if (ua.includes("win")) {
+      os = "windows";
+  }
+  const button = document.querySelector(
+      `#osChoices>.choice[data-key="${os}"]`
+  );
+  if (button) {
+      document.querySelectorAll("#osChoices>.choice").forEach(b => {
+          b.setAttribute("aria-pressed", "false");
+      });
+
+      button.setAttribute("aria-pressed", "true");
+  }
+}
+
+function selectBuildType() {
+      document.querySelectorAll("#buildChoices>.choice").forEach(b => {
+          b.setAttribute("aria-pressed", "false");
+      });
+
+      document.querySelector("#buildChoices>.choice[data-key='updater']").setAttribute("aria-pressed", "true");
+}
+
 setupChoices('osChoices', 'selectedOs');
 setupChoices('buildChoices', 'selectedBuild');
+selectSystemBuild();
+selectBuildType();
 document.getElementById('year').textContent = new Date().getFullYear();
 syncTheme();
 loadDownloadMetadata();
