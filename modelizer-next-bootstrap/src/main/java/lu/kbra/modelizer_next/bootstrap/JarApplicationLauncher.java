@@ -1,6 +1,7 @@
 package lu.kbra.modelizer_next.bootstrap;
 
 import java.io.File;
+import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Queue;
@@ -22,7 +23,12 @@ final class JarApplicationLauncher {
 				throw new AppLaunchException("Entry point '" + application.entryPoint() + "' does not implement AppMain.");
 			}
 			final AppMain appMain = (AppMain) entryPointClass.getDeclaredConstructor().newInstance();
-			appMain.start(args, toBeOpened);
+			try {
+				final Method legacyStart = appMain.getClass().getMethod("start", String[].class);
+				legacyStart.invoke(appMain, new Object[] { (Object) new String[] { "" } });
+			} catch (NoSuchMethodException e) {
+				appMain.start(args, toBeOpened);
+			}
 		} catch (final AppLaunchException ex) {
 			throw ex;
 		} catch (final Exception ex) {

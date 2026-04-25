@@ -160,14 +160,14 @@ public class ViewExportDialog extends JDialog {
 		this.addRow(panel, row++, "Directory", directoryPanel);
 
 		this.addRow(panel, row++, "File pattern", this.filePatternField);
-		final JLabel tokenHint = new JLabel("Use Ctrl+Space for tokens: %FILENAME%, %TYPE%, %EXTENSION%.");
-		final GridBagConstraints hintGbc = new GridBagConstraints();
-		hintGbc.gridx = 0;
-		hintGbc.gridy = row++;
-		hintGbc.gridwidth = 2;
-		hintGbc.insets = new Insets(0, 4, 8, 4);
-		hintGbc.anchor = GridBagConstraints.WEST;
-		panel.add(tokenHint, hintGbc);
+//		final JLabel tokenHint = new JLabel("Use Ctrl+Space for tokens: %FILENAME%, %TYPE%, %EXTENSION%.");
+//		final GridBagConstraints hintGbc = new GridBagConstraints();
+//		hintGbc.gridx = 0;
+//		hintGbc.gridy = row++;
+//		hintGbc.gridwidth = 2;
+//		hintGbc.insets = new Insets(0, 4, 8, 4);
+//		hintGbc.anchor = GridBagConstraints.WEST;
+//		panel.add(tokenHint, hintGbc);
 
 		final GridBagConstraints filler = new GridBagConstraints();
 		filler.gridx = 0;

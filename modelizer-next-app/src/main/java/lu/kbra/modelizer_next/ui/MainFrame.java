@@ -69,6 +69,7 @@ import lu.kbra.modelizer_next.bootstrap.BootstrapConfig;
 import lu.kbra.modelizer_next.bootstrap.UpdateChannel;
 import lu.kbra.modelizer_next.bootstrap.UpdateRuntime;
 import lu.kbra.modelizer_next.bootstrap.UpdateRuntimes;
+import lu.kbra.modelizer_next.common.FileOpenBridge;
 import lu.kbra.modelizer_next.common.VersionComparator;
 import lu.kbra.modelizer_next.document.ModelDocument;
 import lu.kbra.modelizer_next.json.LegacyModelizerImporter;
@@ -517,6 +518,10 @@ public class MainFrame extends JFrame {
 		fileMenu.add(this.createFileMenuItem("Export...",
 				KeyStroke.getKeyStroke(KeyEvent.VK_E, InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK),
 				this::exportImage));
+
+		final JMenuItem tryLoad = new JMenuItem("Show pending files.");
+		tryLoad.addActionListener(action -> JOptionPane.showMessageDialog(null, FileOpenBridge.TO_BE_OPENED.toString()));
+		fileMenu.add(tryLoad);
 
 		final JMenu editMenu = this.createEditMenu();
 

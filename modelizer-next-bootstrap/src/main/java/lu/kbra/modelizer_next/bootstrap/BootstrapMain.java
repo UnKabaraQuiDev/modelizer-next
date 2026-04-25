@@ -13,10 +13,11 @@ public final class BootstrapMain {
 
 	public static void applyConfiguredLookAndFeel() {
 		try {
-			if (SystemThemeDetector.isDark())
+			if (SystemThemeDetector.isDark()) {
 				FlatDarkLaf.setup();
-			else
+			} else {
 				FlatLightLaf.setup();
+			}
 		} catch (final Exception ignored) {
 			ignored.printStackTrace();
 		}

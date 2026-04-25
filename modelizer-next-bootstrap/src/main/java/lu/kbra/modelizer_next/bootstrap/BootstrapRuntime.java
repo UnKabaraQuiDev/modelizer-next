@@ -135,6 +135,7 @@ public class BootstrapRuntime implements UpdateRuntime {
 	public AvailableUpdate checkForUpdates() throws IOException {
 		try {
 			final String currentVersion = this.currentApplication == null ? null : this.currentApplication.version();
+			System.out.println("Comparing " + currentVersion + " on " + configuration.getUpdateChannel());
 			return this.remoteUpdateService.findLatest(this.configuration.getUpdateChannel(), currentVersion);
 		} catch (final InterruptedException ex) {
 			Thread.currentThread().interrupt();
@@ -235,6 +236,7 @@ public class BootstrapRuntime implements UpdateRuntime {
 		} finally {
 			loadingFrame.dispose();
 		}
+
 		this.applicationLauncher.launch(args, toBeOpened, this.currentApplication);
 	}
 

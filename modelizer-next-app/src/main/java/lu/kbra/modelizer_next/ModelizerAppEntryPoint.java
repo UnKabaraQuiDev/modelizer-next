@@ -38,13 +38,17 @@ public class ModelizerAppEntryPoint implements AppMain {
 		SwingUtilities.invokeLater(() -> {
 			MNMain.applyConfiguredLookAndFeel();
 			System.out.println("Args: " + Arrays.toString(args));
-			System.err.println("Files: " + toBeOpened);
+			System.out.println("Files: " + toBeOpened);
 			Optional<DocumentSession> document = Optional.empty();
 			if (toBeOpened != null && !toBeOpened.isEmpty()) {
 				while (document.isEmpty()) {
 					final File f = toBeOpened.poll();
-					if (f == null || !f.exists()) {
+					System.out.println("Trying: " + f);
+					JOptionPane.showMessageDialog(null, "Trying to open: " + f);
+					if (f == null) {
 						break;
+					} else if (!f.exists()) {
+						continue;
 					}
 					document = MainFrame.createDocument(null, f);
 				}
