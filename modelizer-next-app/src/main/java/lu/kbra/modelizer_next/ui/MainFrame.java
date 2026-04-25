@@ -869,7 +869,7 @@ public class MainFrame extends JFrame {
 		}
 	}
 
-	private boolean loadDocument(final File selectedFile) {
+	public boolean loadDocument(final File selectedFile) {
 		if (selectedFile == null || !selectedFile.isFile()) {
 			return false;
 		}
@@ -1247,6 +1247,14 @@ public class MainFrame extends JFrame {
 			JOptionPane.showMessageDialog(this, "Failed to save file:\n" + ex.getMessage(), "Save error", JOptionPane.ERROR_MESSAGE);
 			return false;
 		}
+	}
+
+	public ModelDocument getDocument() {
+		return document;
+	}
+
+	public DocumentSession getSession() {
+		return session;
 	}
 
 }

@@ -28,12 +28,27 @@ final class ApplicationInventory {
 					.map(this::readInstalledApplication)
 					.filter(Optional::isPresent)
 					.map(Optional::get)
-					.max(Comparator.comparing(InstalledApplication::version, VersionComparator.COMPARATOR));
+					.max(Comparator.comparing(InstalledApplication::version, VersionComparator.PARSED_COMPARATOR));
+		}
+	}
+
+	Optional<InstalledApplication> findLatestInstalled(UpdateChannel wantedChannel) throws IOException {
+		final Path applicationsDirectory = BootstrapApp.getApplicationsDirectory().toPath();
+		if (!Files.isDirectory(applicationsDirectory)) {
+			return Optional.empty();
+		}
+		try (var stream = Files.list(applicationsDirectory)) {
+			return stream.filter(path -> path.getFileName().toString().endsWith(".jar"))
+					.map(this::readInstalledApplication)
+					.filter(Optional::isPresent)
+					.map(Optional::get)
+					.filter(c -> c.version().updateChannel() == wantedChannel)
+					.max(Comparator.comparing(InstalledApplication::version, VersionComparator.PARSED_COMPARATOR));
 		}
 	}
 
 	InstalledApplication install(final AvailableUpdate update, final ProgressListener listener) throws IOException {
-		final String safeVersion = update.latestVersion().replaceAll("[^A-Za-z0-9._-]", "_");
+		final String safeVersion = update.latestVersion().toString().replaceAll("[^A-Za-z0-9._-]", "_");
 		final Path target = BootstrapApp.getApplicationsDirectory().toPath().resolve("modelizer-next-app-" + safeVersion + ".jar");
 		final Path tmp = BootstrapApp.getTempDirectory().toPath().resolve(target.getFileName().toString() + ".part");
 		new RemoteUpdateService().download(update, tmp, listener);
@@ -55,7 +70,7 @@ final class ApplicationInventory {
 				if (version == null || version.isBlank() || entryPoint == null || entryPoint.isBlank()) {
 					return Optional.empty();
 				}
-				return Optional.of(new InstalledApplication(version, entryPoint, jarPath));
+				return Optional.of(new InstalledApplication(VersionComparator.parse(version), entryPoint, jarPath));
 			}
 		} catch (final Exception ex) {
 			return Optional.empty();

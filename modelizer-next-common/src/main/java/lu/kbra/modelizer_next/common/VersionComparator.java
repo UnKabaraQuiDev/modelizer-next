@@ -4,23 +4,24 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
+import java.util.stream.Collectors;
+
+import lu.kbra.modelizer_next.bootstrap.UpdateChannel;
 
 public class VersionComparator implements Comparator<String> {
 
-	record ParsedVersion(List<Integer> numbers, int channelRank, long buildNumber) {
+	public record ParsedVersion(List<Integer> numbers, UpdateChannel updateChannel, long buildNumber) {
+
+		@Override
+		public final String toString() {
+			return numbers.stream().map(v -> Integer.toString(v)).collect(Collectors.joining(".")) + "-" + updateChannel.name() + "-"
+					+ buildNumber;
+		}
+
 	}
 
-	private static final int CHANNEL_NIGHTLY = 0;
-	private static final int CHANNEL_SNAPSHOT = 1;
-	private static final int CHANNEL_RELEASE = 2;
-
 	public static final VersionComparator COMPARATOR = new VersionComparator();
-
-	@Override
-	public int compare(final String left, final String right) {
-		final ParsedVersion a = VersionComparator.parse(left);
-		final ParsedVersion b = VersionComparator.parse(right);
-
+	public static final Comparator<ParsedVersion> PARSED_COMPARATOR = (a, b) -> {
 		final int len = Math.max(a.numbers().size(), b.numbers().size());
 		for (int i = 0; i < len; i++) {
 			final int n1 = i < a.numbers().size() ? a.numbers().get(i) : 0;
@@ -30,16 +31,25 @@ public class VersionComparator implements Comparator<String> {
 			}
 		}
 
-		if (a.channelRank() != b.channelRank()) {
-			return Integer.compare(a.channelRank(), b.channelRank());
+		if (a.updateChannel() != b.updateChannel()) {
+			return Integer.compare(a.updateChannel().ordinal(), b.updateChannel().ordinal());
 		}
 
 		return Long.compare(a.buildNumber(), b.buildNumber());
+	};
+
+	@Override
+	public int compare(final String left, final String right) {
+		final ParsedVersion a = VersionComparator.parse(left);
+		final ParsedVersion b = VersionComparator.parse(right);
+
+		return PARSED_COMPARATOR.compare(a, b);
+
 	}
 
-	static ParsedVersion parse(final String version) {
+	public static ParsedVersion parse(final String version) {
 		if (version == null || version.isBlank()) {
-			return new ParsedVersion(List.of(0), VersionComparator.CHANNEL_RELEASE, 0L);
+			return new ParsedVersion(List.of(0), UpdateChannel.NIGHTLY, 0L);
 		}
 
 		final String normalized = version.trim().startsWith("v") || version.trim().startsWith("V") ? version.trim().substring(1)
@@ -57,7 +67,7 @@ public class VersionComparator implements Comparator<String> {
 		}
 
 		int channelIndex = -1;
-		int channelRank = VersionComparator.CHANNEL_RELEASE;
+		int channelRank = UpdateChannel.CHANNEL_RELEASE;
 		for (int i = 1; i < tokens.length; i++) {
 			final int candidate = VersionComparator.parseChannelRank(tokens[i]);
 			if (candidate >= 0) {
@@ -81,14 +91,14 @@ public class VersionComparator implements Comparator<String> {
 			}
 		}
 
-		return new ParsedVersion(numbers, channelRank, buildNumber);
+		return new ParsedVersion(numbers, UpdateChannel.byId(channelRank), buildNumber);
 	}
 
 	private static int parseChannelRank(final String token) {
 		return switch (token.toUpperCase(Locale.ROOT)) {
-		case "NIGHTLY" -> VersionComparator.CHANNEL_NIGHTLY;
-		case "SNAPSHOT" -> VersionComparator.CHANNEL_SNAPSHOT;
-		case "RELEASE" -> VersionComparator.CHANNEL_RELEASE;
+		case "NIGHTLY" -> UpdateChannel.CHANNEL_NIGHTLY;
+		case "SNAPSHOT" -> UpdateChannel.CHANNEL_SNAPSHOT;
+		case "RELEASE" -> UpdateChannel.CHANNEL_RELEASE;
 		default -> -1;
 		};
 	}

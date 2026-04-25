@@ -13,6 +13,7 @@ import javax.swing.SwingUtilities;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 import lu.kbra.modelizer_next.bootstrap.AppMain;
+import lu.kbra.modelizer_next.common.FileOpenBridge;
 import lu.kbra.modelizer_next.common.SampleDocumentFactory;
 import lu.kbra.modelizer_next.ui.DocumentSession;
 import lu.kbra.modelizer_next.ui.MainFrame;
@@ -20,7 +21,7 @@ import lu.kbra.modelizer_next.ui.MainFrame;
 public class ModelizerAppEntryPoint implements AppMain {
 
 	@Override
-	public void start(final String[] args, final Queue<File> toBeOpened) {
+	public void start(final String[] args) {
 		try {
 			App.init();
 			System.out.println(App.NAME + " / " + App.VERSION + " [" + App.DISTRIBUTOR + "]");
@@ -38,21 +39,9 @@ public class ModelizerAppEntryPoint implements AppMain {
 		SwingUtilities.invokeLater(() -> {
 			MNMain.applyConfiguredLookAndFeel();
 			System.out.println("Args: " + Arrays.toString(args));
-			System.out.println("Files: " + toBeOpened);
 			Optional<DocumentSession> document = Optional.empty();
-			if (toBeOpened != null && !toBeOpened.isEmpty()) {
-				while (document.isEmpty()) {
-					final File f = toBeOpened.poll();
-					System.out.println("Trying: " + f);
-					JOptionPane.showMessageDialog(null, "Trying to open: " + f);
-					if (f == null) {
-						break;
-					} else if (!f.exists()) {
-						continue;
-					}
-					document = MainFrame.createDocument(null, f);
-				}
-			} else if (args.length > 0) {
+
+			if (args.length > 0) {
 				final Path file = Path.of(args[0]);
 
 				if (Files.exists(file)) {
@@ -63,6 +52,24 @@ public class ModelizerAppEntryPoint implements AppMain {
 			if (document.isEmpty()) {
 				frame.applyDefaultPaletteToCanvases();
 			}
+
+			FileOpenBridge.setPing(() -> {
+				while (frame.getDocument() == null || frame.getDocument().getMeta().getName().equals(SampleDocumentFactory.META_NAME)) {
+					final File f = FileOpenBridge.TO_BE_OPENED.poll();
+					System.out.println("Got open event for: " + f);
+//					JOptionPane.showMessageDialog(null, "Trying to open: " + f);
+					if (f == null) {
+						break;
+					} else if (!f.exists()) {
+						continue;
+					}
+					if (frame.loadDocument(f)) {
+						FileOpenBridge.TO_BE_OPENED.clear();
+						FileOpenBridge.clearPing();
+					}
+				}
+			});
+
 			frame.setVisible(true);
 		});
 	}

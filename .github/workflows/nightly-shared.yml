@@ -2,8 +2,6 @@ name: Nightly Shared Build
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: '0 3 * * *'
 
 permissions:
   contents: write
@@ -16,29 +14,10 @@ jobs:
       app_version: ${{ steps.meta.outputs.app_version }}
       release_tag: ${{ steps.meta.outputs.release_tag }}
       prerelease: ${{ steps.meta.outputs.prerelease }}
-      should_run: ${{ steps.decide.outputs.should_run }}
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - id: changes
-        if: github.event_name == 'schedule'
-        run: |
-          LOG_OUTPUT=$(git log --since='26 hours ago' --oneline -- . ':(exclude).github/**' ':(exclude)registry/**' ':(exclude)artifacts/**' || true)
-          if echo "$LOG_OUTPUT" | grep -q .; then
-            echo "has_changes=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "has_changes=false" >> "$GITHUB_OUTPUT"
-          fi
-      - id: decide
-        run: |
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            echo "should_run=true" >> "$GITHUB_OUTPUT"
-          elif [ "${{ steps.changes.outputs.has_changes }}" = "true" ]; then
-            echo "should_run=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "should_run=false" >> "$GITHUB_OUTPUT"
-          fi
       - id: meta
         if: steps.decide.outputs.should_run == 'true'
         run: |
@@ -48,7 +27,6 @@ jobs:
 
   build-shared:
     needs: [prepare]
-    if: needs.prepare.outputs.should_run == 'true'
     runs-on: [self-hosted, linux]
     env:
       VERSION_OVERRIDE: ${{ needs.prepare.outputs.version }}
@@ -68,7 +46,6 @@ jobs:
 
   publish:
     needs: [prepare, build-shared]
-    if: needs.prepare.outputs.should_run == 'true'
     runs-on: [self-hosted, linux]
     env:
       VERSION: ${{ needs.prepare.outputs.version }}

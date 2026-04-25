@@ -9,6 +9,16 @@ import java.util.Queue;
 public final class FileOpenBridge {
 
 	public static final Queue<File> TO_BE_OPENED = new ArrayDeque<>();
+	protected static Runnable PING;
+
+	public static void setPing(Runnable ping) {
+		PING = ping;
+		ping.run();
+	}
+
+	public static void clearPing() {
+		PING = null;
+	}
 
 	public static void installFileHandler() {
 		if (!Desktop.isDesktopSupported()) {
@@ -20,7 +30,12 @@ public final class FileOpenBridge {
 			return;
 		}
 
-		desktop.setOpenFileHandler(e -> FileOpenBridge.TO_BE_OPENED.addAll(e.getFiles()));
+		desktop.setOpenFileHandler(e -> {
+			FileOpenBridge.TO_BE_OPENED.addAll(e.getFiles());
+			if (PING != null) {
+				PING.run();
+			}
+		});
 	}
 
 }

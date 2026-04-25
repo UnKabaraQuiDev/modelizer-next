@@ -15,8 +15,11 @@ import javax.swing.JOptionPane;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
+import lu.kbra.modelizer_next.common.VersionComparator.ParsedVersion;
+
 public class BootstrapRuntime implements UpdateRuntime {
 
+	@Deprecated
 	private static final Pattern VERSION_MINUTES_PATTERN = Pattern.compile("^.+-(RELEASE|SNAPSHOT|NIGHTLY)-(\\d+)$");
 	private static final long UPDATE_EPOCH_SECONDS = Instant.parse("2026-01-01T00:00:00Z").getEpochSecond();
 	private static final DateTimeFormatter VERSION_DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
@@ -62,7 +65,7 @@ public class BootstrapRuntime implements UpdateRuntime {
 	private static String describeChannelOption(final UpdateChannel channel, final RemoteUpdateService.UpdateRelease release) {
 		final StringBuilder builder = new StringBuilder(channel.displayName());
 
-		if (release == null || release.version == null || release.version.isBlank()) {
+		if (release == null || release.version == null) {
 			builder.append(" — no published version");
 			return builder.toString();
 		}
@@ -80,7 +83,7 @@ public class BootstrapRuntime implements UpdateRuntime {
 			return null;
 		}
 
-		final String candidate = release.tag != null && !release.tag.isBlank() ? release.tag : release.version;
+		final String candidate = release.tag != null && !release.tag.isBlank() ? release.tag : release.version.toString();
 		if (candidate == null || candidate.isBlank()) {
 			return null;
 		}
@@ -134,7 +137,7 @@ public class BootstrapRuntime implements UpdateRuntime {
 	@Override
 	public AvailableUpdate checkForUpdates() throws IOException {
 		try {
-			final String currentVersion = this.currentApplication == null ? null : this.currentApplication.version();
+			final ParsedVersion currentVersion = this.currentApplication == null ? null : this.currentApplication.version();
 			System.out.println("Comparing " + currentVersion + " on " + configuration.getUpdateChannel());
 			return this.remoteUpdateService.findLatest(this.configuration.getUpdateChannel(), currentVersion);
 		} catch (final InterruptedException ex) {
@@ -154,7 +157,7 @@ public class BootstrapRuntime implements UpdateRuntime {
 	}
 
 	@Override
-	public String getCurrentApplicationVersion() {
+	public ParsedVersion getCurrentApplicationVersion() {
 		return this.currentApplication == null ? null : this.currentApplication.version();
 	}
 
@@ -216,7 +219,8 @@ public class BootstrapRuntime implements UpdateRuntime {
 		loadingFrame.setVisible(true);
 		try {
 			loadingFrame.update("Checking installed application...", 0, 0);
-			this.currentApplication = this.inventory.findLatestInstalled().orElse(null);
+			this.currentApplication = this.inventory.findLatestInstalled(configuration.getUpdateChannel()).orElse(null);
+			System.out.println("Current version: " + currentApplication.version());
 			if (this.currentApplication == null) {
 				final AvailableUpdate bootstrapInstall = this.requireInstallableUpdate(this.configuration.getUpdateChannel(), null);
 				loadingFrame.update("Installing " + bootstrapInstall.latestVersion() + "...", 0, 1);
@@ -279,7 +283,7 @@ public class BootstrapRuntime implements UpdateRuntime {
 		this.configuration.setUpdateChannel(selectedChannel);
 	}
 
-	private AvailableUpdate requireInstallableUpdate(final UpdateChannel channel, final String currentVersion) throws IOException {
+	private AvailableUpdate requireInstallableUpdate(final UpdateChannel channel, final ParsedVersion currentVersion) throws IOException {
 		try {
 			final AvailableUpdate update = this.remoteUpdateService.findLatest(channel, currentVersion);
 			if (update.downloadUri() == null) {

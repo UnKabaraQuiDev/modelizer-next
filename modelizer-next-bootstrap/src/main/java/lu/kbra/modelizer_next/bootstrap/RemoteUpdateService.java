@@ -15,6 +15,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lu.kbra.modelizer_next.common.ChannelComparator;
 import lu.kbra.modelizer_next.common.VersionComparator;
+import lu.kbra.modelizer_next.common.VersionComparator.ParsedVersion;
 
 final class RemoteUpdateService {
 
@@ -33,7 +34,7 @@ final class RemoteUpdateService {
 	}
 
 	static final class UpdateRelease {
-		public String version;
+		public ParsedVersion version;
 		public String url;
 		public String releaseUrl;
 		public String notes;
@@ -43,8 +44,6 @@ final class RemoteUpdateService {
 			return this.releaseUrl == null || this.releaseUrl.isBlank() ? BootstrapApp.RELEASES_URL : this.releaseUrl;
 		}
 	}
-
-	private final ObjectMapper mapper = new ObjectMapper();
 
 	private final HttpClient httpClient = HttpClient.newBuilder()
 			.connectTimeout(Duration.ofSeconds(15))
@@ -102,18 +101,18 @@ final class RemoteUpdateService {
 		if (response.statusCode() < 200 || response.statusCode() >= 300) {
 			throw new IOException("Failed to fetch versions manifest: HTTP " + response.statusCode());
 		}
-		return this.mapper.readValue(response.body(), UpdateManifest.class);
+		return BootstrapApp.MAPPER.readValue(response.body(), UpdateManifest.class);
 	}
 
-	AvailableUpdate findLatest(final UpdateChannel channel, final String currentVersion) throws IOException, InterruptedException {
+	AvailableUpdate findLatest(final UpdateChannel channel, final ParsedVersion currentVersion) throws IOException, InterruptedException {
 		final UpdateManifest manifest = this.fetchManifest();
 		final UpdateRelease release = manifest.channel(channel);
-		if (release == null || release.version == null || release.version.isBlank() || release.url == null || release.url.isBlank()) {
+		if (release == null || release.version == null || release.url == null || release.url.isBlank()) {
 			throw new IOException("No release configured for channel '" + channel.manifestKey() + "'.");
 		}
-		final String normalizedCurrent = currentVersion == null || currentVersion.isBlank() ? "0.0.0" : currentVersion;
-		if (ChannelComparator.COMPARATOR.compare(release.version, normalizedCurrent) == 0
-				&& VersionComparator.COMPARATOR.compare(release.version, normalizedCurrent) <= 0) {
+		final ParsedVersion normalizedCurrent = currentVersion == null ? VersionComparator.parse("0.0.0") : currentVersion;
+		if (ChannelComparator.PARSED_COMPARATOR.compare(release.version, normalizedCurrent) == 0
+				&& VersionComparator.PARSED_COMPARATOR.compare(release.version, normalizedCurrent) <= 0) {
 			return new AvailableUpdate(channel,
 					normalizedCurrent,
 					normalizedCurrent,

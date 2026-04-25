@@ -5,6 +5,8 @@ import java.io.IOException;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
+import lu.kbra.modelizer_next.common.VersionComparator.ParsedVersion;
+
 public interface UpdateRuntime {
 
 	@FunctionalInterface
@@ -18,7 +20,7 @@ public interface UpdateRuntime {
 
 	JsonNode getBootstrapJson();
 
-	String getCurrentApplicationVersion();
+	ParsedVersion getCurrentApplicationVersion();
 
 	UpdateChannel getSelectedChannel();
 

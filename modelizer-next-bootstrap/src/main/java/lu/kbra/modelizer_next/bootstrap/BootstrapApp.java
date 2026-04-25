@@ -6,11 +6,12 @@ import java.io.IOException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import lu.kbra.modelizer_next.common.ParsedVersionModule;
 import lu.kbra.pclib.PCUtils;
 
 public final class BootstrapApp {
 
-	private static final ObjectMapper MAPPER = new ObjectMapper();
+	static final ObjectMapper MAPPER = createMapper();
 	private static final String APP_DIR_PROPERTY = "APP_DIR";
 	private static final String ENABLE_UPDATE_PROPERTY = "enableUpdate";
 	public static boolean ENABLE_UPDATE = PCUtils.getBoolean(BootstrapApp.ENABLE_UPDATE_PROPERTY, true);
@@ -31,6 +32,14 @@ public final class BootstrapApp {
 		BootstrapApp.getHomeDirectory().mkdirs();
 		BootstrapApp.getApplicationsDirectory().mkdirs();
 		BootstrapApp.getTempDirectory().mkdirs();
+	}
+
+	private static ObjectMapper createMapper() {
+		final ObjectMapper mapper = new ObjectMapper();
+
+		mapper.registerModule(new ParsedVersionModule());
+
+		return mapper;
 	}
 
 	public static File getApplicationsDirectory() {
@@ -71,16 +80,17 @@ public final class BootstrapApp {
 
 		BootstrapApp.NAME = BootstrapApp.JSON.path("name").asText("Modelizer Next Bootstrap");
 		BootstrapApp.VERSION = BootstrapApp.JSON.path("version").asText("0.0.0");
-		BootstrapApp.REPOSITORY_URL = BootstrapApp.JSON.path("repository")
-				.asText("https://github.com/UnKabaraQuiDev/modelizer-next");
-		BootstrapApp.RELEASES_URL = BootstrapApp.JSON.path("releases")
-				.asText(BootstrapApp.REPOSITORY_URL + "/releases");
-		BootstrapApp.UPDATES_MANIFEST_URL = BootstrapApp.JSON.path("updatesManifest").asText(
-				"https://raw.githubusercontent.com/UnKabaraQuiDev/modelizer-next/refs/heads/registry/registry/versions.json");
+		BootstrapApp.REPOSITORY_URL = BootstrapApp.JSON.path("repository").asText("https://github.com/UnKabaraQuiDev/modelizer-next");
+		BootstrapApp.RELEASES_URL = BootstrapApp.JSON.path("releases").asText(BootstrapApp.REPOSITORY_URL + "/releases");
+		BootstrapApp.UPDATES_MANIFEST_URL = BootstrapApp.JSON.path("updatesManifest")
+				.asText("https://raw.githubusercontent.com/UnKabaraQuiDev/modelizer-next/refs/heads/registry/registry/versions.json");
 		BootstrapApp.DISTRIBUTOR = BootstrapApp.JSON.path("distributor").asText();
 
-		BootstrapApp.BOOTSTRAP_CONFIG = new BootstrapConfig(BootstrapApp.NAME, BootstrapApp.VERSION,
-				BootstrapApp.REPOSITORY_URL, BootstrapApp.RELEASES_URL, BootstrapApp.UPDATES_MANIFEST_URL,
+		BootstrapApp.BOOTSTRAP_CONFIG = new BootstrapConfig(BootstrapApp.NAME,
+				BootstrapApp.VERSION,
+				BootstrapApp.REPOSITORY_URL,
+				BootstrapApp.RELEASES_URL,
+				BootstrapApp.UPDATES_MANIFEST_URL,
 				BootstrapApp.DISTRIBUTOR);
 
 		BootstrapApp.ensureDirectories();
@@ -105,8 +115,7 @@ public final class BootstrapApp {
 	public static void saveConfiguration(final BootstrapConfiguration configuration) {
 		try {
 			BootstrapApp.ensureDirectories();
-			BootstrapApp.MAPPER.writerWithDefaultPrettyPrinter().writeValue(BootstrapApp.getBootstrapConfigFile(),
-					configuration);
+			BootstrapApp.MAPPER.writerWithDefaultPrettyPrinter().writeValue(BootstrapApp.getBootstrapConfigFile(), configuration);
 		} catch (final IOException ex) {
 			ex.printStackTrace();
 		}

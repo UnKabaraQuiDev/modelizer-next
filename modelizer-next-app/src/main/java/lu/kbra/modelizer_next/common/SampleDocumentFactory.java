@@ -19,9 +19,11 @@ import lu.kbra.modelizer_next.layout.PanelType;
 
 public final class SampleDocumentFactory {
 
+	public static final String META_NAME = "Demo model";
+
 	public static ModelDocument create() {
 		final ModelDocument document = new ModelDocument();
-		document.getMeta().setName("Demo model");
+		document.getMeta().setName(META_NAME);
 
 		final ClassModel customer = new ClassModel();
 		customer.getNames().setConceptualName("Customer");

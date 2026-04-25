@@ -6,6 +6,8 @@ import java.util.Objects;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
+import lu.kbra.modelizer_next.common.VersionComparator.ParsedVersion;
+
 public final class UpdateRuntimes {
 
 	private static final class NoOpUpdateRuntime implements UpdateRuntime {
@@ -26,7 +28,7 @@ public final class UpdateRuntimes {
 		}
 
 		@Override
-		public String getCurrentApplicationVersion() {
+		public ParsedVersion getCurrentApplicationVersion() {
 			return null;
 		}
 
