@@ -213,8 +213,66 @@ jobs:
           path: artifacts/release/windows-portable/*
           if-no-files-found: error
 
+
+  build-macos-bootstrap:
+    needs: [prepare, format]
+    runs-on: [self-hosted, macos]
+    env:
+      VERSION_OVERRIDE: ${{ needs.prepare.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 21
+      - name: Build macos bootstrap installer
+        run: bash ./script/build-release-macos.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: release-macos-bootstrap
+          path: artifacts/release/macos-bootstrap/*
+          if-no-files-found: error
+
+  build-macos-standalone:
+    needs: [prepare, format]
+    runs-on: [self-hosted, macos]
+    env:
+      VERSION_OVERRIDE: ${{ needs.prepare.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 21
+      - name: Build macos standalone app installer
+        run: bash ./script/build-release-macos-standalone.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: release-macos-standalone
+          path: artifacts/release/macos-standalone/*
+          if-no-files-found: error
+
+  build-macos-portable:
+    needs: [prepare, format]
+    runs-on: [self-hosted, macos]
+    env:
+      VERSION_OVERRIDE: ${{ needs.prepare.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 21
+      - name: Build macos portable app
+        run: bash ./script/build-release-macos-portable.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: release-macos-portable
+          path: artifacts/release/macos-portable/*
+          if-no-files-found: error
+		  
   publish:
-    needs: [prepare, build-shared, build-linux-bootstrap, build-linux-standalone, build-linux-portable, build-windows-bootstrap, build-windows-standalone, build-windows-portable]
+    needs: [prepare, build-shared, build-linux-bootstrap, build-linux-standalone, build-linux-portable, build-windows-bootstrap, build-windows-standalone, build-windows-portable, build-macos-bootstrap, build-macos-standalone, build-macos-portable]
     runs-on: [self-hosted, linux]
     env:
       VERSION: ${{ needs.prepare.outputs.version }}
@@ -254,6 +312,9 @@ jobs:
           cp collected/release-windows-bootstrap/* release-assets/
           cp collected/release-windows-standalone/* release-assets/
           cp collected/release-windows-portable/* release-assets/
+		  cp collected/release-macos-bootstrap/* release-assets/
+		  cp collected/release-macos-standalone/* release-assets/
+		  cp collected/release-macos-portable/* release-assets/
 
       - name: Create or update release release
         uses: softprops/action-gh-release@v2
@@ -348,17 +409,26 @@ jobs:
               elif "portable-linux" in name and name.endswith(".zip"):
                   add_asset("linux", "portable", file_path, "Linux portable ZIP")
 
+              elif "portable-macos" in name and name.endswith(".zip"):
+                  add_asset("macos", "portable", file_path, "MacOS portable ZIP")
+
               elif "app-standalone-windows" in name and name.endswith(".exe"):
                   add_asset("windows", "standalone", file_path, "Windows standalone installer")
 
               elif "app-standalone-linux" in name and name.endswith(".deb"):
                   add_asset("linux", "standalone", file_path, "Linux standalone .deb")
 
+              elif "app-standalone-macos" in name and name.endswith(".dmg"):
+                  add_asset("macos", "standalone", file_path, "MacOS standalone .dmg")
+
               elif "bootstrap-windows" in name and name.endswith(".exe"):
                   add_asset("windows", "updater", file_path, "Windows updater installer")
 
               elif "bootstrap-linux" in name and name.endswith(".deb"):
                   add_asset("linux", "updater", file_path, "Linux updater .deb")
+
+              elif "bootstrap-linux" in name and name.endswith(".dmg"):
+                  add_asset("macos", "updater", file_path, "MacOS updater .dmg")
 
               elif "bootstrap" in name and name.endswith(".jar"):
                   add_asset("other", "updater", file_path, "Cross-platform bootstrap JAR")

@@ -164,10 +164,16 @@ stage_bootstrap_artifacts() {
     local bootstrap_exe
     bootstrap_exe="$(find_single_file "modelizer-next-bootstrap/target/dist/windows" '*.exe')"
     cp "${bootstrap_exe}" "${out_dir}/modelizer-next-bootstrap-${platform}-${VERSION}.exe"
+
+  elif [ "${platform}" = "macos" ]; then
+    local bootstrap_pkg
+    bootstrap_pkg="$(find_single_file "modelizer-next-bootstrap/target/dist/macos" '*.dmg')"
+    cp "${bootstrap_pkg}" "${out_dir}/modelizer-next-bootstrap-${platform}-${VERSION}.dmg"
+
   else
-    local bootstrap_exe
-    bootstrap_exe="$(find_single_file "modelizer-next-bootstrap/target/dist/linux" '*.deb')"
-    cp "${bootstrap_exe}" "${out_dir}/modelizer-next-bootstrap-${platform}-${VERSION}.deb"
+    local bootstrap_deb
+    bootstrap_deb="$(find_single_file "modelizer-next-bootstrap/target/dist/linux" '*.deb')"
+    cp "${bootstrap_deb}" "${out_dir}/modelizer-next-bootstrap-${platform}-${VERSION}.deb"
   fi
 }
 
@@ -183,10 +189,16 @@ stage_standalone_artifacts() {
     local app_exe
     app_exe="$(find_single_file "modelizer-next-app/target/dist/windows" '*.exe')"
     cp "${app_exe}" "${out_dir}/modelizer-next-app-standalone-${platform}-${VERSION}.exe"
+
+  elif [ "${platform}" = "macos" ]; then
+    local app_pkg
+    app_pkg="$(find_single_file "modelizer-next-app/target/dist/macos" '*.dmg')"
+    cp "${app_pkg}" "${out_dir}/modelizer-next-app-standalone-${platform}-${VERSION}.dmg"
+
   else
-    local app_exe
-    app_exe="$(find_single_file "modelizer-next-app/target/dist/linux" '*.deb')"
-    cp "${app_exe}" "${out_dir}/modelizer-next-app-standalone-${platform}-${VERSION}.deb"
+    local app_deb
+    app_deb="$(find_single_file "modelizer-next-app/target/dist/linux" '*.deb')"
+    cp "${app_deb}" "${out_dir}/modelizer-next-app-standalone-${platform}-${VERSION}.deb"
   fi
 }
 
@@ -213,11 +225,16 @@ stage_portable_artifacts() {
 
   if [ "${platform}" = "windows" ]; then
     source_dir="$(find_single_directory "modelizer-next-app/target/dist/windows")"
+
+  elif [ "${platform}" = "macos" ]; then
+    source_dir="$(find_single_directory "modelizer-next-app/target/dist/macos")"
+
   else
     source_dir="$(find_single_directory "modelizer-next-app/target/dist/linux")"
   fi
 
   archive_name="modelizer-next-app-portable-${platform}-${VERSION}.zip"
+
   (
     cd "${source_dir}"
     zip -r "${out_dir}/${archive_name}" .

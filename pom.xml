@@ -18,37 +18,55 @@
 
 	<properties>
 		<revision>0.3-SNAPSHOT</revision>
+
 		<java.version>21</java.version>
 		<maven.compiler.source>${java.version}</maven.compiler.source>
 		<maven.compiler.target>${java.version}</maven.compiler.target>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
 		<distributor>Manual build</distributor>
 		<appVersion>0.1</appVersion>
+
 		<modelizer.repositoryUrl>
 			https://github.com/UnKabaraQuiDev/modelizer-next</modelizer.repositoryUrl>
 		<modelizer.releasesUrl>${modelizer.repositoryUrl}/releases</modelizer.releasesUrl>
 		<modelizer.updatesManifestUrl>
 			https://raw.githubusercontent.com/UnKabaraQuiDev/modelizer-next/refs/heads/registry/registry/versions.json</modelizer.updatesManifestUrl>
 		<modelizer.issuesUrl>${modelizer.repositoryUrl}/issues</modelizer.issuesUrl>
+
+		<jpackage.linux.group>Programming</jpackage.linux.group>
+		<jpackage.linux.category>Programming,Utilities</jpackage.linux.category>
+
 		<jpackage.addModules>
 			java.base,java.desktop,java.logging,java.net.http,java.xml,jdk.unsupported,jdk.crypto.ec</jpackage.addModules>
-		<jpackage.group>Programming</jpackage.group>
-		<jpackage.category>Programming,Utilities</jpackage.category>
-		<jpackage.icon>filled in by profiles</jpackage.icon>
-		<jpackage.outputDir>filled in by profiles</jpackage.outputDir>
-		<jpackage.inputDir>${project.build.directory}/jpackage-input/</jpackage.inputDir>
-		<jpackage.inputJar>${project.build.finalName}.jar</jpackage.inputJar>
 		<jpackage.fa1>${jpackage.inputDir}/FAmod.properties</jpackage.fa1>
 		<jpackage.fa2>${jpackage.inputDir}/FAmn.properties</jpackage.fa2>
 		<jpackage.fa3>${jpackage.inputDir}/FAmdlz.properties</jpackage.fa3>
-		<jpackage.name>filled in by modules</jpackage.name>
 		<jpackage.vendor>${project.groupId}</jpackage.vendor>
+
+		<jpackage.macos.bundleId>${project.groupId}.${project.artifactId}</jpackage.macos.bundleId>
+		<jpackage.macos.category>public.app-category.productivity</jpackage.macos.category>
+		<jpackage.macos.sign>false</jpackage.macos.sign>
+		<jpackage.macos.runtimeSigningPrefix>${project.groupId}</jpackage.macos.runtimeSigningPrefix>
+
+		<jpackage.inputDir>${project.build.directory}/jpackage-input/</jpackage.inputDir>
+		<jpackage.inputJar>${project.build.finalName}.jar</jpackage.inputJar>
+
+		<jpackage.name>filled in by modules</jpackage.name>
+		<jpackage.icon>filled in by profiles</jpackage.icon>
+		<jpackage.outputDir>filled in by profiles</jpackage.outputDir>
 		<jpackage.type>filled in by profiles</jpackage.type>
+
 		<app.mainClass>filled in by modules</app.mainClass>
+
 		<skipLinuxInstaller>true</skipLinuxInstaller>
 		<skipWindowsInstaller>true</skipWindowsInstaller>
+		<skipMacosInstaller>true</skipMacosInstaller>
+
 		<skipLinuxPortable>true</skipLinuxPortable>
 		<skipWindowsPortable>true</skipWindowsPortable>
+		<skipMacosPortable>true</skipMacosPortable>
+
 		<skipNative>true</skipNative>
 	</properties>
 
@@ -377,10 +395,11 @@
 											<arg value="${jpackage.addModules}" />
 
 											<arg value="--linux-app-category" />
-											<arg value="${jpackage.category}" />
+											<arg
+												value="${jpackage.linux.category}" />
 
 											<arg value="--linux-menu-group" />
-											<arg value="${jpackage.group}" />
+											<arg value="${jpackage.linux.group}" />
 
 											<arg value="--icon" />
 											<arg value="${jpackage.icon}" />
@@ -439,7 +458,7 @@
 											<arg value="${jpackage.addModules}" />
 
 											<arg value="--win-menu-group" />
-											<arg value="${jpackage.group}" />
+											<arg value="${jpackage.linux.group}" />
 
 											<arg value="--win-menu" />
 											<arg value="--win-shortcut" />
@@ -460,6 +479,68 @@
 
 										</exec>
 
+									</target>
+								</configuration>
+							</execution>
+							<execution>
+								<id>package-installer-macos</id>
+								<phase>package</phase>
+								<goals>
+									<goal>run</goal>
+								</goals>
+
+								<configuration>
+									<skip>${skipMacosInstaller}</skip>
+
+									<target>
+										<exec executable="jpackage"
+											failonerror="true">
+
+											<arg value="--type" />
+											<arg value="${jpackage.type}" />
+
+											<arg value="--name" />
+											<arg value="${jpackage.name}" />
+
+											<arg value="--vendor" />
+											<arg value="${jpackage.vendor}" />
+
+											<arg value="--app-version" />
+											<arg value="${appVersion}" />
+
+											<arg value="--input" />
+											<arg value="${jpackage.inputDir}" />
+
+											<arg value="--main-jar" />
+											<arg value="${jpackage.inputJar}" />
+
+											<arg value="--dest" />
+											<arg value="${jpackage.outputDir}" />
+
+											<arg value="--add-modules" />
+											<arg value="${jpackage.addModules}" />
+
+											<arg
+												value="--mac-package-identifier" />
+											<arg
+												value="${jpackage.macos.bundleId}" />
+
+											<arg value="--mac-package-name" />
+											<arg value="${jpackage.name}" />
+
+											<arg value="--icon" />
+											<arg value="${jpackage.icon}" />
+
+											<arg value="--file-associations" />
+											<arg value="${jpackage.fa1}" />
+
+											<arg value="--file-associations" />
+											<arg value="${jpackage.fa2}" />
+
+											<arg value="--file-associations" />
+											<arg value="${jpackage.fa3}" />
+
+										</exec>
 									</target>
 								</configuration>
 							</execution>
@@ -555,7 +636,51 @@
 									</target>
 								</configuration>
 							</execution>
+							<execution>
+								<id>package-app-image-macos</id>
+								<phase>package</phase>
+								<goals>
+									<goal>run</goal>
+								</goals>
 
+								<configuration>
+									<skip>${skipMacosPortable}</skip>
+
+									<target>
+										<exec executable="jpackage"
+											failonerror="true">
+
+											<arg value="--type" />
+											<arg value="app-image" />
+
+											<arg value="--name" />
+											<arg value="${jpackage.name}" />
+
+											<arg value="--vendor" />
+											<arg value="${jpackage.vendor}" />
+
+											<arg value="--app-version" />
+											<arg value="${appVersion}" />
+
+											<arg value="--input" />
+											<arg value="${jpackage.inputDir}" />
+
+											<arg value="--main-jar" />
+											<arg value="${jpackage.inputJar}" />
+
+											<arg value="--dest" />
+											<arg value="${jpackage.outputDir}" />
+
+											<arg value="--add-modules" />
+											<arg value="${jpackage.addModules}" />
+
+											<arg value="--icon" />
+											<arg value="${jpackage.icon}" />
+
+										</exec>
+									</target>
+								</configuration>
+							</execution>
 						</executions>
 					</plugin>
 				</plugins>
@@ -592,11 +717,30 @@
 		</profile>
 
 		<profile>
+			<id>native-macos</id>
+			<properties>
+				<jpackage.type>dmg</jpackage.type>
+				<jpackage.icon>${jpackage.inputDir}/icon.icns</jpackage.icon>
+				<jpackage.add>${maven.multiModuleProjectDirectory}/app/macos</jpackage.add>
+				<jpackage.outputDir>${project.build.directory}/dist/macos</jpackage.outputDir>
+				<skipMacosInstaller>false</skipMacosInstaller>
+			</properties>
+		</profile>
+
+		<profile>
 			<id>portable</id>
 			<properties>
 				<jpackage.type>app-image</jpackage.type>
 				<skipLinuxInstaller>true</skipLinuxInstaller>
 				<skipWindowsInstaller>true</skipWindowsInstaller>
+				<skipMacosInstaller>true</skipMacosInstaller>
+			</properties>
+		</profile>
+
+		<profile>
+			<id>portable-linux</id>
+			<properties>
+				<skipLinuxPortable>false</skipLinuxPortable>
 			</properties>
 		</profile>
 
@@ -608,9 +752,11 @@
 		</profile>
 
 		<profile>
-			<id>portable-linux</id>
+			<id>portable-macos</id>
 			<properties>
-				<skipLinuxPortable>false</skipLinuxPortable>
+				<jpackage.type>app-image</jpackage.type>
+				<jpackage.icon>${jpackage.inputDir}/icon.icns</jpackage.icon>
+				<skipMacosPortable>false</skipMacosPortable>
 			</properties>
 		</profile>
 

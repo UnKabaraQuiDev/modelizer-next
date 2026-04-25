@@ -217,8 +217,68 @@ jobs:
           path: artifacts/nightly/windows-portable/*
           if-no-files-found: error
 
+  build-macos-bootstrap:
+    needs: [prepare, format]
+    if: needs.prepare.outputs.should_run == 'true'
+    runs-on: [self-hosted, macos]
+    env:
+      VERSION_OVERRIDE: ${{ needs.prepare.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 21
+      - name: Build macos bootstrap installer
+        run: bash ./script/build-nightly-macos.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: nightly-macos-bootstrap
+          path: artifacts/nightly/macos-bootstrap/*
+          if-no-files-found: error
+
+  build-macos-standalone:
+    needs: [prepare, format]
+    if: needs.prepare.outputs.should_run == 'true'
+    runs-on: [self-hosted, macos]
+    env:
+      VERSION_OVERRIDE: ${{ needs.prepare.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 21
+      - name: Build macos standalone app installer
+        run: bash ./script/build-nightly-macos-standalone.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: nightly-macos-standalone
+          path: artifacts/nightly/macos-standalone/*
+          if-no-files-found: error
+
+  build-macos-portable:
+    needs: [prepare, format]
+    if: needs.prepare.outputs.should_run == 'true'
+    runs-on: [self-hosted, macos]
+    env:
+      VERSION_OVERRIDE: ${{ needs.prepare.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 21
+      - name: Build macos portable app
+        run: bash ./script/build-nightly-macos-portable.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: nightly-macos-portable
+          path: artifacts/nightly/macos-portable/*
+          if-no-files-found: error
+
   publish:
-    needs: [prepare, build-shared, build-linux-bootstrap, build-linux-standalone, build-linux-portable, build-windows-bootstrap, build-windows-standalone, build-windows-portable]
+    needs: [prepare, build-shared, build-linux-bootstrap, build-linux-standalone, build-linux-portable, build-windows-bootstrap, build-windows-standalone, build-windows-portable, build-macos-bootstrap, build-macos-standalone, build-macos-portable]
     if: needs.prepare.outputs.should_run == 'true'
     runs-on: [self-hosted, linux]
     env:
@@ -255,6 +315,9 @@ jobs:
           cp collected/nightly-windows-bootstrap/* release-assets/
           cp collected/nightly-windows-standalone/* release-assets/
           cp collected/nightly-windows-portable/* release-assets/
+		  cp collected/nightly-macos-bootstrap/* release-assets/
+		  cp collected/nightly-macos-standalone/* release-assets/
+		  cp collected/nightly-macos-portable/* release-assets/
 
       - name: Create or update nightly release
         uses: softprops/action-gh-release@v2
