@@ -315,9 +315,9 @@ jobs:
           cp collected/nightly-windows-bootstrap/* release-assets/
           cp collected/nightly-windows-standalone/* release-assets/
           cp collected/nightly-windows-portable/* release-assets/
-		  cp collected/nightly-macos-bootstrap/* release-assets/
-		  cp collected/nightly-macos-standalone/* release-assets/
-		  cp collected/nightly-macos-portable/* release-assets/
+          cp collected/nightly-macos-bootstrap/* release-assets/
+          cp collected/nightly-macos-standalone/* release-assets/
+          cp collected/nightly-macos-portable/* release-assets/
 
       - name: Create or update nightly release
         uses: softprops/action-gh-release@v2

@@ -308,9 +308,9 @@ jobs:
           cp collected/snapshot-windows-bootstrap/* release-assets/
           cp collected/snapshot-windows-standalone/* release-assets/
           cp collected/snapshot-windows-portable/* release-assets/
-		  cp collected/snapshot-macos-bootstrap/* release-assets/
-		  cp collected/snapshot-macos-standalone/* release-assets/
-		  cp collected/snapshot-macos-portable/* release-assets/
+          cp collected/snapshot-macos-bootstrap/* release-assets/
+          cp collected/snapshot-macos-standalone/* release-assets/
+          cp collected/snapshot-macos-portable/* release-assets/
 
       - name: Create or update snapshot release
         uses: softprops/action-gh-release@v2

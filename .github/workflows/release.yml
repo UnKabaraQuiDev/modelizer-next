@@ -270,7 +270,7 @@ jobs:
           name: release-macos-portable
           path: artifacts/release/macos-portable/*
           if-no-files-found: error
-		  
+          
   publish:
     needs: [prepare, build-shared, build-linux-bootstrap, build-linux-standalone, build-linux-portable, build-windows-bootstrap, build-windows-standalone, build-windows-portable, build-macos-bootstrap, build-macos-standalone, build-macos-portable]
     runs-on: [self-hosted, linux]
@@ -312,9 +312,9 @@ jobs:
           cp collected/release-windows-bootstrap/* release-assets/
           cp collected/release-windows-standalone/* release-assets/
           cp collected/release-windows-portable/* release-assets/
-		  cp collected/release-macos-bootstrap/* release-assets/
-		  cp collected/release-macos-standalone/* release-assets/
-		  cp collected/release-macos-portable/* release-assets/
+          cp collected/release-macos-bootstrap/* release-assets/
+          cp collected/release-macos-standalone/* release-assets/
+          cp collected/release-macos-portable/* release-assets/
 
       - name: Create or update release release
         uses: softprops/action-gh-release@v2
