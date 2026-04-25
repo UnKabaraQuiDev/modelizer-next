@@ -428,7 +428,7 @@ jobs:
               elif "bootstrap-linux" in name and name.endswith(".deb"):
                   add_asset("linux", "updater", file_path, "Linux updater .deb")
 
-              elif "bootstrap-linux" in name and name.endswith(".dmg"):
+              elif "bootstrap-macos" in name and name.endswith(".dmg"):
                   add_asset("macos", "updater", file_path, "MacOS updater .dmg")
 
               elif "bootstrap" in name and name.endswith(".jar"):
