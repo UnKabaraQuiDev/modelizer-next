@@ -1057,7 +1057,7 @@ public class DiagramCanvas extends JPanel {
 			}
 		}
 
-			return bounds;
+		return bounds;
 	}
 
 	private Rectangle2D computeCommentBounds(final Graphics2D g2, final String text, final NodeLayout layout) {
@@ -1520,11 +1520,7 @@ public class DiagramCanvas extends JPanel {
 
 				final NodeLayout layout = this.resolveRenderLayout(this.findOrCreateNodeLayout(LayoutObjectType.CLASS, classModel.getId()));
 				final Rectangle2D classBounds = this.computeClassBounds(g2, classModel, layout);
-				bounds = this.expandBounds(bounds,
-						classBounds.getX(),
-						classBounds.getY(),
-						classBounds.getWidth(),
-						classBounds.getHeight());
+				bounds = this.expandBounds(bounds, classBounds.getX(), classBounds.getY(), classBounds.getWidth(), classBounds.getHeight());
 			}
 
 			for (final CommentModel commentModel : this.document.getModel().getComments()) {
@@ -1534,7 +1530,8 @@ public class DiagramCanvas extends JPanel {
 					continue;
 				}
 
-				final NodeLayout layout = this.resolveRenderLayout(this.findOrCreateNodeLayout(LayoutObjectType.COMMENT, commentModel.getId()));
+				final NodeLayout layout = this
+						.resolveRenderLayout(this.findOrCreateNodeLayout(LayoutObjectType.COMMENT, commentModel.getId()));
 				final Rectangle2D commentBounds = this.computeCommentBounds(g2, text, layout);
 				bounds = this.expandBounds(bounds,
 						commentBounds.getX(),
@@ -1571,7 +1568,7 @@ public class DiagramCanvas extends JPanel {
 				}
 			}
 
-		return bounds;
+			return bounds;
 		} finally {
 			this.exportSelectionFilter = previousFilter;
 		}
@@ -2024,7 +2021,8 @@ public class DiagramCanvas extends JPanel {
 	private void drawComments(final Graphics2D g2) {
 		for (final CommentModel commentModel : this.document.getModel().getComments()) {
 			final String commentText = this.resolveCommentText(commentModel);
-			if (commentText == null || commentText.isBlank() || !this.isCommentVisible(commentModel) || !this.shouldExportComment(commentModel)) {
+			if (commentText == null || commentText.isBlank() || !this.isCommentVisible(commentModel)
+					|| !this.shouldExportComment(commentModel)) {
 				continue;
 			}
 

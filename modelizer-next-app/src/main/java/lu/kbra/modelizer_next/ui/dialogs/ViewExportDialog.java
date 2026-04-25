@@ -246,8 +246,7 @@ public class ViewExportDialog extends JDialog {
 	}
 
 	private void updateExportButtonState() {
-		this.exportButton.setEnabled(!this.getSelectedPanelTypes().isEmpty()
-				&& !this.outputDirectoryField.getText().isBlank()
+		this.exportButton.setEnabled(!this.getSelectedPanelTypes().isEmpty() && !this.outputDirectoryField.getText().isBlank()
 				&& !this.filePatternField.getText().isBlank());
 	}
 

@@ -66,5 +66,5 @@ class DragListener extends MouseAdapter {
 		this.dragged = null;
 		((Runnable) parent.getClientProperty("savePalettes")).run();
 	}
-	
+
 }

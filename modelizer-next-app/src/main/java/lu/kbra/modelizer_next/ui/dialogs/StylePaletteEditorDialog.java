@@ -180,7 +180,7 @@ public final class StylePaletteEditorDialog {
 		final StylePalettePreviewPanel previewPanel = new StylePalettePreviewPanel();
 
 		final JTextField nameField = new JTextField(initialPalette == null ? "New palette" : initialPalette.getName(), 24);
-		nameField.setEnabled(initialPalette == null ? true :  !"Default".equals(initialPalette.getName()));
+		nameField.setEnabled(initialPalette == null ? true : !"Default".equals(initialPalette.getName()));
 
 		final ColorButton classTextColorButton = new ColorButton("Class text",
 				initialPalette == null ? Color.BLACK : initialPalette.getClassTextColor(),
