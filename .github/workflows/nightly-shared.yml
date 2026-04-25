@@ -75,6 +75,7 @@ jobs:
         run: |
           mkdir -p release-assets
           cp collected/nightly-shared/* release-assets/
+		  echo "${{ env.RELEASE_TAG }}"
 
       - name: Create or update nightly release
         uses: softprops/action-gh-release@v2
