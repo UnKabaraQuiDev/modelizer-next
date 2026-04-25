@@ -7,11 +7,9 @@ MVN_VERSION=$(mvn -B help:evaluate -Dexpression=project.version -q -DforceStdout
 MVN_VERSION=$(echo "$MVN_VERSION" | tr -d '\r\n')
 MVN_VERSION="${MVN_VERSION%-SNAPSHOT}"
 
-BASE_TS=$(date -u -d "2026-01-01 00:00:00" +%s)
-NOW_TS=$(date -u +%s)
-MINUTES=$(( (NOW_TS - BASE_TS) / 60 ))
+COMMIT_COUNT="$(git rev-list --count HEAD)"
 
-TAG="${MVN_VERSION}-SNAPSHOT-${MINUTES}"
+TAG="${MVN_VERSION}-SNAPSHOT-${COMMIT_COUNT}"
 
 echo "Using tag: $TAG"
 

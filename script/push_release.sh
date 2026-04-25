@@ -11,11 +11,9 @@ if [[ "$MVN_VERSION" == *-SNAPSHOT ]]; then
   exit 1
 fi
 
-BASE_TS=$(date -u -d "2026-01-01 00:00:00" +%s)
-NOW_TS=$(date -u +%s)
-MINUTES=$(( (NOW_TS - BASE_TS) / 60 ))
+COMMIT_COUNT="$(git rev-list --count HEAD)"
 
-TAG="${MVN_VERSION}-RELEASE-${MINUTES}"
+TAG="${MVN_VERSION}-RELEASE-${COMMIT_COUNT}"
 
 echo "Using tag: $TAG"
 

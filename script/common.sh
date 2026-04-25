@@ -53,6 +53,44 @@ channel_prerelease() {
   esac
 }
 
+detect_date_cmd() {
+  if command -v date >/dev/null 2>&1 && date -u -d "2024-01-01" +%s >/dev/null 2>&1; then
+    echo "date"
+    return
+  fi
+
+  if command -v gdate >/dev/null 2>&1; then
+    echo "gdate"
+    return
+  fi
+
+  # fallback common macOS brew paths
+  if [ -x "/opt/homebrew/bin/gdate" ]; then
+    echo "/opt/homebrew/bin/gdate"
+    return
+  fi
+
+  if [ -x "/usr/local/bin/gdate" ]; then
+    echo "/usr/local/bin/gdate"
+    return
+  fi
+
+  echo "ERROR: no GNU date found" >&2
+  exit 1
+}
+
+DATE_CMD="$(detect_date_cmd)"
+export DATE_CMD
+
+date_to_epoch() {
+  "$DATE_CMD" -u -d "$1" +%s
+}
+
+epoch_to_datetime() {
+  local ts="$1"
+  "$DATE_CMD" -u -d "@${ts}" "$2"
+}
+
 compute_build_metadata() {
   local channel="$1"
   local platform="${2:-any}"
@@ -63,40 +101,38 @@ compute_build_metadata() {
   local timestamp_date
   local timestamp_time
   local channel_name
-  local epoch_timestamp
-  local build_timestamp_seconds
-  local minutes_since_epoch
+  local commit_count
+
   channel_name="$(channel_upper "${channel}")"
-  epoch_timestamp="$(date -u -d '2026-01-01 00:00:00' +%s)"
 
   if [[ -n "${version_override}" ]]; then
     if [[ "${version_override}" =~ ^([0-9]+(\.[0-9]+)*)-(${channel_name})-([0-9]+)$ ]]; then
       base_version="${BASH_REMATCH[1]}"
       raw_base_version="${BASH_REMATCH[1]}"
-      minutes_since_epoch="${BASH_REMATCH[4]}"
+      commit_count="${BASH_REMATCH[4]}"
     else
-      echo "Version '${version_override}' does not match expected format '<x.y>-${channel_name}-<minutes>'" >&2
+      echo "Version '${version_override}' does not match expected format '<x.y>-${channel_name}-<commits>'" >&2
       exit 1
     fi
   else
     raw_base_version="$(mvn -B help:evaluate -Dexpression=project.version -q -DforceStdout)"
     base_version="$(sanitize_base_for_public_version "${raw_base_version}")"
-    build_timestamp_seconds="$(date -u +%s)"
-    if (( build_timestamp_seconds < epoch_timestamp )); then
-      echo "Current time is before 2026-01-01 00:00:00 UTC" >&2
-      exit 1
-    fi
-    minutes_since_epoch="$(( (build_timestamp_seconds - epoch_timestamp) / 60 ))"
-    version_override="${base_version}-${channel_name}-${minutes_since_epoch}"
+
+    commit_count="$(git rev-list --count HEAD)"
+
+    version_override="${base_version}-${channel_name}-${commit_count}"
   fi
 
-  build_timestamp_seconds="$(( epoch_timestamp + minutes_since_epoch * 60 ))"
-  timestamp_date="$(date -u -d "@${build_timestamp_seconds}" +%Y-%m-%d)"
-  timestamp_time="$(date -u -d "@${build_timestamp_seconds}" +%H-%M-%S)"
+  local ts
+  ts="$("$DATE_CMD" -u +%s)"
+
+  timestamp_date="$(epoch_to_datetime "${ts}" +%Y-%m-%d)"
+  timestamp_time="$(epoch_to_datetime "${ts}" +%H-%M-%S)"
 
   local app_version_base
   app_version_base="$(sanitize_base_for_app_version "${base_version}")"
-  local app_version="${app_version_base}.$(channel_code "${channel}").${minutes_since_epoch}"
+
+  local app_version="${app_version_base}.$(channel_code "${channel}").${commit_count}"
   local prerelease="$(channel_prerelease "${channel}")"
 
   BUILD_DATE="${timestamp_date}"
@@ -164,10 +200,16 @@ stage_bootstrap_artifacts() {
     local bootstrap_exe
     bootstrap_exe="$(find_single_file "modelizer-next-bootstrap/target/dist/windows" '*.exe')"
     cp "${bootstrap_exe}" "${out_dir}/modelizer-next-bootstrap-${platform}-${VERSION}.exe"
+
+  elif [ "${platform}" = "macos" ]; then
+    local bootstrap_pkg
+    bootstrap_pkg="$(find_single_file "modelizer-next-bootstrap/target/dist/macos" '*.dmg')"
+    cp "${bootstrap_pkg}" "${out_dir}/modelizer-next-bootstrap-${platform}-${VERSION}.dmg"
+
   else
-    local bootstrap_exe
-    bootstrap_exe="$(find_single_file "modelizer-next-bootstrap/target/dist/linux" '*.deb')"
-    cp "${bootstrap_exe}" "${out_dir}/modelizer-next-bootstrap-${platform}-${VERSION}.deb"
+    local bootstrap_deb
+    bootstrap_deb="$(find_single_file "modelizer-next-bootstrap/target/dist/linux" '*.deb')"
+    cp "${bootstrap_deb}" "${out_dir}/modelizer-next-bootstrap-${platform}-${VERSION}.deb"
   fi
 }
 
@@ -183,10 +225,16 @@ stage_standalone_artifacts() {
     local app_exe
     app_exe="$(find_single_file "modelizer-next-app/target/dist/windows" '*.exe')"
     cp "${app_exe}" "${out_dir}/modelizer-next-app-standalone-${platform}-${VERSION}.exe"
+
+  elif [ "${platform}" = "macos" ]; then
+    local app_pkg
+    app_pkg="$(find_single_file "modelizer-next-app/target/dist/macos" '*.dmg')"
+    cp "${app_pkg}" "${out_dir}/modelizer-next-app-standalone-${platform}-${VERSION}.dmg"
+
   else
-    local app_exe
-    app_exe="$(find_single_file "modelizer-next-app/target/dist/linux" '*.deb')"
-    cp "${app_exe}" "${out_dir}/modelizer-next-app-standalone-${platform}-${VERSION}.deb"
+    local app_deb
+    app_deb="$(find_single_file "modelizer-next-app/target/dist/linux" '*.deb')"
+    cp "${app_deb}" "${out_dir}/modelizer-next-app-standalone-${platform}-${VERSION}.deb"
   fi
 }
 
@@ -213,11 +261,16 @@ stage_portable_artifacts() {
 
   if [ "${platform}" = "windows" ]; then
     source_dir="$(find_single_directory "modelizer-next-app/target/dist/windows")"
+
+  elif [ "${platform}" = "macos" ]; then
+    source_dir="$(find_single_directory "modelizer-next-app/target/dist/macos")"
+
   else
     source_dir="$(find_single_directory "modelizer-next-app/target/dist/linux")"
   fi
 
   archive_name="modelizer-next-app-portable-${platform}-${VERSION}.zip"
+
   (
     cd "${source_dir}"
     zip -r "${out_dir}/${archive_name}" .
@@ -273,11 +326,18 @@ run_platform_build() {
   esac
 
   echo "Version [$(channel_upper "${channel}")]: ${VERSION} (${BASE_VERSION}) = ${APP_VERSION}"
-	echo "profiles: native,${extra_profiles}"
-  mvn -B -DskipTests -Drevision="${VERSION}" -DappVersion="${APP_VERSION}" \
-    -Ddistributor="Automated ${channel} build ${BUILD_TIMESTAMP} (${platform}-${build_kind})" \
-    "${mvn_args[@]}" \
-    -Pnative,${extra_profiles} clean package
+  echo "profiles: native,${extra_profiles}"
+  echo "mvn args: ${mvn_args[*]:-}"
+  if (( ${#mvn_args[@]} > 0 )); then
+    mvn -B -DskipTests -Drevision="${VERSION}" -DappVersion="${APP_VERSION}" \
+      -Ddistributor="Automated ${channel} build ${BUILD_TIMESTAMP} (${platform}-${build_kind})" \
+      "${mvn_args[@]}" \
+      -Pnative,${extra_profiles} clean package
+  else
+    mvn -B -DskipTests -Drevision="${VERSION}" -DappVersion="${APP_VERSION}" \
+      -Ddistributor="Automated ${channel} build ${BUILD_TIMESTAMP} (${platform}-${build_kind})" \
+      -Pnative,${extra_profiles} clean package
+  fi
 
   case "${build_kind}" in
     standalone)
