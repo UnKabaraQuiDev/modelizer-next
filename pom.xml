@@ -31,7 +31,7 @@
 			https://raw.githubusercontent.com/UnKabaraQuiDev/modelizer-next/refs/heads/registry/registry/versions.json</modelizer.updatesManifestUrl>
 		<modelizer.issuesUrl>${modelizer.repositoryUrl}/issues</modelizer.issuesUrl>
 		<jpackage.addModules>
-			java.base,java.desktop,java.logging,java.net.http,jdk.unsupported,jdk.crypto.ec</jpackage.addModules>
+			java.base,java.desktop,java.logging,java.net.http,java.xml,jdk.unsupported,jdk.crypto.ec</jpackage.addModules>
 		<jpackage.group>Programming</jpackage.group>
 		<jpackage.category>Programming,Utilities</jpackage.category>
 		<jpackage.icon>filled in by profiles</jpackage.icon>

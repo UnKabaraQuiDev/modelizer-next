@@ -3,6 +3,7 @@ package lu.kbra.modelizer_next.ui;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Cursor;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
@@ -54,6 +55,7 @@ import lu.kbra.modelizer_next.ui.dialogs.CommentEditorDialog;
 import lu.kbra.modelizer_next.ui.dialogs.FieldEditorDialog;
 import lu.kbra.modelizer_next.ui.dialogs.LinkEditorDialog;
 import lu.kbra.modelizer_next.ui.dialogs.RenameDialog;
+import lu.kbra.modelizer_next.ui.export.ViewExportScope;
 
 public class DiagramCanvas extends JPanel {
 
@@ -255,6 +257,9 @@ public class DiagramCanvas extends JPanel {
 
 	private static final double CONCEPTUAL_ANCHOR_SPACING = 18.0;
 	private static final double SELF_LINK_OUTSIDE_OFFSET = 40.0;
+	private static final int EXPORT_MARGIN = 32;
+	private static final int DEFAULT_EXPORT_WIDTH = 1200;
+	private static final int DEFAULT_EXPORT_HEIGHT = 800;
 	private final ModelDocument document;
 
 	private final PanelType panelType;
@@ -283,6 +288,9 @@ public class DiagramCanvas extends JPanel {
 	private final Map<String, LinkAnchorPlacement> conceptualAnchorPlacements = new HashMap<>();
 	private final Map<ClassSideKey, List<String>> conceptualSideLinkCache = new HashMap<>();
 	private boolean conceptualAnchorCacheValid;
+	private LinkedHashSet<SelectedElement> exportSelectionFilter;
+	private boolean suppressSelectionDecorations;
+	private boolean suppressInteractiveOverlays;
 	private final Comparator<ClassModel> comparator = (a, b) -> {
 		if (this.selectedElement == null || this.selectedElement.type() != SelectedType.CLASS) {
 			return 0;
@@ -1049,7 +1057,7 @@ public class DiagramCanvas extends JPanel {
 			}
 		}
 
-		return bounds;
+			return bounds;
 	}
 
 	private Rectangle2D computeCommentBounds(final Graphics2D g2, final String text, final NodeLayout layout) {
@@ -1456,6 +1464,210 @@ public class DiagramCanvas extends JPanel {
 		return g2;
 	}
 
+	public BufferedImage createExportImage(final ViewExportScope scope) {
+		final Dimension exportSize = this.getExportSize(scope);
+		final BufferedImage image = new BufferedImage(exportSize.width, exportSize.height, BufferedImage.TYPE_INT_ARGB);
+		final Graphics2D g2 = image.createGraphics();
+		try {
+			this.configureGraphics(g2);
+			this.paintExport(g2, scope);
+		} finally {
+			g2.dispose();
+		}
+		return image;
+	}
+
+	public BufferedImage createExportPreviewImage(final ViewExportScope scope, final int maxWidth, final int maxHeight) {
+		final BufferedImage fullSizeImage = this.createExportImage(scope);
+		final Dimension exportSize = new Dimension(fullSizeImage.getWidth(), fullSizeImage.getHeight());
+		final double scale = Math.min(maxWidth / (double) exportSize.width, maxHeight / (double) exportSize.height);
+		final double safeScale = Math.max(0.05, Math.min(1.0, scale));
+		final int previewWidth = Math.max(1, (int) Math.round(exportSize.width * safeScale));
+		final int previewHeight = Math.max(1, (int) Math.round(exportSize.height * safeScale));
+
+		final BufferedImage image = new BufferedImage(previewWidth, previewHeight, BufferedImage.TYPE_INT_ARGB);
+		final Graphics2D g2 = image.createGraphics();
+		try {
+			this.configureGraphics(g2);
+			g2.drawImage(fullSizeImage, 0, 0, previewWidth, previewHeight, null);
+		} finally {
+			g2.dispose();
+		}
+		return image;
+	}
+
+	private Rectangle2D.Double computeExportContentBounds(final Graphics2D g2, final ViewExportScope scope) {
+		final LinkedHashSet<SelectedElement> previousFilter = this.exportSelectionFilter;
+		if (scope == ViewExportScope.SELECTION && this.exportSelectionFilter == null) {
+			this.exportSelectionFilter = new LinkedHashSet<>(this.selectedElements);
+		}
+
+		try {
+			this.ensureLayouts();
+
+			if (this.panelType == PanelType.CONCEPTUAL) {
+				this.invalidateConceptualAnchorCache();
+				this.ensureConceptualAnchorCache(g2);
+			}
+
+			Rectangle2D.Double bounds = null;
+			final boolean onlySelection = scope == ViewExportScope.SELECTION;
+
+			for (final ClassModel classModel : this.document.getModel().getClasses()) {
+				if (!this.isVisible(classModel) || onlySelection && !this.shouldExportClass(classModel)) {
+					continue;
+				}
+
+				final NodeLayout layout = this.resolveRenderLayout(this.findOrCreateNodeLayout(LayoutObjectType.CLASS, classModel.getId()));
+				final Rectangle2D classBounds = this.computeClassBounds(g2, classModel, layout);
+				bounds = this.expandBounds(bounds,
+						classBounds.getX(),
+						classBounds.getY(),
+						classBounds.getWidth(),
+						classBounds.getHeight());
+			}
+
+			for (final CommentModel commentModel : this.document.getModel().getComments()) {
+				final String text = this.resolveCommentText(commentModel);
+				if (text == null || text.isBlank() || !this.isCommentVisible(commentModel)
+						|| onlySelection && !this.shouldExportComment(commentModel)) {
+					continue;
+				}
+
+				final NodeLayout layout = this.resolveRenderLayout(this.findOrCreateNodeLayout(LayoutObjectType.COMMENT, commentModel.getId()));
+				final Rectangle2D commentBounds = this.computeCommentBounds(g2, text, layout);
+				bounds = this.expandBounds(bounds,
+						commentBounds.getX(),
+						commentBounds.getY(),
+						commentBounds.getWidth(),
+						commentBounds.getHeight());
+
+				final Point2D connectorAnchor = this.findBoundTargetAnchor(g2, commentModel);
+				if (connectorAnchor != null) {
+					bounds = this.expandBounds(bounds,
+							Math.min(connectorAnchor.getX(), commentBounds.getCenterX()),
+							Math.min(connectorAnchor.getY(), commentBounds.getCenterY()),
+							Math.abs(connectorAnchor.getX() - commentBounds.getCenterX()),
+							Math.abs(connectorAnchor.getY() - commentBounds.getCenterY()));
+				}
+			}
+
+			for (final LinkModel linkModel : this.getActiveLinks()) {
+				if (onlySelection && !this.shouldExportLink(linkModel)) {
+					continue;
+				}
+
+				final LinkGeometry geometry = this.resolveLinkGeometry(g2, linkModel);
+				if (geometry == null) {
+					continue;
+				}
+
+				for (final Point2D point : geometry.points()) {
+					bounds = this.expandBounds(bounds, point.getX(), point.getY(), 1.0, 1.0);
+				}
+
+				if (geometry.labelPoint() != null) {
+					bounds = this.expandBounds(bounds, geometry.labelPoint().getX() - 60, geometry.labelPoint().getY() - 20, 120, 40);
+				}
+			}
+
+		return bounds;
+		} finally {
+			this.exportSelectionFilter = previousFilter;
+		}
+	}
+
+	private Dimension computeExportSize(final Graphics2D g2, final ViewExportScope scope) {
+		if (scope == ViewExportScope.VIEW) {
+			return this.getViewportExportSize();
+		}
+
+		final Rectangle2D.Double contentBounds = this.computeExportContentBounds(g2, scope);
+		if (contentBounds == null) {
+			return this.getViewportExportSize();
+		}
+
+		return new Dimension(Math.max(1, (int) Math.ceil(contentBounds.getWidth() + DiagramCanvas.EXPORT_MARGIN * 2.0)),
+				Math.max(1, (int) Math.ceil(contentBounds.getHeight() + DiagramCanvas.EXPORT_MARGIN * 2.0)));
+	}
+
+	private Rectangle2D.Double computeExportWorldBounds(final Graphics2D g2, final ViewExportScope scope) {
+		if (scope == ViewExportScope.VIEW) {
+			final PanelState state = this.getPanelState();
+			final Dimension viewportSize = this.getViewportExportSize();
+			return new Rectangle2D.Double(-state.getPanX() / state.getZoom(),
+					-state.getPanY() / state.getZoom(),
+					viewportSize.getWidth() / state.getZoom(),
+					viewportSize.getHeight() / state.getZoom());
+		}
+
+		final Rectangle2D.Double contentBounds = this.computeExportContentBounds(g2, scope);
+		if (contentBounds == null) {
+			return this.computeExportWorldBounds(g2, ViewExportScope.VIEW);
+		}
+
+		return new Rectangle2D.Double(contentBounds.getX() - DiagramCanvas.EXPORT_MARGIN,
+				contentBounds.getY() - DiagramCanvas.EXPORT_MARGIN,
+				contentBounds.getWidth() + DiagramCanvas.EXPORT_MARGIN * 2.0,
+				contentBounds.getHeight() + DiagramCanvas.EXPORT_MARGIN * 2.0);
+	}
+
+	public Dimension getExportSize(final ViewExportScope scope) {
+		final Graphics2D g2 = this.createGraphicsContext();
+		try {
+			return this.computeExportSize(g2, scope == null ? ViewExportScope.VIEW : scope);
+		} finally {
+			g2.dispose();
+		}
+	}
+
+	private Dimension getViewportExportSize() {
+		return new Dimension(this.getWidth() <= 0 ? DiagramCanvas.DEFAULT_EXPORT_WIDTH : this.getWidth(),
+				this.getHeight() <= 0 ? DiagramCanvas.DEFAULT_EXPORT_HEIGHT : this.getHeight());
+	}
+
+	public boolean hasSelection() {
+		return !this.selectedElements.isEmpty();
+	}
+
+	public void paintExport(final Graphics2D graphics, final ViewExportScope rawScope) {
+		final ViewExportScope scope = rawScope == null ? ViewExportScope.VIEW : rawScope;
+		this.invalidateConceptualAnchorCache();
+		this.ensureLayouts();
+
+		final LinkedHashSet<SelectedElement> previousFilter = this.exportSelectionFilter;
+		final boolean previousSuppressSelectionDecorations = this.suppressSelectionDecorations;
+		final boolean previousSuppressInteractiveOverlays = this.suppressInteractiveOverlays;
+
+		this.exportSelectionFilter = scope == ViewExportScope.SELECTION ? new LinkedHashSet<>(this.selectedElements) : null;
+		this.suppressSelectionDecorations = true;
+		this.suppressInteractiveOverlays = true;
+
+		try {
+			final Dimension exportSize = this.computeExportSize(graphics, scope);
+			final Rectangle2D.Double worldBounds = this.computeExportWorldBounds(graphics, scope);
+
+			graphics.setColor(DiagramCanvas.CANVAS_BACKGROUND_COLOR);
+			graphics.fillRect(0, 0, exportSize.width, exportSize.height);
+			this.drawExportGrid(graphics, exportSize);
+
+			final AffineTransform oldTransform = graphics.getTransform();
+			final double zoom = scope == ViewExportScope.VIEW ? this.getPanelState().getZoom() : 1.0;
+			graphics.translate(-worldBounds.getX() * zoom, -worldBounds.getY() * zoom);
+			graphics.scale(zoom, zoom);
+
+			this.drawComments(graphics);
+			this.drawClasses(graphics);
+			this.drawLinks(graphics);
+
+			graphics.setTransform(oldTransform);
+		} finally {
+			this.exportSelectionFilter = previousFilter;
+			this.suppressSelectionDecorations = previousSuppressSelectionDecorations;
+			this.suppressInteractiveOverlays = previousSuppressInteractiveOverlays;
+		}
+	}
+
 	private LinkModel createLinkFromClipboard(
 			final CopiedLink copiedLink,
 			final Map<String, String> classIdMap,
@@ -1694,9 +1906,39 @@ public class DiagramCanvas extends JPanel {
 		this.drawAlignedLinkLabel(g2, text, center, angle);
 	}
 
+	private boolean shouldExportClass(final ClassModel classModel) {
+		if (this.exportSelectionFilter == null) {
+			return true;
+		}
+		if (classModel == null) {
+			return false;
+		}
+
+		for (final SelectedElement element : this.exportSelectionFilter) {
+			if (element.type() == SelectedType.CLASS && Objects.equals(element.classId(), classModel.getId())) {
+				return true;
+			}
+			if (element.type() == SelectedType.FIELD && Objects.equals(element.classId(), classModel.getId())) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	private boolean shouldExportComment(final CommentModel commentModel) {
+		return this.exportSelectionFilter == null
+				|| commentModel != null && this.exportSelectionFilter.contains(SelectedElement.forComment(commentModel.getId()));
+	}
+
+	private boolean shouldExportLink(final LinkModel linkModel) {
+		return this.exportSelectionFilter == null
+				|| linkModel != null && this.exportSelectionFilter.contains(SelectedElement.forLink(linkModel.getId()));
+	}
+
 	private void drawClasses(final Graphics2D g2) {
 		for (final ClassModel classModel : this.document.getModel().getClasses()) {
-			if (!this.isVisible(classModel)) {
+			if (!this.isVisible(classModel) || !this.shouldExportClass(classModel)) {
 				continue;
 			}
 
@@ -1782,7 +2024,7 @@ public class DiagramCanvas extends JPanel {
 	private void drawComments(final Graphics2D g2) {
 		for (final CommentModel commentModel : this.document.getModel().getComments()) {
 			final String commentText = this.resolveCommentText(commentModel);
-			if (commentText == null || commentText.isBlank() || !this.isCommentVisible(commentModel)) {
+			if (commentText == null || commentText.isBlank() || !this.isCommentVisible(commentModel) || !this.shouldExportComment(commentModel)) {
 				continue;
 			}
 
@@ -1825,8 +2067,18 @@ public class DiagramCanvas extends JPanel {
 		}
 	}
 
+	private void drawExportGrid(final Graphics2D g2, final Dimension size) {
+		g2.setColor(DiagramCanvas.GRID_COLOR);
+		for (int x = 0; x < size.width; x += 40) {
+			g2.drawLine(x, 0, x, size.height);
+		}
+		for (int y = 0; y < size.height; y += 40) {
+			g2.drawLine(0, y, size.width, y);
+		}
+	}
+
 	private void drawLinkPreview(final Graphics2D g2) {
-		if (this.linkCreationState == null) {
+		if (this.suppressInteractiveOverlays || this.linkCreationState == null) {
 			return;
 		}
 
@@ -1867,6 +2119,10 @@ public class DiagramCanvas extends JPanel {
 		g2.setFont(DiagramCanvas.BODY_FONT);
 
 		for (final LinkModel linkModel : this.getActiveLinks()) {
+			if (!this.shouldExportLink(linkModel)) {
+				continue;
+			}
+
 			final LinkGeometry geometry = this.resolveLinkGeometry(g2, linkModel);
 			if (geometry == null) {
 				continue;
@@ -2992,11 +3248,11 @@ public class DiagramCanvas extends JPanel {
 	}
 
 	private boolean isClassSelected(final String classId) {
-		return this.selectedElements.contains(SelectedElement.forClass(classId));
+		return !this.suppressSelectionDecorations && this.selectedElements.contains(SelectedElement.forClass(classId));
 	}
 
 	private boolean isCommentSelected(final String commentId) {
-		return this.selectedElements.contains(SelectedElement.forComment(commentId));
+		return !this.suppressSelectionDecorations && this.selectedElements.contains(SelectedElement.forComment(commentId));
 	}
 
 	private boolean isCommentVisible(final CommentModel commentModel) {
@@ -3045,7 +3301,7 @@ public class DiagramCanvas extends JPanel {
 	}
 
 	private boolean isFieldSelected(final String classId, final String fieldId) {
-		return this.selectedElements.contains(SelectedElement.forField(classId, fieldId));
+		return !this.suppressSelectionDecorations && this.selectedElements.contains(SelectedElement.forField(classId, fieldId));
 	}
 
 	private boolean isInCommentResizeHandle(final Rectangle2D bounds, final Point2D.Double worldPoint) {
@@ -3054,7 +3310,7 @@ public class DiagramCanvas extends JPanel {
 	}
 
 	private boolean isLinkSelected(final String linkId) {
-		return this.selectedElements.contains(SelectedElement.forLink(linkId));
+		return !this.suppressSelectionDecorations && this.selectedElements.contains(SelectedElement.forLink(linkId));
 	}
 
 	private boolean isPointNearGeometry(final Point2D.Double worldPoint, final LinkGeometry geometry) {

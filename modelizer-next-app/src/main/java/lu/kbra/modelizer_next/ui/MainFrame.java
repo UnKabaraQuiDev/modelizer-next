@@ -19,8 +19,10 @@ import java.io.File;
 import java.io.IOException;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import javax.swing.AbstractAction;
@@ -67,6 +69,9 @@ import lu.kbra.modelizer_next.layout.PanelType;
 import lu.kbra.modelizer_next.style.StylePalette;
 import lu.kbra.modelizer_next.style.StylePaletteService;
 import lu.kbra.modelizer_next.ui.dialogs.StylePaletteEditorDialog;
+import lu.kbra.modelizer_next.ui.dialogs.ViewExportDialog;
+import lu.kbra.modelizer_next.ui.export.ViewExportRequest;
+import lu.kbra.modelizer_next.ui.export.ViewExporter;
 import lu.kbra.pclib.PCUtils;
 
 public class MainFrame extends JFrame {
@@ -440,12 +445,6 @@ public class MainFrame extends JFrame {
 			infoMenu.add(bootstrapVersionInfo);
 		}
 
-//		if (!updateRuntimeAvailable) {
-//			final JMenuItem standaloneInfo = new JMenuItem("Standalone mode: bootstrap updates unavailable.");
-//			standaloneInfo.setEnabled(false);
-//			infoMenu.add(standaloneInfo);
-//		}
-
 		return infoMenu;
 	}
 
@@ -459,6 +458,10 @@ public class MainFrame extends JFrame {
 		fileMenu.add(this.createFileMenuItem("Save As...",
 				KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK),
 				this::saveDocumentAs));
+		fileMenu.addSeparator();
+		fileMenu.add(this.createFileMenuItem("Export...",
+				KeyStroke.getKeyStroke(KeyEvent.VK_E, InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK),
+				this::exportCurrentView));
 
 		final JMenu editMenu = this.createEditMenu();
 
@@ -594,6 +597,40 @@ public class MainFrame extends JFrame {
 		return button;
 	}
 
+	private void exportCurrentView() {
+		final DiagramCanvas activeCanvas = this.getActiveCanvas();
+		final ViewExportRequest request = ViewExportDialog.showDialog(this,
+				this.getCanvasesByPanelType(),
+				activeCanvas == null ? PanelType.CONCEPTUAL : activeCanvas.getPanelType(),
+				this.getDefaultExportDirectory());
+
+		if (request == null) {
+			return;
+		}
+
+		try {
+			final List<File> exportedFiles = ViewExporter
+					.exportViews(this.getCanvasesByPanelType(), request, this.getExportSourceFileName());
+			if (exportedFiles.isEmpty()) {
+				JOptionPane.showMessageDialog(this, "No view was exported.", "Export", JOptionPane.WARNING_MESSAGE);
+				return;
+			}
+
+			final StringBuilder message = new StringBuilder("Exported ").append(exportedFiles.size()).append(" file");
+			if (exportedFiles.size() != 1) {
+				message.append('s');
+			}
+			message.append(":\n");
+			for (final File file : exportedFiles) {
+				message.append(file.getAbsolutePath()).append('\n');
+			}
+
+			JOptionPane.showMessageDialog(this, message.toString(), "Export complete", JOptionPane.INFORMATION_MESSAGE);
+		} catch (final IOException ex) {
+			JOptionPane.showMessageDialog(this, "Failed to export view:\n" + ex.getMessage(), "Export error", JOptionPane.ERROR_MESSAGE);
+		}
+	}
+
 	private StylePalette findPaletteByName(final String paletteName) {
 		if (paletteName == null || paletteName.isBlank()) {
 			return null;
@@ -645,6 +682,35 @@ public class MainFrame extends JFrame {
 		case 2 -> this.physicalCanvas;
 		default -> this.conceptualCanvas;
 		};
+	}
+
+	private Map<PanelType, DiagramCanvas> getCanvasesByPanelType() {
+		final Map<PanelType, DiagramCanvas> canvases = new LinkedHashMap<>();
+		canvases.put(PanelType.CONCEPTUAL, this.conceptualCanvas);
+		canvases.put(PanelType.LOGICAL, this.logicalCanvas);
+		canvases.put(PanelType.PHYSICAL, this.physicalCanvas);
+		return canvases;
+	}
+
+	private File getDefaultExportDirectory() {
+		if (this.session.getCurrentFile() != null && this.session.getCurrentFile().getParentFile() != null) {
+			return this.session.getCurrentFile().getParentFile();
+		}
+
+		return new File(System.getProperty("user.home"));
+	}
+
+	private String getExportSourceFileName() {
+		if (this.session.getCurrentFile() != null) {
+			return this.session.getCurrentFile().getName();
+		}
+
+		final String source = this.document.getSource();
+		if (source == null || source.isBlank()) {
+			return "Untitled";
+		}
+
+		return new File(source).getName();
 	}
 
 	private void installCloseHandling() {
