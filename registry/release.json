@@ -1,10 +1,10 @@
 {
   "channel": "release",
-  "version": "3-RELEASE-127",
-  "tag": "3-RELEASE-127",
-  "releaseUrl": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/tag/3-RELEASE-127",
-  "assetUrl": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/3-RELEASE-127/modelizer-next-app-3-RELEASE-127.jar",
-  "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/3-RELEASE-127/modelizer-next-app-3-RELEASE-127.jar",
+  "version": "3-RELEASE-129",
+  "tag": "3-RELEASE-129",
+  "releaseUrl": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/tag/3-RELEASE-129",
+  "assetUrl": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/3-RELEASE-129/modelizer-next-app-3-RELEASE-129.jar",
+  "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/3-RELEASE-129/modelizer-next-app-3-RELEASE-129.jar",
   "platforms": [
     "unknown",
     "linux",
@@ -12,8 +12,85 @@
     "windows"
   ],
   "notes": "Latest release build.",
-  "updatedAt": "2026-04-25T15:28:45Z",
+  "updatedAt": "2026-04-25T15:42:30Z",
   "entries": [
+    {
+      "version": "3-RELEASE-129",
+      "tag": "3-RELEASE-129",
+      "releaseUrl": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/tag/3-RELEASE-129",
+      "assetUrl": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/3-RELEASE-129/modelizer-next-app-3-RELEASE-129.jar",
+      "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/3-RELEASE-129/modelizer-next-app-3-RELEASE-129.jar",
+      "platforms": [
+        "unknown",
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "notes": "Latest release build.",
+      "publishedAt": "2026-04-25T15:42:30Z",
+      "assets": [
+        {
+          "name": "modelizer-next-app-3-RELEASE-129.jar",
+          "platform": "unknown",
+          "kind": "app-standalone-jar",
+          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/3-RELEASE-129/modelizer-next-app-3-RELEASE-129.jar"
+        },
+        {
+          "name": "modelizer-next-app-portable-linux-3-RELEASE-129.zip",
+          "platform": "linux",
+          "kind": "app-portable-native",
+          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/3-RELEASE-129/modelizer-next-app-portable-linux-3-RELEASE-129.zip"
+        },
+        {
+          "name": "modelizer-next-app-portable-macos-3-RELEASE-129.zip",
+          "platform": "macos",
+          "kind": "app-portable-native",
+          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/3-RELEASE-129/modelizer-next-app-portable-macos-3-RELEASE-129.zip"
+        },
+        {
+          "name": "modelizer-next-app-portable-windows-3-RELEASE-129.zip",
+          "platform": "windows",
+          "kind": "app-portable-native",
+          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/3-RELEASE-129/modelizer-next-app-portable-windows-3-RELEASE-129.zip"
+        },
+        {
+          "name": "modelizer-next-app-standalone-linux-3-RELEASE-129.deb",
+          "platform": "linux",
+          "kind": "app-standalone-native",
+          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/3-RELEASE-129/modelizer-next-app-standalone-linux-3-RELEASE-129.deb"
+        },
+        {
+          "name": "modelizer-next-app-standalone-macos-3-RELEASE-129.dmg",
+          "platform": "macos",
+          "kind": "app-standalone-native",
+          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/3-RELEASE-129/modelizer-next-app-standalone-macos-3-RELEASE-129.dmg"
+        },
+        {
+          "name": "modelizer-next-app-standalone-windows-3-RELEASE-129.exe",
+          "platform": "windows",
+          "kind": "app-standalone-native",
+          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/3-RELEASE-129/modelizer-next-app-standalone-windows-3-RELEASE-129.exe"
+        },
+        {
+          "name": "modelizer-next-bootstrap-linux-3-RELEASE-129.deb",
+          "platform": "linux",
+          "kind": "bootstrap-native",
+          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/3-RELEASE-129/modelizer-next-bootstrap-linux-3-RELEASE-129.deb"
+        },
+        {
+          "name": "modelizer-next-bootstrap-macos-3-RELEASE-129.dmg",
+          "platform": "macos",
+          "kind": "bootstrap-native",
+          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/3-RELEASE-129/modelizer-next-bootstrap-macos-3-RELEASE-129.dmg"
+        },
+        {
+          "name": "modelizer-next-bootstrap-windows-3-RELEASE-129.exe",
+          "platform": "windows",
+          "kind": "bootstrap-native",
+          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/3-RELEASE-129/modelizer-next-bootstrap-windows-3-RELEASE-129.exe"
+        }
+      ]
+    },
     {
       "version": "3-RELEASE-127",
       "tag": "3-RELEASE-127",
