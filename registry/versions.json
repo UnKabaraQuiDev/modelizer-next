@@ -1,10 +1,10 @@
 {
   "release": {
-    "version": "0.2-RELEASE-163803",
-    "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/0.2-RELEASE-163803/modelizer-next-app-0.2-RELEASE-163803.jar",
-    "releaseUrl": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/tag/0.2-RELEASE-163803",
+    "version": "3-RELEASE-127",
+    "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/3-RELEASE-127/modelizer-next-app-3-RELEASE-127.jar",
+    "releaseUrl": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/tag/3-RELEASE-127",
     "notes": "Latest release build.",
-    "tag": "0.2-RELEASE-163803"
+    "tag": "3-RELEASE-127"
   },
   "snapshot": {
     "version": "3-SNAPSHOT-126",
