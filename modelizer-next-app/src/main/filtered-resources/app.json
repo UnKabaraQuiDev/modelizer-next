@@ -4,10 +4,8 @@
 	"version": "@project.version@",
 	"revision": "@appVersion@",
 	"distributor": "@distributor@",
-	"repository": "@modelizer.repositoryUrl@",
-	"releases": "@modelizer.releasesUrl@",
-	"updatesManifest": "@modelizer.updatesManifestUrl@",
 	"issues": "@modelizer.issuesUrl@",
 	"entryPoint": "lu.kbra.modelizer_next.ModelizerAppEntryPoint",
-	"portable": @portable@
+	"portable": @portable@,
+	"website": "@modelizer.website@"
 }

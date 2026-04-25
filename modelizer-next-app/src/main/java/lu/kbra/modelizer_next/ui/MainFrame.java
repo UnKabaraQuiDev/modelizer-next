@@ -20,6 +20,8 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -461,6 +463,42 @@ public class MainFrame extends JFrame {
 			bootstrapVersionInfo.addActionListener(al);
 			infoMenu.add(bootstrapVersionInfo);
 		}
+
+		final JMenuItem reportIssueButton = new JMenuItem("Report issue...");
+		reportIssueButton.addActionListener(action -> {
+			try {
+				if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(java.awt.Desktop.Action.BROWSE)) {
+					Desktop.getDesktop().browse(new URI(App.ISSUES_URL));
+					return;
+				}
+			} catch (IOException | URISyntaxException e) {
+				e.printStackTrace();
+			}
+			Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(App.ISSUES_URL), null);
+			JOptionPane.showMessageDialog(null,
+					"The issue link has been copied to your clipboard:\n" + App.ISSUES_URL,
+					"Report an issue",
+					JOptionPane.INFORMATION_MESSAGE);
+		});
+		infoMenu.add(reportIssueButton);
+
+		final JMenuItem websiteButton = new JMenuItem("Website...");
+		websiteButton.addActionListener(action -> {
+			try {
+				if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(java.awt.Desktop.Action.BROWSE)) {
+					Desktop.getDesktop().browse(new URI(App.WEBSITE_URL));
+					return;
+				}
+			} catch (IOException | URISyntaxException e) {
+				e.printStackTrace();
+			}
+			Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(App.WEBSITE_URL), null);
+			JOptionPane.showMessageDialog(null,
+					"The website link has been copied to your clipboard:\n" + App.WEBSITE_URL,
+					"Visit website",
+					JOptionPane.INFORMATION_MESSAGE);
+		});
+		infoMenu.add(websiteButton);
 
 		return infoMenu;
 	}
