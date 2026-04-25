@@ -326,6 +326,7 @@ run_platform_build() {
     installer|normal)
       echo "Starting ${platform} ${channel} bootstrap installer build"
       extra_profiles="native-${platform}"
+      mvn_args=""
       ;;
 
     *)
@@ -335,10 +336,11 @@ run_platform_build() {
   esac
 
   echo "Version [$(channel_upper "${channel}")]: ${VERSION} (${BASE_VERSION}) = ${APP_VERSION}"
-	echo "profiles: native,${extra_profiles}"
+  echo "profiles: native,${extra_profiles}"
+  echo "mvn args: ${mvn_args}"
   mvn -B -DskipTests -Drevision="${VERSION}" -DappVersion="${APP_VERSION}" \
     -Ddistributor="Automated ${channel} build ${BUILD_TIMESTAMP} (${platform}-${build_kind})" \
-    "${mvn_args[@]}" \
+    "${mvn_args[@]:-}" \
     -Pnative,${extra_profiles} clean package
 
   case "${build_kind}" in
