@@ -3,7 +3,9 @@ package lu.kbra.modelizer_next.ui;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Image;
 import java.awt.Insets;
 import java.awt.Toolkit;
 import java.awt.datatransfer.DataFlavor;
@@ -19,6 +21,7 @@ import java.io.File;
 import java.io.IOException;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -26,8 +29,10 @@ import java.util.Map;
 import java.util.Optional;
 
 import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComponent;
@@ -161,7 +166,6 @@ public class MainFrame extends JFrame {
 	private List<StylePalette> palettes;
 
 	private JMenuItem undoMenuItem;
-
 	private JMenuItem redoMenuItem;
 
 	public MainFrame(final DocumentSession session) {
@@ -213,7 +217,18 @@ public class MainFrame extends JFrame {
 
 		this.setJMenuBar(this.createMenuBar());
 
-		this.pinnedStylesPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 6, 0));
+		this.pinnedStylesPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 3, 3));
+		this.pinnedStylesPanel.putClientProperty("dragListener", new DragListener(this.pinnedStylesPanel));
+		this.pinnedStylesPanel.putClientProperty("savePalettes", (Runnable) () -> {
+			final List<String> pinnedPalettes = this.appConfig.getPinnedPaletteNames();
+			pinnedPalettes.clear();
+			pinnedPalettes.addAll(Arrays.stream(this.pinnedStylesPanel.getComponents())
+					.filter(JButton.class::isInstance)
+					.map(JButton.class::cast)
+					.map(JButton::getText)
+					.toList());
+			App.saveConfig(this.appConfig);
+		});
 		this.pinnedStylesPanel.setOpaque(false);
 
 		this.toolBar = this.createToolBar();
@@ -527,6 +542,9 @@ public class MainFrame extends JFrame {
 			this.appConfig.setSelectedPaletteName(palette.getName());
 			App.saveConfig(this.appConfig);
 		});
+		final DragListener dragListener = (DragListener) this.pinnedStylesPanel.getClientProperty("dragListener");
+		button.addMouseListener(dragListener);
+		button.addMouseMotionListener(dragListener);
 		return button;
 	}
 
@@ -553,23 +571,25 @@ public class MainFrame extends JFrame {
 		final JPanel buttons = new JPanel();
 		buttons.setLayout(new FlowLayout(FlowLayout.LEFT, 6, 0));
 
-		buttons.add(this.createToolbarButton("New table", "addTable"));
-		buttons.add(this.createToolbarButton("New field", "addField"));
-		buttons.add(this.createToolbarButton("New comment", "addComment"));
-		buttons.add(this.createToolbarButton("New link", "addLink"));
-//		buttons.addSeparator();
-		buttons.add(this.createToolbarButton("Rename", "renameSelection"));
-		buttons.add(this.createToolbarButton("Delete", "deleteSelection"));
-		buttons.add(this.createToolbarButton("Duplicate", "duplicateSelection"));
+		buttons.add(this.createToolbarButton("add-table.png", "New table", "addTable"));
+		buttons.add(this.createToolbarButton("add-field.png", "New field", "addField"));
+		buttons.add(this.createToolbarButton("add-comment.png", "New comment", "addComment"));
+		buttons.add(this.createToolbarButton("add-link.png", "New link", "addLink"));
+//		buttons.add(this.createToolbarButton("rename.svg", "renameSelection"));
+		buttons.add(this.createToolbarButton("delete.png", "Delete", "deleteSelection"));
+		buttons.add(this.createToolbarButton("duplicate.png", "Duplicate", "duplicateSelection"));
 
 		toolbar.add(buttons, BorderLayout.WEST);
 
 		return toolbar;
 	}
 
-	private JButton createToolbarButton(final String text, final String actionKey) {
-		final JButton button = new JButton(text);
-		button.putClientProperty("baseText", text);
+	private JButton createToolbarButton(final String icon, final String description, final String actionKey) {
+		final JButton button = new JButton();
+		final ImageIcon rawIcon = new ImageIcon(PCUtils.readPackagedBytesFile("/icons/" + icon));
+		final Image scaled = rawIcon.getImage().getScaledInstance(34, 34, Image.SCALE_SMOOTH);
+		button.setIcon(new ImageIcon(scaled));
+		button.putClientProperty("baseText", description);
 		button.putClientProperty("actionKey", actionKey);
 
 		button.addActionListener(event -> {
@@ -579,7 +599,7 @@ public class MainFrame extends JFrame {
 			}
 
 			final ActionEvent actionEvent = new ActionEvent(canvas, ActionEvent.ACTION_PERFORMED, actionKey);
-			final javax.swing.Action action = canvas.getActionMap().get(actionKey);
+			final Action action = canvas.getActionMap().get(actionKey);
 			if (action != null) {
 				action.actionPerformed(actionEvent);
 				canvas.requestFocusInWindow();
@@ -590,9 +610,11 @@ public class MainFrame extends JFrame {
 		if (canvas != null) {
 			final String shortcutText = this.findShortcutText(canvas, actionKey);
 			if (!shortcutText.isBlank()) {
-				button.setText(text + " (" + shortcutText + ")");
+				button.setToolTipText(description + " (" + shortcutText + ")");
 			}
 		}
+
+		button.setPreferredSize(new Dimension(40, 40));
 
 		return button;
 	}
