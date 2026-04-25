@@ -42,8 +42,7 @@ public class VersionComparator implements Comparator<String> {
 			return new ParsedVersion(List.of(0), VersionComparator.CHANNEL_RELEASE, 0L);
 		}
 
-		final String normalized = version.trim().startsWith("v") || version.trim().startsWith("V")
-				? version.trim().substring(1)
+		final String normalized = version.trim().startsWith("v") || version.trim().startsWith("V") ? version.trim().substring(1)
 				: version.trim();
 		final String[] tokens = normalized.split("-");
 		final List<Integer> numbers = new ArrayList<>();
