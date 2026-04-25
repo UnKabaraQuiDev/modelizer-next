@@ -328,10 +328,16 @@ run_platform_build() {
   echo "Version [$(channel_upper "${channel}")]: ${VERSION} (${BASE_VERSION}) = ${APP_VERSION}"
   echo "profiles: native,${extra_profiles}"
   echo "mvn args: ${mvn_args[*]:-}"
-  mvn -B -DskipTests -Drevision="${VERSION}" -DappVersion="${APP_VERSION}" \
-    -Ddistributor="Automated ${channel} build ${BUILD_TIMESTAMP} (${platform}-${build_kind})" \
-    "${mvn_args[@]:-}" \
-    -Pnative,${extra_profiles} clean package
+  if (( ${#mvn_args[@]} > 0 )); then
+    mvn -B -DskipTests -Drevision="${VERSION}" -DappVersion="${APP_VERSION}" \
+      -Ddistributor="Automated ${channel} build ${BUILD_TIMESTAMP} (${platform}-${build_kind})" \
+      "${mvn_args[@]}" \
+      -Pnative,${extra_profiles} clean package
+  else
+    mvn -B -DskipTests -Drevision="${VERSION}" -DappVersion="${APP_VERSION}" \
+      -Ddistributor="Automated ${channel} build ${BUILD_TIMESTAMP} (${platform}-${build_kind})" \
+      -Pnative,${extra_profiles} clean package
+  fi
 
   case "${build_kind}" in
     standalone)
