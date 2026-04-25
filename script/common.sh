@@ -53,6 +53,40 @@ channel_prerelease() {
   esac
 }
 
+date_to_epoch_utc() {
+  local input="$1"
+  local fmt="${2:-%Y-%m-%d %H:%M:%S}"
+
+  # GNU coreutils (Linux / brew)
+  if command -v gdate >/dev/null 2>&1; then
+    gdate -u -d "$input" +%s
+    return
+  fi
+
+  # macOS BSD date
+  date -u -j -f "$fmt" "$input" +%s
+}
+
+epoch_to_date_utc() {
+  local epoch="$1"
+
+  if command -v gdate >/dev/null 2>&1; then
+    gdate -u -d "@$epoch" +%Y-%m-%d
+  else
+    date -u -r "$epoch" +%Y-%m-%d
+  fi
+}
+
+epoch_to_time_utc() {
+  local epoch="$1"
+
+  if command -v gdate >/dev/null 2>&1; then
+    gdate -u -d "@$epoch" +%H-%M-%S
+  else
+    date -u -r "$epoch" +%H-%M-%S
+  fi
+}
+
 compute_build_metadata() {
   local channel="$1"
   local platform="${2:-any}"
@@ -66,8 +100,10 @@ compute_build_metadata() {
   local epoch_timestamp
   local build_timestamp_seconds
   local minutes_since_epoch
+
   channel_name="$(channel_upper "${channel}")"
-  epoch_timestamp="$(date -u -d '2026-01-01 00:00:00' +%s)"
+
+  epoch_timestamp="$(date_to_epoch_utc "2026-01-01 00:00:00")"
 
   if [[ -n "${version_override}" ]]; then
     if [[ "${version_override}" =~ ^([0-9]+(\.[0-9]+)*)-(${channel_name})-([0-9]+)$ ]]; then
@@ -81,21 +117,26 @@ compute_build_metadata() {
   else
     raw_base_version="$(mvn -B help:evaluate -Dexpression=project.version -q -DforceStdout)"
     base_version="$(sanitize_base_for_public_version "${raw_base_version}")"
+
     build_timestamp_seconds="$(date -u +%s)"
+
     if (( build_timestamp_seconds < epoch_timestamp )); then
       echo "Current time is before 2026-01-01 00:00:00 UTC" >&2
       exit 1
     fi
+
     minutes_since_epoch="$(( (build_timestamp_seconds - epoch_timestamp) / 60 ))"
     version_override="${base_version}-${channel_name}-${minutes_since_epoch}"
   fi
 
   build_timestamp_seconds="$(( epoch_timestamp + minutes_since_epoch * 60 ))"
-  timestamp_date="$(date -u -d "@${build_timestamp_seconds}" +%Y-%m-%d)"
-  timestamp_time="$(date -u -d "@${build_timestamp_seconds}" +%H-%M-%S)"
+
+  timestamp_date="$(epoch_to_date_utc "$build_timestamp_seconds")"
+  timestamp_time="$(epoch_to_time_utc "$build_timestamp_seconds")"
 
   local app_version_base
   app_version_base="$(sanitize_base_for_app_version "${base_version}")"
+
   local app_version="${app_version_base}.$(channel_code "${channel}").${minutes_since_epoch}"
   local prerelease="$(channel_prerelease "${channel}")"
 
