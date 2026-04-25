@@ -367,6 +367,7 @@ jobs:
           git config --global user.email "github-actions@github.com"
 
           rm -rf pages-worktree
+		  git worktree prune
           git fetch origin pages
           git worktree add pages-worktree origin/pages
 
@@ -388,7 +389,7 @@ jobs:
               "assets": {
                   "windows": {},
                   "linux": {},
-                  "other": {}
+                  "macos": {}
               }
           }
 
