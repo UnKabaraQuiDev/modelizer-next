@@ -62,7 +62,7 @@ public class MNMain {
 
 	public static void main(final String[] args) {
 		FileOpenBridge.installFileHandler();
-		new ModelizerAppEntryPoint().start(args, FileOpenBridge.TO_BE_OPENED);
+		new ModelizerAppEntryPoint().start(args);
 	}
 
 }
