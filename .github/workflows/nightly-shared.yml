@@ -19,7 +19,6 @@ jobs:
         with:
           fetch-depth: 0
       - id: meta
-        if: steps.decide.outputs.should_run == 'true'
         run: |
           source ./script/common.sh
           compute_build_metadata nightly shared
