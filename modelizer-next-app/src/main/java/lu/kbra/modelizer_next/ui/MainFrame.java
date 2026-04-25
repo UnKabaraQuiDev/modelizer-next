@@ -3,6 +3,7 @@ package lu.kbra.modelizer_next.ui;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Image;
@@ -27,6 +28,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -476,7 +478,7 @@ public class MainFrame extends JFrame {
 		fileMenu.addSeparator();
 		fileMenu.add(this.createFileMenuItem("Export...",
 				KeyStroke.getKeyStroke(KeyEvent.VK_E, InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK),
-				this::exportCurrentView));
+				this::exportImage));
 
 		final JMenu editMenu = this.createEditMenu();
 
@@ -619,7 +621,7 @@ public class MainFrame extends JFrame {
 		return button;
 	}
 
-	private void exportCurrentView() {
+	private void exportImage() {
 		final DiagramCanvas activeCanvas = this.getActiveCanvas();
 		final ViewExportRequest request = ViewExportDialog.showDialog(this,
 				this.getCanvasesByPanelType(),
@@ -638,16 +640,30 @@ public class MainFrame extends JFrame {
 				return;
 			}
 
-			final StringBuilder message = new StringBuilder("Exported ").append(exportedFiles.size()).append(" file");
-			if (exportedFiles.size() != 1) {
-				message.append('s');
-			}
-			message.append(":\n");
-			for (final File file : exportedFiles) {
-				message.append(file.getAbsolutePath()).append('\n');
-			}
+			final String message = "Exported " + exportedFiles.size() + " file" + (exportedFiles.size() > 1 ? "s" : "") + ":\n"
+					+ exportedFiles.stream().map(File::getAbsolutePath).collect(Collectors.joining("\n"));
 
-			JOptionPane.showMessageDialog(this, message.toString(), "Export complete", JOptionPane.INFORMATION_MESSAGE);
+			final Object[] options = { "Show file(s)", "Close" };
+
+			final int choice = JOptionPane.showOptionDialog(null,
+					message,
+					"Export successful",
+					JOptionPane.DEFAULT_OPTION,
+					JOptionPane.INFORMATION_MESSAGE,
+					null,
+					options,
+					options[1]);
+
+			if (choice == 0) {
+				if (!Desktop.isDesktopSupported() || !Desktop.getDesktop().isSupported(java.awt.Desktop.Action.OPEN)) {
+					JOptionPane.showMessageDialog(null,
+							"Your system doesn't seem to support natively opening files :(",
+							"Error",
+							JOptionPane.ERROR_MESSAGE);
+					return;
+				}
+				Desktop.getDesktop().open(exportedFiles.size() > 1 ? request.outputDirectory() : exportedFiles.get(0));
+			}
 		} catch (final IOException ex) {
 			JOptionPane.showMessageDialog(this, "Failed to export view:\n" + ex.getMessage(), "Export error", JOptionPane.ERROR_MESSAGE);
 		}
