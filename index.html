@@ -8,7 +8,7 @@
     <meta property="og:title" content="Modelizer Next" />
     <meta property="og:description" content="A modern database modelling tool with intuitive controls and a clean UI." />
     <meta property="og:type" content="website" />
-      <link rel="icon" href="favicon.png" type="image/png" />
+    <link rel="icon" href="favicon.png" type="image/png" />
     <meta property="og:url" content="https://modelizer.kbra.lu/" />
     <title>Modelizer Next - Plan your databases smarter</title>
     <link rel="stylesheet" href="style.css" />
@@ -387,154 +387,108 @@
       </div>
     </section>
     <section id="download">
-      <div class="container download-layout">
-        <div class="download">
-          <div>
-            <p class="eyebrow">
-              <span class="pulse" aria-hidden="true"></span>Get Modelizer Next
-            </p>
-            <h2>Choose the build that fits your setup.</h2>
-            <p>Select your operating system and build type. The button updates to the exact file for your choice.</p>
-          </div>
-          <div class="selector-card">
+      <div class="container">
+        <div class="download-heading">
+          <p class="eyebrow">
+            <span class="pulse" aria-hidden="true"></span>Get Modelizer Next
+          </p>
+          <h2>Choose the build that fits your setup.</h2>
+          <p>Select your operating system and build type. The button updates to the exact file for your choice.</p>
+        </div>
+        <div class="download-layout">
+          <div class="download">
             <div class="selector-group">
               <h3>Operating system</h3>
-              <div class="choice-grid" id="osChoices">
+              <div class="choice-grid os-list" id="osChoices">
                 <button class="choice has-icon" type="button" data-value="Windows" data-key="windows" aria-pressed="true">
                 <img class="choice-icon" src="img/windows.svg" alt="" />
                 <span class="choice-content">
                   <strong>Windows</strong>
-                  <br />
-                  <span>Best for most classroom and desktop PCs.</span>
+                  <span>Best for most classroom and desktop PCs</span>
                 </span>
                 </button>
                 <button class="choice has-icon" type="button" data-value="Linux" data-key="linux" aria-pressed="false">
                 <img class="choice-icon" src="img/debian.svg" alt="" />
                 <span class="choice-content">
                   <strong>Linux</strong>
-                  <br />
-                  <span>Debian-based installations using
-                    <code>.deb</code>packages.
-                  </span>
+                  <span>Debian-based installations</span>
                 </span>
                 </button>
                 <button class="choice has-icon" type="button" data-value="MacOS" data-key="macos" aria-pressed="false">
                 <img class="choice-icon" src="img/macos.svg" alt="" />
                 <span class="choice-content">
                   <strong>MacOS</strong>
-                  <br />
-                  <span>For MacOS devices, using <code>.dmg</code> packages.</span>
+                  <span>For MacOS devices</span>
                 </span>
                 </button>
               </div>
             </div>
+          </div>
+          <div class="download-option">
             <div class="selector-group">
               <h3>Build type</h3>
               <div class="choice-grid build-list" id="buildChoices">
-                <button class="choice" type="button" data-value="Portable" data-key="portable" aria-pressed="true">
+                <button class="choice" type="button" data-value="Portable" data-key="portable" aria-pressed="false">
                 <strong>Portable</strong>
-                <span>Run without a full install. Good for testing or carrying the app with you.</span>
+                <span>Run without a full install.</span>
                 </button>
                 <button class="choice" type="button" data-value="Standalone installer" data-key="standalone" aria-pressed="false">
-                <strong>Standalone installer</strong>
-                <span>Installs the app, but does not include the updater.</span>
+                <strong>Standalone</strong>
+                <span>Installs the app without updater support.</span>
                 </button>
-                <button class="choice" type="button" data-value="Updater installer" data-key="updater" aria-pressed="false">
-                <strong>Updater installer</strong>
-                <span><strong style="color: #88E788;">Recommended</strong> Includes update support.</span>
+                <button class="choice recommended" type="button" data-value="Updater installer" data-key="updater" aria-pressed="true">
+                <strong>Updater</strong>
+                <span>Recommended. Includes update support.</span>
                 </button>
               </div>
             </div>
+            <div class="download-summary">
+              <div class="summary-row">
+                <span>Current version</span>
+                <strong id="current-version">Loading...</strong>
+              </div>
+              <div class="summary-row" id="errorMessage" style="display: none;">
+              </div>
+              <div class="actions">
+                <a class="btn primary" id="downloadButton" href="https://github.com/UnKabaraQuiDev/modelizer-next/releases" rel="noopener">Download selected build</a>
+                <a class="btn" href="https://github.com/UnKabaraQuiDev/modelizer-next/issues" rel="noopener">Report an issue</a>
+              </div>
+            </div>
           </div>
         </div>
-        <div class="download-option">
-          <h3>Your selection</h3>
-          <div class="download-summary">
-            <div class="summary-row">
-              <span>Operating system</span>
-              <strong id="selectedOs">Windows</strong>
-            </div>
-            <div class="summary-row">
-              <span>Build type</span>
-              <strong id="selectedBuild">Portable</strong>
-            </div>
-            <div class="summary-row">
-              <span>Download</span>
-              <strong id="selectedHint">Windows portable ZIP</strong>
-            </div>
-            <div class="summary-row" id="selectedFileRow" style="display: none;">
-              <span>File</span>
-              <strong>
-              <span id="selectedFile">modelizer-next-app-portable-windows-???.zip</span>
-              </strong>
-            </div>
-          </div>
-          <div class="actions">
-            <a class="btn primary" id="downloadButton" href="https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/???/modelizer-next-app-portable-windows-???.zip" rel="noopener">Download selected build</a>
-            <a class="btn" href="https://github.com/UnKabaraQuiDev/modelizer-next/issues" rel="noopener">Report an issue</a>
-          </div>
-          <div class="steps" style="margin-top:18px">
-            <article class="step">
-              <div class="num">1</div>
-              <div>
-                <h3>Pick your build</h3>
-                <p>Use the selector to decide between portable, standalone installer, or updater installer.</p>
+      </section>
+      <section id="source">
+        <div class="container">
+          <div class="callout">
+            <div>
+              <h2>Open source and ready to inspect.</h2>
+              <p>Modelizer Next is published on GitHub under the GPL-3.0 license.</p>
+              <div class="build-badges" aria-label="Build status badges">
+                <a href="https://github.com/UnKabaraQuiDev/modelizer-next/actions/workflows/nightly.yml" rel="noopener">
+                <img src="https://github.com/UnKabaraQuiDev/modelizer-next/actions/workflows/nightly.yml/badge.svg" alt="Nightly Build status"></a>
+                <a href="https://github.com/UnKabaraQuiDev/modelizer-next/actions/workflows/snapshot.yml" rel="noopener">
+                <img src="https://github.com/UnKabaraQuiDev/modelizer-next/actions/workflows/snapshot.yml/badge.svg" alt="Snapshot Build status"></a>
+                <a href="https://github.com/UnKabaraQuiDev/modelizer-next/actions/workflows/release.yml" rel="noopener">
+                <img src="https://github.com/UnKabaraQuiDev/modelizer-next/actions/workflows/release.yml/badge.svg" alt="Release Build status"></a>
               </div>
-            </article>
-            <article class="step">
-              <div class="num">2</div>
-              <div>
-                <h3>Download directly</h3>
-                <p>Click the direct download button. It points to the exact asset for your selected OS and build type.</p>
-              </div>
-            </article>
-            <article class="step">
-              <div class="num">3</div>
-              <div>
-                <h3>Start modeling</h3>
-                <p>Create a new model or open an existing
-                  <code>.mn</code>,
-                  <code>.mod</code>, or
-                  <code>.mdlz</code>file.
-                </p>
-              </div>
-            </article>
+            </div>
+            <a class="btn" href="https://github.com/UnKabaraQuiDev/modelizer-next" rel="noopener">Browse repository</a>
           </div>
         </div>
-      </div>
-    </section>
-    <section id="source">
-      <div class="container">
-        <div class="callout">
-          <div>
-            <h2>Open source and ready to inspect.</h2>
-            <p>Modelizer Next is published on GitHub under the GPL-3.0 license.</p>
-            <div class="build-badges" aria-label="Build status badges">
-              <a href="https://github.com/UnKabaraQuiDev/modelizer-next/actions/workflows/nightly.yml" rel="noopener">
-              <img src="https://github.com/UnKabaraQuiDev/modelizer-next/actions/workflows/nightly.yml/badge.svg" alt="Nightly Build status"></a>
-              <a href="https://github.com/UnKabaraQuiDev/modelizer-next/actions/workflows/snapshot.yml" rel="noopener">
-              <img src="https://github.com/UnKabaraQuiDev/modelizer-next/actions/workflows/snapshot.yml/badge.svg" alt="Snapshot Build status"></a>
-              <a href="https://github.com/UnKabaraQuiDev/modelizer-next/actions/workflows/release.yml" rel="noopener">
-              <img src="https://github.com/UnKabaraQuiDev/modelizer-next/actions/workflows/release.yml/badge.svg" alt="Release Build status"></a>
-            </div>
-          </div>
-          <a class="btn" href="https://github.com/UnKabaraQuiDev/modelizer-next" rel="noopener">Browse repository</a>
+      </section>
+    </main>
+    <footer>
+      <div class="container foot">
+        <span>©
+          <span id="year"></span> Modelizer Next
+        </span>
+        <div class="foot-links">
+          <a href="https://github.com/UnKabaraQuiDev/modelizer-next/releases/latest" rel="noopener">Releases</a>
+          <a href="https://github.com/UnKabaraQuiDev/modelizer-next/issues" rel="noopener">Issues</a>
+          <a href="https://github.com/UnKabaraQuiDev/modelizer-next/blob/main/LICENSE" rel="noopener">License</a>
         </div>
       </div>
-    </section>
-  </main>
-  <footer>
-    <div class="container foot">
-      <span>©
-        <span id="year"></span> Modelizer Next
-      </span>
-      <div class="foot-links">
-        <a href="https://github.com/UnKabaraQuiDev/modelizer-next/releases/latest" rel="noopener">Releases</a>
-        <a href="https://github.com/UnKabaraQuiDev/modelizer-next/issues" rel="noopener">Issues</a>
-        <a href="https://github.com/UnKabaraQuiDev/modelizer-next/blob/main/LICENSE" rel="noopener">License</a>
-      </div>
-    </div>
-    <script src="script.js"></script>
-  </footer>
-</body>
+      <script src="script.js"></script>
+    </footer>
+  </body>
 </html>

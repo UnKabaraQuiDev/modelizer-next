@@ -26,19 +26,12 @@ function selectedKey(groupId) {
 
 function setupChoices(groupId, outputId) {
   const group = document.getElementById(groupId);
-  const output = document.getElementById(outputId);
   const initial = selectedButton(groupId);
-  if (initial) {
-    output.textContent = initial.dataset.value;
-    output.dataset.key = initial.dataset.key;
-  }
   group.addEventListener('click', event => {
     const button = event.target.closest('.choice');
     if (!button) return;
     group.querySelectorAll('.choice').forEach(choice => choice.setAttribute('aria-pressed', 'false'));
     button.setAttribute('aria-pressed', 'true');
-    output.textContent = button.dataset.value;
-    output.dataset.key = button.dataset.key;
     updateDownloadFromMetadata();
   });
 }
@@ -60,10 +53,11 @@ function findAsset(osKey, buildKey) {
   return downloadMetadata.assets?.[osKey]?.[buildKey] || null;
 }
 
-function setDownloadUnavailable(message) {
+function setDownloadUnavailable() {
+  const errorMessage = document.getElementById('errorMessage');
+  errorMessage.style = "display: block;";
+  errorMessage.textContent = 'An error occured, please download manually below.';
   const button = document.getElementById('downloadButton');
-  document.getElementById('selectedHint').textContent = message;
-  document.getElementById('selectedFile').textContent = 'Not available, please download manually below.';
   button.href = 'https://github.com/UnKabaraQuiDev/modelizer-next/releases';
   button.textContent = 'Open releases';
 }
@@ -73,14 +67,14 @@ function updateDownloadFromMetadata() {
   const buildKey = selectedKey('buildChoices');
   const asset = findAsset(osKey, buildKey);
   if (!asset) {
-    setDownloadUnavailable(downloadMetadata ? 'No matching file found in metadata.json.' : 'Could not load metadata.json.');
+    console.log(`Asset not found for: ${osKey} ${buildKey}`)
+    setDownloadUnavailable();
     return;
   }
-  document.getElementById('selectedHint').textContent = asset.label || `${document.getElementById('selectedOs').textContent} ${document.getElementById('selectedBuild').textContent}`;
-  document.getElementById('selectedFile').textContent = asset.file || asset.url || 'Download file';
   const button = document.getElementById('downloadButton');
   button.href = asset.url;
   button.textContent = 'Download selected build';
+  document.querySelector("#current-version").textContent = downloadMetadata["releaseTag"];
 }
 
 function selectSystemBuild() {
@@ -113,10 +107,11 @@ function selectBuildType() {
       document.querySelector("#buildChoices>.choice[data-key='updater']").setAttribute("aria-pressed", "true");
 }
 
-setupChoices('osChoices', 'selectedOs');
-setupChoices('buildChoices', 'selectedBuild');
 selectSystemBuild();
 selectBuildType();
+setupChoices('osChoices');
+setupChoices('buildChoices');
+
 document.getElementById('year').textContent = new Date().getFullYear();
 syncTheme();
 loadDownloadMetadata();
