@@ -57,6 +57,7 @@
 		<jpackage.icon>filled in by profiles</jpackage.icon>
 		<jpackage.outputDir>filled in by profiles</jpackage.outputDir>
 		<jpackage.type>filled in by profiles</jpackage.type>
+		<jpackage.macos.name>filled in by modules</jpackage.macos.name>
 
 		<app.mainClass>filled in by modules</app.mainClass>
 
@@ -527,7 +528,7 @@
 												value="${jpackage.macos.bundleId}" />
 
 											<arg value="--mac-package-name" />
-											<arg value="${jpackage.name}" />
+											<arg value="${jpackage.macos.name}" />
 
 											<arg value="--icon" />
 											<arg value="${jpackage.icon}" />

@@ -17,6 +17,7 @@
 	<properties>
 		<app.mainClass>lu.kbra.modelizer_next.MNMain</app.mainClass>
 		<jpackage.name>Modelizer Next App</jpackage.name>
+		<jpackage.macos.name>Modelizer Next (Standalone)</jpackage.macos.name>
 		<common.scope>provided</common.scope>
 		<portable>false</portable>
 	</properties>
