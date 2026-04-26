@@ -7,7 +7,7 @@ public class ClassNames {
 
 	public ClassNames() {
 		this.conceptualName = "";
-		this.technicalName = "";
+		this.technicalName = null;
 	}
 
 	public ClassNames(final String conceptualName, final String technicalName) {
@@ -20,7 +20,11 @@ public class ClassNames {
 	}
 
 	public String getTechnicalName() {
-		return this.technicalName;
+		return technicalName == null || technicalName.isBlank() ? conceptualName : this.technicalName;
+	}
+
+	public boolean hasTechnicalName() {
+		return technicalName != null && !technicalName.isBlank();
 	}
 
 	public void setConceptualName(final String conceptualName) {

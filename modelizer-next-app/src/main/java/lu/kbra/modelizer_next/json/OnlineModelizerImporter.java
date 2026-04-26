@@ -194,7 +194,7 @@ public final class OnlineModelizerImporter {
 				final String fieldName = ImportJsonSupport.readText(attributeNode, "name", "field");
 				final String logicalName = ImportJsonSupport.readText(attributeNode, "logicalName", fieldName);
 
-				fieldModel.getNames().setName(fieldName);
+				fieldModel.getNames().setConceptualName(fieldName);
 				fieldModel.getNames().setTechnicalName(logicalName);
 				fieldModel.setComment(ImportJsonSupport.readText(attributeNode, "comment", ""));
 				fieldModel.setNotConceptual(!attributeNode.path("visibility").path("conceptual").asBoolean(true));

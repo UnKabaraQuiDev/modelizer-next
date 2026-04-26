@@ -105,7 +105,7 @@ public final class SampleDocumentFactory {
 			final boolean unique,
 			final boolean notNull) {
 		final FieldModel field = new FieldModel();
-		field.getNames().setName(conceptualName);
+		field.getNames().setConceptualName(conceptualName);
 		field.getNames().setTechnicalName(technicalName);
 		field.setNotConceptual(notConceptual);
 		field.setPrimaryKey(primaryKey);

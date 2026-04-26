@@ -47,7 +47,7 @@ public final class FieldEditorDialog {
 			final ColorButton textColorButton,
 			final ColorButton backgroundColorButton,
 			final JComboBox<String> typeField) {
-		fieldModel.getNames().setName(nameField.getText());
+		fieldModel.getNames().setConceptualName(nameField.getText());
 		fieldModel.getNames().setTechnicalName(technicalNameField.getText());
 		fieldModel.setPrimaryKey(primaryKeyBox.isSelected());
 		fieldModel.setUnique(uniqueBox.isSelected());
@@ -69,7 +69,7 @@ public final class FieldEditorDialog {
 		final Window owner = parent == null ? null : SwingUtilities.getWindowAncestor(parent);
 		final JDialog dialog = new JDialog(owner, "Edit field", Dialog.ModalityType.APPLICATION_MODAL);
 
-		final JTextField nameField = new JTextField(fieldModel.getNames().getName(), 24);
+		final JTextField nameField = new JTextField(fieldModel.getNames().getConceptualName(), 24);
 		final JTextField technicalNameField = new JTextField(fieldModel.getNames().getTechnicalName(), 24);
 
 		final JComboBox<String> sqlTypeBox = new JComboBox<>(FieldModel.SQL_TYPES);

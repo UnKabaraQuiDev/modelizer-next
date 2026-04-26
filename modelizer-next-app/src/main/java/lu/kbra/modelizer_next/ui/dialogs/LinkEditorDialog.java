@@ -87,7 +87,7 @@ public final class LinkEditorDialog {
 				final boolean cellHasFocus) {
 			super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
 			if (value instanceof final FieldModel fieldModel) {
-				this.setText(this.panelType == PanelType.CONCEPTUAL ? fieldModel.getNames().getName()
+				this.setText(this.panelType == PanelType.CONCEPTUAL ? fieldModel.getNames().getConceptualName()
 						: fieldModel.getNames().getTechnicalName());
 			}
 			return this;

@@ -416,7 +416,7 @@ public class DiagramCanvas extends JPanel {
 		}
 
 		final FieldModel fieldModel = new FieldModel();
-		fieldModel.getNames().setName("New field");
+		fieldModel.getNames().setConceptualName("New field");
 		this.applyDefaultPaletteToField(fieldModel);
 		targetClass.getFields().add(fieldModel);
 
@@ -674,7 +674,7 @@ public class DiagramCanvas extends JPanel {
 	private String buildForeignKeyFieldName(final ClassModel targetClass, final FieldModel targetField) {
 		final String className = this
 				.blankToFallback(targetClass.getNames().getTechnicalName(), targetClass.getNames().getConceptualName(), "target");
-		final String fieldName = this.blankToFallback(targetField.getNames().getTechnicalName(), targetField.getNames().getName(), "id");
+		final String fieldName = this.blankToFallback(targetField.getNames().getTechnicalName(), targetField.getNames().getConceptualName(), "id");
 		return className + "_" + fieldName;
 	}
 
@@ -872,7 +872,7 @@ public class DiagramCanvas extends JPanel {
 	private CopiedField captureField(final String ownerClassId, final FieldModel fieldModel) {
 		return new CopiedField(ownerClassId,
 				fieldModel.getId(),
-				fieldModel.getNames().getName(),
+				fieldModel.getNames().getConceptualName(),
 				fieldModel.getNames().getTechnicalName(),
 				fieldModel.isNotConceptual(),
 				fieldModel.getComment(),
@@ -1584,7 +1584,7 @@ public class DiagramCanvas extends JPanel {
 	private FieldModel createFieldFromClipboard(final CopiedField copiedField, final boolean rename) {
 		final FieldModel fieldCopy = new FieldModel();
 
-		fieldCopy.getNames().setName(rename ? this.appendSuffix(copiedField.name(), " Copy") : copiedField.name());
+		fieldCopy.getNames().setConceptualName(rename ? this.appendSuffix(copiedField.name(), " Copy") : copiedField.name());
 		fieldCopy.getNames()
 				.setTechnicalName(rename ? this.appendSuffix(copiedField.technicalName(), "_COPY") : copiedField.technicalName());
 
@@ -2150,7 +2150,7 @@ public class DiagramCanvas extends JPanel {
 
 			for (final FieldModel sourceField : source.getFields()) {
 				final FieldModel fieldCopy = new FieldModel();
-				fieldCopy.getNames().setName(sourceField.getNames().getName());
+				fieldCopy.getNames().setConceptualName(sourceField.getNames().getConceptualName());
 				fieldCopy.getNames().setTechnicalName(sourceField.getNames().getTechnicalName());
 				fieldCopy.setNotConceptual(sourceField.isNotConceptual());
 				fieldCopy.setComment(sourceField.getComment());
@@ -2188,7 +2188,7 @@ public class DiagramCanvas extends JPanel {
 			}
 
 			final FieldModel copy = new FieldModel();
-			copy.getNames().setName(source.getNames().getName() + " Copy");
+			copy.getNames().setConceptualName(source.getNames().getConceptualName() + " Copy");
 			copy.getNames().setTechnicalName(source.getNames().getTechnicalName() + "_COPY");
 			copy.setNotConceptual(source.isNotConceptual());
 			copy.setComment(source.getComment());
@@ -2368,7 +2368,7 @@ public class DiagramCanvas extends JPanel {
 			return;
 		}
 
-		fieldModel.getNames().setName(result.name());
+		fieldModel.getNames().setConceptualName(result.name());
 		fieldModel.getNames().setTechnicalName(result.technicalName());
 		fieldModel.setPrimaryKey(result.primaryKey());
 		fieldModel.setUnique(result.unique());
@@ -2471,7 +2471,7 @@ public class DiagramCanvas extends JPanel {
 				}
 
 				if (technicalName.equalsIgnoreCase(fieldModel.getNames().getTechnicalName())
-						|| displayName.equalsIgnoreCase(fieldModel.getNames().getName())) {
+						|| displayName.equalsIgnoreCase(fieldModel.getNames().getConceptualName())) {
 					matchingField = fieldModel;
 					break;
 				}
@@ -2485,7 +2485,7 @@ public class DiagramCanvas extends JPanel {
 			}
 
 			final FieldModel fieldModel = new FieldModel();
-			fieldModel.getNames().setName(displayName);
+			fieldModel.getNames().setConceptualName(displayName);
 			fieldModel.getNames().setTechnicalName(technicalName.isBlank() ? displayName : technicalName);
 			fieldModel.setNotConceptual(true);
 			fieldModel.setPrimaryKey(false);
@@ -2776,6 +2776,11 @@ public class DiagramCanvas extends JPanel {
 			return;
 		}
 
+		if (source.type() == SelectedType.CLASS && target.type() == SelectedType.LINK) {
+			this.setAssociationClassForLink(source.classId(), target.linkId());
+			return;
+		}
+
 		if (this.panelType == PanelType.CONCEPTUAL) {
 			this.createConceptualLink(source.classId(), target.classId());
 			return;
@@ -2819,7 +2824,7 @@ public class DiagramCanvas extends JPanel {
 	}
 
 	private String getEditableFieldName(final FieldModel fieldModel) {
-		return this.panelType == PanelType.CONCEPTUAL ? fieldModel.getNames().getName() : fieldModel.getNames().getTechnicalName();
+		return this.panelType == PanelType.CONCEPTUAL ? fieldModel.getNames().getConceptualName() : fieldModel.getNames().getTechnicalName();
 	}
 
 	public Dimension getExportSize(final ViewExportScope scope) {
@@ -3280,8 +3285,12 @@ public class DiagramCanvas extends JPanel {
 			return target.type() == SelectedType.CLASS || target.type() == SelectedType.LINK;
 		}
 
+		if (source.type() == SelectedType.CLASS && target.type() == SelectedType.LINK) {
+			return this.findLinkById(target.linkId()) != null && !isLinkConnectedTo(findLinkById(target.linkId()), source.classId());
+		}
+
 		if (this.panelType == PanelType.CONCEPTUAL) {
-			return target.type() == SelectedType.CLASS && !Objects.equals(target.classId(), source.classId());
+			return target.type() == SelectedType.CLASS;
 		}
 
 		final SelectedElement technicalTarget = this.resolveTechnicalTargetEndpoint(target);
@@ -3448,6 +3457,7 @@ public class DiagramCanvas extends JPanel {
 		if (this.panelType == PanelType.CONCEPTUAL) {
 			return switch (selection.type()) {
 			case CLASS, FIELD -> SelectedElement.forClass(selection.classId());
+			case LINK -> source.type() == SelectedType.CLASS ? SelectedElement.forLink(selection.linkId()) : null;
 			default -> null;
 			};
 		}
@@ -3455,6 +3465,7 @@ public class DiagramCanvas extends JPanel {
 		return switch (selection.type()) {
 		case FIELD -> SelectedElement.forField(selection.classId(), selection.fieldId());
 		case CLASS -> SelectedElement.forClass(selection.classId());
+		case LINK -> source.type() == SelectedType.CLASS ? SelectedElement.forLink(selection.linkId()) : null;
 		default -> null;
 		};
 	}
@@ -3949,9 +3960,9 @@ public class DiagramCanvas extends JPanel {
 	private String resolveFieldName(final FieldModel fieldModel) {
 		final String baseName;
 		if (this.panelType == PanelType.CONCEPTUAL) {
-			baseName = this.blankToFallback(fieldModel.getNames().getName(), fieldModel.getNames().getTechnicalName(), "Unnamed field");
+			baseName = this.blankToFallback(fieldModel.getNames().getConceptualName(), fieldModel.getNames().getTechnicalName(), "Unnamed field");
 		} else {
-			baseName = this.blankToFallback(fieldModel.getNames().getTechnicalName(), fieldModel.getNames().getName(), "Unnamed field");
+			baseName = this.blankToFallback(fieldModel.getNames().getTechnicalName(), fieldModel.getNames().getConceptualName(), "Unnamed field");
 		}
 
 		if (this.panelType != PanelType.PHYSICAL) {
@@ -4157,6 +4168,10 @@ public class DiagramCanvas extends JPanel {
 			case LINK -> this.resolveLinkMiddleAnchor(g2, target.linkId());
 			default -> null;
 			};
+		}
+
+		if (target.type() == SelectedType.LINK) {
+			return this.resolveLinkMiddleAnchor(g2, target.linkId());
 		}
 
 		if (this.panelType == PanelType.CONCEPTUAL) {
@@ -4426,6 +4441,38 @@ public class DiagramCanvas extends JPanel {
 		this.defaultPalette = defaultPalette;
 	}
 
+	private void setAssociationClassForLink(final String classId, final String linkId) {
+		final LinkModel linkModel = this.findLinkById(linkId);
+		if (classId == null || linkModel == null || this.findClassById(classId) == null || isLinkConnectedTo(linkModel, classId)) {
+			return;
+		}
+		final LinkModel alreadyExistingLinkModel = this.findLinkByAssociationClassId(classId);
+		if (alreadyExistingLinkModel != null && alreadyExistingLinkModel.getAssociationClassId().equals(classId)) {
+			alreadyExistingLinkModel.setAssociationClassId(null);
+		}
+
+		linkModel.setAssociationClassId(classId);
+		this.select(SelectedElement.forLink(linkId));
+		this.notifyDocumentChanged();
+	}
+
+	private boolean isLinkConnectedTo(LinkModel linkModel, String classId) {
+		if (linkModel == null || classId == null) {
+			return false;
+		}
+		return (linkModel.getFrom() != null && Objects.equals(linkModel.getFrom().getClassId(), classId))
+				|| (linkModel.getTo() != null && Objects.equals(linkModel.getTo().getClassId(), classId));
+	}
+
+	private LinkModel findLinkByAssociationClassId(String classId) {
+		return document.getModel()
+				.getConceptualLinks()
+				.stream()
+				.filter(c -> Objects.equals(c.getAssociationClassId(), classId))
+				.findFirst()
+				.orElse(null);
+	}
+
 	private void setEditableClassName(final ClassModel classModel, final String value) {
 		if (classModel == null) {
 			return;
@@ -4453,7 +4500,7 @@ public class DiagramCanvas extends JPanel {
 		}
 
 		if (this.panelType == PanelType.CONCEPTUAL) {
-			fieldModel.getNames().setName(value);
+			fieldModel.getNames().setConceptualName(value);
 		} else {
 			fieldModel.getNames().setTechnicalName(value);
 		}

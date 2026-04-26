@@ -170,7 +170,7 @@ public class LegacyModelizerImporter {
 				final String fieldName = LegacyModelizerImporter.readText(fieldNode, "name", "field");
 				final String fieldTechnicalName = LegacyModelizerImporter.readText(fieldNode, "secName", fieldName);
 
-				fieldModel.getNames().setName(fieldName);
+				fieldModel.getNames().setConceptualName(fieldName);
 				fieldModel.getNames().setTechnicalName(fieldTechnicalName);
 				fieldModel.setComment(LegacyModelizerImporter.readText(fieldNode, "comment", ""));
 				fieldModel.setNotConceptual(fieldNode.path("noConceptual").asBoolean(false));
