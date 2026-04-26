@@ -35,39 +35,24 @@
 		<modelizer.issuesUrl>${modelizer.repositoryUrl}/issues</modelizer.issuesUrl>
 		<modelizer.website>https://modelizer.kbra.lu/</modelizer.website>
 
-		<jpackage.linux.group>Programming</jpackage.linux.group>
-		<jpackage.linux.category>Programming,Utilities</jpackage.linux.category>
+		<jdeploy.name>filled in by modules</jdeploy.name>
+		<jdeploy.title>filled in by modules</jdeploy.title>
+		<jdeploy.packageJsonName>filled in by modules</jdeploy.packageJsonName>
+		<jdeploy.jar>${project.build.finalName}-with-dependencies.jar</jdeploy.jar>
+		<jdeploy.javaVersion>${java.version}</jdeploy.javaVersion>
+		<jdeploy.jdk>false</jdeploy.jdk>
+		<jdeploy.javafx>false</jdeploy.javafx>
+		<jdeploy.vendor>${project.groupId}</jdeploy.vendor>
+		<jdeploy.author>${project.groupId}</jdeploy.author>
+		<jdeploy.license>UNLICENSED</jdeploy.license>
+		<jdeploy.workDir>${project.build.directory}/jdeploy</jdeploy.workDir>
+		<jdeploy.assetDir>
+			${maven.multiModuleProjectDirectory}/app/${jdeploy.platform}</jdeploy.assetDir>
 
-		<jpackage.addModules>
-			java.base,java.desktop,java.logging,java.net.http,java.xml,jdk.unsupported,jdk.crypto.ec</jpackage.addModules>
-		<jpackage.fa1>${jpackage.inputDir}/FAmod.properties</jpackage.fa1>
-		<jpackage.fa2>${jpackage.inputDir}/FAmn.properties</jpackage.fa2>
-		<jpackage.fa3>${jpackage.inputDir}/FAmdlz.properties</jpackage.fa3>
-		<jpackage.vendor>${project.groupId}</jpackage.vendor>
-
-		<jpackage.macos.bundleId>${project.groupId}.${project.artifactId}</jpackage.macos.bundleId>
-		<jpackage.macos.category>public.app-category.productivity</jpackage.macos.category>
-		<jpackage.macos.sign>false</jpackage.macos.sign>
-		<jpackage.macos.runtimeSigningPrefix>${project.groupId}</jpackage.macos.runtimeSigningPrefix>
-
-		<jpackage.inputDir>${project.build.directory}/jpackage-input/</jpackage.inputDir>
-		<jpackage.inputJar>${project.build.finalName}.jar</jpackage.inputJar>
-
-		<jpackage.name>filled in by modules</jpackage.name>
-		<jpackage.icon>filled in by profiles</jpackage.icon>
-		<jpackage.outputDir>filled in by profiles</jpackage.outputDir>
-		<jpackage.type>filled in by profiles</jpackage.type>
-		<jpackage.macos.name>filled in by modules</jpackage.macos.name>
-
-		<app.mainClass>filled in by modules</app.mainClass>
-
-		<skipLinuxInstaller>true</skipLinuxInstaller>
-		<skipWindowsInstaller>true</skipWindowsInstaller>
-		<skipMacosInstaller>true</skipMacosInstaller>
-
-		<skipLinuxPortable>true</skipLinuxPortable>
-		<skipWindowsPortable>true</skipWindowsPortable>
-		<skipMacosPortable>true</skipMacosPortable>
+		<jdeploy.platform>default</jdeploy.platform>
+		<jdeploy.localInstallers>[]</jdeploy.localInstallers>
+		<jdeploy.localBundles>[]</jdeploy.localBundles>
+		<jdeploy.downloadPlatforms>["default"]</jdeploy.downloadPlatforms>
 
 		<skipNative>true</skipNative>
 	</properties>
@@ -329,356 +314,97 @@
 					<exists>${project.basedir}/native-module.flag</exists>
 				</file>
 			</activation>
+
 			<build>
 				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-resources-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>prepare-jdeploy-package-json</id>
+								<phase>prepare-package</phase>
+								<goals>
+									<goal>copy-resources</goal>
+								</goals>
+								<configuration>
+									<skip>${skipNative}</skip>
+									<encoding>${project.build.sourceEncoding}</encoding>
+									<outputDirectory>${jdeploy.workDir}</outputDirectory>
+									<resources>
+										<resource>
+											<directory>
+												${maven.multiModuleProjectDirectory}/app/jdeploy</directory>
+											<filtering>true</filtering>
+											<includes>
+												<include>package.json</include>
+												<include>launcher-splash.html</include>
+											</includes>
+										</resource>
+									</resources>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-antrun-plugin</artifactId>
 						<executions>
 							<execution>
-								<id>copy-shaded-jar</id>
+								<id>prepare-jdeploy-workdir</id>
 								<phase>package</phase>
 								<goals>
 									<goal>run</goal>
 								</goals>
-
 								<configuration>
 									<skip>${skipNative}</skip>
 									<target>
-										<mkdir
-											dir="${jpackage.inputDir}" />
+										<mkdir dir="${jdeploy.workDir}" />
+
 										<copy
 											file="${project.build.directory}/${project.build.finalName}-with-dependencies.jar"
-											tofile="${jpackage.inputDir}/${project.build.finalName}.jar" />
+											tofile="${jdeploy.workDir}/${jdeploy.jar}"
+											overwrite="true" />
+
 										<copy
-											todir="${jpackage.inputDir}">
-											<fileset dir="${jpackage.add}" />
+											file="${jdeploy.assetDir}/icon.png"
+											tofile="${jdeploy.workDir}/icon.png"
+											overwrite="true"
+											failonerror="false" />
+
+										<copy
+											file="${jdeploy.assetDir}/installsplash.png"
+											tofile="${jdeploy.workDir}/installsplash.png"
+											overwrite="true"
+											failonerror="false" />
+
+										<copy
+											todir="${jdeploy.workDir}"
+											failonerror="false">
+											<fileset dir="${jdeploy.assetDir}">
+												<exclude name="icon.*" />
+												<exclude name="installsplash.*" />
+											</fileset>
 										</copy>
 									</target>
 								</configuration>
 							</execution>
 
 							<execution>
-								<id>package-installer-linux</id>
+								<id>jdeploy-package</id>
 								<phase>package</phase>
 								<goals>
 									<goal>run</goal>
 								</goals>
-
 								<configuration>
-									<skip>${skipLinuxInstaller}</skip>
+									<skip>${skipNative}</skip>
 									<target>
-
-										<exec executable="jpackage"
+										<exec executable="npx"
+											dir="${jdeploy.workDir}"
 											failonerror="true">
-
-											<arg value="--type" />
-											<arg value="${jpackage.type}" />
-
-											<arg value="--name" />
-											<arg value="${jpackage.name}" />
-
-											<arg value="--vendor" />
-											<arg value="${jpackage.vendor}" />
-
-											<arg value="--app-version" />
-											<arg value="${appVersion}" />
-
-											<arg value="--input" />
-											<arg value="${jpackage.inputDir}" />
-
-											<arg value="--main-jar" />
-											<arg value="${jpackage.inputJar}" />
-
-											<arg value="--dest" />
-											<arg value="${jpackage.outputDir}" />
-
-											<arg value="--add-modules" />
-											<arg value="${jpackage.addModules}" />
-
-											<arg value="--linux-app-category" />
-											<arg
-												value="${jpackage.linux.category}" />
-
-											<arg value="--linux-menu-group" />
-											<arg value="${jpackage.linux.group}" />
-
-											<arg value="--icon" />
-											<arg value="${jpackage.icon}" />
-
-											<arg value="--file-associations" />
-											<arg value="${jpackage.fa1}" />
-
-											<arg value="--file-associations" />
-											<arg value="${jpackage.fa2}" />
-
-											<arg value="--file-associations" />
-											<arg value="${jpackage.fa3}" />
-
-										</exec>
-
-									</target>
-								</configuration>
-							</execution>
-							<execution>
-								<id>package-installer-windows</id>
-								<phase>package</phase>
-								<goals>
-									<goal>run</goal>
-								</goals>
-
-								<configuration>
-									<skip>${skipWindowsInstaller}</skip>
-									<target>
-
-										<exec executable="jpackage"
-											failonerror="true">
-
-											<arg value="--type" />
-											<arg
-												value="${jpackage.type}" />
-
-											<arg value="--name" />
-											<arg value="${jpackage.name}" />
-
-											<arg value="--vendor" />
-											<arg value="${jpackage.vendor}" />
-
-											<arg value="--app-version" />
-											<arg value="${appVersion}" />
-
-											<arg value="--input" />
-											<arg value="${jpackage.inputDir}" />
-
-											<arg value="--main-jar" />
-											<arg value="${jpackage.inputJar}" />
-
-											<arg value="--dest" />
-											<arg value="${jpackage.outputDir}" />
-
-											<arg value="--add-modules" />
-											<arg value="${jpackage.addModules}" />
-
-											<arg value="--win-menu-group" />
-											<arg value="${jpackage.linux.group}" />
-
-											<arg value="--win-menu" />
-											<arg value="--win-shortcut" />
-
-											<arg value="--win-per-user-install" />
-
-											<arg value="--icon" />
-											<arg value="${jpackage.icon}" />
-
-											<arg value="--file-associations" />
-											<arg value="${jpackage.fa1}" />
-
-											<arg value="--file-associations" />
-											<arg value="${jpackage.fa2}" />
-
-											<arg value="--file-associations" />
-											<arg value="${jpackage.fa3}" />
-
-										</exec>
-
-									</target>
-								</configuration>
-							</execution>
-							<execution>
-								<id>package-installer-macos</id>
-								<phase>package</phase>
-								<goals>
-									<goal>run</goal>
-								</goals>
-
-								<configuration>
-									<skip>${skipMacosInstaller}</skip>
-
-									<target>
-										<exec executable="jpackage"
-											failonerror="true">
-
-											<arg value="--type" />
-											<arg value="${jpackage.type}" />
-
-											<arg value="--name" />
-											<arg value="${jpackage.name}" />
-
-											<arg value="--vendor" />
-											<arg value="${jpackage.vendor}" />
-
-											<arg value="--app-version" />
-											<arg value="${appVersion}" />
-
-											<arg value="--input" />
-											<arg value="${jpackage.inputDir}" />
-
-											<arg value="--main-jar" />
-											<arg value="${jpackage.inputJar}" />
-
-											<arg value="--dest" />
-											<arg value="${jpackage.outputDir}" />
-
-											<arg value="--add-modules" />
-											<arg value="${jpackage.addModules}" />
-
-											<arg
-												value="--mac-package-identifier" />
-											<arg
-												value="${jpackage.macos.bundleId}" />
-
-											<arg value="--mac-package-name" />
-											<arg value="${jpackage.macos.name}" />
-
-											<arg value="--icon" />
-											<arg value="${jpackage.icon}" />
-
-											<arg value="--file-associations" />
-											<arg value="${jpackage.fa1}" />
-
-											<arg value="--file-associations" />
-											<arg value="${jpackage.fa2}" />
-
-											<arg value="--file-associations" />
-											<arg value="${jpackage.fa3}" />
-
-										</exec>
-									</target>
-								</configuration>
-							</execution>
-							<execution>
-								<id>package-app-image-linux</id>
-								<phase>package</phase>
-								<goals>
-									<goal>run</goal>
-								</goals>
-
-								<configuration>
-									<skip>${skipLinuxPortable}</skip>
-									<target>
-
-										<exec executable="jpackage"
-											failonerror="true">
-
-											<arg value="--type" />
-											<arg value="${jpackage.type}" />
-
-											<arg value="--name" />
-											<arg value="${jpackage.name}" />
-
-											<arg value="--vendor" />
-											<arg value="${jpackage.vendor}" />
-
-											<arg value="--app-version" />
-											<arg value="${appVersion}" />
-
-											<arg value="--input" />
-											<arg value="${jpackage.inputDir}" />
-
-											<arg value="--main-jar" />
-											<arg value="${jpackage.inputJar}" />
-
-											<arg value="--dest" />
-											<arg value="${jpackage.outputDir}" />
-
-											<arg value="--add-modules" />
-											<arg value="${jpackage.addModules}" />
-
-											<arg value="--icon" />
-											<arg value="${jpackage.icon}" />
-
-										</exec>
-
-									</target>
-								</configuration>
-							</execution>
-							<execution>
-								<id>package-app-image-windows</id>
-								<phase>package</phase>
-								<goals>
-									<goal>run</goal>
-								</goals>
-
-								<configuration>
-									<skip>${skipWindowsPortable}</skip>
-									<target>
-
-										<exec executable="jpackage"
-											failonerror="true">
-
-											<arg value="--type" />
-											<arg value="${jpackage.type}" />
-
-											<arg value="--name" />
-											<arg value="${jpackage.name}" />
-
-											<arg value="--vendor" />
-											<arg value="${jpackage.vendor}" />
-
-											<arg value="--app-version" />
-											<arg value="${appVersion}" />
-
-											<arg value="--input" />
-											<arg value="${jpackage.inputDir}" />
-
-											<arg value="--main-jar" />
-											<arg value="${jpackage.inputJar}" />
-
-											<arg value="--dest" />
-											<arg value="${jpackage.outputDir}" />
-
-											<arg value="--add-modules" />
-											<arg value="${jpackage.addModules}" />
-
-											<arg value="--icon" />
-											<arg value="${jpackage.icon}" />
-
-										</exec>
-
-									</target>
-								</configuration>
-							</execution>
-							<execution>
-								<id>package-app-image-macos</id>
-								<phase>package</phase>
-								<goals>
-									<goal>run</goal>
-								</goals>
-
-								<configuration>
-									<skip>${skipMacosPortable}</skip>
-
-									<target>
-										<exec executable="jpackage"
-											failonerror="true">
-
-											<arg value="--type" />
-											<arg value="app-image" />
-
-											<arg value="--name" />
-											<arg value="${jpackage.name}" />
-
-											<arg value="--vendor" />
-											<arg value="${jpackage.vendor}" />
-
-											<arg value="--app-version" />
-											<arg value="${appVersion}" />
-
-											<arg value="--input" />
-											<arg value="${jpackage.inputDir}" />
-
-											<arg value="--main-jar" />
-											<arg value="${jpackage.inputJar}" />
-
-											<arg value="--dest" />
-											<arg value="${jpackage.outputDir}" />
-
-											<arg value="--add-modules" />
-											<arg value="${jpackage.addModules}" />
-
-											<arg value="--icon" />
-											<arg value="${jpackage.icon}" />
-
+											<arg value="jdeploy" />
+											<arg value="package" />
 										</exec>
 									</target>
 								</configuration>
@@ -699,66 +425,64 @@
 		<profile>
 			<id>native-linux</id>
 			<properties>
-				<jpackage.type>deb</jpackage.type>
-				<jpackage.icon>${jpackage.inputDir}/icon.png</jpackage.icon>
-				<jpackage.add>${maven.multiModuleProjectDirectory}/app/linux</jpackage.add>
-				<jpackage.outputDir>${project.build.directory}/dist/linux</jpackage.outputDir>
-				<skipLinuxInstaller>false</skipLinuxInstaller>
+				<jdeploy.platform>linux</jdeploy.platform>
+				<jdeploy.localInstallers>["linux"]</jdeploy.localInstallers>
+				<jdeploy.localBundles>[]</jdeploy.localBundles>
+				<jdeploy.downloadPlatforms>["linux"]</jdeploy.downloadPlatforms>
 			</properties>
 		</profile>
 
 		<profile>
 			<id>native-windows</id>
 			<properties>
-				<jpackage.type>exe</jpackage.type>
-				<jpackage.icon>${jpackage.inputDir}/icon.ico</jpackage.icon>
-				<jpackage.add>${maven.multiModuleProjectDirectory}/app/windows</jpackage.add>
-				<jpackage.outputDir>${project.build.directory}/dist/windows</jpackage.outputDir>
-				<skipWindowsInstaller>false</skipWindowsInstaller>
+				<jdeploy.platform>windows</jdeploy.platform>
+				<jdeploy.localInstallers>["win"]</jdeploy.localInstallers>
+				<jdeploy.localBundles>[]</jdeploy.localBundles>
+				<jdeploy.downloadPlatforms>["win"]</jdeploy.downloadPlatforms>
 			</properties>
 		</profile>
 
 		<profile>
 			<id>native-macos</id>
 			<properties>
-				<jpackage.type>dmg</jpackage.type>
-				<jpackage.icon>${jpackage.inputDir}/icon.icns</jpackage.icon>
-				<jpackage.add>${maven.multiModuleProjectDirectory}/app/macos</jpackage.add>
-				<jpackage.outputDir>${project.build.directory}/dist/macos</jpackage.outputDir>
-				<skipMacosInstaller>false</skipMacosInstaller>
+				<jdeploy.platform>macos</jdeploy.platform>
+				<jdeploy.localInstallers>["mac"]</jdeploy.localInstallers>
+				<jdeploy.localBundles>[]</jdeploy.localBundles>
+				<jdeploy.downloadPlatforms>["mac"]</jdeploy.downloadPlatforms>
 			</properties>
 		</profile>
 
 		<profile>
 			<id>portable</id>
 			<properties>
-				<jpackage.type>app-image</jpackage.type>
-				<skipLinuxInstaller>true</skipLinuxInstaller>
-				<skipWindowsInstaller>true</skipWindowsInstaller>
-				<skipMacosInstaller>true</skipMacosInstaller>
+				<jdeploy.localInstallers>[]</jdeploy.localInstallers>
 			</properties>
 		</profile>
 
 		<profile>
 			<id>portable-linux</id>
 			<properties>
-				<skipLinuxPortable>false</skipLinuxPortable>
+				<jdeploy.platform>linux</jdeploy.platform>
+				<jdeploy.localBundles>["linux"]</jdeploy.localBundles>
+				<jdeploy.downloadPlatforms>["linux"]</jdeploy.downloadPlatforms>
 			</properties>
 		</profile>
 
 		<profile>
 			<id>portable-windows</id>
 			<properties>
-				<skipWindowsPortable>false</skipWindowsPortable>
+				<jdeploy.platform>windows</jdeploy.platform>
+				<jdeploy.localBundles>["win"]</jdeploy.localBundles>
+				<jdeploy.downloadPlatforms>["win"]</jdeploy.downloadPlatforms>
 			</properties>
 		</profile>
 
 		<profile>
 			<id>portable-macos</id>
 			<properties>
-				<jpackage.type>app-image</jpackage.type>
-				<jpackage.icon>${jpackage.inputDir}/icon.icns</jpackage.icon>
-				<skipMacosPortable>false</skipMacosPortable>
+				<jdeploy.platform>macos</jdeploy.platform>
+				<jdeploy.localBundles>["mac"]</jdeploy.localBundles>
+				<jdeploy.downloadPlatforms>["mac"]</jdeploy.downloadPlatforms>
 			</properties>
 		</profile>
 

@@ -196,19 +196,21 @@ stage_bootstrap_artifacts() {
   rm -rf "${out_dir}"
   mkdir -p "${out_dir}"
 
+  local installer_dir="modelizer-next-bootstrap/target/jdeploy/jdeploy/installers"
+
   if [ "${platform}" = "windows" ]; then
     local bootstrap_exe
-    bootstrap_exe="$(find_single_file "modelizer-next-bootstrap/target/dist/windows" '*.exe')"
+    bootstrap_exe="$(find_single_file "${installer_dir}" '*.exe')"
     cp "${bootstrap_exe}" "${out_dir}/modelizer-next-bootstrap-${platform}-${VERSION}.exe"
 
   elif [ "${platform}" = "macos" ]; then
-    local bootstrap_pkg
-    bootstrap_pkg="$(find_single_file "modelizer-next-bootstrap/target/dist/macos" '*.dmg')"
-    cp "${bootstrap_pkg}" "${out_dir}/modelizer-next-bootstrap-${platform}-${VERSION}.dmg"
+    local bootstrap_dmg
+    bootstrap_dmg="$(find_single_file "${installer_dir}" '*.dmg')"
+    cp "${bootstrap_dmg}" "${out_dir}/modelizer-next-bootstrap-${platform}-${VERSION}.dmg"
 
   else
     local bootstrap_deb
-    bootstrap_deb="$(find_single_file "modelizer-next-bootstrap/target/dist/linux" '*.deb')"
+    bootstrap_deb="$(find_single_file "${installer_dir}" '*.deb')"
     cp "${bootstrap_deb}" "${out_dir}/modelizer-next-bootstrap-${platform}-${VERSION}.deb"
   fi
 }
@@ -221,19 +223,21 @@ stage_standalone_artifacts() {
   rm -rf "${out_dir}"
   mkdir -p "${out_dir}"
 
+  local installer_dir="modelizer-next-app/target/jdeploy/jdeploy/installers"
+
   if [ "${platform}" = "windows" ]; then
     local app_exe
-    app_exe="$(find_single_file "modelizer-next-app/target/dist/windows" '*.exe')"
+    app_exe="$(find_single_file "${installer_dir}" '*.exe')"
     cp "${app_exe}" "${out_dir}/modelizer-next-app-standalone-${platform}-${VERSION}.exe"
 
   elif [ "${platform}" = "macos" ]; then
-    local app_pkg
-    app_pkg="$(find_single_file "modelizer-next-app/target/dist/macos" '*.dmg')"
-    cp "${app_pkg}" "${out_dir}/modelizer-next-app-standalone-${platform}-${VERSION}.dmg"
+    local app_dmg
+    app_dmg="$(find_single_file "${installer_dir}" '*.dmg')"
+    cp "${app_dmg}" "${out_dir}/modelizer-next-app-standalone-${platform}-${VERSION}.dmg"
 
   else
     local app_deb
-    app_deb="$(find_single_file "modelizer-next-app/target/dist/linux" '*.deb')"
+    app_deb="$(find_single_file "${installer_dir}" '*.deb')"
     cp "${app_deb}" "${out_dir}/modelizer-next-app-standalone-${platform}-${VERSION}.deb"
   fi
 }
@@ -259,15 +263,7 @@ stage_portable_artifacts() {
   rm -rf "${out_dir}"
   mkdir -p "${out_dir}"
 
-  if [ "${platform}" = "windows" ]; then
-    source_dir="$(find_single_directory "modelizer-next-app/target/dist/windows")"
-
-  elif [ "${platform}" = "macos" ]; then
-    source_dir="$(find_single_directory "modelizer-next-app/target/dist/macos")"
-
-  else
-    source_dir="$(find_single_directory "modelizer-next-app/target/dist/linux")"
-  fi
+  source_dir="$(find_single_directory "modelizer-next-app/target/jdeploy/jdeploy/bundles")"
 
   archive_name="modelizer-next-app-portable-${platform}-${VERSION}.zip"
 

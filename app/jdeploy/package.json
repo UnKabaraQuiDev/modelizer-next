@@ -1,0 +1,68 @@
+{
+  "name": "${jdeploy.packageJsonName}",
+  "version": "${project.version}",
+  "description": "${project.description}",
+  "author": "${jdeploy.author}",
+  "license": "${jdeploy.license}",
+  "preferGlobal": true,
+  "repository": {
+    "type": "git",
+    "url": "${modelizer.repositoryUrl}"
+  },
+  "homepage": "${modelizer.website}",
+  "bugs": {
+    "url": "${modelizer.issuesUrl}"
+  },
+  "main": "index.js",
+  "bin": {
+    "${jdeploy.name}": "jdeploy-bundle/jdeploy.js"
+  },
+  "files": [
+    "jdeploy-bundle"
+  ],
+  "dependencies": {
+    "shelljs": "^0.8.4",
+    "njre": "^0.2.0"
+  },
+  "scripts": {
+    "package": "jdeploy package",
+    "publish": "jdeploy publish"
+  },
+  "jdeploy": {
+    "jar": "${jdeploy.jar}",
+    "javaVersion": "${jdeploy.javaVersion}",
+    "jdk": ${jdeploy.jdk},
+    "javafx": ${jdeploy.javafx},
+    "title": "${jdeploy.title}",
+    "vendor": "${jdeploy.vendor}",
+    "jdeployVersion": "6.1",
+    "installers": ${jdeploy.localInstallers},
+    "bundles": ${jdeploy.localBundles},
+	"generateLegacyBundles": false,
+    "downloadPage": {
+      "platforms": ${jdeploy.downloadPlatforms}
+    },
+    "documentTypes": [
+      {
+        "extension": "mod",
+        "mimetype": "application/x-modelizer-mod",
+        "editor": true,
+        "custom": true
+      },
+      {
+        "extension": "mn",
+        "mimetype": "application/x-modelizer-mn",
+        "editor": true,
+        "custom": true
+      },
+      {
+        "extension": "mdlz",
+        "mimetype": "application/x-modelizer-mdlz",
+        "editor": true,
+        "custom": true
+      }
+    ],
+    "args": [],
+    "winAppDir": "AppData\\\\Local\\\\Programs"
+  }
+}
