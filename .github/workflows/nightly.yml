@@ -231,7 +231,6 @@ jobs:
           java-version: 21
       - name: Install coreutils (gdate) and Maven
         run: |
-          brew update
           brew install coreutils maven
       - name: Verify
         run: |
@@ -259,7 +258,6 @@ jobs:
           java-version: 21
       - name: Install coreutils (gdate) and Maven
         run: |
-          brew update
           brew install coreutils maven
       - name: Verify
         run: |
@@ -287,7 +285,6 @@ jobs:
           java-version: 21
       - name: Install coreutils (gdate) and Maven
         run: |
-          brew update
           brew install coreutils maven
       - name: Verify
         run: |

@@ -483,7 +483,7 @@ public class DiagramCanvas extends JPanel {
 		this.document.getModel().getClasses().add(classModel);
 
 		final NodeLayout layout = this.resolveRenderLayout(this.findOrCreateNodeLayout(LayoutObjectType.CLASS, classModel.getId()));
-		final Point2D.Double center = this.viewportCenterWorld();
+		final Point2D.Double center = this.mouseWorldOrViewportCenter();
 		layout.setPosition(new Point2D.Double(center.getX() - 100, center.getY() - 40));
 		layout.setSize(new Size2D(180, 0));
 
@@ -1143,6 +1143,119 @@ public class DiagramCanvas extends JPanel {
 		};
 	}
 
+	private Rectangle2D.Double computeExportContentBounds(final Graphics2D g2, final ViewExportScope scope) {
+		final LinkedHashSet<SelectedElement> previousFilter = this.exportSelectionFilter;
+		if (scope == ViewExportScope.SELECTION && this.exportSelectionFilter == null) {
+			this.exportSelectionFilter = new LinkedHashSet<>(this.selectedElements);
+		}
+
+		try {
+			this.ensureLayouts();
+
+			if (this.panelType == PanelType.CONCEPTUAL) {
+				this.invalidateConceptualAnchorCache();
+				this.ensureConceptualAnchorCache(g2);
+			}
+
+			Rectangle2D.Double bounds = null;
+			final boolean onlySelection = scope == ViewExportScope.SELECTION;
+
+			for (final ClassModel classModel : this.document.getModel().getClasses()) {
+				if (!this.isVisible(classModel) || onlySelection && !this.shouldExportClass(classModel)) {
+					continue;
+				}
+
+				final NodeLayout layout = this.resolveRenderLayout(this.findOrCreateNodeLayout(LayoutObjectType.CLASS, classModel.getId()));
+				final Rectangle2D classBounds = this.computeClassBounds(g2, classModel, layout);
+				bounds = this.expandBounds(bounds, classBounds.getX(), classBounds.getY(), classBounds.getWidth(), classBounds.getHeight());
+			}
+
+			for (final CommentModel commentModel : this.document.getModel().getComments()) {
+				final String text = this.resolveCommentText(commentModel);
+				if (text == null || text.isBlank() || !this.isCommentVisible(commentModel)
+						|| onlySelection && !this.shouldExportComment(commentModel)) {
+					continue;
+				}
+
+				final NodeLayout layout = this
+						.resolveRenderLayout(this.findOrCreateNodeLayout(LayoutObjectType.COMMENT, commentModel.getId()));
+				final Rectangle2D commentBounds = this.computeCommentBounds(g2, text, layout);
+				bounds = this.expandBounds(bounds,
+						commentBounds.getX(),
+						commentBounds.getY(),
+						commentBounds.getWidth(),
+						commentBounds.getHeight());
+
+				final Point2D connectorAnchor = this.findBoundTargetAnchor(g2, commentModel);
+				if (connectorAnchor != null) {
+					bounds = this.expandBounds(bounds,
+							Math.min(connectorAnchor.getX(), commentBounds.getCenterX()),
+							Math.min(connectorAnchor.getY(), commentBounds.getCenterY()),
+							Math.abs(connectorAnchor.getX() - commentBounds.getCenterX()),
+							Math.abs(connectorAnchor.getY() - commentBounds.getCenterY()));
+				}
+			}
+
+			for (final LinkModel linkModel : this.getActiveLinks()) {
+				if (onlySelection && !this.shouldExportLink(linkModel)) {
+					continue;
+				}
+
+				final LinkGeometry geometry = this.resolveLinkGeometry(g2, linkModel);
+				if (geometry == null) {
+					continue;
+				}
+
+				for (final Point2D point : geometry.points()) {
+					bounds = this.expandBounds(bounds, point.getX(), point.getY(), 1.0, 1.0);
+				}
+
+				if (geometry.labelPoint() != null) {
+					bounds = this.expandBounds(bounds, geometry.labelPoint().getX() - 60, geometry.labelPoint().getY() - 20, 120, 40);
+				}
+			}
+
+			return bounds;
+		} finally {
+			this.exportSelectionFilter = previousFilter;
+		}
+	}
+
+	private Dimension computeExportSize(final Graphics2D g2, final ViewExportScope scope) {
+		if (scope == ViewExportScope.VIEW) {
+			return this.getViewportExportSize();
+		}
+
+		final Rectangle2D.Double contentBounds = this.computeExportContentBounds(g2, scope);
+		if (contentBounds == null) {
+			return this.getViewportExportSize();
+		}
+
+		return new Dimension(Math.max(1, (int) Math.ceil(contentBounds.getWidth() + DiagramCanvas.EXPORT_MARGIN * 2.0)),
+				Math.max(1, (int) Math.ceil(contentBounds.getHeight() + DiagramCanvas.EXPORT_MARGIN * 2.0)));
+	}
+
+	private Rectangle2D.Double computeExportWorldBounds(final Graphics2D g2, final ViewExportScope scope) {
+		if (scope == ViewExportScope.VIEW) {
+			final PanelState state = this.getPanelState();
+			final Dimension viewportSize = this.getViewportExportSize();
+			return new Rectangle2D.Double(-state.getPanX() / state.getZoom(),
+					-state.getPanY() / state.getZoom(),
+					viewportSize.getWidth() / state.getZoom(),
+					viewportSize.getHeight() / state.getZoom());
+		}
+
+		final Rectangle2D.Double contentBounds = this.computeExportContentBounds(g2, scope);
+		if (contentBounds == null) {
+			return this.computeExportWorldBounds(g2, ViewExportScope.VIEW);
+		}
+
+		return new Rectangle2D.Double(contentBounds.getX() - DiagramCanvas.EXPORT_MARGIN,
+				contentBounds.getY() - DiagramCanvas.EXPORT_MARGIN,
+				contentBounds.getWidth() + DiagramCanvas.EXPORT_MARGIN * 2.0,
+				contentBounds.getHeight() + DiagramCanvas.EXPORT_MARGIN * 2.0);
+	}
+
 	private Point2D computePolylineMiddlePoint(final List<Point2D> points) {
 		if (points == null || points.size() < 2) {
 			return null;
@@ -1436,34 +1549,6 @@ public class DiagramCanvas extends JPanel {
 		return selection;
 	}
 
-	private FieldModel createFieldFromClipboard(final CopiedField copiedField, final boolean rename) {
-		final FieldModel fieldCopy = new FieldModel();
-
-		fieldCopy.getNames().setName(rename ? this.appendSuffix(copiedField.name(), " Copy") : copiedField.name());
-		fieldCopy.getNames()
-				.setTechnicalName(rename ? this.appendSuffix(copiedField.technicalName(), "_COPY") : copiedField.technicalName());
-
-		fieldCopy.setNotConceptual(copiedField.notConceptual());
-		fieldCopy.setComment(copiedField.comment());
-		fieldCopy.setPrimaryKey(copiedField.primaryKey());
-		fieldCopy.setUnique(copiedField.unique());
-		fieldCopy.setNotNull(copiedField.notNull());
-		fieldCopy.setType(copiedField.type());
-
-		fieldCopy.getStyle().setTextColor(copiedField.textColor());
-		fieldCopy.getStyle().setBackgroundColor(copiedField.backgroundColor());
-
-		return fieldCopy;
-	}
-
-	private Graphics2D createGraphicsContext() {
-		final BufferedImage image = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
-		final Graphics2D g2 = image.createGraphics();
-		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-		g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-		return g2;
-	}
-
 	public BufferedImage createExportImage(final ViewExportScope scope) {
 		final Dimension exportSize = this.getExportSize(scope);
 		final BufferedImage image = new BufferedImage(exportSize.width, exportSize.height, BufferedImage.TYPE_INT_ARGB);
@@ -1496,173 +1581,32 @@ public class DiagramCanvas extends JPanel {
 		return image;
 	}
 
-	private Rectangle2D.Double computeExportContentBounds(final Graphics2D g2, final ViewExportScope scope) {
-		final LinkedHashSet<SelectedElement> previousFilter = this.exportSelectionFilter;
-		if (scope == ViewExportScope.SELECTION && this.exportSelectionFilter == null) {
-			this.exportSelectionFilter = new LinkedHashSet<>(this.selectedElements);
-		}
+	private FieldModel createFieldFromClipboard(final CopiedField copiedField, final boolean rename) {
+		final FieldModel fieldCopy = new FieldModel();
 
-		try {
-			this.ensureLayouts();
+		fieldCopy.getNames().setName(rename ? this.appendSuffix(copiedField.name(), " Copy") : copiedField.name());
+		fieldCopy.getNames()
+				.setTechnicalName(rename ? this.appendSuffix(copiedField.technicalName(), "_COPY") : copiedField.technicalName());
 
-			if (this.panelType == PanelType.CONCEPTUAL) {
-				this.invalidateConceptualAnchorCache();
-				this.ensureConceptualAnchorCache(g2);
-			}
+		fieldCopy.setNotConceptual(copiedField.notConceptual());
+		fieldCopy.setComment(copiedField.comment());
+		fieldCopy.setPrimaryKey(copiedField.primaryKey());
+		fieldCopy.setUnique(copiedField.unique());
+		fieldCopy.setNotNull(copiedField.notNull());
+		fieldCopy.setType(copiedField.type());
 
-			Rectangle2D.Double bounds = null;
-			final boolean onlySelection = scope == ViewExportScope.SELECTION;
+		fieldCopy.getStyle().setTextColor(copiedField.textColor());
+		fieldCopy.getStyle().setBackgroundColor(copiedField.backgroundColor());
 
-			for (final ClassModel classModel : this.document.getModel().getClasses()) {
-				if (!this.isVisible(classModel) || onlySelection && !this.shouldExportClass(classModel)) {
-					continue;
-				}
-
-				final NodeLayout layout = this.resolveRenderLayout(this.findOrCreateNodeLayout(LayoutObjectType.CLASS, classModel.getId()));
-				final Rectangle2D classBounds = this.computeClassBounds(g2, classModel, layout);
-				bounds = this.expandBounds(bounds, classBounds.getX(), classBounds.getY(), classBounds.getWidth(), classBounds.getHeight());
-			}
-
-			for (final CommentModel commentModel : this.document.getModel().getComments()) {
-				final String text = this.resolveCommentText(commentModel);
-				if (text == null || text.isBlank() || !this.isCommentVisible(commentModel)
-						|| onlySelection && !this.shouldExportComment(commentModel)) {
-					continue;
-				}
-
-				final NodeLayout layout = this
-						.resolveRenderLayout(this.findOrCreateNodeLayout(LayoutObjectType.COMMENT, commentModel.getId()));
-				final Rectangle2D commentBounds = this.computeCommentBounds(g2, text, layout);
-				bounds = this.expandBounds(bounds,
-						commentBounds.getX(),
-						commentBounds.getY(),
-						commentBounds.getWidth(),
-						commentBounds.getHeight());
-
-				final Point2D connectorAnchor = this.findBoundTargetAnchor(g2, commentModel);
-				if (connectorAnchor != null) {
-					bounds = this.expandBounds(bounds,
-							Math.min(connectorAnchor.getX(), commentBounds.getCenterX()),
-							Math.min(connectorAnchor.getY(), commentBounds.getCenterY()),
-							Math.abs(connectorAnchor.getX() - commentBounds.getCenterX()),
-							Math.abs(connectorAnchor.getY() - commentBounds.getCenterY()));
-				}
-			}
-
-			for (final LinkModel linkModel : this.getActiveLinks()) {
-				if (onlySelection && !this.shouldExportLink(linkModel)) {
-					continue;
-				}
-
-				final LinkGeometry geometry = this.resolveLinkGeometry(g2, linkModel);
-				if (geometry == null) {
-					continue;
-				}
-
-				for (final Point2D point : geometry.points()) {
-					bounds = this.expandBounds(bounds, point.getX(), point.getY(), 1.0, 1.0);
-				}
-
-				if (geometry.labelPoint() != null) {
-					bounds = this.expandBounds(bounds, geometry.labelPoint().getX() - 60, geometry.labelPoint().getY() - 20, 120, 40);
-				}
-			}
-
-			return bounds;
-		} finally {
-			this.exportSelectionFilter = previousFilter;
-		}
+		return fieldCopy;
 	}
 
-	private Dimension computeExportSize(final Graphics2D g2, final ViewExportScope scope) {
-		if (scope == ViewExportScope.VIEW) {
-			return this.getViewportExportSize();
-		}
-
-		final Rectangle2D.Double contentBounds = this.computeExportContentBounds(g2, scope);
-		if (contentBounds == null) {
-			return this.getViewportExportSize();
-		}
-
-		return new Dimension(Math.max(1, (int) Math.ceil(contentBounds.getWidth() + DiagramCanvas.EXPORT_MARGIN * 2.0)),
-				Math.max(1, (int) Math.ceil(contentBounds.getHeight() + DiagramCanvas.EXPORT_MARGIN * 2.0)));
-	}
-
-	private Rectangle2D.Double computeExportWorldBounds(final Graphics2D g2, final ViewExportScope scope) {
-		if (scope == ViewExportScope.VIEW) {
-			final PanelState state = this.getPanelState();
-			final Dimension viewportSize = this.getViewportExportSize();
-			return new Rectangle2D.Double(-state.getPanX() / state.getZoom(),
-					-state.getPanY() / state.getZoom(),
-					viewportSize.getWidth() / state.getZoom(),
-					viewportSize.getHeight() / state.getZoom());
-		}
-
-		final Rectangle2D.Double contentBounds = this.computeExportContentBounds(g2, scope);
-		if (contentBounds == null) {
-			return this.computeExportWorldBounds(g2, ViewExportScope.VIEW);
-		}
-
-		return new Rectangle2D.Double(contentBounds.getX() - DiagramCanvas.EXPORT_MARGIN,
-				contentBounds.getY() - DiagramCanvas.EXPORT_MARGIN,
-				contentBounds.getWidth() + DiagramCanvas.EXPORT_MARGIN * 2.0,
-				contentBounds.getHeight() + DiagramCanvas.EXPORT_MARGIN * 2.0);
-	}
-
-	public Dimension getExportSize(final ViewExportScope scope) {
-		final Graphics2D g2 = this.createGraphicsContext();
-		try {
-			return this.computeExportSize(g2, scope == null ? ViewExportScope.VIEW : scope);
-		} finally {
-			g2.dispose();
-		}
-	}
-
-	private Dimension getViewportExportSize() {
-		return new Dimension(this.getWidth() <= 0 ? DiagramCanvas.DEFAULT_EXPORT_WIDTH : this.getWidth(),
-				this.getHeight() <= 0 ? DiagramCanvas.DEFAULT_EXPORT_HEIGHT : this.getHeight());
-	}
-
-	public boolean hasSelection() {
-		return !this.selectedElements.isEmpty();
-	}
-
-	public void paintExport(final Graphics2D graphics, final ViewExportScope rawScope) {
-		final ViewExportScope scope = rawScope == null ? ViewExportScope.VIEW : rawScope;
-		this.invalidateConceptualAnchorCache();
-		this.ensureLayouts();
-
-		final LinkedHashSet<SelectedElement> previousFilter = this.exportSelectionFilter;
-		final boolean previousSuppressSelectionDecorations = this.suppressSelectionDecorations;
-		final boolean previousSuppressInteractiveOverlays = this.suppressInteractiveOverlays;
-
-		this.exportSelectionFilter = scope == ViewExportScope.SELECTION ? new LinkedHashSet<>(this.selectedElements) : null;
-		this.suppressSelectionDecorations = true;
-		this.suppressInteractiveOverlays = true;
-
-		try {
-			final Dimension exportSize = this.computeExportSize(graphics, scope);
-			final Rectangle2D.Double worldBounds = this.computeExportWorldBounds(graphics, scope);
-
-			graphics.setColor(DiagramCanvas.CANVAS_BACKGROUND_COLOR);
-			graphics.fillRect(0, 0, exportSize.width, exportSize.height);
-			this.drawExportGrid(graphics, exportSize);
-
-			final AffineTransform oldTransform = graphics.getTransform();
-			final double zoom = scope == ViewExportScope.VIEW ? this.getPanelState().getZoom() : 1.0;
-			graphics.translate(-worldBounds.getX() * zoom, -worldBounds.getY() * zoom);
-			graphics.scale(zoom, zoom);
-
-			this.drawComments(graphics);
-			this.drawClasses(graphics);
-			this.drawLinks(graphics);
-
-			graphics.setTransform(oldTransform);
-		} finally {
-			this.exportSelectionFilter = previousFilter;
-			this.suppressSelectionDecorations = previousSuppressSelectionDecorations;
-			this.suppressInteractiveOverlays = previousSuppressInteractiveOverlays;
-		}
+	private Graphics2D createGraphicsContext() {
+		final BufferedImage image = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
+		final Graphics2D g2 = image.createGraphics();
+		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+		g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+		return g2;
 	}
 
 	private LinkModel createLinkFromClipboard(
@@ -1713,8 +1657,8 @@ public class DiagramCanvas extends JPanel {
 		case LINK -> this.mapId(linkIdMap, copiedComment.bindingTargetId());
 		};
 
-		if ((copiedComment.bindingTargetType() == BoundTargetType.CLASS && this.findClassById(targetId) == null)
-				|| (copiedComment.bindingTargetType() == BoundTargetType.LINK && this.findLinkById(targetId) == null)) {
+		if (copiedComment.bindingTargetType() == BoundTargetType.CLASS && this.findClassById(targetId) == null
+				|| copiedComment.bindingTargetType() == BoundTargetType.LINK && this.findLinkById(targetId) == null) {
 			return null;
 		}
 
@@ -1903,36 +1847,6 @@ public class DiagramCanvas extends JPanel {
 		this.drawAlignedLinkLabel(g2, text, center, angle);
 	}
 
-	private boolean shouldExportClass(final ClassModel classModel) {
-		if (this.exportSelectionFilter == null) {
-			return true;
-		}
-		if (classModel == null) {
-			return false;
-		}
-
-		for (final SelectedElement element : this.exportSelectionFilter) {
-			if (element.type() == SelectedType.CLASS && Objects.equals(element.classId(), classModel.getId())) {
-				return true;
-			}
-			if (element.type() == SelectedType.FIELD && Objects.equals(element.classId(), classModel.getId())) {
-				return true;
-			}
-		}
-
-		return false;
-	}
-
-	private boolean shouldExportComment(final CommentModel commentModel) {
-		return this.exportSelectionFilter == null
-				|| commentModel != null && this.exportSelectionFilter.contains(SelectedElement.forComment(commentModel.getId()));
-	}
-
-	private boolean shouldExportLink(final LinkModel linkModel) {
-		return this.exportSelectionFilter == null
-				|| linkModel != null && this.exportSelectionFilter.contains(SelectedElement.forLink(linkModel.getId()));
-	}
-
 	private void drawClasses(final Graphics2D g2) {
 		for (final ClassModel classModel : this.document.getModel().getClasses()) {
 			if (!this.isVisible(classModel) || !this.shouldExportClass(classModel)) {
@@ -2055,16 +1969,6 @@ public class DiagramCanvas extends JPanel {
 		}
 	}
 
-	private void drawGrid(final Graphics2D g2) {
-		g2.setColor(DiagramCanvas.GRID_COLOR);
-		for (int x = 0; x < this.getWidth(); x += 40) {
-			g2.drawLine(x, 0, x, this.getHeight());
-		}
-		for (int y = 0; y < this.getHeight(); y += 40) {
-			g2.drawLine(0, y, this.getWidth(), y);
-		}
-	}
-
 	private void drawExportGrid(final Graphics2D g2, final Dimension size) {
 		g2.setColor(DiagramCanvas.GRID_COLOR);
 		for (int x = 0; x < size.width; x += 40) {
@@ -2072,6 +1976,16 @@ public class DiagramCanvas extends JPanel {
 		}
 		for (int y = 0; y < size.height; y += 40) {
 			g2.drawLine(0, y, size.width, y);
+		}
+	}
+
+	private void drawGrid(final Graphics2D g2) {
+		g2.setColor(DiagramCanvas.GRID_COLOR);
+		for (int x = 0; x < this.getWidth(); x += 40) {
+			g2.drawLine(x, 0, x, this.getHeight());
+		}
+		for (int y = 0; y < this.getHeight(); y += 40) {
+			g2.drawLine(0, y, this.getWidth(), y);
 		}
 	}
 
@@ -2908,6 +2822,15 @@ public class DiagramCanvas extends JPanel {
 		return this.panelType == PanelType.CONCEPTUAL ? fieldModel.getNames().getName() : fieldModel.getNames().getTechnicalName();
 	}
 
+	public Dimension getExportSize(final ViewExportScope scope) {
+		final Graphics2D g2 = this.createGraphicsContext();
+		try {
+			return this.computeExportSize(g2, scope == null ? ViewExportScope.VIEW : scope);
+		} finally {
+			g2.dispose();
+		}
+	}
+
 	private SelectedElement getLinkCreationSource() {
 		return this.linkCreationState == null ? null : this.linkCreationState.toSelectedElement();
 	}
@@ -2972,6 +2895,11 @@ public class DiagramCanvas extends JPanel {
 			}
 		}
 		return count;
+	}
+
+	private Dimension getViewportExportSize() {
+		return new Dimension(this.getWidth() <= 0 ? DiagramCanvas.DEFAULT_EXPORT_WIDTH : this.getWidth(),
+				this.getHeight() <= 0 ? DiagramCanvas.DEFAULT_EXPORT_HEIGHT : this.getHeight());
 	}
 
 	private List<FieldModel> getVisibleFields(final ClassModel classModel) {
@@ -3217,6 +3145,10 @@ public class DiagramCanvas extends JPanel {
 			}
 		}
 		return false;
+	}
+
+	public boolean hasSelection() {
+		return !this.selectedElements.isEmpty();
 	}
 
 	private void installKeyBindings() {
@@ -3578,6 +3510,44 @@ public class DiagramCanvas extends JPanel {
 
 		g2.setTransform(oldTransform);
 		g2.dispose();
+	}
+
+	public void paintExport(final Graphics2D graphics, final ViewExportScope rawScope) {
+		final ViewExportScope scope = rawScope == null ? ViewExportScope.VIEW : rawScope;
+		this.invalidateConceptualAnchorCache();
+		this.ensureLayouts();
+
+		final LinkedHashSet<SelectedElement> previousFilter = this.exportSelectionFilter;
+		final boolean previousSuppressSelectionDecorations = this.suppressSelectionDecorations;
+		final boolean previousSuppressInteractiveOverlays = this.suppressInteractiveOverlays;
+
+		this.exportSelectionFilter = scope == ViewExportScope.SELECTION ? new LinkedHashSet<>(this.selectedElements) : null;
+		this.suppressSelectionDecorations = true;
+		this.suppressInteractiveOverlays = true;
+
+		try {
+			final Dimension exportSize = this.computeExportSize(graphics, scope);
+			final Rectangle2D.Double worldBounds = this.computeExportWorldBounds(graphics, scope);
+
+			graphics.setColor(DiagramCanvas.CANVAS_BACKGROUND_COLOR);
+			graphics.fillRect(0, 0, exportSize.width, exportSize.height);
+			this.drawExportGrid(graphics, exportSize);
+
+			final AffineTransform oldTransform = graphics.getTransform();
+			final double zoom = scope == ViewExportScope.VIEW ? this.getPanelState().getZoom() : 1.0;
+			graphics.translate(-worldBounds.getX() * zoom, -worldBounds.getY() * zoom);
+			graphics.scale(zoom, zoom);
+
+			this.drawComments(graphics);
+			this.drawClasses(graphics);
+			this.drawLinks(graphics);
+
+			graphics.setTransform(oldTransform);
+		} finally {
+			this.exportSelectionFilter = previousFilter;
+			this.suppressSelectionDecorations = previousSuppressSelectionDecorations;
+			this.suppressInteractiveOverlays = previousSuppressInteractiveOverlays;
+		}
 	}
 
 	private void pasteSelection() {
@@ -4487,6 +4457,34 @@ public class DiagramCanvas extends JPanel {
 		} else {
 			fieldModel.getNames().setTechnicalName(value);
 		}
+	}
+
+	private boolean shouldExportClass(final ClassModel classModel) {
+		if (this.exportSelectionFilter == null) {
+			return true;
+		}
+		if (classModel == null) {
+			return false;
+		}
+
+		for (final SelectedElement element : this.exportSelectionFilter) {
+			if ((element.type() == SelectedType.CLASS && Objects.equals(element.classId(), classModel.getId()))
+					|| (element.type() == SelectedType.FIELD && Objects.equals(element.classId(), classModel.getId()))) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	private boolean shouldExportComment(final CommentModel commentModel) {
+		return this.exportSelectionFilter == null
+				|| commentModel != null && this.exportSelectionFilter.contains(SelectedElement.forComment(commentModel.getId()));
+	}
+
+	private boolean shouldExportLink(final LinkModel linkModel) {
+		return this.exportSelectionFilter == null
+				|| linkModel != null && this.exportSelectionFilter.contains(SelectedElement.forLink(linkModel.getId()));
 	}
 
 	private void updateSelectionFromMouse(final SelectedElement element, final MouseEvent event) {
