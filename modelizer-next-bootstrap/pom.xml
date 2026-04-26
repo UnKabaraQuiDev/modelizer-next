@@ -16,7 +16,7 @@
 
 	<properties>
 		<app.mainClass>lu.kbra.modelizer_next.bootstrap.BootstrapMain</app.mainClass>
-		<jpackage.name>modelizer-next</jpackage.name>
+		<jpackage.name>Mordelizer Next</jpackage.name>
 		<jpackage.macos.name>Modelizer Next</jpackage.macos.name>
 		<native-module>true</native-module>
 	</properties>
