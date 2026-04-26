@@ -23,6 +23,7 @@ import org.apache.batik.svggen.SVGGraphics2D;
 import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Document;
 
+import lu.kbra.modelizer_next.cmdline.CommandLineExportParser.InvalidArgumentException;
 import lu.kbra.modelizer_next.layout.PanelType;
 import lu.kbra.modelizer_next.ui.canvas.DiagramCanvas;
 
@@ -44,16 +45,16 @@ public final class ViewExporter {
 			final String sourceFileName) throws IOException {
 
 		if (request == null || request.panelTypes() == null || request.panelTypes().isEmpty()) {
-			throw new IOException("No panel type selected.");
+			throw new InvalidArgumentException("No panel type selected.");
 		}
 		if (request.outputDirectory() == null) {
-			throw new IOException("No output directory selected.");
+			throw new InvalidArgumentException("No output directory selected.");
 		}
 		if (!request.outputDirectory().exists()) {
 			Files.createDirectories(request.outputDirectory().toPath());
 		}
 		if (!request.outputDirectory().isDirectory()) {
-			throw new IOException("The selected output path is not a directory.");
+			throw new InvalidArgumentException("The selected output path is not a directory.");
 		}
 
 		final List<File> exportedFiles = new ArrayList<>();

@@ -226,6 +226,7 @@ public class DiagramCanvas extends JPanel {
 		this.installKeyBindings();
 
 		final MouseAdapter mouseAdapter = new MouseAdapter() {
+
 			@Override
 			public void mouseDragged(final MouseEvent e) {
 				DiagramCanvas.this.mouseInteractionController.handleMouseDragged(e);
@@ -245,6 +246,7 @@ public class DiagramCanvas extends JPanel {
 			public void mouseWheelMoved(final MouseWheelEvent e) {
 				DiagramCanvas.this.mouseInteractionController.handleMouseWheelMoved(e);
 			}
+
 		};
 
 		this.addMouseListener(mouseAdapter);
