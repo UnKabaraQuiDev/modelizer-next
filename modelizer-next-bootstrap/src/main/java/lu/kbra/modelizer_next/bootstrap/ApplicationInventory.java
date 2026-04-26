@@ -57,7 +57,7 @@ final class ApplicationInventory {
 				.orElseThrow(() -> new IOException("The downloaded application jar is missing app.json metadata."));
 	}
 
-	private Optional<InstalledApplication> readInstalledApplication(final Path jarPath) {
+	Optional<InstalledApplication> readInstalledApplication(final Path jarPath) {
 		try (JarFile jarFile = new JarFile(jarPath.toFile())) {
 			final var entry = jarFile.getJarEntry("app.json");
 			if (entry == null) {

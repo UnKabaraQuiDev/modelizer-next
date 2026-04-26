@@ -45,4 +45,37 @@
 		</dependency>
 	</dependencies>
 
+	<profiles>
+		<profile>
+			<id>run</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-antrun-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>run-bootstrap</id>
+								<phase>install</phase>
+								<goals>
+									<goal>run</goal>
+								</goals>
+								<configuration>
+									<target>
+										<exec executable="java">
+											<arg value="-DBootstrapApp.enableUpdate" />
+											<arg value="-DBootstrapApp.forceJarName=modelizer-next-app-${revision}.jar" />
+											<arg value="-jar" />
+											<arg value="${project.build.directory}/${project.build.finalName}-with-dependencies.jar" />
+										</exec>
+									</target>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+
 </project>

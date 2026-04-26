@@ -11,11 +11,13 @@ import lu.kbra.pclib.PCUtils;
 
 public final class BootstrapApp {
 
-	static final ObjectMapper MAPPER = createMapper();
-	private static final String APP_DIR_PROPERTY = "APP_DIR";
-	private static final String ENABLE_UPDATE_PROPERTY = "enableUpdate";
+	public static final ObjectMapper MAPPER = createMapper();
+	public static final String APP_DIR_PROPERTY = "APP_DIR";
+	public static final String ENABLE_UPDATE_PROPERTY = BootstrapApp.class.getSimpleName() + ".enableUpdate";
 	public static boolean ENABLE_UPDATE = PCUtils.getBoolean(BootstrapApp.ENABLE_UPDATE_PROPERTY, true);
-	private static final String APP_FOLDER_NAME = "modelizer-next";
+	public static final String APP_FOLDER_NAME = "modelizer-next";
+	public static final String FORCE_JAR_NAME_PROPERTY = BootstrapApp.class.getSimpleName() + ".forceJarName";
+	public static String FORCE_JAR_NAME = System.getProperty(FORCE_JAR_NAME_PROPERTY);
 
 	public static JsonNode JSON;
 

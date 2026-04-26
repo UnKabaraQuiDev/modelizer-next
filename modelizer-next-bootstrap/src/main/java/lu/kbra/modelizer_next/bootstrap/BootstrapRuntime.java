@@ -3,6 +3,8 @@ package lu.kbra.modelizer_next.bootstrap;
 import java.awt.Component;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -35,7 +37,8 @@ public class BootstrapRuntime implements UpdateRuntime {
 				new ApplicationInventory(),
 				new RemoteUpdateService(),
 				new JarApplicationLauncher(),
-				BootstrapApp.ENABLE_UPDATE);
+				BootstrapApp.ENABLE_UPDATE,
+				BootstrapApp.FORCE_JAR_NAME);
 
 		if (firstLaunch) {
 			runtime.promptForInitialChannelSelection();
@@ -112,12 +115,10 @@ public class BootstrapRuntime implements UpdateRuntime {
 
 	private final BootstrapConfiguration configuration;
 	private final ApplicationInventory inventory;
-
 	private final RemoteUpdateService remoteUpdateService;
-
 	private final JarApplicationLauncher applicationLauncher;
-
 	private final boolean automaticUpdatesEnabled;
+	private final String forceJarName;
 
 	private InstalledApplication currentApplication;
 
@@ -126,12 +127,14 @@ public class BootstrapRuntime implements UpdateRuntime {
 			final ApplicationInventory inventory,
 			final RemoteUpdateService remoteUpdateService,
 			final JarApplicationLauncher applicationLauncher,
-			final boolean automaticUpdatesEnabled) {
+			final boolean automaticUpdatesEnabled,
+			final String forceJarName) {
 		this.configuration = configuration;
 		this.inventory = inventory;
 		this.remoteUpdateService = remoteUpdateService;
 		this.applicationLauncher = applicationLauncher;
 		this.automaticUpdatesEnabled = automaticUpdatesEnabled;
+		this.forceJarName = forceJarName;
 	}
 
 	@Override
@@ -214,13 +217,23 @@ public class BootstrapRuntime implements UpdateRuntime {
 		return true;
 	}
 
+	public String getForceJarName() {
+		return forceJarName;
+	}
+
 	public void launch(final String[] args, Queue<File> toBeOpened) throws Exception {
 		final BootstrapLoadingFrame loadingFrame = new BootstrapLoadingFrame();
 		loadingFrame.setVisible(true);
 		try {
 			loadingFrame.update("Checking installed application...", 0, 0);
-			this.currentApplication = this.inventory.findLatestInstalled(configuration.getUpdateChannel()).orElse(null);
-			System.out.println("Current version: " + currentApplication.version());
+			if (getForceJarName() != null && Files.exists(BootstrapApp.getApplicationsDirectory().toPath().resolve(getForceJarName()))) {
+				final Path path = BootstrapApp.getApplicationsDirectory().toPath().resolve(getForceJarName());
+				this.currentApplication = inventory.readInstalledApplication(path)
+						.orElseThrow(() -> new IllegalArgumentException("File: '" + getForceJarName() + "' not found, resolved: " + path));
+			} else {
+				this.currentApplication = this.inventory.findLatestInstalled(configuration.getUpdateChannel()).orElse(null);
+			}
+			System.out.println("Current version" + (getForceJarName() == null ? "" : " (forced)") + ": " + currentApplication.version());
 			if (this.currentApplication == null) {
 				final AvailableUpdate bootstrapInstall = this.requireInstallableUpdate(this.configuration.getUpdateChannel(), null);
 				loadingFrame.update("Installing " + bootstrapInstall.latestVersion() + "...", 0, 1);

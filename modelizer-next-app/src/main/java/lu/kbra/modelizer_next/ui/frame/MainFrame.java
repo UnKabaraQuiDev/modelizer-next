@@ -82,6 +82,7 @@ import lu.kbra.modelizer_next.ui.SwingDocumentLoadHandler;
 import lu.kbra.modelizer_next.ui.ThemeMode;
 import lu.kbra.modelizer_next.ui.canvas.DiagramCanvas;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectionInfo;
+import lu.kbra.modelizer_next.ui.canvas.datastruct.StatusStyleAppearance;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.StylePreviewType;
 import lu.kbra.modelizer_next.ui.dialogs.StylePaletteEditorDialog;
 import lu.kbra.modelizer_next.ui.dialogs.ViewExportDialog;
@@ -92,9 +93,6 @@ import lu.kbra.modelizer_next.ui.impl.DocumentLoadHandler;
 import lu.kbra.pclib.PCUtils;
 
 public class MainFrame extends JFrame {
-
-	private record StatusStyleAppearance(Color foreground, Color background, Color border) {
-	}
 
 	private static final long serialVersionUID = 6643164008640695591L;
 
@@ -244,17 +242,6 @@ public class MainFrame extends JFrame {
 	private void applyThemeAndReopen(final ThemeMode mode) {
 		this.appConfig.setThemeMode(mode);
 		App.saveConfig(this.appConfig);
-
-		final int choice = JOptionPane.showConfirmDialog(this,
-				"Theme change requires restarting the window.\nReopen now with the current document?",
-				"Apply theme",
-				JOptionPane.YES_NO_OPTION,
-				JOptionPane.QUESTION_MESSAGE);
-
-		if (choice != JOptionPane.YES_OPTION) {
-			return;
-		}
-
 		this.reopenWithCurrentDocument();
 	}
 
@@ -429,7 +416,10 @@ public class MainFrame extends JFrame {
 		for (final UpdateChannel updateChannel : UpdateChannel.values()) {
 			final JRadioButtonMenuItem item = new JRadioButtonMenuItem(updateChannel.displayName());
 			item.setSelected(updateChannel == selectedChannel);
-			item.addActionListener(event -> this.bootstrapRuntime().ifPresent(c -> c.setSelectedChannel(updateChannel)));
+			item.addActionListener(event -> this.bootstrapRuntime().ifPresent(c -> {
+				c.setSelectedChannel(updateChannel);
+				checkForUpdatesManually();
+			}));
 			channelGroup.add(item);
 			channelMenu.add(item);
 		}

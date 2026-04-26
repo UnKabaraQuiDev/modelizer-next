@@ -11,9 +11,9 @@
 	<description>Bootstrap and application build for Modelizer Next</description>
 
 	<modules>
-		<module>modelizer-next-bootstrap</module>
-		<module>modelizer-next-app</module>
 		<module>modelizer-next-common</module>
+		<module>modelizer-next-app</module>
+		<module>modelizer-next-bootstrap</module>
 	</modules>
 
 	<properties>
