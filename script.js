@@ -115,3 +115,134 @@ setupChoices('buildChoices');
 document.getElementById('year').textContent = new Date().getFullYear();
 syncTheme();
 loadDownloadMetadata();
+
+
+// source section
+
+const versionsUrl = 'https://raw.githubusercontent.com/UnKabaraQuiDev/modelizer-next/refs/heads/registry/registry/versions.json';
+
+const channelInfo = {
+  release: {
+    name: 'Release',
+    label: 'Stable',
+    icon: '✓'
+  },
+  snapshot: {
+    name: 'Snapshot',
+    label: 'Preview',
+    icon: '◐'
+  },
+  nightly: {
+    name: 'Nightly',
+    label: 'Latest',
+    icon: '✦'
+  }
+};
+
+function formatBuildDate(value) {
+  if (!value) return 'Date unavailable';
+
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return 'Date unavailable';
+
+  return new Intl.DateTimeFormat(undefined, {
+    dateStyle: 'medium',
+    timeStyle: 'short'
+  }).format(date);
+}
+
+async function loadReleaseDate(tag) {
+  try {
+    const response = await fetch(`https://api.github.com/repos/UnKabaraQuiDev/modelizer-next/releases/tags/${tag}`, {
+      cache: 'no-store'
+    });
+
+    if (!response.ok) return null;
+
+    const data = await response.json();
+    return data.published_at || data.created_at || null;
+  } catch (error) {
+    return null;
+  }
+}
+
+function renderChannelRows(channels) {
+  const container = document.getElementById('updateChannels');
+  if (!container) return;
+
+  container.innerHTML = channels.map(channel => `
+    <article class="channel-row ${channel.key}">
+      <div class="channel-icon" aria-hidden="true">${channel.icon}</div>
+
+      <div class="channel-main">
+        <span class="channel-label">${channel.label}</span>
+        <strong>${channel.name}</strong>
+      </div>
+
+      <div class="channel-detail">
+        <span>Version</span>
+        <strong>${channel.version}</strong>
+      </div>
+
+      <div class="channel-detail">
+        <span>Build date</span>
+        <strong>${formatBuildDate(channel.buildDate)}</strong>
+      </div>
+
+      <a class="btn" href="${channel.releaseUrl}" rel="noopener">View release</a>
+    </article>
+  `).join('');
+}
+
+function renderChannelError() {
+  const container = document.getElementById('updateChannels');
+  if (!container) return;
+
+  container.innerHTML = `
+    <article class="channel-row">
+      <div class="channel-main">
+        <span class="channel-label">Unavailable</span>
+        <strong>Could not load update channels</strong>
+      </div>
+
+      <div class="channel-detail">
+        <span>Status</span>
+        <strong>Please open GitHub releases manually.</strong>
+      </div>
+
+      <a class="btn" href="https://github.com/UnKabaraQuiDev/modelizer-next/releases" rel="noopener">View releases</a>
+    </article>
+  `;
+}
+
+async function loadUpdateChannels() {
+  try {
+    const response = await fetch(versionsUrl, {
+      cache: 'no-store'
+    });
+
+    if (!response.ok) throw new Error(`versions.json returned ${response.status}`);
+
+    const versions = await response.json();
+    const order = ['release', 'snapshot', 'nightly'];
+
+    const channels = await Promise.all(order.map(async key => {
+      const version = versions[key];
+      const info = channelInfo[key];
+
+      return {
+        key,
+        ...info,
+        version: version.version,
+        releaseUrl: version.releaseUrl,
+        buildDate: await loadReleaseDate(version.tag)
+      };
+    }));
+
+    renderChannelRows(channels);
+  } catch (error) {
+    renderChannelError();
+  }
+}
+
+loadUpdateChannels();

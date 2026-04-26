@@ -438,7 +438,7 @@
                 </button>
                 <button class="choice recommended" type="button" data-value="Updater installer" data-key="updater" aria-pressed="true">
                 <strong>Updater</strong>
-                <span>Recommended. Includes update support.</span>
+                <span>Includes update support.</span>
                 </button>
               </div>
             </div>
@@ -459,36 +459,49 @@
       </section>
       <section id="source">
         <div class="container">
-          <div class="callout">
+          <div class="callout source-callout">
             <div>
-              <h2>Open source and ready to inspect.</h2>
-              <p>Modelizer Next is published on GitHub under the GPL-3.0 license.</p>
-              <div class="build-badges" aria-label="Build status badges">
-                <a href="https://github.com/UnKabaraQuiDev/modelizer-next/actions/workflows/nightly.yml" rel="noopener">
-                <img src="https://github.com/UnKabaraQuiDev/modelizer-next/actions/workflows/nightly.yml/badge.svg" alt="Nightly Build status"></a>
-                <a href="https://github.com/UnKabaraQuiDev/modelizer-next/actions/workflows/snapshot.yml" rel="noopener">
-                <img src="https://github.com/UnKabaraQuiDev/modelizer-next/actions/workflows/snapshot.yml/badge.svg" alt="Snapshot Build status"></a>
-                <a href="https://github.com/UnKabaraQuiDev/modelizer-next/actions/workflows/release.yml" rel="noopener">
-                <img src="https://github.com/UnKabaraQuiDev/modelizer-next/actions/workflows/release.yml/badge.svg" alt="Release Build status"></a>
+              <div class="title-button-container">
+                  <h2>Fully Open Source</h2>
+                  <a class="btn" href="https://github.com/UnKabaraQuiDev/modelizer-next" rel="noopener">Browse repository</a>
+              </div>
+            <p>Modelizer Next is published on GitHub under the GPL-3.0 license.</p>
+            <div class="build-badges" aria-label="Build status badges">
+              <a href="https://github.com/UnKabaraQuiDev/modelizer-next/actions/workflows/nightly.yml" rel="noopener">
+                <img src="https://github.com/UnKabaraQuiDev/modelizer-next/actions/workflows/nightly.yml/badge.svg" alt="Nightly Build status">
+              </a>
+              <a href="https://github.com/UnKabaraQuiDev/modelizer-next/actions/workflows/snapshot.yml" rel="noopener">
+                <img src="https://github.com/UnKabaraQuiDev/modelizer-next/actions/workflows/snapshot.yml/badge.svg" alt="Snapshot Build status">
+              </a>
+              <a href="https://github.com/UnKabaraQuiDev/modelizer-next/actions/workflows/release.yml" rel="noopener">
+                <img src="https://github.com/UnKabaraQuiDev/modelizer-next/actions/workflows/release.yml/badge.svg" alt="Release Build status">
+              </a>
+            </div>
+            <p>To try out the different versions, open Modelizer Next and change your update channel in <strong>Info &gt; Update Channel</strong>.</p>
+            
+            <div class="channel-list" id="updateChannels" aria-live="polite">
+              <div class="channel-row skeleton">
+                <span>Loading update channels...</span>
               </div>
             </div>
-            <a class="btn" href="https://github.com/UnKabaraQuiDev/modelizer-next" rel="noopener">Browse repository</a>
           </div>
         </div>
-      </section>
-    </main>
-    <footer>
-      <div class="container foot">
-        <span>©
-          <span id="year"></span> Modelizer Next
-        </span>
-        <div class="foot-links">
-          <a href="https://github.com/UnKabaraQuiDev/modelizer-next/releases/latest" rel="noopener">Releases</a>
-          <a href="https://github.com/UnKabaraQuiDev/modelizer-next/issues" rel="noopener">Issues</a>
-          <a href="https://github.com/UnKabaraQuiDev/modelizer-next/blob/main/LICENSE" rel="noopener">License</a>
-        </div>
       </div>
-      <script src="script.js"></script>
-    </footer>
-  </body>
+    </section>
+  </main>
+  <footer>
+    <div class="container foot">
+      <span>©
+        <span id="year"></span> Modelizer Next by <a href="http://github.com/unkabaraquidev/" target="_BLANK">UnKabaraQuiDev</a>
+      </span>
+      <div class="foot-links">
+        <a href="https://github.com/UnKabaraQuiDev/modelizer-next/releases/latest" rel="noopener">Releases</a>
+        <a href="https://github.com/UnKabaraQuiDev/modelizer-next/issues" rel="noopener">Issues</a>
+        <a href="https://github.com/UnKabaraQuiDev/modelizer-next/issues" rel="noopener">Pull requests</a>
+        <a href="https://github.com/UnKabaraQuiDev/modelizer-next/blob/main/LICENSE" rel="noopener">License</a>
+      </div>
+    </div>
+    <script src="script.js"></script>
+  </footer>
+</body>
 </html>
