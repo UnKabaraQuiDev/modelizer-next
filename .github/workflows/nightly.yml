@@ -229,6 +229,14 @@ jobs:
         with:
           distribution: temurin
           java-version: 21
+      - name: Install coreutils (gdate) and Maven
+        run: |
+          brew update
+          brew install coreutils maven
+      - name: Verify
+        run: |
+          gdate --version
+          mvn -v
       - name: Build macos bootstrap installer
         run: bash ./script/build-nightly-macos.sh
       - uses: actions/upload-artifact@v4
@@ -249,6 +257,14 @@ jobs:
         with:
           distribution: temurin
           java-version: 21
+      - name: Install coreutils (gdate) and Maven
+        run: |
+          brew update
+          brew install coreutils maven
+      - name: Verify
+        run: |
+          gdate --version
+          mvn -v
       - name: Build macos standalone app installer
         run: bash ./script/build-nightly-macos-standalone.sh
       - uses: actions/upload-artifact@v4
@@ -269,6 +285,14 @@ jobs:
         with:
           distribution: temurin
           java-version: 21
+      - name: Install coreutils (gdate) and Maven
+        run: |
+          brew update
+          brew install coreutils maven
+      - name: Verify
+        run: |
+          gdate --version
+          mvn -v
       - name: Build macos portable app
         run: bash ./script/build-nightly-macos-portable.sh
       - uses: actions/upload-artifact@v4
