@@ -14,10 +14,10 @@
     "tag": "4-SNAPSHOT-133"
   },
   "nightly": {
-    "version": "4-NIGHTLY-141",
-    "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/4-NIGHTLY-141/modelizer-next-app-4-NIGHTLY-141.jar",
-    "releaseUrl": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/tag/4-NIGHTLY-141",
+    "version": "4-NIGHTLY-142",
+    "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/4-NIGHTLY-142/modelizer-next-app-4-NIGHTLY-142.jar",
+    "releaseUrl": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/tag/4-NIGHTLY-142",
     "notes": "Latest nightly build.",
-    "tag": "4-NIGHTLY-141"
+    "tag": "4-NIGHTLY-142"
   }
 }
