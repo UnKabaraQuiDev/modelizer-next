@@ -39,9 +39,13 @@ import lu.kbra.modelizer_next.domain.CommentKind;
 import lu.kbra.modelizer_next.domain.CommentModel;
 import lu.kbra.modelizer_next.domain.LinkModel;
 import lu.kbra.modelizer_next.layout.PanelType;
-import lu.kbra.modelizer_next.ui.ColorButton;
+import lu.kbra.modelizer_next.ui.component.ColorButton;
 
 public final class CommentEditorDialog {
+
+	public record Result(String text, Color textColor, Color backgroundColor, Color borderColor, CommentKind kind, CommentBinding binding,
+			boolean visibleInConceptual, boolean visibleInLogical, boolean visibleInPhysical) {
+	}
 
 	private static final class Holder {
 		private Result result;
@@ -86,47 +90,7 @@ public final class CommentEditorDialog {
 
 	}
 
-	public record Result(String text, Color textColor, Color backgroundColor, Color borderColor, CommentKind kind, CommentBinding binding,
-			boolean visibleInConceptual, boolean visibleInLogical, boolean visibleInPhysical) {
-	}
-
-	private static AssociationTarget resolveInitialAssociation(final ModelDocument document, final CommentModel initialComment) {
-		if (initialComment == null || initialComment.getKind() == CommentKind.STANDALONE || initialComment.getBinding() == null) {
-			return AssociationTarget.standalone();
-		}
-
-		if (initialComment.getBinding().getTargetType() == BoundTargetType.CLASS) {
-			for (final ClassModel classModel : document.getModel().getClasses()) {
-				if (classModel.getId().equals(initialComment.getBinding().getTargetId())) {
-					return AssociationTarget.forClass(classModel);
-				}
-			}
-		}
-
-		for (final LinkModel linkModel : document.getModel().getConceptualLinks()) {
-			if (linkModel.getId().equals(initialComment.getBinding().getTargetId())) {
-				return AssociationTarget.forLink(linkModel, true);
-			}
-		}
-		for (final LinkModel linkModel : document.getModel().getTechnicalLinks()) {
-			if (linkModel.getId().equals(initialComment.getBinding().getTargetId())) {
-				return AssociationTarget.forLink(linkModel, false);
-			}
-		}
-
-		return AssociationTarget.standalone();
-	}
-
-	private static JPanel row(final String labelText, final Component component) {
-		final JPanel row = new JPanel(new BorderLayout(6, 6));
-		row.setBorder(BorderFactory.createEmptyBorder(4, 0, 4, 0));
-		row.add(new JLabel(labelText), BorderLayout.NORTH);
-		row.add(component, BorderLayout.CENTER);
-		return row;
-	}
-
-	private static String safe(final String value) {
-		return value == null ? "" : value;
+	private CommentEditorDialog() {
 	}
 
 	public static Result showDialog(
@@ -257,7 +221,43 @@ public final class CommentEditorDialog {
 		return holder.result;
 	}
 
-	private CommentEditorDialog() {
+	private static AssociationTarget resolveInitialAssociation(final ModelDocument document, final CommentModel initialComment) {
+		if (initialComment == null || initialComment.getKind() == CommentKind.STANDALONE || initialComment.getBinding() == null) {
+			return AssociationTarget.standalone();
+		}
+
+		if (initialComment.getBinding().getTargetType() == BoundTargetType.CLASS) {
+			for (final ClassModel classModel : document.getModel().getClasses()) {
+				if (classModel.getId().equals(initialComment.getBinding().getTargetId())) {
+					return AssociationTarget.forClass(classModel);
+				}
+			}
+		}
+
+		for (final LinkModel linkModel : document.getModel().getConceptualLinks()) {
+			if (linkModel.getId().equals(initialComment.getBinding().getTargetId())) {
+				return AssociationTarget.forLink(linkModel, true);
+			}
+		}
+		for (final LinkModel linkModel : document.getModel().getTechnicalLinks()) {
+			if (linkModel.getId().equals(initialComment.getBinding().getTargetId())) {
+				return AssociationTarget.forLink(linkModel, false);
+			}
+		}
+
+		return AssociationTarget.standalone();
+	}
+
+	private static JPanel row(final String labelText, final Component component) {
+		final JPanel row = new JPanel(new BorderLayout(6, 6));
+		row.setBorder(BorderFactory.createEmptyBorder(4, 0, 4, 0));
+		row.add(new JLabel(labelText), BorderLayout.NORTH);
+		row.add(component, BorderLayout.CENTER);
+		return row;
+	}
+
+	private static String safe(final String value) {
+		return value == null ? "" : value;
 	}
 
 }

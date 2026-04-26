@@ -1,4 +1,4 @@
-package lu.kbra.modelizer_next.ui;
+package lu.kbra.modelizer_next.ui.frame;
 
 import java.io.File;
 
@@ -25,36 +25,36 @@ public final class DocumentSession {
 		this.savedSnapshot = DocumentSnapshot.from(document);
 	}
 
-	boolean canRedo() {
+	public boolean canRedo() {
 		return this.undoRedoManager.canRedo();
 	}
 
-	boolean canUndo() {
+	public boolean canUndo() {
 		return this.undoRedoManager.canUndo();
 	}
 
-	File getCurrentFile() {
+	public File getCurrentFile() {
 		return this.currentFile;
 	}
 
-	ModelDocument getDocument() {
+	public ModelDocument getDocument() {
 		return this.document;
 	}
 
-	boolean isDirty() {
+	public boolean isDirty() {
 		return this.savedSnapshot == null || !this.savedSnapshot.sameDocumentState(this.document);
 	}
 
-	void markChanged() {
+	public void markChanged() {
 		this.undoRedoManager.recordState(this.document);
 	}
 
-	void markSaved(final File file) {
+	public void markSaved(final File file) {
 		this.currentFile = file;
 		this.savedSnapshot = DocumentSnapshot.from(this.document);
 	}
 
-	boolean redo() {
+	public boolean redo() {
 		return this.undoRedoManager.redo(this.document);
 	}
 
@@ -64,7 +64,7 @@ public final class DocumentSession {
 				+ "]";
 	}
 
-	boolean undo() {
+	public boolean undo() {
 		return this.undoRedoManager.undo(this.document);
 	}
 

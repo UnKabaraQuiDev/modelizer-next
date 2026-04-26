@@ -1,4 +1,4 @@
-package lu.kbra.modelizer_next.ui;
+package lu.kbra.modelizer_next.ui.canvas.datastruct;
 
 import lu.kbra.modelizer_next.layout.PanelType;
 

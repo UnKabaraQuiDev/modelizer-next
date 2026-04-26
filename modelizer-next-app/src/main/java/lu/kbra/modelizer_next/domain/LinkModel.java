@@ -54,16 +54,8 @@ public class LinkModel {
 		return this.labelFrom;
 	}
 
-	public boolean hasLabelFrom() {
-		return labelFrom != null && !labelFrom.isBlank();
-	}
-
 	public String getLabelTo() {
 		return this.labelTo;
-	}
-
-	public boolean hasLabelTo() {
-		return labelTo != null && !labelTo.isBlank();
 	}
 
 	public Color getLineColor() {
@@ -74,16 +66,24 @@ public class LinkModel {
 		return this.name;
 	}
 
-	public boolean hasName() {
-		return name != null && !name.isBlank();
-	}
-
 	public LinkEnd getTo() {
 		return this.to;
 	}
 
+	public boolean hasLabelFrom() {
+		return this.labelFrom != null && !this.labelFrom.isBlank();
+	}
+
+	public boolean hasLabelTo() {
+		return this.labelTo != null && !this.labelTo.isBlank();
+	}
+
+	public boolean hasName() {
+		return this.name != null && !this.name.isBlank();
+	}
+
 	public boolean isSelfLinking() {
-		return to != null && from != null && Objects.equals(this.to.getClassId(), this.from.getClassId());
+		return this.to != null && this.from != null && Objects.equals(this.to.getClassId(), this.from.getClassId());
 	}
 
 	public void setAssociationClassId(final String associationClassId) {

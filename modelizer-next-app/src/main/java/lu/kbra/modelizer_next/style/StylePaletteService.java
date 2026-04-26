@@ -12,6 +12,9 @@ import lu.kbra.modelizer_next.MNMain;
 
 public final class StylePaletteService {
 
+	private StylePaletteService() {
+	}
+
 	public static void deleteByName(final String paletteName) {
 		if (paletteName == null || paletteName.isBlank()) {
 			return;
@@ -21,17 +24,6 @@ public final class StylePaletteService {
 		if (file.isFile()) {
 			file.delete();
 		}
-	}
-
-	private static void ensureDefaultPalette() {
-		final File[] files = App.getStylesDirectory().listFiles((dir, name) -> name.toLowerCase().endsWith(".json"));
-		if (files != null && files.length > 0) {
-			return;
-		}
-
-		final StylePalette palette = new StylePalette();
-		palette.setName("Default");
-		StylePaletteService.save(palette);
 	}
 
 	public static List<StylePalette> loadAll() {
@@ -58,13 +50,6 @@ public final class StylePaletteService {
 		return palettes;
 	}
 
-	private static String sanitizeFileName(final String name) {
-		if (name == null || name.isBlank()) {
-			return "unnamed";
-		}
-		return name.replaceAll("[^a-zA-Z0-9._-]", "_");
-	}
-
 	public static void save(final StylePalette palette) {
 		App.ensureDirsExists();
 
@@ -78,7 +63,22 @@ public final class StylePaletteService {
 		}
 	}
 
-	private StylePaletteService() {
+	private static void ensureDefaultPalette() {
+		final File[] files = App.getStylesDirectory().listFiles((dir, name) -> name.toLowerCase().endsWith(".json"));
+		if (files != null && files.length > 0) {
+			return;
+		}
+
+		final StylePalette palette = new StylePalette();
+		palette.setName("Default");
+		StylePaletteService.save(palette);
+	}
+
+	private static String sanitizeFileName(final String name) {
+		if (name == null || name.isBlank()) {
+			return "unnamed";
+		}
+		return name.replaceAll("[^a-zA-Z0-9._-]", "_");
 	}
 
 }

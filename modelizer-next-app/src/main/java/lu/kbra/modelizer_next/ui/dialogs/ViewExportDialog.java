@@ -39,7 +39,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 import lu.kbra.modelizer_next.layout.PanelType;
-import lu.kbra.modelizer_next.ui.DiagramCanvas;
+import lu.kbra.modelizer_next.ui.canvas.DiagramCanvas;
 import lu.kbra.modelizer_next.ui.export.ViewExportFormat;
 import lu.kbra.modelizer_next.ui.export.ViewExportRequest;
 import lu.kbra.modelizer_next.ui.export.ViewExportScope;
@@ -47,16 +47,131 @@ import lu.kbra.modelizer_next.ui.export.ViewExporter;
 
 public class ViewExportDialog extends JDialog {
 
-	private static final long serialVersionUID = -4894368238563345666L;
+	private static final class ExportPreviewPanel extends JPanel {
 
+		private static final long serialVersionUID = 3338223416144336229L;
+
+		private BufferedImage previewImage;
+
+		private ExportPreviewPanel() {
+			this.setPreferredSize(new Dimension(520, 420));
+			this.setBackground(java.awt.Color.WHITE);
+		}
+
+		@Override
+		protected void paintComponent(final Graphics graphics) {
+			super.paintComponent(graphics);
+
+			if (this.previewImage == null) {
+				return;
+			}
+
+			final int availableWidth = Math.max(1, this.getWidth() - 24);
+			final int availableHeight = Math.max(1, this.getHeight() - 24);
+			final double scale = Math.min(availableWidth / (double) this.previewImage.getWidth(),
+					availableHeight / (double) this.previewImage.getHeight());
+			final int imageWidth = Math.max(1, (int) Math.round(this.previewImage.getWidth() * scale));
+			final int imageHeight = Math.max(1, (int) Math.round(this.previewImage.getHeight() * scale));
+			final int x = (this.getWidth() - imageWidth) / 2;
+			final int y = (this.getHeight() - imageHeight) / 2;
+
+			graphics.drawImage(this.previewImage.getScaledInstance(imageWidth, imageHeight, Image.SCALE_SMOOTH), x, y, null);
+		}
+
+		private void setPreview(final DiagramCanvas canvas, final ViewExportScope scope) {
+			if (canvas == null || scope == null) {
+				this.previewImage = null;
+				this.repaint();
+				return;
+			}
+
+			this.previewImage = canvas.createExportPreviewImage(scope, 900, 700);
+			this.repaint();
+		}
+
+	}
+
+	private static final class PatternTextField extends JTextField {
+
+		private static final long serialVersionUID = 7204067903603166607L;
+
+		private PatternTextField(final String text) {
+			super(text);
+			this.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, InputEvent.CTRL_DOWN_MASK), "showTokenSuggestions");
+			this.getActionMap().put("showTokenSuggestions", new AbstractAction() {
+				private static final long serialVersionUID = 8970378556838542205L;
+
+				@Override
+				public void actionPerformed(final ActionEvent event) {
+					PatternTextField.this.showTokenSuggestions();
+				}
+			});
+			this.addKeyListener(new KeyAdapter() {
+				@Override
+				public void keyTyped(final KeyEvent event) {
+					if (event.getKeyChar() == '%') {
+						SwingUtilities.invokeLater(PatternTextField.this::showTokenSuggestions);
+					}
+				}
+			});
+		}
+
+		private void insertToken(final String token) {
+			final int caretPosition = this.getCaretPosition();
+			if (caretPosition > 0 && this.getText().charAt(caretPosition - 1) == '%') {
+				this.setSelectionStart(caretPosition - 1);
+				this.setSelectionEnd(caretPosition);
+			}
+			this.replaceSelection(token);
+			this.requestFocusInWindow();
+		}
+
+		private void showTokenSuggestions() {
+			final JPopupMenu menu = new JPopupMenu();
+			for (final String token : ViewExporter.FILE_PATTERN_TOKENS) {
+				menu.add(new AbstractAction(token) {
+					private static final long serialVersionUID = 6950296399216736075L;
+
+					@Override
+					public void actionPerformed(final ActionEvent event) {
+						PatternTextField.this.insertToken(token);
+					}
+				});
+			}
+			menu.show(this, 0, this.getHeight());
+		}
+
+	}
+
+	private record SimpleDocumentListener(Runnable delegate) implements DocumentListener {
+		@Override
+		public void changedUpdate(final DocumentEvent event) {
+			this.delegate.run();
+		}
+
+		@Override
+		public void insertUpdate(final DocumentEvent event) {
+			this.delegate.run();
+		}
+
+		@Override
+		public void removeUpdate(final DocumentEvent event) {
+			this.delegate.run();
+		}
+	}
+
+	private static final long serialVersionUID = -4894368238563345666L;
 	private final Map<PanelType, DiagramCanvas> canvases;
 	private final PanelType activePanelType;
 	private final JComboBox<ViewExportFormat> formatSelector;
 	private final JComboBox<ViewExportScope> scopeSelector;
 	private final Map<PanelType, JCheckBox> panelTypeBoxes;
 	private final JTextField outputDirectoryField;
+
 	private final PatternTextField filePatternField;
+
 	private final ExportPreviewPanel previewPanel;
+
 	private final JButton exportButton;
 
 	private ViewExportRequest result;
@@ -95,15 +210,21 @@ public class ViewExportDialog extends JDialog {
 		this.setLocationRelativeTo(parent);
 	}
 
-	public static ViewExportRequest showDialog(
-			final Component parent,
-			final Map<PanelType, DiagramCanvas> canvases,
-			final PanelType activePanelType,
-			final File defaultOutputDirectory) {
+	private void addRow(final JPanel panel, final int row, final String label, final Component component) {
+		final GridBagConstraints labelGbc = new GridBagConstraints();
+		labelGbc.gridx = 0;
+		labelGbc.gridy = row;
+		labelGbc.anchor = GridBagConstraints.NORTHWEST;
+		labelGbc.insets = new Insets(4, 4, 8, 8);
+		panel.add(new JLabel(label), labelGbc);
 
-		final ViewExportDialog dialog = new ViewExportDialog(parent, canvases, activePanelType, defaultOutputDirectory);
-		dialog.setVisible(true);
-		return dialog.result;
+		final GridBagConstraints componentGbc = new GridBagConstraints();
+		componentGbc.gridx = 1;
+		componentGbc.gridy = row;
+		componentGbc.fill = GridBagConstraints.HORIZONTAL;
+		componentGbc.weightx = 1.0;
+		componentGbc.insets = new Insets(4, 4, 8, 4);
+		panel.add(component, componentGbc);
 	}
 
 	private void browseOutputDirectory() {
@@ -250,134 +371,15 @@ public class ViewExportDialog extends JDialog {
 				&& !this.filePatternField.getText().isBlank());
 	}
 
-	private void addRow(final JPanel panel, final int row, final String label, final Component component) {
-		final GridBagConstraints labelGbc = new GridBagConstraints();
-		labelGbc.gridx = 0;
-		labelGbc.gridy = row;
-		labelGbc.anchor = GridBagConstraints.NORTHWEST;
-		labelGbc.insets = new Insets(4, 4, 8, 8);
-		panel.add(new JLabel(label), labelGbc);
+	public static ViewExportRequest showDialog(
+			final Component parent,
+			final Map<PanelType, DiagramCanvas> canvases,
+			final PanelType activePanelType,
+			final File defaultOutputDirectory) {
 
-		final GridBagConstraints componentGbc = new GridBagConstraints();
-		componentGbc.gridx = 1;
-		componentGbc.gridy = row;
-		componentGbc.fill = GridBagConstraints.HORIZONTAL;
-		componentGbc.weightx = 1.0;
-		componentGbc.insets = new Insets(4, 4, 8, 4);
-		panel.add(component, componentGbc);
-	}
-
-	private static final class ExportPreviewPanel extends JPanel {
-
-		private static final long serialVersionUID = 3338223416144336229L;
-
-		private BufferedImage previewImage;
-
-		private ExportPreviewPanel() {
-			this.setPreferredSize(new Dimension(520, 420));
-			this.setBackground(java.awt.Color.WHITE);
-		}
-
-		@Override
-		protected void paintComponent(final Graphics graphics) {
-			super.paintComponent(graphics);
-
-			if (this.previewImage == null) {
-				return;
-			}
-
-			final int availableWidth = Math.max(1, this.getWidth() - 24);
-			final int availableHeight = Math.max(1, this.getHeight() - 24);
-			final double scale = Math.min(availableWidth / (double) this.previewImage.getWidth(),
-					availableHeight / (double) this.previewImage.getHeight());
-			final int imageWidth = Math.max(1, (int) Math.round(this.previewImage.getWidth() * scale));
-			final int imageHeight = Math.max(1, (int) Math.round(this.previewImage.getHeight() * scale));
-			final int x = (this.getWidth() - imageWidth) / 2;
-			final int y = (this.getHeight() - imageHeight) / 2;
-
-			graphics.drawImage(this.previewImage.getScaledInstance(imageWidth, imageHeight, Image.SCALE_SMOOTH), x, y, null);
-		}
-
-		private void setPreview(final DiagramCanvas canvas, final ViewExportScope scope) {
-			if (canvas == null || scope == null) {
-				this.previewImage = null;
-				repaint();
-				return;
-			}
-
-			this.previewImage = canvas.createExportPreviewImage(scope, 900, 700);
-			repaint();
-		}
-
-	}
-
-	private static final class PatternTextField extends JTextField {
-
-		private static final long serialVersionUID = 7204067903603166607L;
-
-		private PatternTextField(final String text) {
-			super(text);
-			this.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, InputEvent.CTRL_DOWN_MASK), "showTokenSuggestions");
-			this.getActionMap().put("showTokenSuggestions", new AbstractAction() {
-				private static final long serialVersionUID = 8970378556838542205L;
-
-				@Override
-				public void actionPerformed(final ActionEvent event) {
-					PatternTextField.this.showTokenSuggestions();
-				}
-			});
-			this.addKeyListener(new KeyAdapter() {
-				@Override
-				public void keyTyped(final KeyEvent event) {
-					if (event.getKeyChar() == '%') {
-						SwingUtilities.invokeLater(PatternTextField.this::showTokenSuggestions);
-					}
-				}
-			});
-		}
-
-		private void insertToken(final String token) {
-			final int caretPosition = this.getCaretPosition();
-			if (caretPosition > 0 && this.getText().charAt(caretPosition - 1) == '%') {
-				this.setSelectionStart(caretPosition - 1);
-				this.setSelectionEnd(caretPosition);
-			}
-			this.replaceSelection(token);
-			this.requestFocusInWindow();
-		}
-
-		private void showTokenSuggestions() {
-			final JPopupMenu menu = new JPopupMenu();
-			for (final String token : ViewExporter.FILE_PATTERN_TOKENS) {
-				menu.add(new AbstractAction(token) {
-					private static final long serialVersionUID = 6950296399216736075L;
-
-					@Override
-					public void actionPerformed(final ActionEvent event) {
-						PatternTextField.this.insertToken(token);
-					}
-				});
-			}
-			menu.show(this, 0, this.getHeight());
-		}
-
-	}
-
-	private record SimpleDocumentListener(Runnable delegate) implements DocumentListener {
-		@Override
-		public void changedUpdate(final DocumentEvent event) {
-			this.delegate.run();
-		}
-
-		@Override
-		public void insertUpdate(final DocumentEvent event) {
-			this.delegate.run();
-		}
-
-		@Override
-		public void removeUpdate(final DocumentEvent event) {
-			this.delegate.run();
-		}
+		final ViewExportDialog dialog = new ViewExportDialog(parent, canvases, activePanelType, defaultOutputDirectory);
+		dialog.setVisible(true);
+		return dialog.result;
 	}
 
 }

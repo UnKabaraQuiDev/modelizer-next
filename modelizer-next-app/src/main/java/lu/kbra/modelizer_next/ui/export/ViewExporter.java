@@ -24,7 +24,7 @@ import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Document;
 
 import lu.kbra.modelizer_next.layout.PanelType;
-import lu.kbra.modelizer_next.ui.DiagramCanvas;
+import lu.kbra.modelizer_next.ui.canvas.DiagramCanvas;
 
 public final class ViewExporter {
 
@@ -35,42 +35,7 @@ public final class ViewExporter {
 	private static final DateTimeFormatter TIME_FORMAT = DateTimeFormatter.ofPattern("HH-mm-ss");
 	private static final String SVG_NAMESPACE_URI = "http://www.w3.org/2000/svg";
 
-	private static File avoidDuplicatePath(final File originalFile, final Set<String> usedPaths) {
-		File candidate = originalFile;
-		int counter = 2;
-		while (!usedPaths.add(candidate.getAbsolutePath())) {
-			final String extension = ViewExporter.stripExtension(candidate.getName()).equals(candidate.getName()) ? ""
-					: "." + ViewExporter.getExtension(candidate.getName());
-			final String nameWithoutExtension = ViewExporter.stripExtension(originalFile.getName());
-			candidate = new File(originalFile.getParentFile(), nameWithoutExtension + "-" + counter + extension);
-			counter++;
-		}
-		return candidate;
-	}
-
-	private static String buildFileName(
-			final String rawPattern,
-			final String sourceFileName,
-			final PanelType panelType,
-			final ViewExportFormat format) {
-
-		String pattern = rawPattern == null || rawPattern.isBlank() ? ViewExporter.DEFAULT_FILE_PATTERN : rawPattern;
-		final LocalDateTime now = LocalDateTime.now();
-		pattern = pattern.replace("%FILENAME%", sourceFileName);
-		pattern = pattern.replace("%TYPE%", ViewExporter.typeToken(panelType));
-		pattern = pattern.replace("%EXTENSION%", format.getExtension());
-		pattern = pattern.replace("%DATE%", ViewExporter.DATE_FORMAT.format(now));
-		pattern = pattern.replace("%TIME%", ViewExporter.TIME_FORMAT.format(now));
-
-		final String cleaned = ViewExporter.sanitizeFileName(pattern);
-		return cleaned.isBlank() ? sourceFileName + "-" + ViewExporter.typeToken(panelType) + "." + format.getExtension() : cleaned;
-	}
-
-	private static File ensureExtension(final File file, final String extension) {
-		if (file.getName().toLowerCase().endsWith("." + extension.toLowerCase())) {
-			return file;
-		}
-		return new File(file.getParentFile(), file.getName() + "." + extension);
+	private ViewExporter() {
 	}
 
 	public static List<File> exportViews(
@@ -116,6 +81,44 @@ public final class ViewExporter {
 		}
 
 		return exportedFiles;
+	}
+
+	private static File avoidDuplicatePath(final File originalFile, final Set<String> usedPaths) {
+		File candidate = originalFile;
+		int counter = 2;
+		while (!usedPaths.add(candidate.getAbsolutePath())) {
+			final String extension = ViewExporter.stripExtension(candidate.getName()).equals(candidate.getName()) ? ""
+					: "." + ViewExporter.getExtension(candidate.getName());
+			final String nameWithoutExtension = ViewExporter.stripExtension(originalFile.getName());
+			candidate = new File(originalFile.getParentFile(), nameWithoutExtension + "-" + counter + extension);
+			counter++;
+		}
+		return candidate;
+	}
+
+	private static String buildFileName(
+			final String rawPattern,
+			final String sourceFileName,
+			final PanelType panelType,
+			final ViewExportFormat format) {
+
+		String pattern = rawPattern == null || rawPattern.isBlank() ? ViewExporter.DEFAULT_FILE_PATTERN : rawPattern;
+		final LocalDateTime now = LocalDateTime.now();
+		pattern = pattern.replace("%FILENAME%", sourceFileName);
+		pattern = pattern.replace("%TYPE%", ViewExporter.typeToken(panelType));
+		pattern = pattern.replace("%EXTENSION%", format.getExtension());
+		pattern = pattern.replace("%DATE%", ViewExporter.DATE_FORMAT.format(now));
+		pattern = pattern.replace("%TIME%", ViewExporter.TIME_FORMAT.format(now));
+
+		final String cleaned = ViewExporter.sanitizeFileName(pattern);
+		return cleaned.isBlank() ? sourceFileName + "-" + ViewExporter.typeToken(panelType) + "." + format.getExtension() : cleaned;
+	}
+
+	private static File ensureExtension(final File file, final String extension) {
+		if (file.getName().toLowerCase().endsWith("." + extension.toLowerCase())) {
+			return file;
+		}
+		return new File(file.getParentFile(), file.getName() + "." + extension);
 	}
 
 	private static String getExtension(final String fileName) {
@@ -169,9 +172,6 @@ public final class ViewExporter {
 		try (FileWriter writer = new FileWriter(outputFile)) {
 			svgGraphics.stream(writer, true);
 		}
-	}
-
-	private ViewExporter() {
 	}
 
 }

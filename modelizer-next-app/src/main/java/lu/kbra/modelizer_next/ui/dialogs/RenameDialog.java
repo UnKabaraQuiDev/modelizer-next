@@ -25,6 +25,9 @@ public final class RenameDialog {
 		private String value;
 	}
 
+	private RenameDialog() {
+	}
+
 	public static String showDialog(final Component parent, final String title, final String initialValue) {
 		final Window owner = parent == null ? null : SwingUtilities.getWindowAncestor(parent);
 		final JDialog dialog = owner instanceof final Frame frame ? new JDialog(frame, title, true)
@@ -84,9 +87,6 @@ public final class RenameDialog {
 
 		dialog.setVisible(true);
 		return resultHolder.cancelled ? null : resultHolder.value;
-	}
-
-	private RenameDialog() {
 	}
 
 }

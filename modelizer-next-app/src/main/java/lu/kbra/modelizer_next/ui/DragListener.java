@@ -20,12 +20,6 @@ class DragListener extends MouseAdapter {
 	}
 
 	@Override
-	public void mousePressed(final MouseEvent e) {
-		this.dragged = e.getComponent();
-		this.dragged.setCursor(Cursor.getPredefinedCursor(Cursor.E_RESIZE_CURSOR));
-	}
-
-	@Override
 	public void mouseDragged(final MouseEvent e) {
 		if (this.dragged == null) {
 			return;
@@ -33,7 +27,7 @@ class DragListener extends MouseAdapter {
 
 		final Point pt = SwingUtilities.convertPoint(this.dragged, e.getPoint(), this.parent);
 		int targetIndex = -1;
-		if (e.getPoint().getX() <= parent.getX()) {
+		if (e.getPoint().getX() <= this.parent.getX()) {
 			targetIndex = 0;
 		} else {
 			for (int i = 0; i < this.parent.getComponentCount(); i++) {
@@ -61,10 +55,16 @@ class DragListener extends MouseAdapter {
 	}
 
 	@Override
+	public void mousePressed(final MouseEvent e) {
+		this.dragged = e.getComponent();
+		this.dragged.setCursor(Cursor.getPredefinedCursor(Cursor.E_RESIZE_CURSOR));
+	}
+
+	@Override
 	public void mouseReleased(final MouseEvent e) {
 		this.dragged.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 		this.dragged = null;
-		((Runnable) parent.getClientProperty("savePalettes")).run();
+		((Runnable) this.parent.getClientProperty("savePalettes")).run();
 	}
 
 }

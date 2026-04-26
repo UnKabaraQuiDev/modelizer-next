@@ -20,11 +20,11 @@ public class ClassNames {
 	}
 
 	public String getTechnicalName() {
-		return technicalName == null || technicalName.isBlank() ? conceptualName : this.technicalName;
+		return this.technicalName == null || this.technicalName.isBlank() ? this.conceptualName : this.technicalName;
 	}
 
 	public boolean hasTechnicalName() {
-		return technicalName != null && !technicalName.isBlank();
+		return this.technicalName != null && !this.technicalName.isBlank();
 	}
 
 	public void setConceptualName(final String conceptualName) {

@@ -15,6 +15,7 @@ import com.formdev.flatlaf.FlatLightLaf;
 import lu.kbra.modelizer_next.common.FileOpenBridge;
 import lu.kbra.modelizer_next.common.SystemThemeDetector;
 import lu.kbra.modelizer_next.json.ColorModule;
+import lu.kbra.modelizer_next.ui.ThemeMode;
 
 public class MNMain {
 
@@ -41,6 +42,11 @@ public class MNMain {
 		}
 	}
 
+	public static void main(final String[] args) {
+		FileOpenBridge.installFileHandler();
+		new ModelizerAppEntryPoint().start(args);
+	}
+
 	private static ObjectMapper createMapper() {
 		final ObjectMapper mapper = new ObjectMapper(JsonFactory.builder()
 				.configure(StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION, true)
@@ -58,11 +64,6 @@ public class MNMain {
 		mapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
 
 		return mapper;
-	}
-
-	public static void main(final String[] args) {
-		FileOpenBridge.installFileHandler();
-		new ModelizerAppEntryPoint().start(args);
 	}
 
 }

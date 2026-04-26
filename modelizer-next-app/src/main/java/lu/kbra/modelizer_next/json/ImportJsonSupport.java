@@ -13,6 +13,9 @@ import lu.kbra.modelizer_next.layout.PanelState;
 
 final class ImportJsonSupport {
 
+	private ImportJsonSupport() {
+	}
+
 	static void addClassLayout(final PanelState panelState, final String classId, final double x, final double y) {
 		ImportJsonSupport.addClassLayout(panelState, classId, x, y, 0.0, 0.0);
 	}
@@ -117,8 +120,5 @@ final class ImportJsonSupport {
 
 		final String value = valueNode.asText();
 		return value == null || value.isBlank() ? fallback : value;
-	}
-
-	private ImportJsonSupport() {
 	}
 }

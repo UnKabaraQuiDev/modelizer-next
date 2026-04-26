@@ -1,4 +1,4 @@
-package lu.kbra.modelizer_next.ui;
+package lu.kbra.modelizer_next.ui.canvas;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
@@ -19,19 +19,7 @@ final class DiagramCanvasActionRegistrar {
 			Runnable pasteSelection) {
 	}
 
-	private static void bind(
-			final InputMap inputMap,
-			final ActionMap actionMap,
-			final KeyStroke keyStroke,
-			final String actionKey,
-			final Runnable action) {
-		inputMap.put(keyStroke, actionKey);
-		actionMap.put(actionKey, new AbstractAction() {
-			@Override
-			public void actionPerformed(final ActionEvent e) {
-				action.run();
-			}
-		});
+	private DiagramCanvasActionRegistrar() {
 	}
 
 	static void installDefault(final JComponent component, final DiagramCanvasActions actions) {
@@ -115,6 +103,18 @@ final class DiagramCanvasActionRegistrar {
 				actions.pasteSelection());
 	}
 
-	private DiagramCanvasActionRegistrar() {
+	private static void bind(
+			final InputMap inputMap,
+			final ActionMap actionMap,
+			final KeyStroke keyStroke,
+			final String actionKey,
+			final Runnable action) {
+		inputMap.put(keyStroke, actionKey);
+		actionMap.put(actionKey, new AbstractAction() {
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				action.run();
+			}
+		});
 	}
 }

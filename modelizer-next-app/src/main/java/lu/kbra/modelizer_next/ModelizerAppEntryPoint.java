@@ -12,10 +12,12 @@ import javax.swing.SwingUtilities;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 import lu.kbra.modelizer_next.bootstrap.AppMain;
+import lu.kbra.modelizer_next.cmdline.CommandLineExportParser;
+import lu.kbra.modelizer_next.cmdline.CommandLineExporter;
 import lu.kbra.modelizer_next.common.FileOpenBridge;
 import lu.kbra.modelizer_next.common.SampleDocumentFactory;
-import lu.kbra.modelizer_next.ui.DocumentSession;
-import lu.kbra.modelizer_next.ui.MainFrame;
+import lu.kbra.modelizer_next.ui.frame.DocumentSession;
+import lu.kbra.modelizer_next.ui.frame.MainFrame;
 
 public class ModelizerAppEntryPoint implements AppMain {
 
@@ -32,6 +34,12 @@ public class ModelizerAppEntryPoint implements AppMain {
 							+ App.ISSUES_URL,
 					"Manifest error",
 					JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+
+		if (CommandLineExportParser.isExportRequest(args)) {
+			final int exitCode = CommandLineExporter.run(args);
+			System.exit(exitCode);
 			return;
 		}
 
@@ -55,10 +63,9 @@ public class ModelizerAppEntryPoint implements AppMain {
 			frame.setVisible(true);
 
 			FileOpenBridge.setCallback(() -> {
-				while (frame.getDocument() == null || frame.getDocument().getMeta().getName().equals(SampleDocumentFactory.META_NAME)) {
+				while (frame.getDocument() == null || SampleDocumentFactory.META_NAME.equals(frame.getDocument().getMeta().getName())) {
 					final File f = FileOpenBridge.TO_BE_OPENED.poll();
 					System.out.println("Got open event for: " + f);
-//					JOptionPane.showMessageDialog(null, "Trying to open: " + f);
 					if (f == null) {
 						break;
 					} else if (!f.exists()) {

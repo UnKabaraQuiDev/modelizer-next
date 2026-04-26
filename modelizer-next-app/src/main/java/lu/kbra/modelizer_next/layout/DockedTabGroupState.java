@@ -6,22 +6,13 @@ import java.util.UUID;
 
 public class DockedTabGroupState {
 
-	public static DockedTabGroupState createDefault() {
-		final DockedTabGroupState state = new DockedTabGroupState();
-		state.getTabs().add(PanelType.CONCEPTUAL);
-		state.getTabs().add(PanelType.LOGICAL);
-		state.getTabs().add(PanelType.PHYSICAL);
-		state.setSelectedTab(PanelType.CONCEPTUAL);
-		return state;
-	}
-
 	private String id;
+
 	private double x;
 	private double y;
 	private double width;
 	private double height;
 	private List<PanelType> tabs;
-
 	private PanelType selectedTab;
 
 	public DockedTabGroupState() {
@@ -94,6 +85,15 @@ public class DockedTabGroupState {
 	public String toString() {
 		return "DockedTabGroupState@" + System.identityHashCode(this) + " [id=" + this.id + ", x=" + this.x + ", y=" + this.y + ", width="
 				+ this.width + ", height=" + this.height + ", tabs=" + this.tabs + ", selectedTab=" + this.selectedTab + "]";
+	}
+
+	public static DockedTabGroupState createDefault() {
+		final DockedTabGroupState state = new DockedTabGroupState();
+		state.getTabs().add(PanelType.CONCEPTUAL);
+		state.getTabs().add(PanelType.LOGICAL);
+		state.getTabs().add(PanelType.PHYSICAL);
+		state.setSelectedTab(PanelType.CONCEPTUAL);
+		return state;
 	}
 
 }

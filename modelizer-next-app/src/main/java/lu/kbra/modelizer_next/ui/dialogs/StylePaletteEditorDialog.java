@@ -31,7 +31,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 
 import lu.kbra.modelizer_next.style.StylePalette;
-import lu.kbra.modelizer_next.ui.ColorButton;
+import lu.kbra.modelizer_next.ui.component.ColorButton;
 
 public final class StylePaletteEditorDialog {
 
@@ -125,45 +125,7 @@ public final class StylePaletteEditorDialog {
 		}
 	}
 
-	private static StylePalette buildPalette(
-			final String name,
-			final ColorButton classTextColorButton,
-			final ColorButton classBackgroundColorButton,
-			final ColorButton classBorderColorButton,
-			final ColorButton fieldTextColorButton,
-			final ColorButton fieldBackgroundColorButton,
-			final ColorButton commentTextColorButton,
-			final ColorButton commentBackgroundColorButton,
-			final ColorButton commentBorderColorButton,
-			final ColorButton linkColorButton) {
-		final StylePalette palette = new StylePalette();
-		palette.setName(name == null || name.isBlank() ? "Unnamed palette" : name);
-		palette.setClassTextColor(classTextColorButton.getSelectedColor());
-		palette.setClassBackgroundColor(classBackgroundColorButton.getSelectedColor());
-		palette.setClassBorderColor(classBorderColorButton.getSelectedColor());
-		palette.setFieldTextColor(fieldTextColorButton.getSelectedColor());
-		palette.setFieldBackgroundColor(fieldBackgroundColorButton.getSelectedColor());
-		palette.setCommentTextColor(commentTextColorButton.getSelectedColor());
-		palette.setCommentBackgroundColor(commentBackgroundColorButton.getSelectedColor());
-		palette.setCommentBorderColor(commentBorderColorButton.getSelectedColor());
-		palette.setLinkColor(linkColorButton.getSelectedColor());
-		return palette;
-	}
-
-	private static JPanel flow(final Component... components) {
-		final JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
-		for (final Component component : components) {
-			panel.add(component);
-		}
-		return panel;
-	}
-
-	private static JPanel row(final String label, final Component component) {
-		final JPanel panel = new JPanel(new BorderLayout(6, 6));
-		panel.setBorder(BorderFactory.createEmptyBorder(4, 0, 4, 0));
-		panel.add(new JLabel(label), BorderLayout.NORTH);
-		panel.add(component, BorderLayout.CENTER);
-		return panel;
+	private StylePaletteEditorDialog() {
 	}
 
 	public static StylePalette showDialog(final Component parent) {
@@ -327,7 +289,45 @@ public final class StylePaletteEditorDialog {
 		return holder.palette;
 	}
 
-	private StylePaletteEditorDialog() {
+	private static StylePalette buildPalette(
+			final String name,
+			final ColorButton classTextColorButton,
+			final ColorButton classBackgroundColorButton,
+			final ColorButton classBorderColorButton,
+			final ColorButton fieldTextColorButton,
+			final ColorButton fieldBackgroundColorButton,
+			final ColorButton commentTextColorButton,
+			final ColorButton commentBackgroundColorButton,
+			final ColorButton commentBorderColorButton,
+			final ColorButton linkColorButton) {
+		final StylePalette palette = new StylePalette();
+		palette.setName(name == null || name.isBlank() ? "Unnamed palette" : name);
+		palette.setClassTextColor(classTextColorButton.getSelectedColor());
+		palette.setClassBackgroundColor(classBackgroundColorButton.getSelectedColor());
+		palette.setClassBorderColor(classBorderColorButton.getSelectedColor());
+		palette.setFieldTextColor(fieldTextColorButton.getSelectedColor());
+		palette.setFieldBackgroundColor(fieldBackgroundColorButton.getSelectedColor());
+		palette.setCommentTextColor(commentTextColorButton.getSelectedColor());
+		palette.setCommentBackgroundColor(commentBackgroundColorButton.getSelectedColor());
+		palette.setCommentBorderColor(commentBorderColorButton.getSelectedColor());
+		palette.setLinkColor(linkColorButton.getSelectedColor());
+		return palette;
+	}
+
+	private static JPanel flow(final Component... components) {
+		final JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
+		for (final Component component : components) {
+			panel.add(component);
+		}
+		return panel;
+	}
+
+	private static JPanel row(final String label, final Component component) {
+		final JPanel panel = new JPanel(new BorderLayout(6, 6));
+		panel.setBorder(BorderFactory.createEmptyBorder(4, 0, 4, 0));
+		panel.add(new JLabel(label), BorderLayout.NORTH);
+		panel.add(component, BorderLayout.CENTER);
+		return panel;
 	}
 
 }

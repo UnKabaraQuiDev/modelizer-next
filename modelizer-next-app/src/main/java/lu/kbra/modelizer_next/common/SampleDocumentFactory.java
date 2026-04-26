@@ -21,9 +21,12 @@ public final class SampleDocumentFactory {
 
 	public static final String META_NAME = "Demo model";
 
+	private SampleDocumentFactory() {
+	}
+
 	public static ModelDocument create() {
 		final ModelDocument document = new ModelDocument();
-		document.getMeta().setName(META_NAME);
+		document.getMeta().setName(SampleDocumentFactory.META_NAME);
 
 		final ClassModel customer = new ClassModel();
 		customer.getNames().setConceptualName("Customer");
@@ -142,9 +145,6 @@ public final class SampleDocumentFactory {
 		layout.setPosition(new Point2D.Double(x, y));
 		layout.setSize(new Size2D(width, height));
 		panelState.getNodeLayouts().add(layout);
-	}
-
-	private SampleDocumentFactory() {
 	}
 
 }

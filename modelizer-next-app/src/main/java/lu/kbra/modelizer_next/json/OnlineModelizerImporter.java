@@ -20,6 +20,18 @@ import lu.kbra.modelizer_next.layout.PanelType;
 
 public final class OnlineModelizerImporter {
 
+	private OnlineModelizerImporter() {
+	}
+
+	public static ModelDocument importFile(final File file) throws IOException {
+		final JsonNode root = MNMain.OBJECT_MAPPER.readTree(file);
+		if (!OnlineModelizerImporter.isOnlineRoot(root)) {
+			throw new IOException("Unsupported Online Modelizer file format.");
+		}
+
+		return OnlineModelizerImporter.importRoot(root);
+	}
+
 	private static void addNodeLayouts(final ModelDocument document, final JsonNode node, final String objectId, final boolean comment) {
 		final JsonNode dataNode = node.path("data");
 		final JsonNode viewPositions = dataNode.path("viewPositions");
@@ -142,15 +154,6 @@ public final class OnlineModelizerImporter {
 		}
 
 		return linkModel;
-	}
-
-	public static ModelDocument importFile(final File file) throws IOException {
-		final JsonNode root = MNMain.OBJECT_MAPPER.readTree(file);
-		if (!OnlineModelizerImporter.isOnlineRoot(root)) {
-			throw new IOException("Unsupported Online Modelizer file format.");
-		}
-
-		return OnlineModelizerImporter.importRoot(root);
 	}
 
 	private static ModelDocument importRoot(final JsonNode root) {
@@ -302,8 +305,5 @@ public final class OnlineModelizerImporter {
 			return bySourceId;
 		}
 		return fieldIdsByQualifiedName.get(rawFieldRef);
-	}
-
-	private OnlineModelizerImporter() {
 	}
 }

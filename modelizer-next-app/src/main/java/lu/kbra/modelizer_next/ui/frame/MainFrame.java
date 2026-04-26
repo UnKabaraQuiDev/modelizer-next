@@ -1,4 +1,4 @@
-package lu.kbra.modelizer_next.ui;
+package lu.kbra.modelizer_next.ui.frame;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -65,7 +65,6 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import lu.kbra.modelizer_next.App;
 import lu.kbra.modelizer_next.AppConfig;
 import lu.kbra.modelizer_next.MNMain;
-import lu.kbra.modelizer_next.ThemeMode;
 import lu.kbra.modelizer_next.bootstrap.AvailableUpdate;
 import lu.kbra.modelizer_next.bootstrap.BootstrapConfig;
 import lu.kbra.modelizer_next.bootstrap.UpdateChannel;
@@ -79,10 +78,17 @@ import lu.kbra.modelizer_next.json.OnlineModelizerImporter;
 import lu.kbra.modelizer_next.layout.PanelType;
 import lu.kbra.modelizer_next.style.StylePalette;
 import lu.kbra.modelizer_next.style.StylePaletteService;
+import lu.kbra.modelizer_next.ui.SwingDocumentLoadHandler;
+import lu.kbra.modelizer_next.ui.ThemeMode;
+import lu.kbra.modelizer_next.ui.canvas.DiagramCanvas;
+import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectionInfo;
+import lu.kbra.modelizer_next.ui.canvas.datastruct.StylePreviewType;
 import lu.kbra.modelizer_next.ui.dialogs.StylePaletteEditorDialog;
 import lu.kbra.modelizer_next.ui.dialogs.ViewExportDialog;
 import lu.kbra.modelizer_next.ui.export.ViewExportRequest;
 import lu.kbra.modelizer_next.ui.export.ViewExporter;
+import lu.kbra.modelizer_next.ui.impl.DocumentChangeListener;
+import lu.kbra.modelizer_next.ui.impl.DocumentLoadHandler;
 import lu.kbra.pclib.PCUtils;
 
 public class MainFrame extends JFrame {
@@ -92,79 +98,16 @@ public class MainFrame extends JFrame {
 
 	private static final long serialVersionUID = 6643164008640695591L;
 
-	public static boolean confirmModernDocumentVersion(final Component parent, final ModelDocument loadedDocument) {
-		final String fileVersion = loadedDocument.getMeta() == null ? null : loadedDocument.getMeta().getApplicationVersion();
-
-		if (fileVersion != null && !fileVersion.isBlank() && VersionComparator.COMPARATOR.compare(fileVersion, App.VERSION) > 0) {
-			final int choice = JOptionPane.showConfirmDialog(parent,
-					"This file was created with a newer version of the application (" + fileVersion
-							+ ").\nDo you want to try to load the file anyways ?",
-					"Newer file version",
-					JOptionPane.YES_NO_OPTION,
-					JOptionPane.WARNING_MESSAGE);
-			return choice == JOptionPane.YES_OPTION;
-		}
-
-		return true;
-	}
-
-	public static Optional<DocumentSession> createDocument(final Component parent, final File selectedFile) {
-		final String extension = PCUtils.getFileExtension(selectedFile.getName());
-
-		try {
-			final ModelDocument loadedDocument;
-			final File openedFile;
-
-			switch (extension) {
-			case "mod" -> {
-				final int choice = JOptionPane.showConfirmDialog(parent,
-						"This file comes from an older version of Modelizer.\nThere may be errors or unsupported elements during import.\nDo you want to continue?",
-						"Legacy Modelizer import",
-						JOptionPane.YES_NO_OPTION,
-						JOptionPane.WARNING_MESSAGE);
-				if (choice != JOptionPane.YES_OPTION) {
-					return Optional.empty();
-				}
-
-				loadedDocument = LegacyModelizerImporter.importFile(selectedFile);
-				openedFile = null;
-			}
-			case "mdlz" -> {
-				loadedDocument = OnlineModelizerImporter.importFile(selectedFile);
-				openedFile = null;
-			}
-			case "mn" -> {
-				loadedDocument = ModernModelizerImporter.importFile(selectedFile);
-				if (!MainFrame.confirmModernDocumentVersion(parent, loadedDocument)) {
-					return Optional.empty();
-				}
-				openedFile = selectedFile;
-			}
-			default -> throw new IOException("Unsupported file extension: ." + extension);
-			}
-
-			if (loadedDocument == null) {
-				return Optional.empty();
-			}
-
-			loadedDocument.setSource(selectedFile.getPath());
-
-			return Optional.of(new DocumentSession(loadedDocument, openedFile));
-		} catch (final IOException ex) {
-			JOptionPane.showMessageDialog(parent, "Failed to load file:\n" + ex.getMessage(), "Load error", JOptionPane.ERROR_MESSAGE);
-			return Optional.empty();
-		}
-	}
-
 	private DocumentSession session;
+
 	private ModelDocument document;
+
 	private JLabel statusLabel;
 	private JLabel selectionPathLabel;
 	private JTabbedPane tabbedPane;
 	private DiagramCanvas conceptualCanvas;
 	private DiagramCanvas logicalCanvas;
 	private DiagramCanvas physicalCanvas;
-
 	private JToolBar toolBar;
 	private JPanel pinnedStylesPanel;
 
@@ -176,7 +119,7 @@ public class MainFrame extends JFrame {
 
 	public MainFrame(final DocumentSession session) {
 		super("Modelizer Next");
-		setContent(session);
+		this.setContent(session);
 		this.setSize(1200, 800);
 		this.setLocationRelativeTo(null);
 	}
@@ -185,11 +128,36 @@ public class MainFrame extends JFrame {
 		this(new DocumentSession(document));
 	}
 
-	protected void setContent(DocumentSession session) {
+	public void applyDefaultPaletteToCanvases() {
+		final StylePalette palette = this.findPaletteByName(this.appConfig.getDefaultPaletteName());
+		this.conceptualCanvas.applyPalette(palette);
+		this.logicalCanvas.applyPalette(palette);
+		this.physicalCanvas.applyPalette(palette);
+	}
+
+	public ModelDocument getDocument() {
+		return this.document;
+	}
+
+	public DocumentSession getSession() {
+		return this.session;
+	}
+
+	public boolean loadDocument(final File selectedFile) {
+		if (selectedFile == null || !selectedFile.isFile()) {
+			return false;
+		}
+
+		final Optional<DocumentSession> model = MainFrame.createDocument(this, selectedFile);
+		model.ifPresent(this::openInFrame);
+		return model.isPresent();
+	}
+
+	protected void setContent(final DocumentSession session) {
 		super.setTitle("Modelizer Next");
 
-		setContentPane(new JPanel());
-		clearListeners();
+		this.setContentPane(new JPanel());
+		this.clearListeners();
 
 		this.session = session;
 		this.document = session.getDocument();
@@ -205,7 +173,7 @@ public class MainFrame extends JFrame {
 				SwingConstants.LEFT);
 		this.selectionPathLabel = new JLabel("No selection", SwingConstants.RIGHT);
 
-		final CanvasEventListener canvasListener = new CanvasEventListener() {
+		final DocumentChangeListener canvasListener = new DocumentChangeListener() {
 
 			@Override
 			public void onDocumentChanged() {
@@ -271,36 +239,6 @@ public class MainFrame extends JFrame {
 		this.refreshFrameTitle();
 		this.revalidate();
 		this.repaint();
-	}
-
-	private void clearListeners() {
-		removeListener(this.getComponentListeners(), this::removeComponentListener);
-		removeListener(this.getContainerListeners(), this::removeContainerListener);
-		removeListener(this.getFocusListeners(), this::removeFocusListener);
-		removeListener(this.getWindowFocusListeners(), this::removeWindowFocusListener);
-		removeListener(this.getWindowListeners(), this::removeWindowListener);
-		removeListener(this.getWindowStateListeners(), this::removeWindowStateListener);
-		removeListener(this.getHierarchyBoundsListeners(), this::removeHierarchyBoundsListener);
-		removeListener(this.getHierarchyListeners(), this::removeHierarchyListener);
-		removeListener(this.getInputMethodListeners(), this::removeInputMethodListener);
-		removeListener(this.getKeyListeners(), this::removeKeyListener);
-		removeListener(this.getMouseListeners(), this::removeMouseListener);
-		removeListener(this.getMouseMotionListeners(), this::removeMouseMotionListener);
-		removeListener(this.getMouseWheelListeners(), this::removeMouseWheelListener);
-		removeListener(this.getPropertyChangeListeners(), this::removePropertyChangeListener);
-	}
-
-	private <T extends EventListener> void removeListener(T[] listeners, Consumer<T> remove) {
-		for (T t : listeners) {
-			remove.accept(t);
-		}
-	}
-
-	public void applyDefaultPaletteToCanvases() {
-		final StylePalette palette = this.findPaletteByName(this.appConfig.getDefaultPaletteName());
-		this.conceptualCanvas.applyPalette(palette);
-		this.logicalCanvas.applyPalette(palette);
-		this.physicalCanvas.applyPalette(palette);
 	}
 
 	private void applyThemeAndReopen(final ThemeMode mode) {
@@ -388,6 +326,23 @@ public class MainFrame extends JFrame {
 				}
 			}
 		}.execute();
+	}
+
+	private void clearListeners() {
+		this.removeListener(this.getComponentListeners(), this::removeComponentListener);
+		this.removeListener(this.getContainerListeners(), this::removeContainerListener);
+		this.removeListener(this.getFocusListeners(), this::removeFocusListener);
+		this.removeListener(this.getWindowFocusListeners(), this::removeWindowFocusListener);
+		this.removeListener(this.getWindowListeners(), this::removeWindowListener);
+		this.removeListener(this.getWindowStateListeners(), this::removeWindowStateListener);
+		this.removeListener(this.getHierarchyBoundsListeners(), this::removeHierarchyBoundsListener);
+		this.removeListener(this.getHierarchyListeners(), this::removeHierarchyListener);
+		this.removeListener(this.getInputMethodListeners(), this::removeInputMethodListener);
+		this.removeListener(this.getKeyListeners(), this::removeKeyListener);
+		this.removeListener(this.getMouseListeners(), this::removeMouseListener);
+		this.removeListener(this.getMouseMotionListeners(), this::removeMouseMotionListener);
+		this.removeListener(this.getMouseWheelListeners(), this::removeMouseWheelListener);
+		this.removeListener(this.getPropertyChangeListeners(), this::removePropertyChangeListener);
 	}
 
 	private boolean confirmCloseWithSave(final String prompt) {
@@ -597,7 +552,7 @@ public class MainFrame extends JFrame {
 		return chooser;
 	}
 
-	private JButton createPinnedStyleButton(final StylePalette palette, final DiagramCanvas.StylePreviewType previewType) {
+	private JButton createPinnedStyleButton(final StylePalette palette, final StylePreviewType previewType) {
 		final JButton button = new JButton(palette.getName());
 		button.setFocusable(false);
 		button.setFocusPainted(false);
@@ -904,16 +859,6 @@ public class MainFrame extends JFrame {
 		}
 	}
 
-	public boolean loadDocument(final File selectedFile) {
-		if (selectedFile == null || !selectedFile.isFile()) {
-			return false;
-		}
-
-		final Optional<DocumentSession> model = MainFrame.createDocument(this, selectedFile);
-		model.ifPresent(this::openInFrame);
-		return model.isPresent();
-	}
-
 	private Color mixWithWhite(final Color color, final double amount) {
 		if (color == null) {
 			return Color.WHITE;
@@ -946,7 +891,7 @@ public class MainFrame extends JFrame {
 //			this.dispose();
 //		});
 
-		setContent(session);
+		this.setContent(session);
 	}
 
 	private void populateStylesMenu(final JMenu stylesMenu) {
@@ -1097,8 +1042,7 @@ public class MainFrame extends JFrame {
 		this.pinnedStylesPanel.removeAll();
 
 		final DiagramCanvas canvas = this.getActiveCanvas();
-		final DiagramCanvas.StylePreviewType previewType = canvas == null ? DiagramCanvas.StylePreviewType.NONE
-				: canvas.getStylePreviewType();
+		final StylePreviewType previewType = canvas == null ? StylePreviewType.NONE : canvas.getStylePreviewType();
 
 		for (final String paletteName : this.appConfig.getPinnedPaletteNames()) {
 			final StylePalette palette = this.findPaletteByName(paletteName);
@@ -1128,13 +1072,19 @@ public class MainFrame extends JFrame {
 		}
 	}
 
+	private <T extends EventListener> void removeListener(final T[] listeners, final Consumer<T> remove) {
+		for (final T t : listeners) {
+			remove.accept(t);
+		}
+	}
+
 	private void reopenWithCurrentDocument() {
 //		this.dispose();
 
 		SwingUtilities.invokeLater(() -> {
 			MNMain.applyConfiguredLookAndFeel();
 
-			setContent(session);
+			this.setContent(this.session);
 
 //			final MainFrame frame = new MainFrame(this.session);
 //			frame.setVisible(true);
@@ -1166,9 +1116,7 @@ public class MainFrame extends JFrame {
 		App.saveConfig(this.appConfig);
 	}
 
-	private StatusStyleAppearance resolvePinnedStyleAppearance(
-			final StylePalette palette,
-			final DiagramCanvas.StylePreviewType previewType) {
+	private StatusStyleAppearance resolvePinnedStyleAppearance(final StylePalette palette, final StylePreviewType previewType) {
 		if (palette == null) {
 			return new StatusStyleAppearance(Color.BLACK, Color.WHITE, Color.GRAY);
 		}
@@ -1290,12 +1238,84 @@ public class MainFrame extends JFrame {
 		}
 	}
 
-	public ModelDocument getDocument() {
-		return document;
+	public static boolean confirmModernDocumentVersion(final Component parent, final ModelDocument loadedDocument) {
+		final String fileVersion = loadedDocument.getMeta() == null ? null : loadedDocument.getMeta().getApplicationVersion();
+
+		if (fileVersion != null && !fileVersion.isBlank() && VersionComparator.COMPARATOR.compare(fileVersion, App.VERSION) > 0) {
+			final int choice = JOptionPane.showConfirmDialog(parent,
+					"This file was created with a newer version of the application (" + fileVersion
+							+ ").\nDo you want to try to load the file anyways ?",
+					"Newer file version",
+					JOptionPane.YES_NO_OPTION,
+					JOptionPane.WARNING_MESSAGE);
+			return choice == JOptionPane.YES_OPTION;
+		}
+
+		return true;
 	}
 
-	public DocumentSession getSession() {
-		return session;
+	public static boolean confirmModernDocumentVersion(final ModelDocument loadedDocument, final DocumentLoadHandler handler) {
+
+		final String fileVersion = loadedDocument.getMeta() == null ? null : loadedDocument.getMeta().getApplicationVersion();
+
+		if (fileVersion != null && !fileVersion.isBlank() && VersionComparator.COMPARATOR.compare(fileVersion, App.VERSION) > 0) {
+
+			return handler.confirmNewerVersion(fileVersion, App.VERSION);
+		}
+
+		return true;
+	}
+
+	public static Optional<DocumentSession> createDocument(final Component parent, final File selectedFile) {
+
+		return MainFrame.createDocument(selectedFile, new SwingDocumentLoadHandler(parent));
+	}
+
+	public static Optional<DocumentSession> createDocument(final File selectedFile, final DocumentLoadHandler handler) {
+
+		final String extension = PCUtils.getFileExtension(selectedFile.getName());
+
+		try {
+			final ModelDocument loadedDocument;
+			final File openedFile;
+
+			switch (extension) {
+			case "mod" -> {
+				if (!handler.confirmLegacyImport(selectedFile)) {
+					return Optional.empty();
+				}
+
+				loadedDocument = LegacyModelizerImporter.importFile(selectedFile);
+				openedFile = null;
+			}
+			case "mdlz" -> {
+				loadedDocument = OnlineModelizerImporter.importFile(selectedFile);
+				openedFile = null;
+			}
+			case "mn" -> {
+				loadedDocument = ModernModelizerImporter.importFile(selectedFile);
+
+				if (!MainFrame.confirmModernDocumentVersion(loadedDocument, handler)) {
+					return Optional.empty();
+				}
+
+				openedFile = selectedFile;
+			}
+			default -> throw new IOException("Unsupported file extension: ." + extension);
+			}
+
+			if (loadedDocument == null) {
+				return Optional.empty();
+			}
+
+			loadedDocument.setSource(selectedFile.getPath());
+
+			return Optional.of(new DocumentSession(loadedDocument, openedFile));
+		} catch (final IOException ex) {
+			handler.error("Failed to load file", ex);
+			return Optional.empty();
+		}
+
 	}
 
 }

@@ -1,4 +1,4 @@
-package lu.kbra.modelizer_next;
+package lu.kbra.modelizer_next.ui;
 
 public enum ThemeMode {
 	LIGHT,

@@ -3,6 +3,8 @@ package lu.kbra.modelizer_next;
 import java.util.ArrayList;
 import java.util.List;
 
+import lu.kbra.modelizer_next.ui.ThemeMode;
+
 public class AppConfig {
 
 	private ThemeMode themeMode = ThemeMode.SYSTEM;

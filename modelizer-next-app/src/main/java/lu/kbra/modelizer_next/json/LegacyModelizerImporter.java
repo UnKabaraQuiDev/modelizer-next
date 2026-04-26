@@ -30,6 +30,31 @@ public class LegacyModelizerImporter {
 	private record LegacyRef(String tableName, String fieldName) {
 	}
 
+	private LegacyModelizerImporter() {
+	}
+
+	public static ModelDocument importFile(final File file) throws IOException {
+		final JsonNode root = MNMain.OBJECT_MAPPER.readTree(file);
+		if (!LegacyModelizerImporter.isLegacyRoot(root)) {
+			throw new IOException("Unsupported legacy Modelizer file format.");
+		}
+
+		return LegacyModelizerImporter.importRoot(root);
+	}
+
+	public static boolean isLegacyFile(final File file) throws IOException {
+		if (file == null) {
+			return false;
+		}
+
+		final String fileName = file.getName().toLowerCase();
+		if (fileName.endsWith(".mod")) {
+			return true;
+		}
+
+		return LegacyModelizerImporter.isLegacyRoot(MNMain.OBJECT_MAPPER.readTree(file));
+	}
+
 	private static void addClassLayout(final PanelState panelState, final String classId, final double x, final double y) {
 		final NodeLayout layout = new NodeLayout();
 		layout.setObjectType(LayoutObjectType.CLASS);
@@ -131,15 +156,6 @@ public class LegacyModelizerImporter {
 		linkModel.setFrom(new LinkEnd(fromClassId, fromFieldId));
 		linkModel.setTo(new LinkEnd(toClassId, toFieldId));
 		return linkModel;
-	}
-
-	public static ModelDocument importFile(final File file) throws IOException {
-		final JsonNode root = MNMain.OBJECT_MAPPER.readTree(file);
-		if (!LegacyModelizerImporter.isLegacyRoot(root)) {
-			throw new IOException("Unsupported legacy Modelizer file format.");
-		}
-
-		return LegacyModelizerImporter.importRoot(root);
 	}
 
 	private static ModelDocument importRoot(final JsonNode root) {
@@ -261,19 +277,6 @@ public class LegacyModelizerImporter {
 		return document;
 	}
 
-	public static boolean isLegacyFile(final File file) throws IOException {
-		if (file == null) {
-			return false;
-		}
-
-		final String fileName = file.getName().toLowerCase();
-		if (fileName.endsWith(".mod")) {
-			return true;
-		}
-
-		return LegacyModelizerImporter.isLegacyRoot(MNMain.OBJECT_MAPPER.readTree(file));
-	}
-
 	private static boolean isLegacyRoot(final JsonNode root) {
 		return root != null && root.isObject() && root.has("tables") && !root.has("model") && !root.has("workspace");
 	}
@@ -366,9 +369,6 @@ public class LegacyModelizerImporter {
 
 		final String value = valueNode.asText();
 		return value == null || value.isBlank() ? fallback : value;
-	}
-
-	private LegacyModelizerImporter() {
 	}
 
 }

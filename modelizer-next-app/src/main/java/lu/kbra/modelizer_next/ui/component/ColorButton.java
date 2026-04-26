@@ -1,4 +1,4 @@
-package lu.kbra.modelizer_next.ui;
+package lu.kbra.modelizer_next.ui.component;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -57,12 +57,6 @@ public class ColorButton extends JButton {
 		return this.selectedColor;
 	}
 
-	private void refreshStyle() {
-		this.setBackground(this.selectedColor);
-		final int brightness = (this.selectedColor.getRed() + this.selectedColor.getGreen() + this.selectedColor.getBlue()) / 3;
-		this.setForeground(brightness < 128 ? Color.WHITE : Color.BLACK);
-	}
-
 	public void setSelectedColor(final Color selectedColor) {
 		this.selectedColor = selectedColor;
 		this.refreshStyle();
@@ -71,6 +65,12 @@ public class ColorButton extends JButton {
 	@Override
 	public String toString() {
 		return "ColorButton@" + System.identityHashCode(this) + " [selectedColor=" + this.selectedColor + "]";
+	}
+
+	private void refreshStyle() {
+		this.setBackground(this.selectedColor);
+		final int brightness = (this.selectedColor.getRed() + this.selectedColor.getGreen() + this.selectedColor.getBlue()) / 3;
+		this.setForeground(brightness < 128 ? Color.WHITE : Color.BLACK);
 	}
 
 }

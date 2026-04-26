@@ -27,11 +27,11 @@ public class FieldNames {
 	}
 
 	public String getTechnicalName() {
-		return this.technicalName == null || technicalName.isBlank() ? this.conceptualName : this.technicalName;
+		return this.technicalName == null || this.technicalName.isBlank() ? this.conceptualName : this.technicalName;
 	}
 
 	public boolean hasTechnicalName() {
-		return technicalName != null && !technicalName.isBlank();
+		return this.technicalName != null && !this.technicalName.isBlank();
 	}
 
 	public void setConceptualName(final String name) {

@@ -30,9 +30,13 @@ import lu.kbra.modelizer_next.domain.ClassModel;
 import lu.kbra.modelizer_next.domain.FieldModel;
 import lu.kbra.modelizer_next.domain.LinkModel;
 import lu.kbra.modelizer_next.layout.PanelType;
-import lu.kbra.modelizer_next.ui.ColorButton;
+import lu.kbra.modelizer_next.ui.component.ColorButton;
 
 public final class LinkEditorDialog {
+
+	public record Result(String name, Color lineColor, String fromClassId, String toClassId, String fromFieldId, String toFieldId,
+			Cardinality cardinalityFrom, Cardinality cardinalityTo, String associationClassId, String labelFrom, String labelTo) {
+	}
 
 	private record AssociationOption(String classId, String label) {
 		private static AssociationOption none() {
@@ -98,46 +102,7 @@ public final class LinkEditorDialog {
 		private Result result;
 	}
 
-	public record Result(String name, Color lineColor, String fromClassId, String toClassId, String fromFieldId, String toFieldId,
-			Cardinality cardinalityFrom, Cardinality cardinalityTo, String associationClassId, String labelFrom, String labelTo) {
-	}
-
-	private static AssociationOption findAssociationOption(final JComboBox<AssociationOption> box, final String classId) {
-		for (int i = 0; i < box.getItemCount(); i++) {
-			final AssociationOption option = box.getItemAt(i);
-			if (Objects.equals(option.classId(), classId)) {
-				return option;
-			}
-		}
-		return box.getItemAt(0);
-	}
-
-	private static ClassModel findClass(final List<ClassModel> classes, final String id) {
-		for (final ClassModel classModel : classes) {
-			if (classModel.getId().equals(id)) {
-				return classModel;
-			}
-		}
-		return null;
-	}
-
-	private static FieldModel findField(final ClassModel classModel, final String id) {
-		if (classModel == null || id == null) {
-			return null;
-		}
-		for (final FieldModel fieldModel : classModel.getFields()) {
-			if (fieldModel.getId().equals(id)) {
-				return fieldModel;
-			}
-		}
-		return null;
-	}
-
-	private static JPanel labeled(final String labelText, final Component component) {
-		final JPanel panel = new JPanel(new BorderLayout(4, 4));
-		panel.add(new JLabel(labelText), BorderLayout.NORTH);
-		panel.add(component, BorderLayout.CENTER);
-		return panel;
+	private LinkEditorDialog() {
 	}
 
 	public static Result showDialog(
@@ -358,7 +323,42 @@ public final class LinkEditorDialog {
 		return holder.result;
 	}
 
-	private LinkEditorDialog() {
+	private static AssociationOption findAssociationOption(final JComboBox<AssociationOption> box, final String classId) {
+		for (int i = 0; i < box.getItemCount(); i++) {
+			final AssociationOption option = box.getItemAt(i);
+			if (Objects.equals(option.classId(), classId)) {
+				return option;
+			}
+		}
+		return box.getItemAt(0);
+	}
+
+	private static ClassModel findClass(final List<ClassModel> classes, final String id) {
+		for (final ClassModel classModel : classes) {
+			if (classModel.getId().equals(id)) {
+				return classModel;
+			}
+		}
+		return null;
+	}
+
+	private static FieldModel findField(final ClassModel classModel, final String id) {
+		if (classModel == null || id == null) {
+			return null;
+		}
+		for (final FieldModel fieldModel : classModel.getFields()) {
+			if (fieldModel.getId().equals(id)) {
+				return fieldModel;
+			}
+		}
+		return null;
+	}
+
+	private static JPanel labeled(final String labelText, final Component component) {
+		final JPanel panel = new JPanel(new BorderLayout(4, 4));
+		panel.add(new JLabel(labelText), BorderLayout.NORTH);
+		panel.add(component, BorderLayout.CENTER);
+		return panel;
 	}
 
 }

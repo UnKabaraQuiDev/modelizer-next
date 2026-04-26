@@ -25,44 +25,19 @@ import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 
 import lu.kbra.modelizer_next.domain.FieldModel;
-import lu.kbra.modelizer_next.ui.ColorButton;
+import lu.kbra.modelizer_next.ui.component.ColorButton;
 
 public final class FieldEditorDialog {
-
-	private static final class Holder {
-		private Result result;
-	}
 
 	public record Result(String name, String technicalName, boolean primaryKey, boolean unique, boolean notNull, Color textColor,
 			Color backgroundColor, int moveDelta, String type) {
 	}
 
-	private static void applyFieldValues(
-			final FieldModel fieldModel,
-			final JTextField nameField,
-			final JTextField technicalNameField,
-			final JCheckBox primaryKeyBox,
-			final JCheckBox uniqueBox,
-			final JCheckBox notNullBox,
-			final ColorButton textColorButton,
-			final ColorButton backgroundColorButton,
-			final JComboBox<String> typeField) {
-		fieldModel.getNames().setConceptualName(nameField.getText());
-		fieldModel.getNames().setTechnicalName(technicalNameField.getText());
-		fieldModel.setPrimaryKey(primaryKeyBox.isSelected());
-		fieldModel.setUnique(uniqueBox.isSelected());
-		fieldModel.setNotNull(notNullBox.isSelected());
-		fieldModel.getStyle().setTextColor(textColorButton.getSelectedColor());
-		fieldModel.getStyle().setBackgroundColor(backgroundColorButton.getSelectedColor());
-		fieldModel.setType(typeField.getSelectedItem() == null ? null : typeField.getSelectedItem().toString().trim());
+	private static final class Holder {
+		private Result result;
 	}
 
-	private static JPanel row(final String labelText, final Component component) {
-		final JPanel row = new JPanel(new BorderLayout(6, 6));
-		row.setBorder(BorderFactory.createEmptyBorder(4, 0, 4, 0));
-		row.add(new JLabel(labelText), BorderLayout.NORTH);
-		row.add(component, BorderLayout.CENTER);
-		return row;
+	private FieldEditorDialog() {
 	}
 
 	public static Result showDialog(final Component parent, final FieldModel fieldModel, final IntConsumer moveCallback) {
@@ -175,7 +150,32 @@ public final class FieldEditorDialog {
 		return holder.result;
 	}
 
-	private FieldEditorDialog() {
+	private static void applyFieldValues(
+			final FieldModel fieldModel,
+			final JTextField nameField,
+			final JTextField technicalNameField,
+			final JCheckBox primaryKeyBox,
+			final JCheckBox uniqueBox,
+			final JCheckBox notNullBox,
+			final ColorButton textColorButton,
+			final ColorButton backgroundColorButton,
+			final JComboBox<String> typeField) {
+		fieldModel.getNames().setConceptualName(nameField.getText());
+		fieldModel.getNames().setTechnicalName(technicalNameField.getText());
+		fieldModel.setPrimaryKey(primaryKeyBox.isSelected());
+		fieldModel.setUnique(uniqueBox.isSelected());
+		fieldModel.setNotNull(notNullBox.isSelected());
+		fieldModel.getStyle().setTextColor(textColorButton.getSelectedColor());
+		fieldModel.getStyle().setBackgroundColor(backgroundColorButton.getSelectedColor());
+		fieldModel.setType(typeField.getSelectedItem() == null ? null : typeField.getSelectedItem().toString().trim());
+	}
+
+	private static JPanel row(final String labelText, final Component component) {
+		final JPanel row = new JPanel(new BorderLayout(6, 6));
+		row.setBorder(BorderFactory.createEmptyBorder(4, 0, 4, 0));
+		row.add(new JLabel(labelText), BorderLayout.NORTH);
+		row.add(component, BorderLayout.CENTER);
+		return row;
 	}
 
 }

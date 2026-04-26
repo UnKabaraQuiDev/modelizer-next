@@ -5,10 +5,6 @@ import java.util.Map;
 
 public class WorkspaceState {
 
-	public static WorkspaceState createDefault() {
-		return new WorkspaceState();
-	}
-
 	private DockLayoutState dockLayout;
 
 	private Map<PanelType, PanelState> panels;
@@ -40,6 +36,10 @@ public class WorkspaceState {
 	@Override
 	public String toString() {
 		return "WorkspaceState@" + System.identityHashCode(this) + " [dockLayout=" + this.dockLayout + ", panels=" + this.panels + "]";
+	}
+
+	public static WorkspaceState createDefault() {
+		return new WorkspaceState();
 	}
 
 }

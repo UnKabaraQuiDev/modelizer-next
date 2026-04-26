@@ -22,23 +22,18 @@ import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 
 import lu.kbra.modelizer_next.domain.ClassModel;
-import lu.kbra.modelizer_next.ui.ColorButton;
+import lu.kbra.modelizer_next.ui.component.ColorButton;
 
 public final class ClassEditorDialog {
+
+	public record Result(String conceptualName, String technicalName, Color textColor, Color backgroundColor, Color borderColor) {
+	}
 
 	private static final class Holder {
 		private Result result;
 	}
 
-	public record Result(String conceptualName, String technicalName, Color textColor, Color backgroundColor, Color borderColor) {
-	}
-
-	private static JPanel row(final String labelText, final Component component) {
-		final JPanel row = new JPanel(new BorderLayout(6, 6));
-		row.setBorder(BorderFactory.createEmptyBorder(4, 0, 4, 0));
-		row.add(new JLabel(labelText), BorderLayout.NORTH);
-		row.add(component, BorderLayout.CENTER);
-		return row;
+	private ClassEditorDialog() {
 	}
 
 	public static Result showDialog(final Component parent, final ClassModel classModel) {
@@ -102,7 +97,12 @@ public final class ClassEditorDialog {
 		return holder.result;
 	}
 
-	private ClassEditorDialog() {
+	private static JPanel row(final String labelText, final Component component) {
+		final JPanel row = new JPanel(new BorderLayout(6, 6));
+		row.setBorder(BorderFactory.createEmptyBorder(4, 0, 4, 0));
+		row.add(new JLabel(labelText), BorderLayout.NORTH);
+		row.add(component, BorderLayout.CENTER);
+		return row;
 	}
 
 }
