@@ -216,7 +216,7 @@ jobs:
 
   build-macos-bootstrap:
     needs: [prepare, format]
-    runs-on: [self-hosted, macos]
+    runs-on: [macos-latest]
     env:
       VERSION_OVERRIDE: ${{ needs.prepare.outputs.version }}
     steps:
@@ -235,7 +235,7 @@ jobs:
 
   build-macos-standalone:
     needs: [prepare, format]
-    runs-on: [self-hosted, macos]
+    runs-on: [macos-latest]
     env:
       VERSION_OVERRIDE: ${{ needs.prepare.outputs.version }}
     steps:
@@ -254,7 +254,7 @@ jobs:
 
   build-macos-portable:
     needs: [prepare, format]
-    runs-on: [self-hosted, macos]
+    runs-on: [macos-latest]
     env:
       VERSION_OVERRIDE: ${{ needs.prepare.outputs.version }}
     steps:
