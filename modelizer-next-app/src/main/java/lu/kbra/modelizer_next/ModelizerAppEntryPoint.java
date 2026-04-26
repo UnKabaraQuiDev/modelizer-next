@@ -47,12 +47,14 @@ public class ModelizerAppEntryPoint implements AppMain {
 					document = MainFrame.createDocument(null, file.toFile());
 				}
 			}
+
 			final MainFrame frame = new MainFrame(document.orElseGet(() -> new DocumentSession(SampleDocumentFactory.create(), null)));
 			if (document.isEmpty()) {
 				frame.applyDefaultPaletteToCanvases();
 			}
+			frame.setVisible(true);
 
-			FileOpenBridge.setPing(() -> {
+			FileOpenBridge.setCallback(() -> {
 				while (frame.getDocument() == null || frame.getDocument().getMeta().getName().equals(SampleDocumentFactory.META_NAME)) {
 					final File f = FileOpenBridge.TO_BE_OPENED.poll();
 					System.out.println("Got open event for: " + f);
@@ -64,12 +66,10 @@ public class ModelizerAppEntryPoint implements AppMain {
 					}
 					if (frame.loadDocument(f)) {
 						FileOpenBridge.TO_BE_OPENED.clear();
-						FileOpenBridge.clearPing();
+						FileOpenBridge.clearCallback();
 					}
 				}
 			});
-
-			frame.setVisible(true);
 		});
 	}
 

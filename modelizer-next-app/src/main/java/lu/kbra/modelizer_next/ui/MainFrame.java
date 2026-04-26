@@ -25,11 +25,13 @@ import java.net.URISyntaxException;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.EventListener;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import javax.swing.AbstractAction;
@@ -154,19 +156,19 @@ public class MainFrame extends JFrame {
 		}
 	}
 
-	private final DocumentSession session;
-	private final ModelDocument document;
-	private final JLabel statusLabel;
-	private final JLabel selectionPathLabel;
-	private final JTabbedPane tabbedPane;
-	private final DiagramCanvas conceptualCanvas;
-	private final DiagramCanvas logicalCanvas;
-	private final DiagramCanvas physicalCanvas;
+	private DocumentSession session;
+	private ModelDocument document;
+	private JLabel statusLabel;
+	private JLabel selectionPathLabel;
+	private JTabbedPane tabbedPane;
+	private DiagramCanvas conceptualCanvas;
+	private DiagramCanvas logicalCanvas;
+	private DiagramCanvas physicalCanvas;
 
-	private final JToolBar toolBar;
-	private final JPanel pinnedStylesPanel;
+	private JToolBar toolBar;
+	private JPanel pinnedStylesPanel;
 
-	private final AppConfig appConfig;
+	private AppConfig appConfig;
 	private List<StylePalette> palettes;
 
 	private JMenuItem undoMenuItem;
@@ -174,6 +176,21 @@ public class MainFrame extends JFrame {
 
 	public MainFrame(final DocumentSession session) {
 		super("Modelizer Next");
+		setContent(session);
+		this.setSize(1200, 800);
+		this.setLocationRelativeTo(null);
+	}
+
+	public MainFrame(final ModelDocument document) {
+		this(new DocumentSession(document));
+	}
+
+	protected void setContent(DocumentSession session) {
+		super.setTitle("Modelizer Next");
+
+		setContentPane(new JPanel());
+		clearListeners();
+
 		this.session = session;
 		this.document = session.getDocument();
 
@@ -246,18 +263,37 @@ public class MainFrame extends JFrame {
 
 		this.add(this.tabbedPane, BorderLayout.CENTER);
 		this.add(statusPanel, BorderLayout.SOUTH);
-		this.setSize(1200, 800);
-		this.setLocationRelativeTo(null);
 
 		this.installFileDropSupport();
 		this.updateSelectionLabel(this.getActiveCanvas().getSelectionInfo());
 		this.refreshToolbarLabels();
 		this.updateUndoRedoMenuItems();
 		this.refreshFrameTitle();
+		this.revalidate();
+		this.repaint();
 	}
 
-	public MainFrame(final ModelDocument document) {
-		this(new DocumentSession(document));
+	private void clearListeners() {
+		removeListener(this.getComponentListeners(), this::removeComponentListener);
+		removeListener(this.getContainerListeners(), this::removeContainerListener);
+		removeListener(this.getFocusListeners(), this::removeFocusListener);
+		removeListener(this.getWindowFocusListeners(), this::removeWindowFocusListener);
+		removeListener(this.getWindowListeners(), this::removeWindowListener);
+		removeListener(this.getWindowStateListeners(), this::removeWindowStateListener);
+		removeListener(this.getHierarchyBoundsListeners(), this::removeHierarchyBoundsListener);
+		removeListener(this.getHierarchyListeners(), this::removeHierarchyListener);
+		removeListener(this.getInputMethodListeners(), this::removeInputMethodListener);
+		removeListener(this.getKeyListeners(), this::removeKeyListener);
+		removeListener(this.getMouseListeners(), this::removeMouseListener);
+		removeListener(this.getMouseMotionListeners(), this::removeMouseMotionListener);
+		removeListener(this.getMouseWheelListeners(), this::removeMouseWheelListener);
+		removeListener(this.getPropertyChangeListeners(), this::removePropertyChangeListener);
+	}
+
+	private <T extends EventListener> void removeListener(T[] listeners, Consumer<T> remove) {
+		for (T t : listeners) {
+			remove.accept(t);
+		}
 	}
 
 	public void applyDefaultPaletteToCanvases() {
@@ -874,7 +910,7 @@ public class MainFrame extends JFrame {
 		}
 
 		final Optional<DocumentSession> model = MainFrame.createDocument(this, selectedFile);
-		model.ifPresent(this::openInNewFrame);
+		model.ifPresent(this::openInFrame);
 		return model.isPresent();
 	}
 
@@ -893,7 +929,7 @@ public class MainFrame extends JFrame {
 	private void newDocument() {
 		final ModelDocument newDocument = new ModelDocument();
 		newDocument.setSource("New document");
-		this.openInNewFrame(new DocumentSession(newDocument));
+		this.openInFrame(new DocumentSession(newDocument));
 	}
 
 	private void onDocumentChanged() {
@@ -902,11 +938,15 @@ public class MainFrame extends JFrame {
 		this.refreshFrameTitle();
 	}
 
-	private void openInNewFrame(final DocumentSession session) {
-		final MainFrame frame = new MainFrame(session);
-		frame.setVisible(true);
-		frame.setBounds(this.getBounds());
-		this.dispose();
+	private void openInFrame(final DocumentSession session) {
+//		SwingUtilities.invokeLater(() -> {
+//			final MainFrame frame = new MainFrame(session);
+//			frame.setVisible(true);
+//			frame.setBounds(this.getBounds());
+//			this.dispose();
+//		});
+
+		setContent(session);
 	}
 
 	private void populateStylesMenu(final JMenu stylesMenu) {
@@ -1089,13 +1129,15 @@ public class MainFrame extends JFrame {
 	}
 
 	private void reopenWithCurrentDocument() {
-		this.dispose();
+//		this.dispose();
 
 		SwingUtilities.invokeLater(() -> {
 			MNMain.applyConfiguredLookAndFeel();
 
-			final MainFrame frame = new MainFrame(this.session);
-			frame.setVisible(true);
+			setContent(session);
+
+//			final MainFrame frame = new MainFrame(this.session);
+//			frame.setVisible(true);
 		});
 	}
 

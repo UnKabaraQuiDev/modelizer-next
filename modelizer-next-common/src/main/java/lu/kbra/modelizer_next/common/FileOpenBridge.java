@@ -11,12 +11,12 @@ public final class FileOpenBridge {
 	public static final Queue<File> TO_BE_OPENED = new ArrayDeque<>();
 	protected static Runnable PING;
 
-	public static void setPing(Runnable ping) {
+	public static void setCallback(Runnable ping) {
 		PING = ping;
 		ping.run();
 	}
 
-	public static void clearPing() {
+	public static void clearCallback() {
 		PING = null;
 	}
 
