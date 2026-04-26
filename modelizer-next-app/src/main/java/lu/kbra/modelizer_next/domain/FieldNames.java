@@ -39,6 +39,10 @@ public class FieldNames {
 	}
 
 	public void setTechnicalName(final String technicalName) {
+		if (technicalName == null || technicalName.isBlank()) {
+			this.technicalName = null;
+			return;
+		}
 		this.technicalName = technicalName;
 	}
 

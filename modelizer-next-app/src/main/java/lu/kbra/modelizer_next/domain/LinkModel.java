@@ -26,8 +26,8 @@ public class LinkModel {
 		this.cardinalityTo = Cardinality.ZERO_OR_MANY;
 		this.associationClassId = null;
 		this.lineColor = Color.BLACK;
-		this.labelFrom = "";
-		this.labelTo = "";
+		this.labelFrom = null;
+		this.labelTo = null;
 	}
 
 	public String getAssociationClassId() {
@@ -54,8 +54,16 @@ public class LinkModel {
 		return this.labelFrom;
 	}
 
+	public boolean hasLabelFrom() {
+		return labelFrom != null && !labelFrom.isBlank();
+	}
+
 	public String getLabelTo() {
 		return this.labelTo;
+	}
+
+	public boolean hasLabelTo() {
+		return labelTo != null && !labelTo.isBlank();
 	}
 
 	public Color getLineColor() {
@@ -66,12 +74,16 @@ public class LinkModel {
 		return this.name;
 	}
 
+	public boolean hasName() {
+		return name != null && !name.isBlank();
+	}
+
 	public LinkEnd getTo() {
 		return this.to;
 	}
 
 	public boolean isSelfLinking() {
-		return Objects.equals(this.to.getClassId(), this.from.getClassId());
+		return to != null && from != null && Objects.equals(this.to.getClassId(), this.from.getClassId());
 	}
 
 	public void setAssociationClassId(final String associationClassId) {
@@ -94,12 +106,18 @@ public class LinkModel {
 		this.id = id;
 	}
 
-	public void setLabelFrom(final String nameFrom) {
-		this.labelFrom = nameFrom;
+	public void setLabelFrom(final String labelFrom) {
+		if (labelFrom == null || labelFrom.isBlank()) {
+			this.labelFrom = null;
+		}
+		this.labelFrom = labelFrom;
 	}
 
-	public void setLabelTo(final String nameTo) {
-		this.labelTo = nameTo;
+	public void setLabelTo(final String labelTo) {
+		if (labelTo == null || labelTo.isBlank()) {
+			this.labelTo = null;
+		}
+		this.labelTo = labelTo;
 	}
 
 	public void setLineColor(final Color lineColor) {
@@ -107,6 +125,10 @@ public class LinkModel {
 	}
 
 	public void setName(final String name) {
+		if (name == null || name.isBlank()) {
+			this.name = null;
+			return;
+		}
 		this.name = name;
 	}
 

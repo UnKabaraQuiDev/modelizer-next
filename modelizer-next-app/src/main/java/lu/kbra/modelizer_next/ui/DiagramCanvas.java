@@ -674,7 +674,8 @@ public class DiagramCanvas extends JPanel {
 	private String buildForeignKeyFieldName(final ClassModel targetClass, final FieldModel targetField) {
 		final String className = this
 				.blankToFallback(targetClass.getNames().getTechnicalName(), targetClass.getNames().getConceptualName(), "target");
-		final String fieldName = this.blankToFallback(targetField.getNames().getTechnicalName(), targetField.getNames().getConceptualName(), "id");
+		final String fieldName = this
+				.blankToFallback(targetField.getNames().getTechnicalName(), targetField.getNames().getConceptualName(), "id");
 		return className + "_" + fieldName;
 	}
 
@@ -2337,7 +2338,7 @@ public class DiagramCanvas extends JPanel {
 			return;
 		}
 
-		final CommentEditorDialog.Result result = CommentEditorDialog.showDialog(this, this.document, commentModel);
+		final CommentEditorDialog.Result result = CommentEditorDialog.showDialog(this, this.document, commentModel, panelType);
 		if (result == null) {
 			return;
 		}
@@ -2824,7 +2825,8 @@ public class DiagramCanvas extends JPanel {
 	}
 
 	private String getEditableFieldName(final FieldModel fieldModel) {
-		return this.panelType == PanelType.CONCEPTUAL ? fieldModel.getNames().getConceptualName() : fieldModel.getNames().getTechnicalName();
+		return this.panelType == PanelType.CONCEPTUAL ? fieldModel.getNames().getConceptualName()
+				: fieldModel.getNames().getTechnicalName();
 	}
 
 	public Dimension getExportSize(final ViewExportScope scope) {
@@ -3960,9 +3962,11 @@ public class DiagramCanvas extends JPanel {
 	private String resolveFieldName(final FieldModel fieldModel) {
 		final String baseName;
 		if (this.panelType == PanelType.CONCEPTUAL) {
-			baseName = this.blankToFallback(fieldModel.getNames().getConceptualName(), fieldModel.getNames().getTechnicalName(), "Unnamed field");
+			baseName = this
+					.blankToFallback(fieldModel.getNames().getConceptualName(), fieldModel.getNames().getTechnicalName(), "Unnamed field");
 		} else {
-			baseName = this.blankToFallback(fieldModel.getNames().getTechnicalName(), fieldModel.getNames().getConceptualName(), "Unnamed field");
+			baseName = this
+					.blankToFallback(fieldModel.getNames().getTechnicalName(), fieldModel.getNames().getConceptualName(), "Unnamed field");
 		}
 
 		if (this.panelType != PanelType.PHYSICAL) {

@@ -38,6 +38,7 @@ import lu.kbra.modelizer_next.domain.CommentBinding;
 import lu.kbra.modelizer_next.domain.CommentKind;
 import lu.kbra.modelizer_next.domain.CommentModel;
 import lu.kbra.modelizer_next.domain.LinkModel;
+import lu.kbra.modelizer_next.layout.PanelType;
 import lu.kbra.modelizer_next.ui.ColorButton;
 
 public final class CommentEditorDialog {
@@ -128,7 +129,11 @@ public final class CommentEditorDialog {
 		return value == null ? "" : value;
 	}
 
-	public static Result showDialog(final Component parent, final ModelDocument document, final CommentModel initialComment) {
+	public static Result showDialog(
+			final Component parent,
+			final ModelDocument document,
+			final CommentModel initialComment,
+			final PanelType panelType) {
 		final Window owner = parent == null ? null : SwingUtilities.getWindowAncestor(parent);
 		final JDialog dialog = new JDialog(owner, "Edit comment", Dialog.ModalityType.APPLICATION_MODAL);
 
@@ -153,11 +158,14 @@ public final class CommentEditorDialog {
 			for (final ClassModel classModel : document.getModel().getClasses()) {
 				associationList.add(AssociationTarget.forClass(classModel));
 			}
-			for (final LinkModel linkModel : document.getModel().getConceptualLinks()) {
-				associationList.add(AssociationTarget.forLink(linkModel, true));
-			}
-			for (final LinkModel linkModel : document.getModel().getTechnicalLinks()) {
-				associationList.add(AssociationTarget.forLink(linkModel, false));
+			if (panelType == PanelType.CONCEPTUAL) {
+				for (final LinkModel linkModel : document.getModel().getConceptualLinks()) {
+					associationList.add(AssociationTarget.forLink(linkModel, true));
+				}
+			} else {
+				for (final LinkModel linkModel : document.getModel().getTechnicalLinks()) {
+					associationList.add(AssociationTarget.forLink(linkModel, false));
+				}
 			}
 		}
 		final JComboBox<AssociationTarget> associationBox = new JComboBox<>(
