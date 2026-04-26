@@ -1,10 +1,10 @@
 {
   "channel": "snapshot",
-  "version": "4-SNAPSHOT-133",
-  "tag": "4-SNAPSHOT-133",
-  "releaseUrl": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/tag/4-SNAPSHOT-133",
-  "assetUrl": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/4-SNAPSHOT-133/modelizer-next-app-4-SNAPSHOT-133.jar",
-  "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/4-SNAPSHOT-133/modelizer-next-app-4-SNAPSHOT-133.jar",
+  "version": "4-SNAPSHOT-149",
+  "tag": "4-SNAPSHOT-149",
+  "releaseUrl": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/tag/4-SNAPSHOT-149",
+  "assetUrl": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/4-SNAPSHOT-149/modelizer-next-app-4-SNAPSHOT-149.jar",
+  "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/4-SNAPSHOT-149/modelizer-next-app-4-SNAPSHOT-149.jar",
   "platforms": [
     "unknown",
     "linux",
@@ -12,8 +12,85 @@
     "windows"
   ],
   "notes": "Latest snapshot build.",
-  "updatedAt": "2026-04-25T18:19:21Z",
+  "updatedAt": "2026-04-26T14:22:56Z",
   "entries": [
+    {
+      "version": "4-SNAPSHOT-149",
+      "tag": "4-SNAPSHOT-149",
+      "releaseUrl": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/tag/4-SNAPSHOT-149",
+      "assetUrl": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/4-SNAPSHOT-149/modelizer-next-app-4-SNAPSHOT-149.jar",
+      "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/4-SNAPSHOT-149/modelizer-next-app-4-SNAPSHOT-149.jar",
+      "platforms": [
+        "unknown",
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "notes": "Latest snapshot build.",
+      "publishedAt": "2026-04-26T14:22:56Z",
+      "assets": [
+        {
+          "name": "modelizer-next-app-4-SNAPSHOT-149.jar",
+          "platform": "unknown",
+          "kind": "app-standalone-jar",
+          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/4-SNAPSHOT-149/modelizer-next-app-4-SNAPSHOT-149.jar"
+        },
+        {
+          "name": "modelizer-next-app-portable-linux-4-SNAPSHOT-149.zip",
+          "platform": "linux",
+          "kind": "app-portable-native",
+          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/4-SNAPSHOT-149/modelizer-next-app-portable-linux-4-SNAPSHOT-149.zip"
+        },
+        {
+          "name": "modelizer-next-app-portable-macos-4-SNAPSHOT-149.zip",
+          "platform": "macos",
+          "kind": "app-portable-native",
+          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/4-SNAPSHOT-149/modelizer-next-app-portable-macos-4-SNAPSHOT-149.zip"
+        },
+        {
+          "name": "modelizer-next-app-portable-windows-4-SNAPSHOT-149.zip",
+          "platform": "windows",
+          "kind": "app-portable-native",
+          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/4-SNAPSHOT-149/modelizer-next-app-portable-windows-4-SNAPSHOT-149.zip"
+        },
+        {
+          "name": "modelizer-next-app-standalone-linux-4-SNAPSHOT-149.deb",
+          "platform": "linux",
+          "kind": "app-standalone-native",
+          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/4-SNAPSHOT-149/modelizer-next-app-standalone-linux-4-SNAPSHOT-149.deb"
+        },
+        {
+          "name": "modelizer-next-app-standalone-macos-4-SNAPSHOT-149.dmg",
+          "platform": "macos",
+          "kind": "app-standalone-native",
+          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/4-SNAPSHOT-149/modelizer-next-app-standalone-macos-4-SNAPSHOT-149.dmg"
+        },
+        {
+          "name": "modelizer-next-app-standalone-windows-4-SNAPSHOT-149.exe",
+          "platform": "windows",
+          "kind": "app-standalone-native",
+          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/4-SNAPSHOT-149/modelizer-next-app-standalone-windows-4-SNAPSHOT-149.exe"
+        },
+        {
+          "name": "modelizer-next-bootstrap-linux-4-SNAPSHOT-149.deb",
+          "platform": "linux",
+          "kind": "bootstrap-native",
+          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/4-SNAPSHOT-149/modelizer-next-bootstrap-linux-4-SNAPSHOT-149.deb"
+        },
+        {
+          "name": "modelizer-next-bootstrap-macos-4-SNAPSHOT-149.dmg",
+          "platform": "macos",
+          "kind": "bootstrap-native",
+          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/4-SNAPSHOT-149/modelizer-next-bootstrap-macos-4-SNAPSHOT-149.dmg"
+        },
+        {
+          "name": "modelizer-next-bootstrap-windows-4-SNAPSHOT-149.exe",
+          "platform": "windows",
+          "kind": "bootstrap-native",
+          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/4-SNAPSHOT-149/modelizer-next-bootstrap-windows-4-SNAPSHOT-149.exe"
+        }
+      ]
+    },
     {
       "version": "4-SNAPSHOT-133",
       "tag": "4-SNAPSHOT-133",
