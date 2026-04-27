@@ -7,13 +7,7 @@ import lu.kbra.modelizer_next.layout.PanelType;
 import lu.kbra.modelizer_next.ui.export.ViewExportFormat;
 import lu.kbra.modelizer_next.ui.export.ViewExportScope;
 
-public record CommandLineExportOptions(
-		File inputFile,
-		ViewExportFormat format,
-		ViewExportScope scope,
-		List<PanelType> panelTypes,
-		File outputDirectory,
-		String fileNamePattern,
-		boolean force) {
+public record CommandLineExportOptions(File inputFile, ViewExportFormat format, ViewExportScope scope, List<PanelType> panelTypes,
+		File outputDirectory, String fileNamePattern, boolean force) {
 
 }
