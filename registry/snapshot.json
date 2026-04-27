@@ -1,10 +1,10 @@
 {
   "channel": "snapshot",
-  "version": "4-SNAPSHOT-161",
-  "tag": "4-SNAPSHOT-161",
-  "releaseUrl": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/tag/4-SNAPSHOT-161",
-  "assetUrl": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/4-SNAPSHOT-161/modelizer-next-app-4-SNAPSHOT-161.jar",
-  "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/4-SNAPSHOT-161/modelizer-next-app-4-SNAPSHOT-161.jar",
+  "version": "5-SNAPSHOT-166",
+  "tag": "5-SNAPSHOT-166",
+  "releaseUrl": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/tag/5-SNAPSHOT-166",
+  "assetUrl": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/5-SNAPSHOT-166/modelizer-next-app-5-SNAPSHOT-166.jar",
+  "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/5-SNAPSHOT-166/modelizer-next-app-5-SNAPSHOT-166.jar",
   "platforms": [
     "unknown",
     "linux",
@@ -12,8 +12,85 @@
     "windows"
   ],
   "notes": "Latest snapshot build.",
-  "updatedAt": "2026-04-27T11:33:59Z",
+  "updatedAt": "2026-04-27T15:52:12Z",
   "entries": [
+    {
+      "version": "5-SNAPSHOT-166",
+      "tag": "5-SNAPSHOT-166",
+      "releaseUrl": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/tag/5-SNAPSHOT-166",
+      "assetUrl": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/5-SNAPSHOT-166/modelizer-next-app-5-SNAPSHOT-166.jar",
+      "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/5-SNAPSHOT-166/modelizer-next-app-5-SNAPSHOT-166.jar",
+      "platforms": [
+        "unknown",
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "notes": "Latest snapshot build.",
+      "publishedAt": "2026-04-27T15:52:12Z",
+      "assets": [
+        {
+          "name": "modelizer-next-app-5-SNAPSHOT-166.jar",
+          "platform": "unknown",
+          "kind": "app-standalone-jar",
+          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/5-SNAPSHOT-166/modelizer-next-app-5-SNAPSHOT-166.jar"
+        },
+        {
+          "name": "modelizer-next-app-portable-linux-5-SNAPSHOT-166.zip",
+          "platform": "linux",
+          "kind": "app-portable-native",
+          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/5-SNAPSHOT-166/modelizer-next-app-portable-linux-5-SNAPSHOT-166.zip"
+        },
+        {
+          "name": "modelizer-next-app-portable-macos-5-SNAPSHOT-166.zip",
+          "platform": "macos",
+          "kind": "app-portable-native",
+          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/5-SNAPSHOT-166/modelizer-next-app-portable-macos-5-SNAPSHOT-166.zip"
+        },
+        {
+          "name": "modelizer-next-app-portable-windows-5-SNAPSHOT-166.zip",
+          "platform": "windows",
+          "kind": "app-portable-native",
+          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/5-SNAPSHOT-166/modelizer-next-app-portable-windows-5-SNAPSHOT-166.zip"
+        },
+        {
+          "name": "modelizer-next-app-standalone-linux-5-SNAPSHOT-166.deb",
+          "platform": "linux",
+          "kind": "app-standalone-native",
+          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/5-SNAPSHOT-166/modelizer-next-app-standalone-linux-5-SNAPSHOT-166.deb"
+        },
+        {
+          "name": "modelizer-next-app-standalone-macos-5-SNAPSHOT-166.dmg",
+          "platform": "macos",
+          "kind": "app-standalone-native",
+          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/5-SNAPSHOT-166/modelizer-next-app-standalone-macos-5-SNAPSHOT-166.dmg"
+        },
+        {
+          "name": "modelizer-next-app-standalone-windows-5-SNAPSHOT-166.exe",
+          "platform": "windows",
+          "kind": "app-standalone-native",
+          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/5-SNAPSHOT-166/modelizer-next-app-standalone-windows-5-SNAPSHOT-166.exe"
+        },
+        {
+          "name": "modelizer-next-bootstrap-linux-5-SNAPSHOT-166.deb",
+          "platform": "linux",
+          "kind": "bootstrap-native",
+          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/5-SNAPSHOT-166/modelizer-next-bootstrap-linux-5-SNAPSHOT-166.deb"
+        },
+        {
+          "name": "modelizer-next-bootstrap-macos-5-SNAPSHOT-166.dmg",
+          "platform": "macos",
+          "kind": "bootstrap-native",
+          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/5-SNAPSHOT-166/modelizer-next-bootstrap-macos-5-SNAPSHOT-166.dmg"
+        },
+        {
+          "name": "modelizer-next-bootstrap-windows-5-SNAPSHOT-166.exe",
+          "platform": "windows",
+          "kind": "bootstrap-native",
+          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/5-SNAPSHOT-166/modelizer-next-bootstrap-windows-5-SNAPSHOT-166.exe"
+        }
+      ]
+    },
     {
       "version": "4-SNAPSHOT-161",
       "tag": "4-SNAPSHOT-161",
