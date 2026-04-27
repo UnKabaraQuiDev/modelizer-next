@@ -34,6 +34,7 @@
 			https://raw.githubusercontent.com/UnKabaraQuiDev/modelizer-next/refs/heads/registry/registry/versions.json</modelizer.updatesManifestUrl>
 		<modelizer.issuesUrl>${modelizer.repositoryUrl}/issues</modelizer.issuesUrl>
 		<modelizer.website>https://modelizer.kbra.lu/</modelizer.website>
+		<modelizer.releasesManifestUrl>https://raw.githubusercontent.com/UnKabaraQuiDev/modelizer-next/refs/heads/registry/registry/release.json</modelizer.releasesManifestUrl>
 
 		<jpackage.linux.group>Programming</jpackage.linux.group>
 		<jpackage.linux.category>Programming,Utilities</jpackage.linux.category>

@@ -27,6 +27,7 @@ public final class BootstrapApp {
 	public static String RELEASES_URL;
 	public static String UPDATES_MANIFEST_URL;
 	public static String DISTRIBUTOR;
+	public static String RELEASES_MANIFEST_URL;
 
 	public static BootstrapConfig BOOTSTRAP_CONFIG;
 
@@ -87,6 +88,8 @@ public final class BootstrapApp {
 		BootstrapApp.UPDATES_MANIFEST_URL = BootstrapApp.JSON.path("updatesManifest")
 				.asText("https://raw.githubusercontent.com/UnKabaraQuiDev/modelizer-next/refs/heads/registry/registry/versions.json");
 		BootstrapApp.DISTRIBUTOR = BootstrapApp.JSON.path("distributor").asText();
+		BootstrapApp.RELEASES_MANIFEST_URL = BootstrapApp.JSON.path("releasesManifestUrl")
+				.asText("https://raw.githubusercontent.com/UnKabaraQuiDev/modelizer-next/refs/heads/registry/registry/release.json");
 
 		BootstrapApp.BOOTSTRAP_CONFIG = new BootstrapConfig(BootstrapApp.NAME,
 				BootstrapApp.VERSION,

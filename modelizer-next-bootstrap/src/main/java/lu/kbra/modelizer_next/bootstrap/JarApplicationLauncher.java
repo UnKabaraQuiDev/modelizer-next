@@ -31,6 +31,8 @@ final class JarApplicationLauncher {
 			}
 		} catch (final AppLaunchException ex) {
 			throw ex;
+		} catch (final ClassNotFoundException | NoClassDefFoundError ex) {
+			throw new AppLaunchException("Failed to launch application because the bootstrap launcher is outdated.", ex);
 		} catch (final Exception ex) {
 			throw new AppLaunchException("Failed to launch application from " + application.jarFile(), ex);
 		}

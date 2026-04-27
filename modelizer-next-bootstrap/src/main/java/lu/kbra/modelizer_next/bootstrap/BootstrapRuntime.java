@@ -255,7 +255,62 @@ public class BootstrapRuntime implements UpdateRuntime {
 			loadingFrame.dispose();
 		}
 
-		this.applicationLauncher.launch(args, toBeOpened, this.currentApplication);
+		try {
+			this.applicationLauncher.launch(args, toBeOpened, this.currentApplication);
+		} catch (final AppLaunchException ex) {
+			if (!this.isCausedByClassNotFound(ex)) {
+				throw ex;
+			}
+			this.handleOutdatedBootstrapLauncher(ex);
+		}
+	}
+
+	private void handleOutdatedBootstrapLauncher(final AppLaunchException launchException) throws Exception {
+		final ParsedVersion currentBootstrapVersion = lu.kbra.modelizer_next.common.VersionComparator.parse(BootstrapApp.VERSION);
+		final BootstrapLoadingFrame loadingFrame = new BootstrapLoadingFrame();
+		loadingFrame.setVisible(true);
+		try {
+			loadingFrame.update("Checking bootstrap launcher update...", 0, 0);
+			final BootstrapInstallerUpdate update = this.remoteUpdateService
+					.findLatestBootstrapInstaller(this.configuration.getUpdateChannel(), currentBootstrapVersion);
+			if (!update.isUpdateAvailable()) {
+				throw new AppLaunchException("The application needs a newer bootstrap launcher, but no bootstrap update is available.",
+						launchException);
+			}
+			if (update.platform() == BootstrapInstallerUpdate.Platform.UNSUPPORTED) {
+				throw new AppLaunchException("The application needs a newer bootstrap launcher, but this platform is not supported.",
+						launchException);
+			}
+
+			final String safeVersion = update.latestVersion().toString().replaceAll("[^A-Za-z0-9._-]", "_");
+			final Path installerPath = BootstrapApp.getTempDirectory()
+					.toPath()
+					.resolve("modelizer-next-bootstrap-" + safeVersion + update.platform().extension());
+			this.remoteUpdateService
+					.download(update.installerUri(), installerPath, update.latestVersion().toString(), loadingFrame::update);
+			loadingFrame.dispose();
+
+			if (new BootstrapInstallerLauncher().promptAndStartInstaller(update, installerPath)) {
+				System.exit(0);
+			}
+			throw new AppLaunchException(
+					"The application needs a newer bootstrap launcher. Install the downloaded installer to continue: " + installerPath,
+					launchException);
+		} catch (final InterruptedException ex) {
+			Thread.currentThread().interrupt();
+			throw new AppLaunchException("Interrupted while checking for a bootstrap launcher update.", ex);
+		} finally {
+			loadingFrame.dispose();
+		}
+	}
+
+	private boolean isCausedByClassNotFound(final Throwable throwable) {
+		for (Throwable current = throwable; current != null; current = current.getCause()) {
+			if (current instanceof ClassNotFoundException || current instanceof NoClassDefFoundError) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	private void promptForInitialChannelSelection() throws IOException {

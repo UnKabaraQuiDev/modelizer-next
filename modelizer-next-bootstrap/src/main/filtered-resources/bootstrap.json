@@ -6,5 +6,6 @@
   "repository": "@modelizer.repositoryUrl@",
   "releases": "@modelizer.releasesUrl@",
   "updatesManifest": "@modelizer.updatesManifestUrl@",
-  "issues": "@modelizer.issuesUrl@"
+  "issues": "@modelizer.issuesUrl@",
+  "releasesManifestUrl": "@modelizer.releasesManifestUrl@"
 }
