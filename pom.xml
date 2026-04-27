@@ -35,40 +35,47 @@
 		<modelizer.issuesUrl>${modelizer.repositoryUrl}/issues</modelizer.issuesUrl>
 		<modelizer.website>https://modelizer.kbra.lu/</modelizer.website>
 
-		<jpackage.linux.group>Programming</jpackage.linux.group>
-		<jpackage.linux.category>Programming,Utilities</jpackage.linux.category>
+		<conveyor.billingEmail></conveyor.billingEmail>
 
-		<jpackage.addModules>
-			java.base,java.desktop,java.logging,java.net.http,java.xml,jdk.unsupported,jdk.crypto.ec</jpackage.addModules>
-		<jpackage.fa1>${jpackage.inputDir}/FAmod.properties</jpackage.fa1>
-		<jpackage.fa2>${jpackage.inputDir}/FAmn.properties</jpackage.fa2>
-		<jpackage.fa3>${jpackage.inputDir}/FAmdlz.properties</jpackage.fa3>
-		<jpackage.vendor>${project.groupId}</jpackage.vendor>
+		<conveyor.linux.group>Programming</conveyor.linux.group>
+		<conveyor.linux.category>Programming,Utilities</conveyor.linux.category>
 
-		<jpackage.macos.bundleId>${project.groupId}.${project.artifactId}</jpackage.macos.bundleId>
-		<jpackage.macos.category>public.app-category.productivity</jpackage.macos.category>
-		<jpackage.macos.sign>false</jpackage.macos.sign>
-		<jpackage.macos.runtimeSigningPrefix>${project.groupId}</jpackage.macos.runtimeSigningPrefix>
+		<conveyor.addModules>
+			java.base,java.desktop,java.logging,java.net.http,java.xml,jdk.unsupported,jdk.crypto.ec</conveyor.addModules>
+		<conveyor.fa1>${conveyor.inputDir}/FAmod.properties</conveyor.fa1>
+		<conveyor.fa2>${conveyor.inputDir}/FAmn.properties</conveyor.fa2>
+		<conveyor.fa3>${conveyor.inputDir}/FAmdlz.properties</conveyor.fa3>
+		<conveyor.vendor>${project.groupId}</conveyor.vendor>
 
-		<jpackage.inputDir>${project.build.directory}/jpackage-input/</jpackage.inputDir>
-		<jpackage.inputJar>${project.build.finalName}.jar</jpackage.inputJar>
+		<conveyor.macos.bundleId>${project.groupId}.${project.artifactId}</conveyor.macos.bundleId>
+		<conveyor.macos.category>public.app-category.productivity</conveyor.macos.category>
+		<conveyor.macos.sign>false</conveyor.macos.sign>
+		<conveyor.macos.runtimeSigningPrefix>${project.groupId}</conveyor.macos.runtimeSigningPrefix>
 
-		<jpackage.name>filled in by modules</jpackage.name>
-		<jpackage.icon>filled in by profiles</jpackage.icon>
-		<jpackage.outputDir>filled in by profiles</jpackage.outputDir>
-		<jpackage.type>filled in by profiles</jpackage.type>
-		<jpackage.macos.name>filled in by modules</jpackage.macos.name>
+		<conveyor.inputDir>${project.build.directory}/conveyor-input/</conveyor.inputDir>
+		<conveyor.inputJar>${project.build.finalName}.jar</conveyor.inputJar>
+
+		<conveyor.name>filled in by modules</conveyor.name>
+		<conveyor.internal.name>filled in by modules</conveyor.internal.name>
+		<conveyor.icon>filled in by profiles</conveyor.icon>
+		<conveyor.outputDir>filled in by profiles</conveyor.outputDir>
+		<conveyor.type>filled in by profiles</conveyor.type>
+		<conveyor.macos.name>filled in by modules</conveyor.macos.name>
 
 		<app.mainClass>filled in by modules</app.mainClass>
 
-		<skipLinuxInstaller>true</skipLinuxInstaller>
-		<skipWindowsInstaller>true</skipWindowsInstaller>
-		<skipMacosInstaller>true</skipMacosInstaller>
+		<conveyor.windows.type>none</conveyor.windows.type>
+		<conveyor.macos.type>none</conveyor.macos.type>
+		<conveyor.linux.type>none</conveyor.linux.type>
 
-		<skipLinuxPortable>true</skipLinuxPortable>
-		<skipWindowsPortable>true</skipWindowsPortable>
-		<skipMacosPortable>true</skipMacosPortable>
+		<conveyor.linux>false</conveyor.linux>
+		<conveyor.windows>false</conveyor.windows>
+		<conveyor.macos>false</conveyor.macos>
 
+		<conveyor.portable>false</conveyor.portable>
+		<conveyor.machine></conveyor.machine>
+		<conveyor.target></conveyor.target>
+		
 		<skipNative>true</skipNative>
 	</properties>
 
@@ -134,6 +141,11 @@
 					<version>3.3.1</version>
 					<configuration>
 						<encoding>${project.build.sourceEncoding}</encoding>
+						<nonFilteredFileExtensions>
+							<nonFilteredFileExtension>png</nonFilteredFileExtension>
+							<nonFilteredFileExtension>ico</nonFilteredFileExtension>
+							<nonFilteredFileExtension>icns</nonFilteredFileExtension>
+						</nonFilteredFileExtensions>
 					</configuration>
 				</plugin>
 				<plugin>
@@ -195,6 +207,7 @@
 		</resources>
 
 		<plugins>
+
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-shade-plugin</artifactId>
@@ -218,6 +231,7 @@
 					</execution>
 				</executions>
 			</plugin>
+
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-deploy-plugin</artifactId>
@@ -225,6 +239,7 @@
 					<skip>true</skip>
 				</configuration>
 			</plugin>
+
 		</plugins>
 	</build>
 
@@ -326,369 +341,114 @@
 			<id>native-module</id>
 			<activation>
 				<file>
-					<exists>${project.basedir}/native-module.flag</exists>
+					<exists>${basedir}/native-module.flag</exists>
 				</file>
 			</activation>
 			<build>
 				<plugins>
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-antrun-plugin</artifactId>
+						<artifactId>maven-resources-plugin</artifactId>
+
 						<executions>
 							<execution>
-								<id>copy-shaded-jar</id>
+								<id>filter-conveyor-config</id>
+								<phase>prepare-package</phase>
+								<goals>
+									<goal>copy-resources</goal>
+								</goals>
+
+								<configuration>
+
+									<!-- Output directory -->
+									<outputDirectory>
+										${project.build.directory}/conveyor
+									</outputDirectory>
+
+									<!-- Enable filtering -->
+									<resources>
+										<resource>
+											<directory>
+												${maven.multiModuleProjectDirectory}/app</directory>
+											<includes>
+												<include>conveyor.conf</include>
+											</includes>
+											<filtering>true</filtering>
+										</resource>
+									</resources>
+
+									<delimiters>
+										<delimiter>@</delimiter>
+									</delimiters>
+									<useDefaultDelimiters>false</useDefaultDelimiters>
+
+									<!-- Encoding -->
+									<encoding>${project.build.sourceEncoding}</encoding>
+
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-antrun-plugin</artifactId>
+						<executions>
+
+							<execution>
+								<id>prepare-conveyor</id>
 								<phase>package</phase>
 								<goals>
 									<goal>run</goal>
 								</goals>
-
 								<configuration>
 									<skip>${skipNative}</skip>
 									<target>
 										<mkdir
-											dir="${jpackage.inputDir}" />
+											dir="${project.build.directory}/conveyor" />
+
+										<!-- Copy shaded jar -->
 										<copy
 											file="${project.build.directory}/${project.build.finalName}-with-dependencies.jar"
-											tofile="${jpackage.inputDir}/${project.build.finalName}.jar" />
-										<copy
-											todir="${jpackage.inputDir}">
-											<fileset dir="${jpackage.add}" />
-										</copy>
+											tofile="${project.build.directory}/conveyor/${project.build.finalName}.jar" />
 									</target>
 								</configuration>
 							</execution>
 
+							<!-- Run Conveyor -->
 							<execution>
-								<id>package-installer-linux</id>
+								<id>conveyor-package</id>
 								<phase>package</phase>
 								<goals>
 									<goal>run</goal>
 								</goals>
-
 								<configuration>
-									<skip>${skipLinuxInstaller}</skip>
+									<skip>${skipNative}</skip>
 									<target>
-
-										<exec executable="jpackage"
+										<exec executable="conveyor"
 											failonerror="true">
-
-											<arg value="--type" />
-											<arg value="${jpackage.type}" />
-
-											<arg value="--name" />
-											<arg value="${jpackage.name}" />
-
-											<arg value="--vendor" />
-											<arg value="${jpackage.vendor}" />
-
-											<arg value="--app-version" />
-											<arg value="${appVersion}" />
-
-											<arg value="--input" />
-											<arg value="${jpackage.inputDir}" />
-
-											<arg value="--main-jar" />
-											<arg value="${jpackage.inputJar}" />
-
-											<arg value="--dest" />
-											<arg value="${jpackage.outputDir}" />
-
-											<arg value="--add-modules" />
-											<arg value="${jpackage.addModules}" />
-
-											<arg value="--linux-app-category" />
+											<arg value="--file" />
 											<arg
-												value="${jpackage.linux.category}" />
-
-											<arg value="--linux-menu-group" />
-											<arg value="${jpackage.linux.group}" />
-
-											<arg value="--icon" />
-											<arg value="${jpackage.icon}" />
-
-											<arg value="--file-associations" />
-											<arg value="${jpackage.fa1}" />
-
-											<arg value="--file-associations" />
-											<arg value="${jpackage.fa2}" />
-
-											<arg value="--file-associations" />
-											<arg value="${jpackage.fa3}" />
-
-										</exec>
-
-									</target>
-								</configuration>
-							</execution>
-							<execution>
-								<id>package-installer-windows</id>
-								<phase>package</phase>
-								<goals>
-									<goal>run</goal>
-								</goals>
-
-								<configuration>
-									<skip>${skipWindowsInstaller}</skip>
-									<target>
-
-										<exec executable="jpackage"
-											failonerror="true">
-
-											<arg value="--type" />
+												value="${project.build.directory}/conveyor/conveyor.conf" />
 											<arg
-												value="${jpackage.type}" />
+												value="-Kapp.machines=[${conveyor.machine}]" />
+											<arg value="make" />
+											<arg value="${conveyor.target}" />
 
-											<arg value="--name" />
-											<arg value="${jpackage.name}" />
-
-											<arg value="--vendor" />
-											<arg value="${jpackage.vendor}" />
-
-											<arg value="--app-version" />
-											<arg value="${appVersion}" />
-
-											<arg value="--input" />
-											<arg value="${jpackage.inputDir}" />
-
-											<arg value="--main-jar" />
-											<arg value="${jpackage.inputJar}" />
-
-											<arg value="--dest" />
-											<arg value="${jpackage.outputDir}" />
-
-											<arg value="--add-modules" />
-											<arg value="${jpackage.addModules}" />
-
-											<arg value="--win-menu-group" />
-											<arg value="${jpackage.linux.group}" />
-
-											<arg value="--win-menu" />
-											<arg value="--win-shortcut" />
-
-											<arg value="--win-per-user-install" />
-
-											<arg value="--icon" />
-											<arg value="${jpackage.icon}" />
-
-											<arg value="--file-associations" />
-											<arg value="${jpackage.fa1}" />
-
-											<arg value="--file-associations" />
-											<arg value="${jpackage.fa2}" />
-
-											<arg value="--file-associations" />
-											<arg value="${jpackage.fa3}" />
-
-										</exec>
-
-									</target>
-								</configuration>
-							</execution>
-							<execution>
-								<id>package-installer-macos</id>
-								<phase>package</phase>
-								<goals>
-									<goal>run</goal>
-								</goals>
-
-								<configuration>
-									<skip>${skipMacosInstaller}</skip>
-
-									<target>
-										<exec executable="jpackage"
-											failonerror="true">
-
-											<arg value="--type" />
-											<arg value="${jpackage.type}" />
-
-											<arg value="--name" />
-											<arg value="${jpackage.name}" />
-
-											<arg value="--vendor" />
-											<arg value="${jpackage.vendor}" />
-
-											<arg value="--app-version" />
-											<arg value="${appVersion}" />
-
-											<arg value="--input" />
-											<arg value="${jpackage.inputDir}" />
-
-											<arg value="--main-jar" />
-											<arg value="${jpackage.inputJar}" />
-
-											<arg value="--dest" />
-											<arg value="${jpackage.outputDir}" />
-
-											<arg value="--add-modules" />
-											<arg value="${jpackage.addModules}" />
-
-											<arg
-												value="--mac-package-identifier" />
-											<arg
-												value="${jpackage.macos.bundleId}" />
-
-											<arg value="--mac-package-name" />
-											<arg value="${jpackage.macos.name}" />
-
-											<arg value="--icon" />
-											<arg value="${jpackage.icon}" />
-
-											<arg value="--file-associations" />
-											<arg value="${jpackage.fa1}" />
-
-											<arg value="--file-associations" />
-											<arg value="${jpackage.fa2}" />
-
-											<arg value="--file-associations" />
-											<arg value="${jpackage.fa3}" />
-
+											<env key="CONVEYOR_AGREE_TO_LICENSE"
+												value="1" />
 										</exec>
 									</target>
 								</configuration>
 							</execution>
-							<execution>
-								<id>package-app-image-linux</id>
-								<phase>package</phase>
-								<goals>
-									<goal>run</goal>
-								</goals>
 
-								<configuration>
-									<skip>${skipLinuxPortable}</skip>
-									<target>
-
-										<exec executable="jpackage"
-											failonerror="true">
-
-											<arg value="--type" />
-											<arg value="${jpackage.type}" />
-
-											<arg value="--name" />
-											<arg value="${jpackage.name}" />
-
-											<arg value="--vendor" />
-											<arg value="${jpackage.vendor}" />
-
-											<arg value="--app-version" />
-											<arg value="${appVersion}" />
-
-											<arg value="--input" />
-											<arg value="${jpackage.inputDir}" />
-
-											<arg value="--main-jar" />
-											<arg value="${jpackage.inputJar}" />
-
-											<arg value="--dest" />
-											<arg value="${jpackage.outputDir}" />
-
-											<arg value="--add-modules" />
-											<arg value="${jpackage.addModules}" />
-
-											<arg value="--icon" />
-											<arg value="${jpackage.icon}" />
-
-										</exec>
-
-									</target>
-								</configuration>
-							</execution>
-							<execution>
-								<id>package-app-image-windows</id>
-								<phase>package</phase>
-								<goals>
-									<goal>run</goal>
-								</goals>
-
-								<configuration>
-									<skip>${skipWindowsPortable}</skip>
-									<target>
-
-										<exec executable="jpackage"
-											failonerror="true">
-
-											<arg value="--type" />
-											<arg value="${jpackage.type}" />
-
-											<arg value="--name" />
-											<arg value="${jpackage.name}" />
-
-											<arg value="--vendor" />
-											<arg value="${jpackage.vendor}" />
-
-											<arg value="--app-version" />
-											<arg value="${appVersion}" />
-
-											<arg value="--input" />
-											<arg value="${jpackage.inputDir}" />
-
-											<arg value="--main-jar" />
-											<arg value="${jpackage.inputJar}" />
-
-											<arg value="--dest" />
-											<arg value="${jpackage.outputDir}" />
-
-											<arg value="--add-modules" />
-											<arg value="${jpackage.addModules}" />
-
-											<arg value="--icon" />
-											<arg value="${jpackage.icon}" />
-
-										</exec>
-
-									</target>
-								</configuration>
-							</execution>
-							<execution>
-								<id>package-app-image-macos</id>
-								<phase>package</phase>
-								<goals>
-									<goal>run</goal>
-								</goals>
-
-								<configuration>
-									<skip>${skipMacosPortable}</skip>
-
-									<target>
-										<exec executable="jpackage"
-											failonerror="true">
-
-											<arg value="--type" />
-											<arg value="app-image" />
-
-											<arg value="--name" />
-											<arg value="${jpackage.name}" />
-
-											<arg value="--vendor" />
-											<arg value="${jpackage.vendor}" />
-
-											<arg value="--app-version" />
-											<arg value="${appVersion}" />
-
-											<arg value="--input" />
-											<arg value="${jpackage.inputDir}" />
-
-											<arg value="--main-jar" />
-											<arg value="${jpackage.inputJar}" />
-
-											<arg value="--dest" />
-											<arg value="${jpackage.outputDir}" />
-
-											<arg value="--add-modules" />
-											<arg value="${jpackage.addModules}" />
-
-											<arg value="--icon" />
-											<arg value="${jpackage.icon}" />
-
-										</exec>
-									</target>
-								</configuration>
-							</execution>
 						</executions>
 					</plugin>
 				</plugins>
 			</build>
 		</profile>
 
+		<!-- Enable native packaging -->
 		<profile>
 			<id>native</id>
 			<properties>
@@ -696,69 +456,80 @@
 			</properties>
 		</profile>
 
+		<!-- Linux installer -->
 		<profile>
 			<id>native-linux</id>
 			<properties>
-				<jpackage.type>deb</jpackage.type>
-				<jpackage.icon>${jpackage.inputDir}/icon.png</jpackage.icon>
-				<jpackage.add>${maven.multiModuleProjectDirectory}/app/linux</jpackage.add>
-				<jpackage.outputDir>${project.build.directory}/dist/linux</jpackage.outputDir>
-				<skipLinuxInstaller>false</skipLinuxInstaller>
+				<conveyor.linux>true</conveyor.linux>
+				<conveyor.linux.type>${conveyor.type}</conveyor.linux.type>
+				<conveyor.machine>linux.amd64.glibc</conveyor.machine>
+				<conveyor.target>debian-package</conveyor.target>
+
+				<conveyor.type>deb</conveyor.type>
+				<conveyor.icon>
+					${maven.multiModuleProjectDirectory}/app/linux/icon.png</conveyor.icon>
 			</properties>
 		</profile>
 
+		<!-- Windows installer -->
 		<profile>
 			<id>native-windows</id>
 			<properties>
-				<jpackage.type>exe</jpackage.type>
-				<jpackage.icon>${jpackage.inputDir}/icon.ico</jpackage.icon>
-				<jpackage.add>${maven.multiModuleProjectDirectory}/app/windows</jpackage.add>
-				<jpackage.outputDir>${project.build.directory}/dist/windows</jpackage.outputDir>
-				<skipWindowsInstaller>false</skipWindowsInstaller>
+				<conveyor.windows>true</conveyor.windows>
+				<conveyor.windows.type>${conveyor.type}</conveyor.windows.type>
+				<conveyor.machine>windows.amd64</conveyor.machine>
+				<conveyor.target>windows-msix</conveyor.target>
+
+				<conveyor.type>exe</conveyor.type>
+				<conveyor.icon>
+					${maven.multiModuleProjectDirectory}/app/windows/icon.ico</conveyor.icon>
 			</properties>
 		</profile>
 
+		<!-- macOS installer -->
 		<profile>
 			<id>native-macos</id>
 			<properties>
-				<jpackage.type>dmg</jpackage.type>
-				<jpackage.icon>${jpackage.inputDir}/icon.icns</jpackage.icon>
-				<jpackage.add>${maven.multiModuleProjectDirectory}/app/macos</jpackage.add>
-				<jpackage.outputDir>${project.build.directory}/dist/macos</jpackage.outputDir>
-				<skipMacosInstaller>false</skipMacosInstaller>
+				<conveyor.macos>true</conveyor.macos>
+				<conveyor.macos.type>${conveyor.type}</conveyor.macos.type>
+				<conveyor.machine>mac.amd64</conveyor.machine>
+				<conveyor.target>mac-app</conveyor.target>
+
+				<conveyor.type>dmg</conveyor.type>
+				<conveyor.icon>
+					${maven.multiModuleProjectDirectory}/app/macos/icon.icns</conveyor.icon>
 			</properties>
 		</profile>
 
+		<!-- Portable builds -->
 		<profile>
 			<id>portable</id>
 			<properties>
-				<jpackage.type>app-image</jpackage.type>
-				<skipLinuxInstaller>true</skipLinuxInstaller>
-				<skipWindowsInstaller>true</skipWindowsInstaller>
-				<skipMacosInstaller>true</skipMacosInstaller>
+				<conveyor.portable>true</conveyor.portable>
 			</properties>
 		</profile>
 
 		<profile>
 			<id>portable-linux</id>
 			<properties>
-				<skipLinuxPortable>false</skipLinuxPortable>
+				<conveyor.linux>true</conveyor.linux>
+				<conveyor.machine>linux.amd64.glibc</conveyor.machine>
 			</properties>
 		</profile>
 
 		<profile>
 			<id>portable-windows</id>
 			<properties>
-				<skipWindowsPortable>false</skipWindowsPortable>
+				<conveyor.windows>true</conveyor.windows>
+				<conveyor.machine>linux.amd64</conveyor.machine>
 			</properties>
 		</profile>
 
 		<profile>
 			<id>portable-macos</id>
 			<properties>
-				<jpackage.type>app-image</jpackage.type>
-				<jpackage.icon>${jpackage.inputDir}/icon.icns</jpackage.icon>
-				<skipMacosPortable>false</skipMacosPortable>
+				<conveyor.macos>true</conveyor.macos>
+				<conveyor.machine>mac.amd64</conveyor.machine>
 			</properties>
 		</profile>
 

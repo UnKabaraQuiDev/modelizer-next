@@ -16,8 +16,9 @@
 
 	<properties>
 		<app.mainClass>lu.kbra.modelizer_next.MNMain</app.mainClass>
-		<jpackage.name>Modelizer Next App</jpackage.name>
-		<jpackage.macos.name>Modelizer Next (Standalone)</jpackage.macos.name>
+		<conveyor.name>Modelizer Next App (Standalone)</conveyor.name>
+		<conveyor.macos.name>Modelizer Next (Standalone)</conveyor.macos.name>
+		<conveyor.internal.name>modelizer-next-app</conveyor.internal.name>
 		<common.scope>provided</common.scope>
 		<portable>false</portable>
 	</properties>

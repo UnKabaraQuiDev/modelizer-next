@@ -16,8 +16,9 @@
 
 	<properties>
 		<app.mainClass>lu.kbra.modelizer_next.bootstrap.BootstrapMain</app.mainClass>
-		<jpackage.name>Modelizer Next</jpackage.name>
-		<jpackage.macos.name>Modelizer Next</jpackage.macos.name>
+		<conveyor.name>Modelizer Next</conveyor.name>
+		<conveyor.internal.name>modelizer-next</conveyor.internal.name>
+		<conveyor.macos.name>Modelizer Next</conveyor.macos.name>
 		<native-module>true</native-module>
 	</properties>
 
@@ -64,10 +65,13 @@
 								<configuration>
 									<target>
 										<exec executable="java">
-											<arg value="-DBootstrapApp.enableUpdate" />
-											<arg value="-DBootstrapApp.forceJarName=modelizer-next-app-${revision}.jar" />
+											<arg
+												value="-DBootstrapApp.enableUpdate" />
+											<arg
+												value="-DBootstrapApp.forceJarName=modelizer-next-app-${revision}.jar" />
 											<arg value="-jar" />
-											<arg value="${project.build.directory}/${project.build.finalName}-with-dependencies.jar" />
+											<arg
+												value="${project.build.directory}/${project.build.finalName}-with-dependencies.jar" />
 										</exec>
 									</target>
 								</configuration>
