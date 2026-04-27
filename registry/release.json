@@ -1,10 +1,10 @@
 {
   "channel": "release",
-  "version": "3-RELEASE-129",
-  "tag": "3-RELEASE-129",
-  "releaseUrl": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/tag/3-RELEASE-129",
-  "assetUrl": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/3-RELEASE-129/modelizer-next-app-3-RELEASE-129.jar",
-  "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/3-RELEASE-129/modelizer-next-app-3-RELEASE-129.jar",
+  "version": "4-RELEASE-162",
+  "tag": "4-RELEASE-162",
+  "releaseUrl": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/tag/4-RELEASE-162",
+  "assetUrl": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/4-RELEASE-162/modelizer-next-app-4-RELEASE-162.jar",
+  "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/4-RELEASE-162/modelizer-next-app-4-RELEASE-162.jar",
   "platforms": [
     "unknown",
     "linux",
@@ -12,8 +12,85 @@
     "windows"
   ],
   "notes": "Latest release build.",
-  "updatedAt": "2026-04-25T15:42:30Z",
+  "updatedAt": "2026-04-27T14:35:24Z",
   "entries": [
+    {
+      "version": "4-RELEASE-162",
+      "tag": "4-RELEASE-162",
+      "releaseUrl": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/tag/4-RELEASE-162",
+      "assetUrl": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/4-RELEASE-162/modelizer-next-app-4-RELEASE-162.jar",
+      "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/4-RELEASE-162/modelizer-next-app-4-RELEASE-162.jar",
+      "platforms": [
+        "unknown",
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "notes": "Latest release build.",
+      "publishedAt": "2026-04-27T14:35:24Z",
+      "assets": [
+        {
+          "name": "modelizer-next-app-4-RELEASE-162.jar",
+          "platform": "unknown",
+          "kind": "app-standalone-jar",
+          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/4-RELEASE-162/modelizer-next-app-4-RELEASE-162.jar"
+        },
+        {
+          "name": "modelizer-next-app-portable-linux-4-RELEASE-162.zip",
+          "platform": "linux",
+          "kind": "app-portable-native",
+          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/4-RELEASE-162/modelizer-next-app-portable-linux-4-RELEASE-162.zip"
+        },
+        {
+          "name": "modelizer-next-app-portable-macos-4-RELEASE-162.zip",
+          "platform": "macos",
+          "kind": "app-portable-native",
+          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/4-RELEASE-162/modelizer-next-app-portable-macos-4-RELEASE-162.zip"
+        },
+        {
+          "name": "modelizer-next-app-portable-windows-4-RELEASE-162.zip",
+          "platform": "windows",
+          "kind": "app-portable-native",
+          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/4-RELEASE-162/modelizer-next-app-portable-windows-4-RELEASE-162.zip"
+        },
+        {
+          "name": "modelizer-next-app-standalone-linux-4-RELEASE-162.deb",
+          "platform": "linux",
+          "kind": "app-standalone-native",
+          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/4-RELEASE-162/modelizer-next-app-standalone-linux-4-RELEASE-162.deb"
+        },
+        {
+          "name": "modelizer-next-app-standalone-macos-4-RELEASE-162.dmg",
+          "platform": "macos",
+          "kind": "app-standalone-native",
+          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/4-RELEASE-162/modelizer-next-app-standalone-macos-4-RELEASE-162.dmg"
+        },
+        {
+          "name": "modelizer-next-app-standalone-windows-4-RELEASE-162.exe",
+          "platform": "windows",
+          "kind": "app-standalone-native",
+          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/4-RELEASE-162/modelizer-next-app-standalone-windows-4-RELEASE-162.exe"
+        },
+        {
+          "name": "modelizer-next-bootstrap-linux-4-RELEASE-162.deb",
+          "platform": "linux",
+          "kind": "bootstrap-native",
+          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/4-RELEASE-162/modelizer-next-bootstrap-linux-4-RELEASE-162.deb"
+        },
+        {
+          "name": "modelizer-next-bootstrap-macos-4-RELEASE-162.dmg",
+          "platform": "macos",
+          "kind": "bootstrap-native",
+          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/4-RELEASE-162/modelizer-next-bootstrap-macos-4-RELEASE-162.dmg"
+        },
+        {
+          "name": "modelizer-next-bootstrap-windows-4-RELEASE-162.exe",
+          "platform": "windows",
+          "kind": "bootstrap-native",
+          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/4-RELEASE-162/modelizer-next-bootstrap-windows-4-RELEASE-162.exe"
+        }
+      ]
+    },
     {
       "version": "3-RELEASE-129",
       "tag": "3-RELEASE-129",
