@@ -18,6 +18,8 @@ public final class BootstrapApp {
 	public static final String APP_FOLDER_NAME = "modelizer-next";
 	public static final String FORCE_JAR_NAME_PROPERTY = BootstrapApp.class.getSimpleName() + ".forceJarName";
 	public static String FORCE_JAR_NAME = System.getProperty(FORCE_JAR_NAME_PROPERTY);
+	public static final String FORCE_BOOTSTRAP_UPDATE_PROPERTY = BootstrapApp.class.getSimpleName() + ".forceBootstrapUpdate";
+	public static boolean FORCE_BOOTSTRAP_UPDATE = Boolean.getBoolean(FORCE_BOOTSTRAP_UPDATE_PROPERTY);
 
 	public static JsonNode JSON;
 
