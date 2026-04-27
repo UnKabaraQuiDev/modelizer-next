@@ -17,6 +17,18 @@ import javax.swing.JOptionPane;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
+import lu.kbra.modelizer_next.bootstrap.config.BootstrapApp;
+import lu.kbra.modelizer_next.bootstrap.config.BootstrapConfiguration;
+import lu.kbra.modelizer_next.bootstrap.remote.RemoteUpdateService;
+import lu.kbra.modelizer_next.bootstrap.selfupdate.BootstrapInstallerLauncher;
+import lu.kbra.modelizer_next.bootstrap.selfupdate.BootstrapInstallerUpdate;
+import lu.kbra.modelizer_next.bootstrap.subapp.AppLaunchException;
+import lu.kbra.modelizer_next.bootstrap.subapp.ApplicationInventory;
+import lu.kbra.modelizer_next.bootstrap.subapp.ApplicationUpdateStorage;
+import lu.kbra.modelizer_next.bootstrap.subapp.InstalledApplication;
+import lu.kbra.modelizer_next.bootstrap.subapp.JarApplicationLauncher;
+import lu.kbra.modelizer_next.bootstrap.ui.BootstrapLoadingFrame;
+import lu.kbra.modelizer_next.common.VersionComparator;
 import lu.kbra.modelizer_next.common.VersionComparator.ParsedVersion;
 
 public class BootstrapRuntime implements UpdateRuntime {
@@ -37,6 +49,7 @@ public class BootstrapRuntime implements UpdateRuntime {
 				new ApplicationInventory(),
 				new RemoteUpdateService(),
 				new JarApplicationLauncher(),
+				new ApplicationUpdateStorage(),
 				BootstrapApp.ENABLE_UPDATE,
 				BootstrapApp.FORCE_JAR_NAME);
 
@@ -117,6 +130,7 @@ public class BootstrapRuntime implements UpdateRuntime {
 	private final ApplicationInventory inventory;
 	private final RemoteUpdateService remoteUpdateService;
 	private final JarApplicationLauncher applicationLauncher;
+	private final ApplicationUpdateStorage updateStorage;
 	private final boolean automaticUpdatesEnabled;
 	private final String forceJarName;
 
@@ -127,12 +141,14 @@ public class BootstrapRuntime implements UpdateRuntime {
 			final ApplicationInventory inventory,
 			final RemoteUpdateService remoteUpdateService,
 			final JarApplicationLauncher applicationLauncher,
+			final ApplicationUpdateStorage updateStorage,
 			final boolean automaticUpdatesEnabled,
 			final String forceJarName) {
 		this.configuration = configuration;
 		this.inventory = inventory;
 		this.remoteUpdateService = remoteUpdateService;
 		this.applicationLauncher = applicationLauncher;
+		this.updateStorage = updateStorage;
 		this.automaticUpdatesEnabled = automaticUpdatesEnabled;
 		this.forceJarName = forceJarName;
 	}
@@ -147,6 +163,26 @@ public class BootstrapRuntime implements UpdateRuntime {
 			Thread.currentThread().interrupt();
 			throw new IOException("Interrupted while checking for updates.", ex);
 		}
+	}
+
+	@Override
+	public long getInstalledUpdatesDiskUsageBytes() throws IOException {
+		return this.updateStorage.calculateDiskUsageBytes();
+	}
+
+	@Override
+	public int getInstalledUpdatesFileCount() throws IOException {
+		return this.updateStorage.countFiles();
+	}
+
+	@Override
+	public Path getInstalledUpdatesDirectory() {
+		return this.updateStorage.getUpdatesDirectory();
+	}
+
+	@Override
+	public long freeUnusedInstalledUpdates() throws IOException {
+		return this.updateStorage.freeUnusedUpdates(this.configuration.getUpdateChannel(), this.currentApplication);
 	}
 
 	@Override
@@ -241,6 +277,7 @@ public class BootstrapRuntime implements UpdateRuntime {
 				this.currentApplication = this.inventory.install(bootstrapInstall, loadingFrame::update);
 			} else if (this.automaticUpdatesEnabled && this.configuration.isAutoCheckUpdates()) {
 				try {
+					this.promptForBootstrapReinstallIfRequired();
 					final AvailableUpdate update = this.remoteUpdateService.findLatest(this.configuration.getUpdateChannel(),
 							this.currentApplication.version());
 					if (update.isUpdateAvailable()) {
@@ -268,6 +305,29 @@ public class BootstrapRuntime implements UpdateRuntime {
 		}
 	}
 
+	private void promptForBootstrapReinstallIfRequired() throws Exception {
+		final RemoteUpdateService.UpdateManifest manifest = this.remoteUpdateService.fetchManifest();
+		if (manifest.bootstrapVersion == null) {
+			return;
+		}
+		final ParsedVersion currentBootstrapVersion = VersionComparator.parse(BootstrapApp.VERSION);
+		if (VersionComparator.PARSED_COMPARATOR.compare(manifest.bootstrapVersion, currentBootstrapVersion) <= 0) {
+			return;
+		}
+
+		final int choice = JOptionPane.showConfirmDialog(null,
+				"This app version needs a newer bootstrap install.\n\n"
+						+ "Required bootstrap version: " + manifest.bootstrapVersion + "\n"
+						+ "Current bootstrap version: " + currentBootstrapVersion + "\n\n"
+						+ "Update the bootstrap now?",
+				"Bootstrap update required",
+				JOptionPane.YES_NO_OPTION,
+				JOptionPane.WARNING_MESSAGE);
+		if (choice == JOptionPane.YES_OPTION) {
+			this.handleOutdatedBootstrapLauncher(null);
+		}
+	}
+
 	private void handleOutdatedBootstrapLauncher(final AppLaunchException launchException) throws Exception {
 		final ParsedVersion currentBootstrapVersion = lu.kbra.modelizer_next.common.VersionComparator.parse(BootstrapApp.VERSION);
 		final BootstrapLoadingFrame loadingFrame = new BootstrapLoadingFrame();
@@ -280,7 +340,7 @@ public class BootstrapRuntime implements UpdateRuntime {
 				throw new AppLaunchException("The application needs a newer bootstrap launcher, but no bootstrap update is available.",
 						launchException);
 			}
-			if (update.platform() == BootstrapInstallerUpdate.Platform.UNSUPPORTED) {
+			if (update.platform() == lu.kbra.modelizer_next.common.Platform.UNSUPPORTED) {
 				throw new AppLaunchException("The application needs a newer bootstrap launcher, but this platform is not supported.",
 						launchException);
 			}
@@ -288,7 +348,7 @@ public class BootstrapRuntime implements UpdateRuntime {
 			final String safeVersion = update.latestVersion().toString().replaceAll("[^A-Za-z0-9._-]", "_");
 			final Path installerPath = BootstrapApp.getTempDirectory()
 					.toPath()
-					.resolve("modelizer-next-bootstrap-" + safeVersion + update.platform().extension());
+					.resolve("modelizer-next-bootstrap-" + safeVersion + update.platform().installerExtension());
 			this.remoteUpdateService
 					.download(update.installerUri(), installerPath, update.latestVersion().toString(), loadingFrame::update);
 			loadingFrame.dispose();

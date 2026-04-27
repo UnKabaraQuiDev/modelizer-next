@@ -2,6 +2,7 @@ package lu.kbra.modelizer_next.bootstrap;
 
 import java.awt.Component;
 import java.io.IOException;
+import java.nio.file.Path;
 
 public class AbstractBootstrapRuntime {
 
@@ -25,6 +26,22 @@ public class AbstractBootstrapRuntime {
 
 	public AvailableUpdate checkForUpdates() throws IOException {
 		return new AvailableUpdate(UpdateChannel.RELEASE, null, null, null, null, null);
+	}
+
+	public long getInstalledUpdatesDiskUsageBytes() throws IOException {
+		return 0L;
+	}
+
+	public int getInstalledUpdatesFileCount() throws IOException {
+		return 0;
+	}
+
+	public Path getInstalledUpdatesDirectory() {
+		return null;
+	}
+
+	public long freeUnusedInstalledUpdates() throws IOException {
+		return 0L;
 	}
 
 	public String getCurrentApplicationVersion() {

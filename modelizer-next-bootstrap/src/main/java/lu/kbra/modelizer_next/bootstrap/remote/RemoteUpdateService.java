@@ -1,4 +1,4 @@
-package lu.kbra.modelizer_next.bootstrap;
+package lu.kbra.modelizer_next.bootstrap.remote;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -10,23 +10,29 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
-import java.util.Locale;
 import java.util.Objects;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
+import lu.kbra.modelizer_next.bootstrap.AvailableUpdate;
+import lu.kbra.modelizer_next.bootstrap.ProgressListener;
+import lu.kbra.modelizer_next.bootstrap.UpdateChannel;
+import lu.kbra.modelizer_next.bootstrap.config.BootstrapApp;
+import lu.kbra.modelizer_next.bootstrap.selfupdate.BootstrapInstallerUpdate;
 import lu.kbra.modelizer_next.common.ChannelComparator;
+import lu.kbra.modelizer_next.common.Platform;
 import lu.kbra.modelizer_next.common.VersionComparator;
 import lu.kbra.modelizer_next.common.VersionComparator.ParsedVersion;
 
-final class RemoteUpdateService {
+public final class RemoteUpdateService {
 
-	static final class UpdateManifest {
+	public static final class UpdateManifest {
 		public UpdateRelease release;
 		public UpdateRelease snapshot;
 		public UpdateRelease nightly;
+		public ParsedVersion bootstrapVersion;
 
-		UpdateRelease channel(final UpdateChannel channel) {
+		public UpdateRelease channel(final UpdateChannel channel) {
 			return switch (channel) {
 			case RELEASE -> this.release;
 			case SNAPSHOT -> this.snapshot;
@@ -35,14 +41,14 @@ final class RemoteUpdateService {
 		}
 	}
 
-	static final class UpdateRelease {
+	public static final class UpdateRelease {
 		public ParsedVersion version;
 		public String url;
 		public String releaseUrl;
 		public String notes;
 		public String tag;
 
-		String releaseUrlOrDefault() {
+		public String releaseUrlOrDefault() {
 			return this.releaseUrl == null || this.releaseUrl.isBlank() ? BootstrapApp.RELEASES_URL : this.releaseUrl;
 		}
 	}
@@ -52,14 +58,14 @@ final class RemoteUpdateService {
 			.followRedirects(HttpClient.Redirect.NORMAL)
 			.build();
 
-	void download(final AvailableUpdate update, final Path destination, final ProgressListener listener) throws IOException {
+	public void download(final AvailableUpdate update, final Path destination, final ProgressListener listener) throws IOException {
 		if (update == null || update.downloadUri() == null) {
 			throw new IOException("No downloadable update is available.");
 		}
 		this.download(update.downloadUri(), destination, update.latestVersion().toString(), listener);
 	}
 
-	void download(final URI downloadUri, final Path destination, final String displayVersion, final ProgressListener listener)
+	public void download(final URI downloadUri, final Path destination, final String displayVersion, final ProgressListener listener)
 			throws IOException {
 		if (downloadUri == null) {
 			throw new IOException("No downloadable update is available.");
@@ -99,7 +105,7 @@ final class RemoteUpdateService {
 		}
 	}
 
-	BootstrapInstallerUpdate findLatestBootstrapInstaller(final UpdateChannel channel, final ParsedVersion currentVersion)
+	public BootstrapInstallerUpdate findLatestBootstrapInstaller(final UpdateChannel channel, final ParsedVersion currentVersion)
 			throws IOException, InterruptedException {
 		final JsonNode manifest = this.fetchReleaseManifestJson();
 		final JsonNode bootstrap = this.findBootstrapNode(manifest, channel);
@@ -108,11 +114,11 @@ final class RemoteUpdateService {
 					currentVersion,
 					null,
 					URI.create(BootstrapApp.RELEASES_URL),
-					BootstrapInstallerUpdate.Platform.UNSUPPORTED);
+					Platform.UNSUPPORTED);
 		}
 
 		final String versionText = bootstrap.path("version").asText();
-		final BootstrapInstallerUpdate.Platform platform = this.detectPlatform();
+		final Platform platform = this.detectPlatform();
 		final URI installerUri = this.findInstallerUri(bootstrap, platform);
 		URI releasePageUri;
 		try {
@@ -127,11 +133,11 @@ final class RemoteUpdateService {
 				platform);
 	}
 
-	UpdateManifest fetchManifest() throws IOException, InterruptedException {
+	public UpdateManifest fetchManifest() throws IOException, InterruptedException {
 		return BootstrapApp.MAPPER.treeToValue(this.fetchManifestJson(), UpdateManifest.class);
 	}
 
-	JsonNode fetchReleaseManifestJson() throws IOException, InterruptedException {
+	public JsonNode fetchReleaseManifestJson() throws IOException, InterruptedException {
 		final HttpRequest request = HttpRequest.newBuilder(URI.create(BootstrapApp.RELEASES_MANIFEST_URL))
 				.header("Accept", "application/json")
 				.header("User-Agent", BootstrapApp.NAME + "/" + BootstrapApp.VERSION)
@@ -146,7 +152,7 @@ final class RemoteUpdateService {
 		return BootstrapApp.MAPPER.readTree(response.body());
 	}
 
-	JsonNode fetchManifestJson() throws IOException, InterruptedException {
+	public JsonNode fetchManifestJson() throws IOException, InterruptedException {
 		final HttpRequest request = HttpRequest.newBuilder(URI.create(BootstrapApp.UPDATES_MANIFEST_URL))
 				.header("Accept", "application/json")
 				.header("User-Agent", BootstrapApp.NAME + "/" + BootstrapApp.VERSION)
@@ -161,7 +167,7 @@ final class RemoteUpdateService {
 		return BootstrapApp.MAPPER.readTree(response.body());
 	}
 
-	AvailableUpdate findLatest(final UpdateChannel channel, final ParsedVersion currentVersion) throws IOException, InterruptedException {
+	public AvailableUpdate findLatest(final UpdateChannel channel, final ParsedVersion currentVersion) throws IOException, InterruptedException {
 		final UpdateManifest manifest = this.fetchManifest();
 		final UpdateRelease release = manifest.channel(channel);
 		if (release == null || release.version == null || release.url == null || release.url.isBlank()) {
@@ -186,23 +192,13 @@ final class RemoteUpdateService {
 				URI.create(release.releaseUrlOrDefault()));
 	}
 
-	private BootstrapInstallerUpdate.Platform detectPlatform() {
-		final String os = System.getProperty("os.name", "").toLowerCase(Locale.ROOT);
-		if (os.contains("win")) {
-			return BootstrapInstallerUpdate.Platform.WINDOWS;
-		}
-		if (os.contains("mac") || os.contains("darwin")) {
-			return BootstrapInstallerUpdate.Platform.MACOS;
-		}
-		if (os.contains("linux")) {
-			return BootstrapInstallerUpdate.Platform.LINUX;
-		}
-		return BootstrapInstallerUpdate.Platform.UNSUPPORTED;
+	private Platform detectPlatform() {
+		return Platform.get();
 	}
 
 	private JsonNode findBootstrapNode(final JsonNode manifest, final UpdateChannel channel) {
 		final String latest = manifest.path("version").asText();
-		final BootstrapInstallerUpdate.Platform platform = this.detectPlatform();
+		final Platform platform = this.detectPlatform();
 		final JsonNode entries = manifest.path("entries");
 		if (entries.isArray()) {
 			for (final JsonNode entry : entries) {
@@ -214,13 +210,13 @@ final class RemoteUpdateService {
 		return null;
 	}
 
-	private URI findInstallerUri(final JsonNode bootstrap, final BootstrapInstallerUpdate.Platform platform) {
+	private URI findInstallerUri(final JsonNode bootstrap, final Platform platform) {
 		final JsonNode assets = bootstrap.path("assets");
-		if (platform == BootstrapInstallerUpdate.Platform.UNSUPPORTED || assets == null || assets.isMissingNode() || !assets.isArray()) {
+		if (platform == Platform.UNSUPPORTED || assets == null || assets.isMissingNode() || !assets.isArray()) {
 			return null;
 		}
 		for (JsonNode node : assets) {
-			if (node.path("platform").asText().equals(platform.name().toLowerCase())
+			if (node.path("platform").asText().equals(platform.manifestKey())
 					&& "bootstrap-native".equals(node.path("kind").asText())) {
 				try {
 					return URI.create(node.path("url").asText());

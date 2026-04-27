@@ -1,4 +1,4 @@
-package lu.kbra.modelizer_next.bootstrap;
+package lu.kbra.modelizer_next.bootstrap.subapp;
 
 import java.io.File;
 import java.lang.reflect.Method;
@@ -6,11 +6,13 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Queue;
 
-final class JarApplicationLauncher {
+import lu.kbra.modelizer_next.bootstrap.AppMain;
+
+public final class JarApplicationLauncher {
 
 	private URLClassLoader activeLoader;
 
-	void launch(final String[] args, final Queue<File> toBeOpened, final InstalledApplication application) throws AppLaunchException {
+	public void launch(final String[] args, final Queue<File> toBeOpened, final InstalledApplication application) throws AppLaunchException {
 		if (application == null) {
 			throw new AppLaunchException("No installed application is available.");
 		}

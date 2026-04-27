@@ -1,15 +1,15 @@
-package lu.kbra.modelizer_next.bootstrap;
+package lu.kbra.modelizer_next.bootstrap.selfupdate;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-final class BootstrapVersionComparator implements Comparator<String> {
+public final class BootstrapVersionComparator implements Comparator<String> {
 
 	private record ParsedVersion(List<Integer> numbers, int type, int date) {
 	}
 
-	static final BootstrapVersionComparator COMPARATOR = new BootstrapVersionComparator();
+	public static final BootstrapVersionComparator COMPARATOR = new BootstrapVersionComparator();
 
 	@Override
 	public int compare(final String left, final String right) {

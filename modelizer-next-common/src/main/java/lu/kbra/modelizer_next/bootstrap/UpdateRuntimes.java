@@ -2,6 +2,7 @@ package lu.kbra.modelizer_next.bootstrap;
 
 import java.awt.Component;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.Objects;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -15,6 +16,26 @@ public final class UpdateRuntimes {
 		@Override
 		public AvailableUpdate checkForUpdates() throws IOException {
 			return new AvailableUpdate(UpdateChannel.RELEASE, null, null, null, null, null);
+		}
+
+		@Override
+		public long getInstalledUpdatesDiskUsageBytes() throws IOException {
+			return 0L;
+		}
+
+		@Override
+		public int getInstalledUpdatesFileCount() throws IOException {
+			return 0;
+		}
+
+		@Override
+		public Path getInstalledUpdatesDirectory() {
+			return null;
+		}
+
+		@Override
+		public long freeUnusedInstalledUpdates() throws IOException {
+			return 0L;
 		}
 
 		@Override

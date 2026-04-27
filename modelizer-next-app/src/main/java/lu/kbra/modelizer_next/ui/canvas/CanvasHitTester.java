@@ -20,19 +20,10 @@ import lu.kbra.modelizer_next.ui.canvas.datastruct.HitResult;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.LinkGeometry;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectedElement;
 
-final class CanvasHitTester {
+interface CanvasHitTester extends DiagramCanvasExt {
 
-	private final DiagramCanvasModuleRegistry registry;
-	private final DiagramCanvas canvas;
-
-	CanvasHitTester(final DiagramCanvasModuleRegistry registry, final DiagramCanvas canvas) {
-		this.registry = Objects.requireNonNull(registry, "registry");
-		this.canvas = Objects.requireNonNull(canvas, "canvas");
-		this.registry.setCanvasHitTester(this);
-	}
-
-	FieldHitResult findFieldHit(final ClassModel classModel, final Rectangle2D classBounds, final Point2D.Double worldPoint) {
-		final List<FieldModel> visibleFields = this.canvas.getVisibleFields(classModel);
+	default FieldHitResult findFieldHit(final ClassModel classModel, final Rectangle2D classBounds, final Point2D.Double worldPoint) {
+		final List<FieldModel> visibleFields = getCanvas().getVisibleFields(classModel);
 
 		for (int i = 0; i < visibleFields.size(); i++) {
 			final Rectangle2D fieldBounds = new Rectangle2D.Double(classBounds.getX(),
@@ -48,55 +39,55 @@ final class CanvasHitTester {
 		return null;
 	}
 
-	HitResult findTopmostHit(final Point2D.Double worldPoint) {
+	default HitResult findTopmostHit(final Point2D.Double worldPoint) {
 		final BufferedImage image = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
 		final Graphics2D g2 = image.createGraphics();
 		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 
 		try {
-			for (int i = this.canvas.getActiveLinks().size() - 1; i >= 0; i--) {
-				final LinkModel linkModel = this.canvas.getActiveLinks().get(i);
-				final LinkGeometry geometry = this.canvas.resolveLinkGeometry(g2, linkModel);
+			for (int i = getCanvas().getActiveLinks().size() - 1; i >= 0; i--) {
+				final LinkModel linkModel = getCanvas().getActiveLinks().get(i);
+				final LinkGeometry geometry = getCanvas().resolveLinkGeometry(g2, linkModel);
 
-				if (geometry != null && this.canvas.isPointNearGeometry(worldPoint, geometry)) {
+				if (geometry != null && getCanvas().isPointNearGeometry(worldPoint, geometry)) {
 					return new HitResult(null,
 							new Rectangle2D.Double(worldPoint.getX(), worldPoint.getY(), 1, 1),
 							SelectedElement.forLink(linkModel.getId()));
 				}
 			}
 
-			for (int i = this.canvas.document.getModel().getComments().size() - 1; i >= 0; i--) {
-				final CommentModel commentModel = this.canvas.document.getModel().getComments().get(i);
-				final String text = this.canvas.resolveCommentText(commentModel);
+			for (int i = getCanvas().document.getModel().getComments().size() - 1; i >= 0; i--) {
+				final CommentModel commentModel = getCanvas().document.getModel().getComments().get(i);
+				final String text = getCanvas().resolveCommentText(commentModel);
 
-				if (text == null || text.isBlank() || !this.canvas.isCommentVisible(commentModel)) {
+				if (text == null || text.isBlank() || !getCanvas().isCommentVisible(commentModel)) {
 					continue;
 				}
 
-				final NodeLayout layout = this.canvas.findOrCreateNodeLayout(LayoutObjectType.COMMENT, commentModel.getId());
-				final Rectangle2D bounds = this.canvas.computeCommentBounds(g2, text, layout);
+				final NodeLayout layout = getCanvas().findOrCreateNodeLayout(LayoutObjectType.COMMENT, commentModel.getId());
+				final Rectangle2D bounds = getCanvas().computeCommentBounds(g2, text, layout);
 
 				if (bounds.contains(worldPoint.getX(), worldPoint.getY())) {
 					return new HitResult(layout, bounds, SelectedElement.forComment(commentModel.getId()));
 				}
 			}
 
-			for (int i = this.canvas.document.getModel().getClasses().size() - 1; i >= 0; i--) {
-				final ClassModel classModel = this.canvas.document.getModel().getClasses().get(i);
-				if (!this.canvas.isVisible(classModel)) {
+			for (int i = getCanvas().document.getModel().getClasses().size() - 1; i >= 0; i--) {
+				final ClassModel classModel = getCanvas().document.getModel().getClasses().get(i);
+				if (!getCanvas().isVisible(classModel)) {
 					continue;
 				}
 
-				final NodeLayout layout = this.canvas
-						.resolveRenderLayout(this.canvas.findOrCreateNodeLayout(LayoutObjectType.CLASS, classModel.getId()));
-				final Rectangle2D bounds = this.canvas.computeClassBounds(g2, classModel, layout);
+				final NodeLayout layout = getCanvas()
+						.resolveRenderLayout(getCanvas().findOrCreateNodeLayout(LayoutObjectType.CLASS, classModel.getId()));
+				final Rectangle2D bounds = getCanvas().computeClassBounds(g2, classModel, layout);
 
 				if (!bounds.contains(worldPoint.getX(), worldPoint.getY())) {
 					continue;
 				}
 
-				final FieldHitResult fieldHitResult = this.canvas.findFieldHit(classModel, bounds, worldPoint);
+				final FieldHitResult fieldHitResult = getCanvas().findFieldHit(classModel, bounds, worldPoint);
 				if (fieldHitResult != null) {
 					return new HitResult(layout,
 							fieldHitResult.bounds(),
@@ -112,12 +103,12 @@ final class CanvasHitTester {
 		return null;
 	}
 
-	boolean isInCommentResizeHandle(final Rectangle2D bounds, final Point2D.Double worldPoint) {
+	default boolean isInCommentResizeHandle(final Rectangle2D bounds, final Point2D.Double worldPoint) {
 		return worldPoint.getX() >= bounds.getMaxX() - DiagramCanvas.COMMENT_RESIZE_HANDLE_SIZE
 				&& worldPoint.getY() >= bounds.getMaxY() - DiagramCanvas.COMMENT_RESIZE_HANDLE_SIZE;
 	}
 
-	boolean isPointNearGeometry(final Point2D.Double worldPoint, final LinkGeometry geometry) {
+	default boolean isPointNearGeometry(final Point2D.Double worldPoint, final LinkGeometry geometry) {
 		for (int i = 0; i < geometry.points().size() - 1; i++) {
 			final Point2D first = geometry.points().get(i);
 			final Point2D second = geometry.points().get(i + 1);
@@ -134,4 +125,5 @@ final class CanvasHitTester {
 
 		return false;
 	}
+
 }

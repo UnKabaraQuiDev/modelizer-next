@@ -3,6 +3,7 @@ package lu.kbra.modelizer_next.ui.canvas;
 import java.awt.event.MouseEvent;
 import java.util.Objects;
 
+import lu.kbra.modelizer_next.document.ModelDocument;
 import lu.kbra.modelizer_next.domain.ClassModel;
 import lu.kbra.modelizer_next.domain.CommentModel;
 import lu.kbra.modelizer_next.domain.LinkModel;
@@ -10,46 +11,37 @@ import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectedElement;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectionInfo;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.StylePreviewType;
 
-final class SelectionController {
+interface SelectionController extends DiagramCanvasExt {
 
-	private final DiagramCanvasModuleRegistry registry;
-	private final DiagramCanvas canvas;
-
-	SelectionController(final DiagramCanvasModuleRegistry registry, final DiagramCanvas canvas) {
-		this.registry = Objects.requireNonNull(registry, "registry");
-		this.canvas = Objects.requireNonNull(canvas, "canvas");
-		this.registry.setSelectionController(this);
-	}
-
-	void addToSelection(final SelectedElement element) {
+	default void addToSelection(final SelectedElement element) {
 		if (element == null) {
 			return;
 		}
 
-		this.registry.document().getModel().getClasses().sort(this.canvas.comparator);
-		this.canvas.selectedElements.add(element);
-		this.canvas.selectedElement = element;
-		this.canvas.notifySelectionChanged();
-		this.canvas.repaint();
+		getDocument().getModel().getClasses().sort(getCanvas().comparator);
+		getCanvas().selectedElements.add(element);
+		getCanvas().selectedElement = element;
+		getCanvas().notifySelectionChanged();
+		getCanvas().repaint();
 	}
 
-	void clearSelection() {
-		this.canvas.selectedElements.clear();
-		this.canvas.selectedElement = null;
-		this.canvas.notifySelectionChanged();
-		this.canvas.repaint();
+	default void clearSelection() {
+		getCanvas().selectedElements.clear();
+		getCanvas().selectedElement = null;
+		getCanvas().notifySelectionChanged();
+		getCanvas().repaint();
 	}
 
-	SelectionInfo getSelectionInfo() {
-		return new SelectionInfo(this.registry.panelType(), this.canvas.buildSelectionPath());
+	default SelectionInfo getSelectionInfo() {
+		return new SelectionInfo(getPanelType(), getCanvas().buildSelectionPath());
 	}
 
-	StylePreviewType getStylePreviewType() {
-		if (this.canvas.selectedElement == null) {
+	default StylePreviewType getStylePreviewType() {
+		if (getCanvas().selectedElement == null) {
 			return StylePreviewType.NONE;
 		}
 
-		return switch (this.canvas.selectedElement.type()) {
+		return switch (getCanvas().selectedElement.type()) {
 		case CLASS -> StylePreviewType.CLASS;
 		case FIELD -> StylePreviewType.FIELD;
 		case COMMENT -> StylePreviewType.COMMENT;
@@ -58,83 +50,83 @@ final class SelectionController {
 		};
 	}
 
-	boolean hasSelection() {
-		return !this.canvas.selectedElements.isEmpty();
+	default boolean hasSelection() {
+		return !getCanvas().selectedElements.isEmpty();
 	}
 
-	boolean isClassSelected(final String classId) {
-		return !this.canvas.suppressSelectionDecorations && this.canvas.selectedElements.contains(SelectedElement.forClass(classId));
+	default boolean isClassSelected(final String classId) {
+		return !getCanvas().suppressSelectionDecorations && getCanvas().selectedElements.contains(SelectedElement.forClass(classId));
 	}
 
-	boolean isCommentSelected(final String commentId) {
-		return !this.canvas.suppressSelectionDecorations && this.canvas.selectedElements.contains(SelectedElement.forComment(commentId));
+	default boolean isCommentSelected(final String commentId) {
+		return !getCanvas().suppressSelectionDecorations && getCanvas().selectedElements.contains(SelectedElement.forComment(commentId));
 	}
 
-	boolean isElementSelected(final SelectedElement element) {
-		return element != null && this.canvas.selectedElements.contains(element);
+	default boolean isElementSelected(final SelectedElement element) {
+		return element != null && getCanvas().selectedElements.contains(element);
 	}
 
-	boolean isFieldSelected(final String classId, final String fieldId) {
-		return !this.canvas.suppressSelectionDecorations
-				&& this.canvas.selectedElements.contains(SelectedElement.forField(classId, fieldId));
+	default boolean isFieldSelected(final String classId, final String fieldId) {
+		return !getCanvas().suppressSelectionDecorations
+				&& getCanvas().selectedElements.contains(SelectedElement.forField(classId, fieldId));
 	}
 
-	boolean isLinkSelected(final String linkId) {
-		return !this.canvas.suppressSelectionDecorations && this.canvas.selectedElements.contains(SelectedElement.forLink(linkId));
+	default boolean isLinkSelected(final String linkId) {
+		return !getCanvas().suppressSelectionDecorations && getCanvas().selectedElements.contains(SelectedElement.forLink(linkId));
 	}
 
-	void removeFromSelection(final SelectedElement element) {
+	default void removeFromSelection(final SelectedElement element) {
 		if (element == null) {
 			return;
 		}
 
-		this.canvas.selectedElements.remove(element);
+		getCanvas().selectedElements.remove(element);
 
-		if (Objects.equals(this.canvas.selectedElement, element)) {
-			this.canvas.selectedElement = this.canvas.selectedElements.isEmpty() ? null : this.canvas.selectedElements.getLast();
+		if (Objects.equals(getCanvas().selectedElement, element)) {
+			getCanvas().selectedElement = getCanvas().selectedElements.isEmpty() ? null : getCanvas().selectedElements.getLast();
 		}
 
-		this.canvas.notifySelectionChanged();
-		this.canvas.repaint();
+		getCanvas().notifySelectionChanged();
+		getCanvas().repaint();
 	}
 
-	void select(final SelectedElement element) {
-		this.canvas.selectedElements.clear();
+	default void select(final SelectedElement element) {
+		getCanvas().selectedElements.clear();
 		if (element != null) {
-			this.canvas.selectedElements.add(element);
+			getCanvas().selectedElements.add(element);
 		}
-		this.registry.document().getModel().getClasses().sort(this.canvas.comparator);
-		this.canvas.selectedElement = element;
-		this.canvas.notifySelectionChanged();
-		this.canvas.repaint();
+		getDocument().getModel().getClasses().sort(getCanvas().comparator);
+		getCanvas().selectedElement = element;
+		getCanvas().notifySelectionChanged();
+		getCanvas().repaint();
 	}
 
-	void selectAll() {
-		this.canvas.selectedElements.clear();
+	default void selectAll() {
+		getCanvas().selectedElements.clear();
 
-		for (final ClassModel classModel : this.registry.document().getModel().getClasses()) {
-			if (this.canvas.isVisible(classModel)) {
-				this.canvas.selectedElements.add(SelectedElement.forClass(classModel.getId()));
+		for (final ClassModel classModel : getDocument().getModel().getClasses()) {
+			if (getCanvas().isVisible(classModel)) {
+				getCanvas().selectedElements.add(SelectedElement.forClass(classModel.getId()));
 			}
 		}
 
-		for (final CommentModel commentModel : this.registry.document().getModel().getComments()) {
-			final String text = this.canvas.resolveCommentText(commentModel);
-			if (this.canvas.isCommentVisible(commentModel) && text != null && !text.isBlank()) {
-				this.canvas.selectedElements.add(SelectedElement.forComment(commentModel.getId()));
+		for (final CommentModel commentModel : getDocument().getModel().getComments()) {
+			final String text = getCanvas().resolveCommentText(commentModel);
+			if (getCanvas().isCommentVisible(commentModel) && text != null && !text.isBlank()) {
+				getCanvas().selectedElements.add(SelectedElement.forComment(commentModel.getId()));
 			}
 		}
 
-		for (final LinkModel linkModel : this.canvas.getActiveLinks()) {
-			this.canvas.selectedElements.add(SelectedElement.forLink(linkModel.getId()));
+		for (final LinkModel linkModel : getCanvas().getActiveLinks()) {
+			getCanvas().selectedElements.add(SelectedElement.forLink(linkModel.getId()));
 		}
 
-		this.canvas.selectedElement = this.canvas.selectedElements.isEmpty() ? null : this.canvas.selectedElements.getLast();
-		this.canvas.notifySelectionChanged();
-		this.canvas.repaint();
+		getCanvas().selectedElement = getCanvas().selectedElements.isEmpty() ? null : getCanvas().selectedElements.getLast();
+		getCanvas().notifySelectionChanged();
+		getCanvas().repaint();
 	}
 
-	void updateSelectionFromMouse(final SelectedElement element, final MouseEvent event) {
+	default void updateSelectionFromMouse(final SelectedElement element, final MouseEvent event) {
 		if (element == null) {
 			if (!event.isShiftDown() && !event.isControlDown()) {
 				this.clearSelection();
@@ -154,4 +146,5 @@ final class SelectionController {
 
 		this.select(element);
 	}
+
 }

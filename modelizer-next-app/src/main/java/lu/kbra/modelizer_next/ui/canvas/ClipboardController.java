@@ -31,23 +31,14 @@ import lu.kbra.modelizer_next.ui.canvas.datastruct.CopiedLink;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectedElement;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectedType;
 
-final class ClipboardController {
+interface ClipboardController extends DiagramCanvasExt {
 
-	private final DiagramCanvasModuleRegistry registry;
-	private final DiagramCanvas canvas;
-
-	ClipboardController(final DiagramCanvasModuleRegistry registry, final DiagramCanvas canvas) {
-		this.registry = Objects.requireNonNull(registry, "registry");
-		this.canvas = Objects.requireNonNull(canvas, "canvas");
-		this.registry.setClipboardController(this);
-	}
-
-	void copySelection() {
-		if (this.canvas.selectedElements.isEmpty()) {
+	default void copySelection() {
+		if (getCanvas().selectedElements.isEmpty()) {
 			return;
 		}
 
-		final List<SelectedElement> snapshot = new ArrayList<>(this.canvas.selectedElements);
+		final List<SelectedElement> snapshot = new ArrayList<>(getCanvas().selectedElements);
 
 		final Set<String> selectedClassIds = new LinkedHashSet<>();
 		final Set<String> selectedFieldIds = new LinkedHashSet<>();
@@ -82,7 +73,7 @@ final class ClipboardController {
 		final Set<String> copiedFieldIds = new HashSet<>();
 
 		for (final String classId : selectedClassIds) {
-			final ClassModel classModel = this.canvas.findClassById(classId);
+			final ClassModel classModel = getCanvas().findClassById(classId);
 			if (classModel == null) {
 				continue;
 			}
@@ -91,27 +82,27 @@ final class ClipboardController {
 				copiedFieldIds.add(fieldModel.getId());
 			}
 
-			copiedClasses.add(this.canvas.captureClass(classModel));
+			copiedClasses.add(getCanvas().captureClass(classModel));
 		}
 
 		for (final String fieldId : selectedFieldIds) {
-			final ClassModel owner = this.canvas.findOwnerClassOfField(fieldId);
+			final ClassModel owner = getCanvas().findOwnerClassOfField(fieldId);
 			if (owner == null) {
 				continue;
 			}
 
-			final FieldModel fieldModel = this.canvas.findFieldById(owner.getId(), fieldId);
+			final FieldModel fieldModel = getCanvas().findFieldById(owner.getId(), fieldId);
 			if (fieldModel == null) {
 				continue;
 			}
 
 			copiedFieldIds.add(fieldModel.getId());
-			copiedFields.add(this.canvas.captureField(owner.getId(), fieldModel));
+			copiedFields.add(getCanvas().captureField(owner.getId(), fieldModel));
 		}
 
 		final Set<String> linksToCopy = new LinkedHashSet<>(selectedLinkIds);
 
-		for (final LinkModel linkModel : this.canvas.getActiveLinks()) {
+		for (final LinkModel linkModel : getCanvas().getActiveLinks()) {
 			if (linkModel == null || linkModel.getFrom() == null || linkModel.getTo() == null) {
 				continue;
 			}
@@ -129,40 +120,40 @@ final class ClipboardController {
 		}
 
 		for (final String linkId : linksToCopy) {
-			final LinkModel linkModel = this.canvas.findLinkById(linkId);
+			final LinkModel linkModel = getCanvas().findLinkById(linkId);
 			if (linkModel != null) {
-				copiedLinks.add(this.canvas.captureLink(linkModel));
+				copiedLinks.add(getCanvas().captureLink(linkModel));
 			}
 		}
 
 		for (final String commentId : selectedCommentIds) {
-			final CommentModel commentModel = this.canvas.findCommentById(commentId);
+			final CommentModel commentModel = getCanvas().findCommentById(commentId);
 			if (commentModel != null) {
-				copiedComments.add(this.canvas.captureComment(commentModel));
+				copiedComments.add(getCanvas().captureComment(commentModel));
 			}
 		}
 
-		DiagramCanvas.clipboardSnapshot = new ClipboardSnapshot(this.canvas.panelType,
+		DiagramCanvas.clipboardSnapshot = new ClipboardSnapshot(getCanvas().panelType,
 				List.copyOf(copiedClasses),
 				List.copyOf(copiedFields),
 				List.copyOf(copiedComments),
 				List.copyOf(copiedLinks));
 	}
 
-	void cutSelection() {
+	default void cutSelection() {
 		this.copySelection();
-		this.canvas.deleteSelection();
+		getCanvas().deleteSelection();
 	}
 
-	void duplicateSelection() {
-		if (this.canvas.selectedElements.isEmpty()) {
+	default void duplicateSelection() {
+		if (getCanvas().selectedElements.isEmpty()) {
 			return;
 		}
 
-		final List<SelectedElement> snapshot = new ArrayList<>(this.canvas.selectedElements);
+		final List<SelectedElement> snapshot = new ArrayList<>(getCanvas().selectedElements);
 
-		final Rectangle2D.Double selectionBounds = this.canvas.computeSelectionBounds(snapshot);
-		final Point2D.Double duplicateTarget = this.canvas.mouseWorldOrViewportCenter();
+		final Rectangle2D.Double selectionBounds = getCanvas().computeSelectionBounds(snapshot);
+		final Point2D.Double duplicateTarget = getCanvas().mouseWorldOrViewportCenter();
 
 		final double deltaX = selectionBounds == null ? DiagramCanvas.PASTE_OFFSET : duplicateTarget.getX() - selectionBounds.getCenterX();
 		final double deltaY = selectionBounds == null ? DiagramCanvas.PASTE_OFFSET : duplicateTarget.getY() - selectionBounds.getCenterY();
@@ -195,7 +186,7 @@ final class ClipboardController {
 		final LinkedHashSet<SelectedElement> newSelection = new LinkedHashSet<>();
 
 		for (final String classId : selectedClassIds) {
-			final ClassModel source = this.canvas.findClassById(classId);
+			final ClassModel source = getCanvas().findClassById(classId);
 			if (source == null) {
 				continue;
 			}
@@ -227,11 +218,11 @@ final class ClipboardController {
 				duplicatedFieldIds.put(sourceField.getId(), fieldCopy.getId());
 			}
 
-			this.canvas.document.getModel().getClasses().add(copy);
+			getCanvas().document.getModel().getClasses().add(copy);
 			duplicatedClassIds.put(source.getId(), copy.getId());
 
-			final NodeLayout sourceLayout = this.canvas.findOrCreateNodeLayout(LayoutObjectType.CLASS, source.getId());
-			final NodeLayout copyLayout = this.canvas.findOrCreateNodeLayout(LayoutObjectType.CLASS, copy.getId());
+			final NodeLayout sourceLayout = getCanvas().findOrCreateNodeLayout(LayoutObjectType.CLASS, source.getId());
+			final NodeLayout copyLayout = getCanvas().findOrCreateNodeLayout(LayoutObjectType.CLASS, copy.getId());
 			copyLayout.setPosition(
 					new Point2D.Double(sourceLayout.getPosition().getX() + deltaX, sourceLayout.getPosition().getY() + deltaY));
 			copyLayout.setSize(new Size2D(sourceLayout.getSize().getWidth(), sourceLayout.getSize().getHeight()));
@@ -240,12 +231,12 @@ final class ClipboardController {
 		}
 
 		for (final String fieldId : selectedFieldIds) {
-			final ClassModel owner = this.canvas.findOwnerClassOfField(fieldId);
+			final ClassModel owner = getCanvas().findOwnerClassOfField(fieldId);
 			if (owner == null || duplicatedClassIds.containsKey(owner.getId())) {
 				continue;
 			}
 
-			final FieldModel source = this.canvas.findFieldById(owner.getId(), fieldId);
+			final FieldModel source = getCanvas().findFieldById(owner.getId(), fieldId);
 			if (source == null) {
 				continue;
 			}
@@ -273,7 +264,7 @@ final class ClipboardController {
 		}
 
 		for (final String commentId : selectedCommentIds) {
-			final CommentModel source = this.canvas.findCommentById(commentId);
+			final CommentModel source = getCanvas().findCommentById(commentId);
 			if (source == null) {
 				continue;
 			}
@@ -297,11 +288,11 @@ final class ClipboardController {
 				copy.setBinding(new CommentBinding(source.getBinding().getTargetType(), targetId));
 			}
 
-			this.canvas.document.getModel().getComments().add(copy);
+			getCanvas().document.getModel().getComments().add(copy);
 			duplicatedCommentIds.put(source.getId(), copy.getId());
 
-			final NodeLayout sourceLayout = this.canvas.findOrCreateNodeLayout(LayoutObjectType.COMMENT, source.getId());
-			final NodeLayout copyLayout = this.canvas.findOrCreateNodeLayout(LayoutObjectType.COMMENT, copy.getId());
+			final NodeLayout sourceLayout = getCanvas().findOrCreateNodeLayout(LayoutObjectType.COMMENT, source.getId());
+			final NodeLayout copyLayout = getCanvas().findOrCreateNodeLayout(LayoutObjectType.COMMENT, copy.getId());
 			copyLayout.setPosition(
 					new Point2D.Double(sourceLayout.getPosition().getX() + deltaX, sourceLayout.getPosition().getY() + deltaY));
 			copyLayout.setSize(new Size2D(sourceLayout.getSize().getWidth(), sourceLayout.getSize().getHeight()));
@@ -310,7 +301,7 @@ final class ClipboardController {
 		}
 
 		final Set<String> linksToDuplicate = new LinkedHashSet<>(selectedLinkIds);
-		for (final LinkModel link : this.canvas.getActiveLinks()) {
+		for (final LinkModel link : getCanvas().getActiveLinks()) {
 			final boolean fromClassDuplicated = duplicatedClassIds.containsKey(link.getFrom().getClassId());
 			final boolean toClassDuplicated = duplicatedClassIds.containsKey(link.getTo().getClassId());
 			final boolean fromFieldDuplicated = link.getFrom().getFieldId() != null
@@ -324,7 +315,7 @@ final class ClipboardController {
 		}
 
 		for (final String linkId : linksToDuplicate) {
-			final LinkModel source = this.canvas.findLinkById(linkId);
+			final LinkModel source = getCanvas().findLinkById(linkId);
 			if (source == null) {
 				continue;
 			}
@@ -346,11 +337,11 @@ final class ClipboardController {
 			copy.setCardinalityFrom(source.getCardinalityFrom());
 			copy.setCardinalityTo(source.getCardinalityTo());
 
-			this.canvas.getActiveLinks().add(copy);
+			getCanvas().getActiveLinks().add(copy);
 			duplicatedLinkIds.put(source.getId(), copy.getId());
 
-			final LinkLayout sourceLayout = this.canvas.findOrCreateLinkLayout(source.getId());
-			final LinkLayout copyLayout = this.canvas.findOrCreateLinkLayout(copy.getId());
+			final LinkLayout sourceLayout = getCanvas().findOrCreateLinkLayout(source.getId());
+			final LinkLayout copyLayout = getCanvas().findOrCreateLinkLayout(copy.getId());
 			copyLayout.getBendPoints().clear();
 			for (final Point2D.Double bendPoint : sourceLayout.getBendPoints()) {
 				copyLayout.getBendPoints().add(new Point2D.Double(bendPoint.getX() + deltaX, bendPoint.getY() + deltaY));
@@ -363,24 +354,24 @@ final class ClipboardController {
 			newSelection.add(SelectedElement.forLink(copy.getId()));
 		}
 
-		this.canvas.selectedElements.clear();
-		this.canvas.selectedElements.addAll(newSelection);
-		this.canvas.selectedElement = this.canvas.selectedElements.isEmpty() ? null : this.canvas.selectedElements.getLast();
+		getCanvas().selectedElements.clear();
+		getCanvas().selectedElements.addAll(newSelection);
+		getCanvas().selectedElement = getCanvas().selectedElements.isEmpty() ? null : getCanvas().selectedElements.getLast();
 
-		this.canvas.notifySelectionChanged();
-		this.canvas.notifyDocumentChanged();
-		this.canvas.repaint();
+		getCanvas().notifySelectionChanged();
+		getCanvas().notifyDocumentChanged();
+		getCanvas().repaint();
 	}
 
-	void pasteSelection() {
+	default void pasteSelection() {
 		final ClipboardSnapshot clipboard = DiagramCanvas.clipboardSnapshot;
 
 		if (clipboard == null || clipboard.isEmpty()) {
 			return;
 		}
 
-		final Rectangle2D.Double clipboardBounds = this.canvas.computeClipboardBounds(clipboard);
-		final Point2D.Double pasteTarget = this.canvas.mouseWorldOrViewportCenter();
+		final Rectangle2D.Double clipboardBounds = getCanvas().computeClipboardBounds(clipboard);
+		final Point2D.Double pasteTarget = getCanvas().mouseWorldOrViewportCenter();
 
 		final double deltaX = clipboardBounds == null ? DiagramCanvas.PASTE_OFFSET : pasteTarget.getX() - clipboardBounds.getCenterX();
 
@@ -395,8 +386,8 @@ final class ClipboardController {
 		for (final CopiedClass copiedClass : clipboard.classes()) {
 			final ClassModel classCopy = new ClassModel();
 
-			classCopy.getNames().setConceptualName(this.canvas.appendSuffix(copiedClass.conceptualName(), " Copy"));
-			classCopy.getNames().setTechnicalName(this.canvas.appendSuffix(copiedClass.technicalName(), "_COPY"));
+			classCopy.getNames().setConceptualName(getCanvas().appendSuffix(copiedClass.conceptualName(), " Copy"));
+			classCopy.getNames().setTechnicalName(getCanvas().appendSuffix(copiedClass.technicalName(), "_COPY"));
 			classCopy.setGroup(copiedClass.group());
 
 			classCopy.getVisibility().setConceptual(copiedClass.visibleInConceptual());
@@ -408,28 +399,28 @@ final class ClipboardController {
 			classCopy.getStyle().setBorderColor(copiedClass.borderColor());
 
 			for (final CopiedField copiedField : copiedClass.fields()) {
-				final FieldModel fieldCopy = this.canvas.createFieldFromClipboard(copiedField, false);
+				final FieldModel fieldCopy = getCanvas().createFieldFromClipboard(copiedField, false);
 				classCopy.getFields().add(fieldCopy);
 				pastedFieldIds.put(copiedField.sourceId(), fieldCopy.getId());
 			}
 
-			this.canvas.document.getModel().getClasses().add(classCopy);
+			getCanvas().document.getModel().getClasses().add(classCopy);
 			pastedClassIds.put(copiedClass.sourceId(), classCopy.getId());
 
-			this.canvas.applyNodeLayout(LayoutObjectType.CLASS, classCopy.getId(), copiedClass.layout(), deltaX, deltaY);
+			getCanvas().applyNodeLayout(LayoutObjectType.CLASS, classCopy.getId(), copiedClass.layout(), deltaX, deltaY);
 
 			newSelection.add(SelectedElement.forClass(classCopy.getId()));
 		}
 
 		for (final CopiedField copiedField : clipboard.fields()) {
-			final String ownerClassId = this.canvas.mapId(pastedClassIds, copiedField.ownerClassId());
-			final ClassModel owner = this.canvas.findClassById(ownerClassId);
+			final String ownerClassId = getCanvas().mapId(pastedClassIds, copiedField.ownerClassId());
+			final ClassModel owner = getCanvas().findClassById(ownerClassId);
 
 			if (owner == null) {
 				continue;
 			}
 
-			final FieldModel fieldCopy = this.canvas.createFieldFromClipboard(copiedField, true);
+			final FieldModel fieldCopy = getCanvas().createFieldFromClipboard(copiedField, true);
 
 			int insertIndex = -1;
 			for (int i = 0; i < owner.getFields().size(); i++) {
@@ -449,18 +440,18 @@ final class ClipboardController {
 			newSelection.add(SelectedElement.forField(owner.getId(), fieldCopy.getId()));
 		}
 
-		if (clipboard.panelType() == this.canvas.panelType) {
+		if (clipboard.panelType() == getCanvas().panelType) {
 			for (final CopiedLink copiedLink : clipboard.links()) {
-				final LinkModel linkCopy = this.canvas.createLinkFromClipboard(copiedLink, pastedClassIds, pastedFieldIds);
+				final LinkModel linkCopy = getCanvas().createLinkFromClipboard(copiedLink, pastedClassIds, pastedFieldIds);
 
 				if (linkCopy == null) {
 					continue;
 				}
 
-				this.canvas.getActiveLinks().add(linkCopy);
+				getCanvas().getActiveLinks().add(linkCopy);
 				pastedLinkIds.put(copiedLink.sourceId(), linkCopy.getId());
 
-				this.canvas.applyLinkLayout(linkCopy.getId(), copiedLink.layout(), deltaX, deltaY);
+				getCanvas().applyLinkLayout(linkCopy.getId(), copiedLink.layout(), deltaX, deltaY);
 
 				newSelection.add(SelectedElement.forLink(linkCopy.getId()));
 			}
@@ -479,15 +470,15 @@ final class ClipboardController {
 			commentCopy.setVisibleInLogical(copiedComment.visibleInLogical());
 			commentCopy.setVisibleInPhysical(copiedComment.visibleInPhysical());
 
-			final CommentBinding binding = this.canvas.createRemappedCommentBinding(copiedComment, pastedClassIds, pastedLinkIds);
+			final CommentBinding binding = getCanvas().createRemappedCommentBinding(copiedComment, pastedClassIds, pastedLinkIds);
 			if (binding != null) {
 				commentCopy.setBinding(binding);
 			} else if (copiedComment.kind() == CommentKind.BOUND) {
 				commentCopy.setKind(CommentKind.STANDALONE);
 			}
 
-			this.canvas.document.getModel().getComments().add(commentCopy);
-			this.canvas.applyNodeLayout(LayoutObjectType.COMMENT, commentCopy.getId(), copiedComment.layout(), deltaX, deltaY);
+			getCanvas().document.getModel().getComments().add(commentCopy);
+			getCanvas().applyNodeLayout(LayoutObjectType.COMMENT, commentCopy.getId(), copiedComment.layout(), deltaX, deltaY);
 
 			newSelection.add(SelectedElement.forComment(commentCopy.getId()));
 		}
@@ -496,14 +487,15 @@ final class ClipboardController {
 			return;
 		}
 
-		this.canvas.selectedElements.clear();
-		this.canvas.selectedElements.addAll(newSelection);
-		this.canvas.selectedElement = this.canvas.selectedElements.getLast();
+		getCanvas().selectedElements.clear();
+		getCanvas().selectedElements.addAll(newSelection);
+		getCanvas().selectedElement = getCanvas().selectedElements.getLast();
 
-		this.canvas.document.getModel().getClasses().sort(this.canvas.comparator);
+		getCanvas().document.getModel().getClasses().sort(getCanvas().comparator);
 
-		this.canvas.notifySelectionChanged();
-		this.canvas.notifyDocumentChanged();
-		this.canvas.repaint();
+		getCanvas().notifySelectionChanged();
+		getCanvas().notifyDocumentChanged();
+		getCanvas().repaint();
 	}
+
 }

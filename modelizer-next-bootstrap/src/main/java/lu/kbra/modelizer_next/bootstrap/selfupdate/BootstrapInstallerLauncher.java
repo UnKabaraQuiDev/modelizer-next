@@ -1,12 +1,12 @@
-package lu.kbra.modelizer_next.bootstrap;
+package lu.kbra.modelizer_next.bootstrap.selfupdate;
 
 import java.awt.Desktop;
 import java.io.IOException;
 import java.nio.file.Path;
 
-final class BootstrapInstallerLauncher {
+public final class BootstrapInstallerLauncher {
 
-	boolean promptAndStartInstaller(final BootstrapInstallerUpdate update, final Path installerPath) throws IOException {
+	public boolean promptAndStartInstaller(final BootstrapInstallerUpdate update, final Path installerPath) throws IOException {
 		final String adminHint = update.platform().adminRightsExpected()
 				? "\n\nYour system will ask for administrator rights to install it."
 				: "\n\nThe installer may ask for administrator rights when you copy the app into Applications.";
@@ -25,7 +25,7 @@ final class BootstrapInstallerLauncher {
 		return true;
 	}
 
-	private void startInstaller(final BootstrapInstallerUpdate.Platform platform, final Path installerPath) throws IOException {
+	private void startInstaller(final lu.kbra.modelizer_next.common.Platform platform, final Path installerPath) throws IOException {
 		final String installer = installerPath.toAbsolutePath().toString();
 
 		final ProcessBuilder process = switch (platform) {

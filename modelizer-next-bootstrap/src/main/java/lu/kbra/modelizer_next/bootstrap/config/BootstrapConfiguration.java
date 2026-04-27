@@ -1,4 +1,6 @@
-package lu.kbra.modelizer_next.bootstrap;
+package lu.kbra.modelizer_next.bootstrap.config;
+
+import lu.kbra.modelizer_next.bootstrap.UpdateChannel;
 
 public class BootstrapConfiguration {
 

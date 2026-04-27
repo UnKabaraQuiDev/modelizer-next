@@ -499,10 +499,6 @@ public class MainFrame extends JFrame {
 				KeyStroke.getKeyStroke(KeyEvent.VK_E, InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK),
 				this::exportImage));
 
-//		final JMenuItem tryLoad = new JMenuItem("Show pending files.");
-//		tryLoad.addActionListener(action -> JOptionPane.showMessageDialog(null, FileOpenBridge.TO_BE_OPENED.toString()));
-//		fileMenu.add(tryLoad);
-
 		final JMenu editMenu = this.createEditMenu();
 
 		final JMenu insertMenu = new JMenu("Insert");
@@ -1069,15 +1065,9 @@ public class MainFrame extends JFrame {
 	}
 
 	private void reopenWithCurrentDocument() {
-//		this.dispose();
-
 		SwingUtilities.invokeLater(() -> {
 			MNMain.applyConfiguredLookAndFeel();
-
 			this.setContent(this.session);
-
-//			final MainFrame frame = new MainFrame(this.session);
-//			frame.setVisible(true);
 		});
 	}
 

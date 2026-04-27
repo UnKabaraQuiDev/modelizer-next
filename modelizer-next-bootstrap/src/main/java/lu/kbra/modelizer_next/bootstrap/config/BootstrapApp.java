@@ -1,4 +1,4 @@
-package lu.kbra.modelizer_next.bootstrap;
+package lu.kbra.modelizer_next.bootstrap.config;
 
 import java.io.File;
 import java.io.IOException;
@@ -6,6 +6,7 @@ import java.io.IOException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import lu.kbra.modelizer_next.bootstrap.BootstrapConfig;
 import lu.kbra.modelizer_next.common.ParsedVersionModule;
 import lu.kbra.pclib.PCUtils;
 

@@ -28,115 +28,115 @@ final class DiagramCanvasModuleRegistry {
 		this.panelType = Objects.requireNonNull(panelType, "panelType");
 	}
 
-	CanvasExportRenderer canvasExportRenderer() {
+	default CanvasExportRenderer canvasExportRenderer() {
 		return Objects.requireNonNull(this.canvasExportRenderer, "canvasExportRenderer");
 	}
 
-	CanvasHitTester canvasHitTester() {
+	default CanvasHitTester canvasHitTester() {
 		return Objects.requireNonNull(this.canvasHitTester, "canvasHitTester");
 	}
 
-	CanvasRenderer canvasRenderer() {
+	default CanvasRenderer canvasRenderer() {
 		return Objects.requireNonNull(this.canvasRenderer, "canvasRenderer");
 	}
 
-	ClipboardController clipboardController() {
+	default ClipboardController clipboardController() {
 		return Objects.requireNonNull(this.clipboardController, "clipboardController");
 	}
 
-	ConceptualAnchorCache conceptualAnchorCache() {
+	default ConceptualAnchorCache conceptualAnchorCache() {
 		return Objects.requireNonNull(this.conceptualAnchorCache, "conceptualAnchorCache");
 	}
 
-	ModelDocument document() {
+	default ModelDocument document() {
 		return this.document;
 	}
 
-	LayoutCache layoutCache() {
+	default LayoutCache layoutCache() {
 		return Objects.requireNonNull(this.layoutCache, "layoutCache");
 	}
 
-	LinkGeometryResolver linkGeometryResolver() {
+	default LinkGeometryResolver linkGeometryResolver() {
 		return Objects.requireNonNull(this.linkGeometryResolver, "linkGeometryResolver");
 	}
 
-	DiagramModelEditor modelEditor() {
+	default DiagramModelEditor modelEditor() {
 		return Objects.requireNonNull(this.modelEditor, "modelEditor");
 	}
 
-	DiagramModelLookup modelLookup() {
+	default DiagramModelLookup modelLookup() {
 		return Objects.requireNonNull(this.modelLookup, "modelLookup");
 	}
 
-	MouseInteractionController mouseInteractionController() {
+	default MouseInteractionController mouseInteractionController() {
 		return Objects.requireNonNull(this.mouseInteractionController, "mouseInteractionController");
 	}
 
-	NameResolver nameResolver() {
+	default NameResolver nameResolver() {
 		return Objects.requireNonNull(this.nameResolver, "nameResolver");
 	}
 
-	PaletteController paletteController() {
+	default PaletteController paletteController() {
 		return Objects.requireNonNull(this.paletteController, "paletteController");
 	}
 
-	PanelType panelType() {
+	default PanelType panelType() {
 		return this.panelType;
 	}
 
-	SelectionController selectionController() {
+	default SelectionController selectionController() {
 		return Objects.requireNonNull(this.selectionController, "selectionController");
 	}
 
-	void setCanvasExportRenderer(final CanvasExportRenderer canvasExportRenderer) {
+	default void setCanvasExportRenderer(final CanvasExportRenderer canvasExportRenderer) {
 		this.canvasExportRenderer = Objects.requireNonNull(canvasExportRenderer, "canvasExportRenderer");
 	}
 
-	void setCanvasHitTester(final CanvasHitTester canvasHitTester) {
+	default void setCanvasHitTester(final CanvasHitTester canvasHitTester) {
 		this.canvasHitTester = Objects.requireNonNull(canvasHitTester, "canvasHitTester");
 	}
 
-	void setCanvasRenderer(final CanvasRenderer canvasRenderer) {
+	default void setCanvasRenderer(final CanvasRenderer canvasRenderer) {
 		this.canvasRenderer = Objects.requireNonNull(canvasRenderer, "canvasRenderer");
 	}
 
-	void setClipboardController(final ClipboardController clipboardController) {
+	default void setClipboardController(final ClipboardController clipboardController) {
 		this.clipboardController = Objects.requireNonNull(clipboardController, "clipboardController");
 	}
 
-	void setConceptualAnchorCache(final ConceptualAnchorCache conceptualAnchorCache) {
+	default void setConceptualAnchorCache(final ConceptualAnchorCache conceptualAnchorCache) {
 		this.conceptualAnchorCache = Objects.requireNonNull(conceptualAnchorCache, "conceptualAnchorCache");
 	}
 
-	void setLayoutCache(final LayoutCache layoutCache) {
+	default void setLayoutCache(final LayoutCache layoutCache) {
 		this.layoutCache = Objects.requireNonNull(layoutCache, "layoutCache");
 	}
 
-	void setLinkGeometryResolver(final LinkGeometryResolver linkGeometryResolver) {
+	default void setLinkGeometryResolver(final LinkGeometryResolver linkGeometryResolver) {
 		this.linkGeometryResolver = Objects.requireNonNull(linkGeometryResolver, "linkGeometryResolver");
 	}
 
-	void setModelEditor(final DiagramModelEditor modelEditor) {
+	default void setModelEditor(final DiagramModelEditor modelEditor) {
 		this.modelEditor = Objects.requireNonNull(modelEditor, "modelEditor");
 	}
 
-	void setModelLookup(final DiagramModelLookup modelLookup) {
+	default void setModelLookup(final DiagramModelLookup modelLookup) {
 		this.modelLookup = Objects.requireNonNull(modelLookup, "modelLookup");
 	}
 
-	void setMouseInteractionController(final MouseInteractionController mouseInteractionController) {
+	default void setMouseInteractionController(final MouseInteractionController mouseInteractionController) {
 		this.mouseInteractionController = Objects.requireNonNull(mouseInteractionController, "mouseInteractionController");
 	}
 
-	void setNameResolver(final NameResolver nameResolver) {
+	default void setNameResolver(final NameResolver nameResolver) {
 		this.nameResolver = Objects.requireNonNull(nameResolver, "nameResolver");
 	}
 
-	void setPaletteController(final PaletteController paletteController) {
+	default void setPaletteController(final PaletteController paletteController) {
 		this.paletteController = Objects.requireNonNull(paletteController, "paletteController");
 	}
 
-	void setSelectionController(final SelectionController selectionController) {
+	default void setSelectionController(final SelectionController selectionController) {
 		this.selectionController = Objects.requireNonNull(selectionController, "selectionController");
 	}
 

@@ -16,7 +16,7 @@ public final class SystemThemeDetector {
 				return SystemThemeDetector.isMacDark();
 			}
 		} catch (final Exception ignored) {
-			ignored.printStackTrace();
+			// fall through
 		}
 
 		return false;

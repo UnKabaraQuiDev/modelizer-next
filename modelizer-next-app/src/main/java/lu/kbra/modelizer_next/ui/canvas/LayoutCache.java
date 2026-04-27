@@ -4,21 +4,16 @@ import java.awt.geom.Point2D;
 import java.util.Optional;
 
 import lu.kbra.modelizer_next.common.Size2D;
+import lu.kbra.modelizer_next.document.ModelDocument;
 import lu.kbra.modelizer_next.layout.LayoutObjectType;
 import lu.kbra.modelizer_next.layout.LinkLayout;
 import lu.kbra.modelizer_next.layout.NodeLayout;
 import lu.kbra.modelizer_next.layout.PanelState;
+import lu.kbra.modelizer_next.layout.PanelType;
 
-final class LayoutCache {
+interface LayoutCache extends DiagramCanvasExt {
 
-	private final DiagramCanvasModuleRegistry registry;
-
-	LayoutCache(final DiagramCanvasModuleRegistry registry) {
-		this.registry = registry;
-		this.registry.setLayoutCache(this);
-	}
-
-	Optional<NodeLayout> findNodeLayout(final LayoutObjectType objectType, final String objectId) {
+	default Optional<NodeLayout> findNodeLayout(final LayoutObjectType objectType, final String objectId) {
 		if (objectId == null) {
 			return Optional.empty();
 		}
@@ -32,7 +27,7 @@ final class LayoutCache {
 		return Optional.empty();
 	}
 
-	LinkLayout findOrCreateLinkLayout(final String linkId) {
+	default LinkLayout findOrCreateLinkLayout(final String linkId) {
 		for (final LinkLayout linkLayout : this.getPanelState().getLinkLayouts()) {
 			if (linkLayout.getLinkId().equals(linkId)) {
 				return linkLayout;
@@ -45,7 +40,7 @@ final class LayoutCache {
 		return linkLayout;
 	}
 
-	NodeLayout findOrCreateNodeLayout(final LayoutObjectType objectType, final String objectId) {
+	default NodeLayout findOrCreateNodeLayout(final LayoutObjectType objectType, final String objectId) {
 		for (final NodeLayout layout : this.getPanelState().getNodeLayouts()) {
 			if (layout.getObjectType() == objectType && layout.getObjectId().equals(objectId)) {
 				return layout;
@@ -62,7 +57,8 @@ final class LayoutCache {
 		return layout;
 	}
 
-	PanelState getPanelState() {
-		return this.registry.document().getWorkspace().getPanels().get(this.registry.panelType());
+	default PanelState getPanelState() {
+		return getDocument().getWorkspace().getPanels().get(getPanelType());
 	}
+
 }

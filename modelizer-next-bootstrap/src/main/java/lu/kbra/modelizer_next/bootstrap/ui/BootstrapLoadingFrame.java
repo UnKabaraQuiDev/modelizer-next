@@ -1,4 +1,4 @@
-package lu.kbra.modelizer_next.bootstrap;
+package lu.kbra.modelizer_next.bootstrap.ui;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -12,13 +12,13 @@ import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 import javax.swing.border.EmptyBorder;
 
-final class BootstrapLoadingFrame extends JFrame {
+public final class BootstrapLoadingFrame extends JFrame {
 
 	private static final long serialVersionUID = 1L;
 	private final JLabel messageLabel = new JLabel("Preparing Modelizer Next...", SwingConstants.CENTER);
 	private final JProgressBar progressBar = new JProgressBar();
 
-	BootstrapLoadingFrame() {
+	public BootstrapLoadingFrame() {
 		super("Modelizer Next");
 		this.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 		this.setUndecorated(false);
@@ -33,7 +33,7 @@ final class BootstrapLoadingFrame extends JFrame {
 		this.setLocationRelativeTo(null);
 	}
 
-	void update(final String message, final int value, final int max) {
+	public void update(final String message, final int value, final int max) {
 		SwingUtilities.invokeLater(() -> {
 			this.messageLabel.setText(message == null || message.isBlank() ? "Preparing Modelizer Next..." : message);
 			if (max <= 0) {
