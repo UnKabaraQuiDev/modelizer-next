@@ -256,8 +256,8 @@ public class BootstrapRuntime implements UpdateRuntime {
 		}
 
 		try {
-			if(FORCE_BOOTSTRAP_UPDATE) {
-				this.handleOutdatedBootstrapLauncher(ex);
+			if (BootstrapApp.FORCE_BOOTSTRAP_UPDATE) {
+				this.handleOutdatedBootstrapLauncher(null);
 			}
 			this.applicationLauncher.launch(args, toBeOpened, this.currentApplication);
 		} catch (final AppLaunchException ex) {
