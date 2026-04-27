@@ -25,7 +25,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 
 import javax.swing.Action;
@@ -77,7 +76,7 @@ import lu.kbra.modelizer_next.ui.impl.DocumentChangeListener;
 
 public class DiagramCanvas extends JPanel
 		implements DiagramModelLookup, LayoutCache, SelectionController, NameResolver, PaletteController, ClipboardController,
-		LinkGeometryResolver, ConceptualAnchorCache, CanvasHitTester, CanvasExportRenderer, DiagramModelEditor, MouseInteractionController {
+		LinkGeometryResolver, ConceptualAnchorCache, CanvasHitTester, CanvasExportRenderer, DiagramModelEditor, DragSelectionController, DiagramPathBuilder, MouseInteractionController {
 
 	static final double PASTE_OFFSET = 30.0;
 
@@ -241,25 +240,6 @@ public class DiagramCanvas extends JPanel
 		this.revalidate();
 		this.repaint();
 	}
-
-	void addDraggedLayout(
-			final List<DraggedLayout> layouts,
-			final Set<String> seen,
-			final SelectedElement element,
-			final NodeLayout fallbackLayout) {
-		final NodeLayout layout = this.resolveNodeLayoutForSelection(element, fallbackLayout);
-		if (layout == null) {
-			return;
-		}
-
-		final String key = layout.getObjectType() + ":" + layout.getObjectId();
-		if (!seen.add(key)) {
-			return;
-		}
-
-		layouts.add(new DraggedLayout(layout, layout.getPosition().getX(), layout.getPosition().getY()));
-	}
-
 	String appendSuffix(final String value, final String suffix) {
 		if (value == null || value.isBlank()) {
 			return value;
@@ -329,168 +309,6 @@ public class DiagramCanvas extends JPanel
 		this.select(SelectedElement.forComment(commentId));
 		this.notifyDocumentChanged();
 	}
-
-	void buildDragRenderLayers(final DraggedSelection selection) {
-		this.currentDragOffset = new Point2D.Double();
-	}
-
-	String buildForeignKeyFieldName(final ClassModel targetClass, final FieldModel targetField) {
-		final String className = this
-				.blankToFallback(targetClass.getNames().getTechnicalName(), targetClass.getNames().getConceptualName(), "target");
-		final String fieldName = this
-				.blankToFallback(targetField.getNames().getTechnicalName(), targetField.getNames().getConceptualName(), "id");
-		return className + "_" + fieldName;
-	}
-
-	String buildForeignKeyFieldTechnicalName(final ClassModel targetClass, final FieldModel targetField) {
-		final String rawName = this.buildForeignKeyFieldName(targetClass, targetField);
-		return rawName.trim().replaceAll("[^A-Za-z0-9_]+", "_").replaceAll("_+", "_").replaceAll("^_|_$", "").toLowerCase();
-	}
-
-	String buildLinkPath(final LinkModel linkModel) {
-		final ClassModel fromClass = this.findClassById(linkModel.getFrom().getClassId());
-		final ClassModel toClass = this.findClassById(linkModel.getTo().getClassId());
-
-		final String fromName = fromClass == null ? "?" : this.resolveClassTitle(fromClass);
-		final String toName = toClass == null ? "?" : this.resolveClassTitle(toClass);
-
-		if (this.panelType == PanelType.CONCEPTUAL) {
-			String middle = linkModel.getName() == null || linkModel.getName().isBlank() ? "link" : linkModel.getName();
-
-			if (linkModel.getAssociationClassId() != null && !linkModel.getAssociationClassId().isBlank()) {
-				final ClassModel associationClass = this.findClassById(linkModel.getAssociationClassId());
-				middle += "[" + (associationClass == null ? linkModel.getAssociationClassId() : this.resolveClassTitle(associationClass))
-						+ "]";
-			}
-
-			return fromName + " > " + middle + " < " + toName;
-		}
-
-		final FieldModel fromField = this.findFieldById(linkModel.getFrom().getClassId(), linkModel.getFrom().getFieldId());
-		final FieldModel toField = this.findFieldById(linkModel.getTo().getClassId(), linkModel.getTo().getFieldId());
-
-		final String fromFieldName = fromField == null ? "?" : this.resolveFieldName(fromField);
-		final String toFieldName = toField == null ? "?" : this.resolveFieldName(toField);
-
-		return fromName + " > " + fromFieldName + " -> " + toFieldName + " < " + toName;
-	}
-
-	String buildSelectionPath() {
-		if (this.selectedElement == null) {
-			return "";
-		}
-
-		switch (this.selectedElement.type()) {
-		case CLASS -> {
-			final ClassModel classModel = this.findClassById(this.selectedElement.classId());
-			return classModel == null ? "" : this.resolveClassTitle(classModel);
-		}
-		case FIELD -> {
-			final ClassModel classModel = this.findClassById(this.selectedElement.classId());
-			final FieldModel fieldModel = this.findFieldById(this.selectedElement.classId(), this.selectedElement.fieldId());
-			if (classModel == null || fieldModel == null) {
-				return "";
-			}
-			return this.resolveClassTitle(classModel) + " > " + this.resolveFieldName(fieldModel);
-		}
-		case COMMENT -> {
-			final CommentModel commentModel = this.findCommentById(this.selectedElement.commentId());
-			if (commentModel == null) {
-				return "";
-			}
-
-			if (commentModel.getKind() == CommentKind.STANDALONE) {
-				return "Comment";
-			}
-
-			if (commentModel.getBinding() != null && commentModel.getBinding().getTargetType() == BoundTargetType.CLASS) {
-				final ClassModel classModel = this.findClassById(commentModel.getBinding().getTargetId());
-				return classModel == null ? "Comment" : this.resolveClassTitle(classModel) + " > comment";
-			}
-
-			final LinkModel linkModel = commentModel.getBinding() == null ? null
-					: this.findLinkById(commentModel.getBinding().getTargetId());
-			return linkModel == null ? "Comment" : this.buildLinkPath(linkModel) + " > comment";
-		}
-		case LINK -> {
-			final LinkModel linkModel = this.findLinkById(this.selectedElement.linkId());
-			return linkModel == null ? "" : this.buildLinkPath(linkModel);
-		}
-		default -> {
-			return "";
-		}
-		}
-	}
-
-	List<Point2D> buildSelfLinkPoints(final Graphics2D g2, final LinkModel linkModel, final Point2D fromPoint, final Point2D toPoint) {
-		final List<Point2D> points = new ArrayList<>();
-		points.add(fromPoint);
-
-		final ClassModel classModel = this.findClassById(linkModel.getFrom().getClassId());
-		if (classModel == null) {
-			points.add(toPoint);
-			return points;
-		}
-
-		if (this.panelType != PanelType.CONCEPTUAL) {
-			final NodeLayout layout = this.resolveRenderLayout(this.findOrCreateNodeLayout(LayoutObjectType.CLASS, classModel.getId()));
-			final Rectangle2D bounds = this.computeClassBounds(g2, classModel, layout);
-			final AnchorSide side = this.chooseTechnicalSelfLinkSide(g2, linkModel);
-			final int sideLoad = this.getTechnicalSideLinkCount(g2, classModel.getId(), side, linkModel.getId());
-			final double outsideOffset = DiagramCanvas.SELF_LINK_OUTSIDE_OFFSET + sideLoad * 12.0;
-			final double outsideX = side == AnchorSide.LEFT ? bounds.getX() - outsideOffset : bounds.getMaxX() + outsideOffset;
-
-			points.add(new Point2D.Double(outsideX, fromPoint.getY()));
-			points.add(new Point2D.Double(outsideX, toPoint.getY()));
-			points.add(toPoint);
-			return points;
-		}
-
-		final LinkAnchorPlacement placement = this.conceptualAnchorPlacements.get(linkModel.getId());
-		if (placement == null) {
-			points.add(toPoint);
-			return points;
-		}
-
-		final NodeLayout layout = this.resolveRenderLayout(this.findOrCreateNodeLayout(LayoutObjectType.CLASS, classModel.getId()));
-		final Rectangle2D bounds = this.computeClassBounds(g2, classModel, layout);
-		final double outsideOffset = DiagramCanvas.SELF_LINK_OUTSIDE_OFFSET + Math.max(placement.fromCount(), placement.toCount()) * 4.0;
-
-		switch (placement.fromSide()) {
-		case TOP -> {
-			final double outsideY = bounds.getY() - outsideOffset;
-			final double outsideX = bounds.getMaxX() + outsideOffset;
-			points.add(new Point2D.Double(fromPoint.getX(), outsideY));
-			points.add(new Point2D.Double(outsideX, outsideY));
-			points.add(new Point2D.Double(outsideX, toPoint.getY()));
-		}
-		case RIGHT -> {
-			final double outsideX = bounds.getMaxX() + outsideOffset;
-			final double outsideY = bounds.getMaxY() + outsideOffset;
-			points.add(new Point2D.Double(outsideX, fromPoint.getY()));
-			points.add(new Point2D.Double(outsideX, outsideY));
-			points.add(new Point2D.Double(toPoint.getX(), outsideY));
-		}
-		case BOTTOM -> {
-			final double outsideY = bounds.getMaxY() + outsideOffset;
-			final double outsideX = bounds.getX() - outsideOffset;
-			points.add(new Point2D.Double(fromPoint.getX(), outsideY));
-			points.add(new Point2D.Double(outsideX, outsideY));
-			points.add(new Point2D.Double(outsideX, toPoint.getY()));
-		}
-		case LEFT -> {
-			final double outsideX = bounds.getX() - outsideOffset;
-			final double outsideY = bounds.getY() - outsideOffset;
-			points.add(new Point2D.Double(outsideX, fromPoint.getY()));
-			points.add(new Point2D.Double(outsideX, outsideY));
-			points.add(new Point2D.Double(toPoint.getX(), outsideY));
-		}
-		}
-
-		points.add(toPoint);
-		return points;
-	}
-
 	CopiedClass captureClass(final ClassModel classModel) {
 		final List<CopiedField> fields = new ArrayList<>();
 
@@ -965,37 +783,6 @@ public class DiagramCanvas extends JPanel
 		this.select(SelectedElement.forLink(linkModel.getId()));
 		this.notifyDocumentChanged();
 	}
-
-	DraggedSelection createDraggedSelection(
-			final SelectedElement hitSelection,
-			final NodeLayout hitLayout,
-			final Point2D.Double worldPoint,
-			final Rectangle2D hitBounds) {
-		final List<DraggedLayout> layouts = new ArrayList<>();
-		final Set<String> seen = new HashSet<>();
-
-		if (this.selectedElements.isEmpty() || !this.isElementSelected(hitSelection)) {
-			this.addDraggedLayout(layouts, seen, hitSelection, hitLayout);
-		} else {
-			for (final SelectedElement element : this.selectedElements) {
-				this.addDraggedLayout(layouts, seen, element, null);
-			}
-
-			if (layouts.isEmpty()) {
-				this.addDraggedLayout(layouts, seen, hitSelection, hitLayout);
-			}
-		}
-
-		final DraggedSelection selection = new DraggedSelection(layouts,
-				worldPoint.getX() - hitBounds.getX(),
-				worldPoint.getY() - hitBounds.getY(),
-				hitLayout.getPosition().getX(),
-				hitLayout.getPosition().getY());
-
-		this.buildDragRenderLayers(selection);
-		return selection;
-	}
-
 	FieldModel createFieldFromClipboard(final CopiedField copiedField, final boolean rename) {
 		final FieldModel fieldCopy = new FieldModel();
 
@@ -1869,11 +1656,6 @@ public class DiagramCanvas extends JPanel
 			g2.dispose();
 		}
 	}
-
-	boolean isDragRenderingActive() {
-		return this.draggedSelection != null;
-	}
-
 	boolean isLinkConnectedTo(final LinkModel linkModel, final String classId) {
 		if (linkModel == null || classId == null) {
 			return false;
@@ -2085,19 +1867,6 @@ public class DiagramCanvas extends JPanel
 
 		return best;
 	}
-
-	NodeLayout resolveNodeLayoutForSelection(final SelectedElement element, final NodeLayout fallbackLayout) {
-		if (element == null) {
-			return fallbackLayout;
-		}
-
-		return (switch (element.type()) {
-		case CLASS, FIELD -> this.findNodeLayout(LayoutObjectType.CLASS, element.classId());
-		case COMMENT -> this.findNodeLayout(LayoutObjectType.COMMENT, element.commentId());
-		default -> Optional.<NodeLayout>empty();
-		}).orElse(fallbackLayout);
-	}
-
 	Point2D resolveOppositeReferencePoint(final Graphics2D g2, final String classId, final String fieldId) {
 		final ClassModel classModel = this.findClassById(classId);
 		if (classModel == null || !this.isVisible(classModel)) {

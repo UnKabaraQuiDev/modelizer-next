@@ -15,6 +15,7 @@ import lu.kbra.modelizer_next.layout.NodeLayout;
 import lu.kbra.modelizer_next.layout.PanelType;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.AnchorPair;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.AnchorSide;
+import lu.kbra.modelizer_next.ui.canvas.datastruct.LinkAnchorPlacement;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.LinkGeometry;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectedElement;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectedType;
@@ -261,6 +262,76 @@ interface LinkGeometryResolver extends DiagramCanvasExt {
 		}
 
 		return getCanvas().resolveTechnicalFieldAnchor(g2, target.classId(), target.fieldId(), source.classId(), source.fieldId());
+	}
+
+
+	default List<Point2D> buildSelfLinkPoints(final Graphics2D g2, final LinkModel linkModel, final Point2D fromPoint, final Point2D toPoint) {
+		final List<Point2D> points = new ArrayList<>();
+		points.add(fromPoint);
+
+		final ClassModel classModel = getCanvas().findClassById(linkModel.getFrom().getClassId());
+		if (classModel == null) {
+			points.add(toPoint);
+			return points;
+		}
+
+		if (getCanvas().panelType != PanelType.CONCEPTUAL) {
+			final NodeLayout layout = getCanvas().resolveRenderLayout(getCanvas().findOrCreateNodeLayout(LayoutObjectType.CLASS, classModel.getId()));
+			final Rectangle2D bounds = getCanvas().computeClassBounds(g2, classModel, layout);
+			final AnchorSide side = getCanvas().chooseTechnicalSelfLinkSide(g2, linkModel);
+			final int sideLoad = getCanvas().getTechnicalSideLinkCount(g2, classModel.getId(), side, linkModel.getId());
+			final double outsideOffset = DiagramCanvas.SELF_LINK_OUTSIDE_OFFSET + sideLoad * 12.0;
+			final double outsideX = side == AnchorSide.LEFT ? bounds.getX() - outsideOffset : bounds.getMaxX() + outsideOffset;
+
+			points.add(new Point2D.Double(outsideX, fromPoint.getY()));
+			points.add(new Point2D.Double(outsideX, toPoint.getY()));
+			points.add(toPoint);
+			return points;
+		}
+
+		final LinkAnchorPlacement placement = getCanvas().conceptualAnchorPlacements.get(linkModel.getId());
+		if (placement == null) {
+			points.add(toPoint);
+			return points;
+		}
+
+		final NodeLayout layout = getCanvas().resolveRenderLayout(getCanvas().findOrCreateNodeLayout(LayoutObjectType.CLASS, classModel.getId()));
+		final Rectangle2D bounds = getCanvas().computeClassBounds(g2, classModel, layout);
+		final double outsideOffset = DiagramCanvas.SELF_LINK_OUTSIDE_OFFSET + Math.max(placement.fromCount(), placement.toCount()) * 4.0;
+
+		switch (placement.fromSide()) {
+		case TOP -> {
+			final double outsideY = bounds.getY() - outsideOffset;
+			final double outsideX = bounds.getMaxX() + outsideOffset;
+			points.add(new Point2D.Double(fromPoint.getX(), outsideY));
+			points.add(new Point2D.Double(outsideX, outsideY));
+			points.add(new Point2D.Double(outsideX, toPoint.getY()));
+		}
+		case RIGHT -> {
+			final double outsideX = bounds.getMaxX() + outsideOffset;
+			final double outsideY = bounds.getMaxY() + outsideOffset;
+			points.add(new Point2D.Double(outsideX, fromPoint.getY()));
+			points.add(new Point2D.Double(outsideX, outsideY));
+			points.add(new Point2D.Double(toPoint.getX(), outsideY));
+		}
+		case BOTTOM -> {
+			final double outsideY = bounds.getMaxY() + outsideOffset;
+			final double outsideX = bounds.getX() - outsideOffset;
+			points.add(new Point2D.Double(fromPoint.getX(), outsideY));
+			points.add(new Point2D.Double(outsideX, outsideY));
+			points.add(new Point2D.Double(outsideX, toPoint.getY()));
+		}
+		case LEFT -> {
+			final double outsideX = bounds.getX() - outsideOffset;
+			final double outsideY = bounds.getY() - outsideOffset;
+			points.add(new Point2D.Double(outsideX, fromPoint.getY()));
+			points.add(new Point2D.Double(outsideX, outsideY));
+			points.add(new Point2D.Double(toPoint.getX(), outsideY));
+		}
+		}
+
+		points.add(toPoint);
+		return points;
 	}
 
 }

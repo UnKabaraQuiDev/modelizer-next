@@ -4,12 +4,10 @@ import java.awt.geom.Point2D;
 import java.util.Optional;
 
 import lu.kbra.modelizer_next.common.Size2D;
-import lu.kbra.modelizer_next.document.ModelDocument;
 import lu.kbra.modelizer_next.layout.LayoutObjectType;
 import lu.kbra.modelizer_next.layout.LinkLayout;
 import lu.kbra.modelizer_next.layout.NodeLayout;
 import lu.kbra.modelizer_next.layout.PanelState;
-import lu.kbra.modelizer_next.layout.PanelType;
 
 interface LayoutCache extends DiagramCanvasExt {
 
