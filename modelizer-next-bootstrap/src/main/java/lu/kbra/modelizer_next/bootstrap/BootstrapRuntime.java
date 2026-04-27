@@ -233,7 +233,8 @@ public class BootstrapRuntime implements UpdateRuntime {
 			} else {
 				this.currentApplication = this.inventory.findLatestInstalled(configuration.getUpdateChannel()).orElse(null);
 			}
-			System.out.println("Current version" + (getForceJarName() == null ? "" : " (forced)") + ": " + currentApplication.version());
+			System.out.println("Current version" + (getForceJarName() == null ? "" : " (forced)") + ": "
+					+ (currentApplication == null ? "none" : currentApplication.version()));
 			if (this.currentApplication == null) {
 				final AvailableUpdate bootstrapInstall = this.requireInstallableUpdate(this.configuration.getUpdateChannel(), null);
 				loadingFrame.update("Installing " + bootstrapInstall.latestVersion() + "...", 0, 1);
