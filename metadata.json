@@ -1,68 +1,67 @@
 {
   "version": 1,
   "repository": "UnKabaraQuiDev/modelizer-next",
-  "releaseTag": "3-RELEASE-129",
+  "releaseTag": "4-RELEASE-162",
   "assets": {
     "windows": {
       "portable": {
         "label": "Windows portable ZIP",
-        "tag": "3-RELEASE-129",
-        "file": "modelizer-next-app-portable-windows-3-RELEASE-129.zip",
-        "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/3-RELEASE-129/modelizer-next-app-portable-windows-3-RELEASE-129.zip"
+        "tag": "4-RELEASE-162",
+        "file": "modelizer-next-app-portable-windows-4-RELEASE-162.zip",
+        "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/4-RELEASE-162/modelizer-next-app-portable-windows-4-RELEASE-162.zip"
       },
       "standalone": {
         "label": "Windows standalone installer",
-        "tag": "3-RELEASE-129",
-        "file": "modelizer-next-app-standalone-windows-3-RELEASE-129.exe",
-        "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/3-RELEASE-129/modelizer-next-app-standalone-windows-3-RELEASE-129.exe"
+        "tag": "4-RELEASE-162",
+        "file": "modelizer-next-app-standalone-windows-4-RELEASE-162.exe",
+        "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/4-RELEASE-162/modelizer-next-app-standalone-windows-4-RELEASE-162.exe"
       },
       "updater": {
         "label": "Windows updater installer",
-        "tag": "3-RELEASE-129",
-        "file": "modelizer-next-bootstrap-windows-3-RELEASE-129.exe",
-        "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/3-RELEASE-129/modelizer-next-bootstrap-windows-3-RELEASE-129.exe"
+        "tag": "4-RELEASE-162",
+        "file": "modelizer-next-bootstrap-windows-4-RELEASE-162.exe",
+        "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/4-RELEASE-162/modelizer-next-bootstrap-windows-4-RELEASE-162.exe"
       }
     },
     "linux": {
       "portable": {
         "label": "Linux portable ZIP",
-        "tag": "3-RELEASE-129",
-        "file": "modelizer-next-app-portable-linux-3-RELEASE-129.zip",
-        "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/3-RELEASE-129/modelizer-next-app-portable-linux-3-RELEASE-129.zip"
+        "tag": "4-RELEASE-162",
+        "file": "modelizer-next-app-portable-linux-4-RELEASE-162.zip",
+        "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/4-RELEASE-162/modelizer-next-app-portable-linux-4-RELEASE-162.zip"
       },
       "standalone": {
         "label": "Linux standalone .deb",
-        "tag": "3-RELEASE-129",
-        "file": "modelizer-next-app-standalone-linux-3-RELEASE-129.deb",
-        "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/3-RELEASE-129/modelizer-next-app-standalone-linux-3-RELEASE-129.deb"
+        "tag": "4-RELEASE-162",
+        "file": "modelizer-next-app-standalone-linux-4-RELEASE-162.deb",
+        "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/4-RELEASE-162/modelizer-next-app-standalone-linux-4-RELEASE-162.deb"
       },
       "updater": {
         "label": "Linux updater .deb",
-        "tag": "3-RELEASE-129",
-        "file": "modelizer-next-bootstrap-linux-3-RELEASE-129.deb",
-        "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/3-RELEASE-129/modelizer-next-bootstrap-linux-3-RELEASE-129.deb"
+        "tag": "4-RELEASE-162",
+        "file": "modelizer-next-bootstrap-linux-4-RELEASE-162.deb",
+        "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/4-RELEASE-162/modelizer-next-bootstrap-linux-4-RELEASE-162.deb"
       }
     },
     "macos": {
       "portable": {
         "label": "MacOS portable ZIP",
-        "tag": "3-RELEASE-129",
-        "file": "modelizer-next-app-portable-macos-3-RELEASE-129.zip",
-        "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/3-RELEASE-129/modelizer-next-app-portable-macos-3-RELEASE-129.zip"
+        "tag": "4-RELEASE-162",
+        "file": "modelizer-next-app-portable-macos-4-RELEASE-162.zip",
+        "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/4-RELEASE-162/modelizer-next-app-portable-macos-4-RELEASE-162.zip"
       },
       "standalone": {
         "label": "MacOS standalone .dmg",
-        "tag": "3-RELEASE-129",
-        "file": "modelizer-next-app-standalone-macos-3-RELEASE-129.dmg",
-        "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/3-RELEASE-129/modelizer-next-app-standalone-macos-3-RELEASE-129.dmg"
+        "tag": "4-RELEASE-162",
+        "file": "modelizer-next-app-standalone-macos-4-RELEASE-162.dmg",
+        "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/4-RELEASE-162/modelizer-next-app-standalone-macos-4-RELEASE-162.dmg"
       },
       "updater": {
-        "label": "MacOS Updater .dmg",
-        "tag": "3-RELEASE-129",
-        "file": "modelizer-next-bootstrap-macos-3-RELEASE-129.dmg",
-        "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/3-RELEASE-129/modelizer-next-bootstrap-macos-3-RELEASE-129.dmg"
+        "label": "MacOS updater .dmg",
+        "tag": "4-RELEASE-162",
+        "file": "modelizer-next-bootstrap-macos-4-RELEASE-162.dmg",
+        "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/4-RELEASE-162/modelizer-next-bootstrap-macos-4-RELEASE-162.dmg"
       }
-
     }
   }
 }
