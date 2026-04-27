@@ -29,14 +29,15 @@
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="px"
      inkscape:zoom="0.54552184"
-     inkscape:cx="3001.713"
-     inkscape:cy="276.79918"
+     inkscape:cx="4086.9125"
+     inkscape:cy="199.80868"
      inkscape:window-width="1920"
      inkscape:window-height="992"
      inkscape:window-x="0"
      inkscape:window-y="0"
      inkscape:window-maximized="1"
-     inkscape:current-layer="layer1">
+     inkscape:current-layer="layer1"
+     showgrid="false">
     <inkscape:page
        x="0"
        y="0"
@@ -103,9 +104,46 @@
        inkscape:export-filename="icons/icon.png"
        inkscape:export-xdpi="743.09"
        inkscape:export-ydpi="743.09" />
+    <inkscape:page
+       x="3654"
+       y="0"
+       width="512"
+       height="512"
+       id="page2"
+       margin="0"
+       bleed="0"
+       inkscape:label="undo" />
+    <inkscape:page
+       x="4176"
+       y="0"
+       width="512"
+       height="512"
+       id="page3"
+       margin="0"
+       bleed="0"
+       inkscape:label="redo" />
   </sodipodi:namedview>
   <defs
      id="defs1">
+    <marker
+       style="overflow:visible"
+       id="RoundedArrow"
+       refX="0"
+       refY="0"
+       orient="auto-start-reverse"
+       inkscape:stockid="Rounded arrow"
+       markerWidth="40"
+       markerHeight="40"
+       viewBox="0 0 1 1"
+       inkscape:isstock="true"
+       inkscape:collect="always"
+       preserveAspectRatio="xMidYMid"
+       markerUnits="userSpaceOnUse">
+      <path
+         d="m -0.14780188,-2.873901 4.49560378,2.24780197 a 0.7,0.7 0 0 1 0,1.25219806 L -0.14780188,2.873901 A 0.8652476,0.8652476 0 0 1 -1.4,2.1 v -4.2 a 0.8652476,0.8652476 0 0 1 1.25219812,-0.773901 z"
+         style="fill:context-stroke;fill-rule:evenodd;stroke:none;stroke-width:0.7"
+         id="path12" />
+    </marker>
     <inkscape:path-effect
        effect="powerclip"
        message=""
@@ -405,5 +443,15 @@
            sodipodi:type="rect" />
       </g>
     </g>
+    <path
+       style="fill:#ffdead;stroke:#000000;stroke-width:131.1496063;stroke-linejoin:round;stroke-miterlimit:1.7;stroke-dasharray:none;marker-end:url(#RoundedArrow);paint-order:normal;stroke-dashoffset:0;stroke-linecap:butt"
+       d="M 4135.3034,256 H 3865.4373"
+       id="path10"
+       sodipodi:nodetypes="cc" />
+    <path
+       style="fill:#ffdead;stroke:#000000;stroke-width:131.15;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:1.7;stroke-dasharray:none;stroke-dashoffset:0;marker-end:url(#RoundedArrow);paint-order:normal"
+       d="M 4202.3719,256 H 4472.238"
+       id="path14"
+       sodipodi:nodetypes="cc" />
   </g>
 </svg>

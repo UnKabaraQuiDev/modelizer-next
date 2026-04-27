@@ -16,7 +16,7 @@ final class DiagramCanvasActionRegistrar {
 	record DiagramCanvasActions(Runnable renameSelection, IntConsumer moveFieldSelection, IntConsumer moveSelectedFieldInList,
 			Runnable addTable, Runnable addField, Runnable addComment, Runnable deleteSelection, Runnable duplicateSelection,
 			Runnable clearSelection, Runnable addLink, Runnable selectAll, Runnable edit, Runnable copySelection, Runnable cutSelection,
-			Runnable pasteSelection) {
+			Runnable pasteSelection, Runnable undo, Runnable redo) {
 	}
 
 	private DiagramCanvasActionRegistrar() {
@@ -25,6 +25,17 @@ final class DiagramCanvasActionRegistrar {
 	static void installDefault(final JComponent component, final DiagramCanvasActions actions) {
 		final InputMap inputMap = component.getInputMap(JComponent.WHEN_FOCUSED);
 		final ActionMap actionMap = component.getActionMap();
+
+		DiagramCanvasActionRegistrar.bind(inputMap,
+				actionMap,
+				KeyStroke.getKeyStroke(KeyEvent.VK_Z, InputEvent.CTRL_DOWN_MASK),
+				"undo",
+				actions.undo());
+		DiagramCanvasActionRegistrar.bind(inputMap,
+				actionMap,
+				KeyStroke.getKeyStroke(KeyEvent.VK_Z, InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK),
+				"redo",
+				actions.redo());
 
 		DiagramCanvasActionRegistrar
 				.bind(inputMap, actionMap, KeyStroke.getKeyStroke(KeyEvent.VK_F2, 0), "renameSelection", actions.renameSelection());

@@ -74,9 +74,9 @@ import lu.kbra.modelizer_next.ui.dialogs.LinkEditorDialog;
 import lu.kbra.modelizer_next.ui.export.ViewExportScope;
 import lu.kbra.modelizer_next.ui.impl.DocumentChangeListener;
 
-public class DiagramCanvas extends JPanel
-		implements DiagramModelLookup, LayoutCache, SelectionController, NameResolver, PaletteController, ClipboardController,
-		LinkGeometryResolver, ConceptualAnchorCache, CanvasHitTester, CanvasExportRenderer, DiagramModelEditor, DragSelectionController, DiagramPathBuilder, MouseInteractionController {
+public class DiagramCanvas extends JPanel implements DiagramModelLookup, LayoutCache, SelectionController, NameResolver, PaletteController,
+		ClipboardController, LinkGeometryResolver, ConceptualAnchorCache, CanvasHitTester, CanvasExportRenderer, DiagramModelEditor,
+		DragSelectionController, DiagramPathBuilder, MouseInteractionController {
 
 	static final double PASTE_OFFSET = 30.0;
 
@@ -138,7 +138,7 @@ public class DiagramCanvas extends JPanel
 	final ModelDocument document;
 
 	final PanelType panelType;
-	final DocumentChangeListener eventListener;
+	final DocumentChangeListener documentEventListener;
 	DraggedSelection draggedSelection;
 
 	Point lastScreenPoint;
@@ -182,10 +182,10 @@ public class DiagramCanvas extends JPanel
 		return aSelected ? -1 : 1;
 	};
 
-	public DiagramCanvas(final ModelDocument document, final PanelType panelType, final DocumentChangeListener eventListener) {
+	public DiagramCanvas(final ModelDocument document, final PanelType panelType, final DocumentChangeListener documentEventListener) {
 		this.document = document;
 		this.panelType = panelType;
-		this.eventListener = eventListener;
+		this.documentEventListener = documentEventListener;
 
 		this.setBackground(DiagramCanvas.CANVAS_BACKGROUND_COLOR);
 		this.setOpaque(true);
@@ -240,6 +240,7 @@ public class DiagramCanvas extends JPanel
 		this.revalidate();
 		this.repaint();
 	}
+
 	String appendSuffix(final String value, final String suffix) {
 		if (value == null || value.isBlank()) {
 			return value;
@@ -309,6 +310,7 @@ public class DiagramCanvas extends JPanel
 		this.select(SelectedElement.forComment(commentId));
 		this.notifyDocumentChanged();
 	}
+
 	CopiedClass captureClass(final ClassModel classModel) {
 		final List<CopiedField> fields = new ArrayList<>();
 
@@ -783,6 +785,7 @@ public class DiagramCanvas extends JPanel
 		this.select(SelectedElement.forLink(linkModel.getId()));
 		this.notifyDocumentChanged();
 	}
+
 	FieldModel createFieldFromClipboard(final CopiedField copiedField, final boolean rename) {
 		final FieldModel fieldCopy = new FieldModel();
 
@@ -1617,7 +1620,9 @@ public class DiagramCanvas extends JPanel
 						this::editSelected,
 						this::copySelection,
 						this::cutSelection,
-						this::pasteSelection));
+						this::pasteSelection,
+						documentEventListener::undo,
+						documentEventListener::redo));
 	}
 
 	boolean isCommentVisible(final CommentModel commentModel) {
@@ -1656,6 +1661,7 @@ public class DiagramCanvas extends JPanel
 			g2.dispose();
 		}
 	}
+
 	boolean isLinkConnectedTo(final LinkModel linkModel, final String classId) {
 		if (linkModel == null || classId == null) {
 			return false;
@@ -1783,14 +1789,14 @@ public class DiagramCanvas extends JPanel
 
 	void notifyDocumentChanged() {
 		this.invalidateConceptualAnchorCache();
-		if (this.eventListener != null) {
-			this.eventListener.onDocumentChanged();
+		if (this.documentEventListener != null) {
+			this.documentEventListener.onDocumentChanged();
 		}
 	}
 
 	void notifySelectionChanged() {
-		if (this.eventListener != null) {
-			this.eventListener.onSelectionChanged(this.getSelectionInfo());
+		if (this.documentEventListener != null) {
+			this.documentEventListener.onSelectionChanged(this.getSelectionInfo());
 		}
 	}
 
@@ -1867,6 +1873,7 @@ public class DiagramCanvas extends JPanel
 
 		return best;
 	}
+
 	Point2D resolveOppositeReferencePoint(final Graphics2D g2, final String classId, final String fieldId) {
 		final ClassModel classModel = this.findClassById(classId);
 		if (classModel == null || !this.isVisible(classModel)) {

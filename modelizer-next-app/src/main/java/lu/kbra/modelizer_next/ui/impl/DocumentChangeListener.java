@@ -16,10 +16,24 @@ public interface DocumentChangeListener {
 
 		}
 
+		@Override
+		public void redo() {
+
+		}
+
+		@Override
+		public void undo() {
+
+		}
+
 	};
 
 	void onDocumentChanged();
 
 	void onSelectionChanged(SelectionInfo selectionInfo);
+
+	void redo();
+
+	void undo();
 
 }
