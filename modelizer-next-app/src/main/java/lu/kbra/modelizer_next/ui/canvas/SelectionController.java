@@ -3,7 +3,6 @@ package lu.kbra.modelizer_next.ui.canvas;
 import java.awt.event.MouseEvent;
 import java.util.Objects;
 
-import lu.kbra.modelizer_next.document.ModelDocument;
 import lu.kbra.modelizer_next.domain.ClassModel;
 import lu.kbra.modelizer_next.domain.CommentModel;
 import lu.kbra.modelizer_next.domain.LinkModel;
