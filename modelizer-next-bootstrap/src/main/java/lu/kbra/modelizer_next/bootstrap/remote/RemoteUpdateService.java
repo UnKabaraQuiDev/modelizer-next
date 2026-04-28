@@ -108,7 +108,9 @@ public final class RemoteUpdateService {
 	public BootstrapInstallerUpdate findLatestBootstrapInstaller(final UpdateChannel channel, final ParsedVersion currentVersion)
 			throws IOException, InterruptedException {
 		final JsonNode manifest = this.fetchReleaseManifestJson();
+		System.err.println(manifest);
 		final JsonNode bootstrap = this.findBootstrapNode(manifest, channel);
+		System.err.println(bootstrap);
 		if (bootstrap == null || bootstrap.isMissingNode() || bootstrap.isNull()) {
 			return new BootstrapInstallerUpdate(currentVersion,
 					currentVersion,
@@ -167,7 +169,8 @@ public final class RemoteUpdateService {
 		return BootstrapApp.MAPPER.readTree(response.body());
 	}
 
-	public AvailableUpdate findLatest(final UpdateChannel channel, final ParsedVersion currentVersion) throws IOException, InterruptedException {
+	public AvailableUpdate findLatest(final UpdateChannel channel, final ParsedVersion currentVersion)
+			throws IOException, InterruptedException {
 		final UpdateManifest manifest = this.fetchManifest();
 		final UpdateRelease release = manifest.channel(channel);
 		if (release == null || release.version == null || release.url == null || release.url.isBlank()) {
@@ -204,6 +207,8 @@ public final class RemoteUpdateService {
 			for (final JsonNode entry : entries) {
 				if (entry != null && entry.isObject() && Objects.equals(latest, entry.path("version").asText())) {
 					return entry;
+				} else {
+					System.err.println("not matching: " + entry);
 				}
 			}
 		}
@@ -216,13 +221,14 @@ public final class RemoteUpdateService {
 			return null;
 		}
 		for (JsonNode node : assets) {
-			if (node.path("platform").asText().equals(platform.manifestKey())
-					&& "bootstrap-native".equals(node.path("kind").asText())) {
+			if (node.path("platform").asText().equals(platform.manifestKey()) && "bootstrap-native".equals(node.path("kind").asText())) {
 				try {
 					return URI.create(node.path("url").asText());
 				} catch (IllegalArgumentException e) {
 					return null;
 				}
+			} else {
+				System.err.println("not matching: " + node);
 			}
 		}
 		return null;

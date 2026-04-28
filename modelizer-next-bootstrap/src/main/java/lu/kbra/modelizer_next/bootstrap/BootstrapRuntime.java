@@ -28,6 +28,7 @@ import lu.kbra.modelizer_next.bootstrap.subapp.ApplicationUpdateStorage;
 import lu.kbra.modelizer_next.bootstrap.subapp.InstalledApplication;
 import lu.kbra.modelizer_next.bootstrap.subapp.JarApplicationLauncher;
 import lu.kbra.modelizer_next.bootstrap.ui.BootstrapLoadingFrame;
+import lu.kbra.modelizer_next.common.Platform;
 import lu.kbra.modelizer_next.common.VersionComparator;
 import lu.kbra.modelizer_next.common.VersionComparator.ParsedVersion;
 
@@ -294,14 +295,14 @@ public class BootstrapRuntime implements UpdateRuntime {
 
 		try {
 			if (BootstrapApp.FORCE_BOOTSTRAP_UPDATE) {
-				this.handleOutdatedBootstrapLauncher(null);
+				this.handleOutdatedBootstrapLauncher(null, true);
 			}
 			this.applicationLauncher.launch(args, toBeOpened, this.currentApplication);
 		} catch (final AppLaunchException ex) {
 			if (!this.isCausedByClassNotFound(ex)) {
 				throw ex;
 			}
-			this.handleOutdatedBootstrapLauncher(ex);
+			this.handleOutdatedBootstrapLauncher(ex, false);
 		}
 	}
 
@@ -316,19 +317,17 @@ public class BootstrapRuntime implements UpdateRuntime {
 		}
 
 		final int choice = JOptionPane.showConfirmDialog(null,
-				"This app version needs a newer bootstrap install.\n\n"
-						+ "Required bootstrap version: " + manifest.bootstrapVersion + "\n"
-						+ "Current bootstrap version: " + currentBootstrapVersion + "\n\n"
-						+ "Update the bootstrap now?",
+				"This app version needs a newer bootstrap install.\n\n" + "Required bootstrap version: " + manifest.bootstrapVersion + "\n"
+						+ "Current bootstrap version: " + currentBootstrapVersion + "\n\n" + "Update the bootstrap now?",
 				"Bootstrap update required",
 				JOptionPane.YES_NO_OPTION,
 				JOptionPane.WARNING_MESSAGE);
 		if (choice == JOptionPane.YES_OPTION) {
-			this.handleOutdatedBootstrapLauncher(null);
+			this.handleOutdatedBootstrapLauncher(null, false);
 		}
 	}
 
-	private void handleOutdatedBootstrapLauncher(final AppLaunchException launchException) throws Exception {
+	private void handleOutdatedBootstrapLauncher(final AppLaunchException launchException, final boolean forced) throws Exception {
 		final ParsedVersion currentBootstrapVersion = lu.kbra.modelizer_next.common.VersionComparator.parse(BootstrapApp.VERSION);
 		final BootstrapLoadingFrame loadingFrame = new BootstrapLoadingFrame();
 		loadingFrame.setVisible(true);
@@ -336,11 +335,11 @@ public class BootstrapRuntime implements UpdateRuntime {
 			loadingFrame.update("Checking bootstrap launcher update...", 0, 0);
 			final BootstrapInstallerUpdate update = this.remoteUpdateService
 					.findLatestBootstrapInstaller(this.configuration.getUpdateChannel(), currentBootstrapVersion);
-			if (!update.isUpdateAvailable()) {
+			if (!update.isUpdateAvailable() && !forced) {
 				throw new AppLaunchException("The application needs a newer bootstrap launcher, but no bootstrap update is available.",
 						launchException);
 			}
-			if (update.platform() == lu.kbra.modelizer_next.common.Platform.UNSUPPORTED) {
+			if (update.platform() == Platform.UNSUPPORTED) {
 				throw new AppLaunchException("The application needs a newer bootstrap launcher, but this platform is not supported.",
 						launchException);
 			}
