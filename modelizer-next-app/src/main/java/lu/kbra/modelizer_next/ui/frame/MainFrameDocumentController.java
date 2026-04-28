@@ -86,8 +86,9 @@ public interface MainFrameDocumentController {
 				try {
 					final Transferable transferable = support.getTransferable();
 
-					@SuppressWarnings("unchecked") final List<File> files = (List<File>) transferable
-							.getTransferData(DataFlavor.javaFileListFlavor);
+					@SuppressWarnings(
+						"unchecked"
+					) final List<File> files = (List<File>) transferable.getTransferData(DataFlavor.javaFileListFlavor);
 
 					if (files == null || files.isEmpty()) {
 						return false;
@@ -99,10 +100,7 @@ public interface MainFrameDocumentController {
 						}
 					}
 
-					JOptionPane.showMessageDialog(frame,
-							"No supported file could be loaded.",
-							"Drop error",
-							JOptionPane.WARNING_MESSAGE);
+					JOptionPane.showMessageDialog(frame, "No supported file could be loaded.", "Drop error", JOptionPane.WARNING_MESSAGE);
 					return false;
 				} catch (final Exception ex) {
 					JOptionPane.showMessageDialog(frame,

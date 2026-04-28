@@ -26,11 +26,8 @@ final class DiagramCanvasActionRegistrar {
 		final InputMap inputMap = component.getInputMap(JComponent.WHEN_FOCUSED);
 		final ActionMap actionMap = component.getActionMap();
 
-		DiagramCanvasActionRegistrar.bind(inputMap,
-				actionMap,
-				KeyStroke.getKeyStroke(KeyEvent.VK_Z, InputEvent.CTRL_DOWN_MASK),
-				"undo",
-				actions.undo());
+		DiagramCanvasActionRegistrar
+				.bind(inputMap, actionMap, KeyStroke.getKeyStroke(KeyEvent.VK_Z, InputEvent.CTRL_DOWN_MASK), "undo", actions.undo());
 		DiagramCanvasActionRegistrar.bind(inputMap,
 				actionMap,
 				KeyStroke.getKeyStroke(KeyEvent.VK_Z, InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK),

@@ -35,7 +35,8 @@ interface DiagramPathBuilder extends DiagramCanvasExt {
 
 			if (linkModel.getAssociationClassId() != null && !linkModel.getAssociationClassId().isBlank()) {
 				final ClassModel associationClass = getCanvas().findClassById(linkModel.getAssociationClassId());
-				middle += "[" + (associationClass == null ? linkModel.getAssociationClassId() : getCanvas().resolveClassTitle(associationClass))
+				middle += "["
+						+ (associationClass == null ? linkModel.getAssociationClassId() : getCanvas().resolveClassTitle(associationClass))
 						+ "]";
 			}
 
@@ -63,7 +64,8 @@ interface DiagramPathBuilder extends DiagramCanvasExt {
 		}
 		case FIELD -> {
 			final ClassModel classModel = getCanvas().findClassById(getCanvas().selectedElement.classId());
-			final FieldModel fieldModel = getCanvas().findFieldById(getCanvas().selectedElement.classId(), getCanvas().selectedElement.fieldId());
+			final FieldModel fieldModel = getCanvas().findFieldById(getCanvas().selectedElement.classId(),
+					getCanvas().selectedElement.fieldId());
 			if (classModel == null || fieldModel == null) {
 				return "";
 			}

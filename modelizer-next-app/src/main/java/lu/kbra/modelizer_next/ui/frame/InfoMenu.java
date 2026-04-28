@@ -31,8 +31,12 @@ final class InfoMenu extends JMenu {
 		this.add(this.createUpdateChannelMenu(frame));
 		this.add(this.createVersionInfoItem(frame));
 		this.addBootstrapVersionInfoIfAvailable(frame);
-		this.add(this.createOpenUrlItem("Report issue...", App.ISSUES_URL, "Report an issue", "The issue link has been copied to your clipboard:"));
-		this.add(this.createOpenUrlItem("Website...", App.WEBSITE_URL, "Visit website", "The website link has been copied to your clipboard:"));
+		this.add(this.createOpenUrlItem("Report issue...",
+				App.ISSUES_URL,
+				"Report an issue",
+				"The issue link has been copied to your clipboard:"));
+		this.add(this
+				.createOpenUrlItem("Website...", App.WEBSITE_URL, "Visit website", "The website link has been copied to your clipboard:"));
 	}
 
 	private JMenuItem createCheckForUpdatesItem(final MainFrame frame) {
@@ -77,10 +81,13 @@ final class InfoMenu extends JMenu {
 		final boolean updateRuntimeAvailable = bootstrapRuntime.isPresent();
 		final JMenuItem versionInfo = new JMenuItem("Version: " + App.VERSION + " [" + App.DISTRIBUTOR + "]");
 		versionInfo.setToolTipText("Click to copy version informations.");
-		versionInfo.addActionListener(event -> Toolkit.getDefaultToolkit()
-				.getSystemClipboard()
-				.setContents(new StringSelection("==== APP INFO ====\n" + App.JSON.toPrettyString() + "\n==== BOOTSTRAP INFO ====\n"
-						+ (updateRuntimeAvailable ? bootstrapRuntime.get().getBootstrapJson().toPrettyString() : "NONE")), null));
+		versionInfo
+				.addActionListener(event -> Toolkit.getDefaultToolkit()
+						.getSystemClipboard()
+						.setContents(
+								new StringSelection("==== APP INFO ====\n" + App.JSON.toPrettyString() + "\n==== BOOTSTRAP INFO ====\n"
+										+ (updateRuntimeAvailable ? bootstrapRuntime.get().getBootstrapJson().toPrettyString() : "NONE")),
+								null));
 		return versionInfo;
 	}
 
@@ -94,10 +101,15 @@ final class InfoMenu extends JMenu {
 		final JMenuItem bootstrapVersionInfo = new JMenuItem(
 				"Bootstrap Version: " + bootstrapConfig.version() + " [" + bootstrapConfig.distributor() + "]");
 		bootstrapVersionInfo.setToolTipText("Click to copy bootstrap version informations.");
-		bootstrapVersionInfo.addActionListener(event -> Toolkit.getDefaultToolkit()
-				.getSystemClipboard()
-				.setContents(new StringSelection("==== APP INFO ====\n" + App.JSON.toPrettyString() + "\n==== BOOTSTRAP INFO ====\n"
-						+ bootstrapRuntime.get().getBootstrapJson().toPrettyString()), null));
+		bootstrapVersionInfo
+				.addActionListener(
+						event -> Toolkit.getDefaultToolkit()
+								.getSystemClipboard()
+								.setContents(
+										new StringSelection(
+												"==== APP INFO ====\n" + App.JSON.toPrettyString() + "\n==== BOOTSTRAP INFO ====\n"
+														+ bootstrapRuntime.get().getBootstrapJson().toPrettyString()),
+										null));
 		this.add(bootstrapVersionInfo);
 	}
 
@@ -113,10 +125,7 @@ final class InfoMenu extends JMenu {
 				e.printStackTrace();
 			}
 			Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(url), null);
-			JOptionPane.showMessageDialog(null,
-					fallbackMessage + "\n" + url,
-					title,
-					JOptionPane.INFORMATION_MESSAGE);
+			JOptionPane.showMessageDialog(null, fallbackMessage + "\n" + url, title, JOptionPane.INFORMATION_MESSAGE);
 		});
 		return item;
 	}

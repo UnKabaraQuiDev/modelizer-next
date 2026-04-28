@@ -7,12 +7,12 @@ import java.util.LinkedHashSet;
 import java.util.List;
 
 import javax.swing.BorderFactory;
+import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JRadioButtonMenuItem;
-import javax.swing.ButtonGroup;
 
 import lu.kbra.modelizer_next.App;
 import lu.kbra.modelizer_next.style.StylePalette;

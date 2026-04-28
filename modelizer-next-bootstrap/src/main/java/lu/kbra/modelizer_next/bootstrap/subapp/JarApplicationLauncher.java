@@ -12,7 +12,8 @@ public final class JarApplicationLauncher {
 
 	private URLClassLoader activeLoader;
 
-	public void launch(final String[] args, final Queue<File> toBeOpened, final InstalledApplication application) throws AppLaunchException {
+	public void launch(final String[] args, final Queue<File> toBeOpened, final InstalledApplication application)
+			throws AppLaunchException {
 		if (application == null) {
 			throw new AppLaunchException("No installed application is available.");
 		}

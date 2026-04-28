@@ -21,10 +21,7 @@ final class InsertMenu extends JMenu {
 		this.add(this.createCanvasMenuItem(frame, "New link", "addLink", MainFrameMenuBar.ctrl(KeyEvent.VK_L)));
 	}
 
-	private JMenuItem createCanvasMenuItem(final MainFrame frame,
-			final String text,
-			final String actionKey,
-			final KeyStroke keyStroke) {
+	private JMenuItem createCanvasMenuItem(final MainFrame frame, final String text, final String actionKey, final KeyStroke keyStroke) {
 		final JMenuItem item = new JMenuItem(text);
 		item.setAccelerator(keyStroke);
 		item.addActionListener(event -> {

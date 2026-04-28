@@ -264,8 +264,11 @@ interface LinkGeometryResolver extends DiagramCanvasExt {
 		return getCanvas().resolveTechnicalFieldAnchor(g2, target.classId(), target.fieldId(), source.classId(), source.fieldId());
 	}
 
-
-	default List<Point2D> buildSelfLinkPoints(final Graphics2D g2, final LinkModel linkModel, final Point2D fromPoint, final Point2D toPoint) {
+	default List<Point2D> buildSelfLinkPoints(
+			final Graphics2D g2,
+			final LinkModel linkModel,
+			final Point2D fromPoint,
+			final Point2D toPoint) {
 		final List<Point2D> points = new ArrayList<>();
 		points.add(fromPoint);
 
@@ -276,7 +279,8 @@ interface LinkGeometryResolver extends DiagramCanvasExt {
 		}
 
 		if (getCanvas().panelType != PanelType.CONCEPTUAL) {
-			final NodeLayout layout = getCanvas().resolveRenderLayout(getCanvas().findOrCreateNodeLayout(LayoutObjectType.CLASS, classModel.getId()));
+			final NodeLayout layout = getCanvas()
+					.resolveRenderLayout(getCanvas().findOrCreateNodeLayout(LayoutObjectType.CLASS, classModel.getId()));
 			final Rectangle2D bounds = getCanvas().computeClassBounds(g2, classModel, layout);
 			final AnchorSide side = getCanvas().chooseTechnicalSelfLinkSide(g2, linkModel);
 			final int sideLoad = getCanvas().getTechnicalSideLinkCount(g2, classModel.getId(), side, linkModel.getId());
@@ -295,7 +299,8 @@ interface LinkGeometryResolver extends DiagramCanvasExt {
 			return points;
 		}
 
-		final NodeLayout layout = getCanvas().resolveRenderLayout(getCanvas().findOrCreateNodeLayout(LayoutObjectType.CLASS, classModel.getId()));
+		final NodeLayout layout = getCanvas()
+				.resolveRenderLayout(getCanvas().findOrCreateNodeLayout(LayoutObjectType.CLASS, classModel.getId()));
 		final Rectangle2D bounds = getCanvas().computeClassBounds(g2, classModel, layout);
 		final double outsideOffset = DiagramCanvas.SELF_LINK_OUTSIDE_OFFSET + Math.max(placement.fromCount(), placement.toCount()) * 4.0;
 

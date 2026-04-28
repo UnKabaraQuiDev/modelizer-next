@@ -34,10 +34,7 @@ final class MainFrameMenuBar extends JMenuBar {
 		return appearanceMenu;
 	}
 
-	private JRadioButtonMenuItem createThemeItem(final MainFrame frame,
-			final String text,
-			final ThemeMode mode,
-			final ButtonGroup group) {
+	private JRadioButtonMenuItem createThemeItem(final MainFrame frame, final String text, final ThemeMode mode, final ButtonGroup group) {
 		final JRadioButtonMenuItem item = new JRadioButtonMenuItem(text);
 		item.setSelected(frame.appConfig.getThemeMode() == mode);
 		item.addActionListener(event -> frame.applyThemeAndReopen(mode));
