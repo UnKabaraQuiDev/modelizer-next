@@ -1,19 +1,36 @@
 {
   "channel": "snapshot",
-  "version": "5-SNAPSHOT-166",
-  "tag": "5-SNAPSHOT-166",
-  "releaseUrl": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/tag/5-SNAPSHOT-166",
-  "assetUrl": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/5-SNAPSHOT-166/modelizer-next-app-5-SNAPSHOT-166.jar",
-  "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/5-SNAPSHOT-166/modelizer-next-app-5-SNAPSHOT-166.jar",
+  "version": "5-SNAPSHOT-175",
+  "tag": "5-SNAPSHOT-175",
+  "releaseUrl": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/tag/5-SNAPSHOT-175",
+  "assetUrl": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/5-SNAPSHOT-175/modelizer-next-app-5-SNAPSHOT-175.jar",
+  "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/5-SNAPSHOT-175/modelizer-next-app-5-SNAPSHOT-175.jar",
   "platforms": [
-    "unknown",
-    "linux",
-    "macos",
-    "windows"
+    "unknown"
   ],
   "notes": "Latest snapshot build.",
-  "updatedAt": "2026-04-27T15:52:12Z",
+  "updatedAt": "2026-04-29T17:21:05Z",
   "entries": [
+    {
+      "version": "5-SNAPSHOT-175",
+      "tag": "5-SNAPSHOT-175",
+      "releaseUrl": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/tag/5-SNAPSHOT-175",
+      "assetUrl": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/5-SNAPSHOT-175/modelizer-next-app-5-SNAPSHOT-175.jar",
+      "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/5-SNAPSHOT-175/modelizer-next-app-5-SNAPSHOT-175.jar",
+      "platforms": [
+        "unknown"
+      ],
+      "notes": "Latest snapshot build.",
+      "publishedAt": "2026-04-29T17:21:05Z",
+      "assets": [
+        {
+          "name": "modelizer-next-app-5-SNAPSHOT-175.jar",
+          "platform": "unknown",
+          "kind": "app-standalone-jar",
+          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/5-SNAPSHOT-175/modelizer-next-app-5-SNAPSHOT-175.jar"
+        }
+      ]
+    },
     {
       "version": "5-SNAPSHOT-166",
       "tag": "5-SNAPSHOT-166",
