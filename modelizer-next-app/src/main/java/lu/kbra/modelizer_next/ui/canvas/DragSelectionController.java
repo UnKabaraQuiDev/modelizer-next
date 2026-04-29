@@ -14,6 +14,9 @@ import lu.kbra.modelizer_next.ui.canvas.datastruct.DraggedLayout;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.DraggedSelection;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectedElement;
 
+/**
+ * Contains drag-selection helpers for moving selected canvas elements.
+ */
 interface DragSelectionController extends DiagramCanvasExt {
 
 	default void addDraggedLayout(

@@ -23,6 +23,9 @@ import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectedType;
 import lu.kbra.modelizer_next.ui.dialogs.LinkEditorDialog;
 import lu.kbra.modelizer_next.ui.dialogs.RenameDialog;
 
+/**
+ * Contains document editing helpers for model changes made from the canvas.
+ */
 interface DiagramModelEditor extends DiagramCanvasExt {
 
 	default void addComment() {

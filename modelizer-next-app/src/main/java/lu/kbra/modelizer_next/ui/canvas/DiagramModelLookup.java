@@ -8,6 +8,9 @@ import lu.kbra.modelizer_next.domain.FieldModel;
 import lu.kbra.modelizer_next.domain.LinkModel;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectedElement;
 
+/**
+ * Contains lookup helpers for classes, comments, fields, links, layouts, and panel state.
+ */
 interface DiagramModelLookup extends DiagramCanvasExt {
 
 	default ClassModel findClassById(final String id) {

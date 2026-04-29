@@ -20,6 +20,9 @@ import lu.kbra.modelizer_next.ui.canvas.datastruct.LinkGeometry;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectedElement;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectedType;
 
+/**
+ * Contains anchor and geometry resolution for links and link labels.
+ */
 interface LinkGeometryResolver extends DiagramCanvasExt {
 
 	default Point2D computePolylineMiddlePoint(final List<Point2D> points) {

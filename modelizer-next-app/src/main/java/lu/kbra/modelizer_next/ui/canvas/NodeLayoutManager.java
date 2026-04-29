@@ -19,6 +19,9 @@ import lu.kbra.modelizer_next.ui.canvas.datastruct.CopiedLinkLayout;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.CopiedNodeLayout;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.DraggedLayout;
 
+/**
+ * Contains node movement and layout update helpers.
+ */
 public interface NodeLayoutManager extends DiagramCanvasExt {
 
 	default void applyNodeLayout(

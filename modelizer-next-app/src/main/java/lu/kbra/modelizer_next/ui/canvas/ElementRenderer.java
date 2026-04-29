@@ -20,6 +20,9 @@ import lu.kbra.modelizer_next.layout.PanelType;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.LinkGeometry;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectedElement;
 
+/**
+ * Contains drawing helpers for classes, comments, fields, links, and overlays.
+ */
 public interface ElementRenderer extends DiagramCanvasExt {
 
 	default void drawAlignedLinkLabel(final Graphics2D g2, final String text, final Point2D center, final double angle) {

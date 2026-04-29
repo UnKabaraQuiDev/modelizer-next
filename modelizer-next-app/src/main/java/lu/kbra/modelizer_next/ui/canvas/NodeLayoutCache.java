@@ -9,6 +9,9 @@ import lu.kbra.modelizer_next.layout.LinkLayout;
 import lu.kbra.modelizer_next.layout.NodeLayout;
 import lu.kbra.modelizer_next.layout.PanelState;
 
+/**
+ * Contains node layout lookup, creation, and bounds cache helpers.
+ */
 public interface NodeLayoutCache extends DiagramCanvasExt {
 
 	default Optional<NodeLayout> findNodeLayout(final LayoutObjectType objectType, final String objectId) {

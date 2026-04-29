@@ -19,8 +19,7 @@ final class EditMenu extends JMenu {
 		frame.undoMenuItem.addActionListener(event -> frame.undo());
 
 		frame.redoMenuItem = new JMenuItem("Redo");
-		frame.redoMenuItem.setAccelerator(
-				KeyStroke.getKeyStroke(KeyEvent.VK_Z, MainFrame.CTRL_MODIFIER | InputEvent.SHIFT_DOWN_MASK));
+		frame.redoMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Z, MainFrame.CTRL_MODIFIER | InputEvent.SHIFT_DOWN_MASK));
 		frame.redoMenuItem.addActionListener(event -> frame.redo());
 
 		this.add(frame.undoMenuItem);

@@ -17,6 +17,9 @@ import lu.kbra.modelizer_next.ui.canvas.datastruct.HitResult;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectedElement;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectedType;
 
+/**
+ * Contains creation actions for tables, fields, comments, and links.
+ */
 public interface ElementCreator extends DiagramCanvasExt {
 
 	default void createTechnicalLink(final SelectedElement fromEndpoint, final SelectedElement toEndpoint) {

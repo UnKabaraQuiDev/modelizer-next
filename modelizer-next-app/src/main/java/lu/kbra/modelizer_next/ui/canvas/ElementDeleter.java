@@ -3,6 +3,9 @@ package lu.kbra.modelizer_next.ui.canvas;
 import lu.kbra.modelizer_next.domain.ClassModel;
 import lu.kbra.modelizer_next.layout.LayoutObjectType;
 
+/**
+ * Contains deletion actions for the current canvas selection.
+ */
 public interface ElementDeleter extends DiagramCanvasExt {
 
 	default void deleteClass(final String classId) {

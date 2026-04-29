@@ -22,6 +22,9 @@ import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectedElement;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectedType;
 import lu.kbra.modelizer_next.ui.export.ViewExportScope;
 
+/**
+ * Contains file export actions and export scope handling.
+ */
 public interface ExportManager extends DiagramCanvasExt {
 
 	default Rectangle2D.Double computeExportContentBounds(final Graphics2D g2, final ViewExportScope scope) {

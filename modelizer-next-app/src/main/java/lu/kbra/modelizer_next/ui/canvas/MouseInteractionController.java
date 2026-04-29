@@ -16,6 +16,9 @@ import lu.kbra.modelizer_next.ui.canvas.datastruct.ResizingComment;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectedElement;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectedType;
 
+/**
+ * Contains mouse interaction handling for selection, dragging, panning, and link creation.
+ */
 interface MouseInteractionController extends DiagramCanvasExt {
 
 	default MouseAdapter createMouseAdapter() {

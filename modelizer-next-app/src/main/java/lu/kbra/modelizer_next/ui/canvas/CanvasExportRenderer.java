@@ -10,6 +10,9 @@ import java.util.LinkedHashSet;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectedElement;
 import lu.kbra.modelizer_next.ui.export.ViewExportScope;
 
+/**
+ * Contains export rendering helpers that paint the canvas into images and previews.
+ */
 interface CanvasExportRenderer extends DiagramCanvasExt {
 
 	default BufferedImage createExportImage(final ViewExportScope scope) {

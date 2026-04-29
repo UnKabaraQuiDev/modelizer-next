@@ -7,6 +7,9 @@ import lu.kbra.modelizer_next.domain.LinkModel;
 import lu.kbra.modelizer_next.style.StylePalette;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectedElement;
 
+/**
+ * Contains style palette lookup and default style application helpers.
+ */
 interface PaletteController extends DiagramCanvasExt {
 
 	default void applyDefaultPaletteToClass(final ClassModel classModel) {

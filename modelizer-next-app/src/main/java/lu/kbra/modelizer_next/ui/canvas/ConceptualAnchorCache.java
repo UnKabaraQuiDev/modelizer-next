@@ -20,6 +20,9 @@ import lu.kbra.modelizer_next.ui.canvas.datastruct.AnchorSidePair;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.ClassSideKey;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.LinkAnchorPlacement;
 
+/**
+ * Contains cache and placement logic for conceptual link anchors.
+ */
 interface ConceptualAnchorCache extends DiagramCanvasExt {
 
 	default Point2D computeConceptualAnchorPoint(final Rectangle2D bounds, final AnchorSide side, final int index, final int totalCount) {

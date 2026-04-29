@@ -20,6 +20,9 @@ import lu.kbra.modelizer_next.ui.canvas.datastruct.CopiedLink;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.CopiedLinkLayout;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.CopiedNodeLayout;
 
+/**
+ * Contains snapshot helpers used to copy classes, comments, fields, links, and layouts.
+ */
 public interface CaptureManager extends DiagramCanvasExt {
 
 	default CopiedClass captureClass(final ClassModel classModel) {
@@ -86,8 +89,7 @@ public interface CaptureManager extends DiagramCanvasExt {
 				to == null ? null : to.getClassId(),
 				to == null ? null : to.getFieldId(),
 				linkModel.getCardinalityFrom(),
-				linkModel
-						.getCardinalityTo(),
+				linkModel.getCardinalityTo(),
 				linkModel.getLabelFrom(),
 				linkModel.getLabelTo(),
 				getCanvas().captureLinkLayout(linkModel.getId()));

@@ -13,6 +13,9 @@ import lu.kbra.modelizer_next.ui.canvas.datastruct.AnchorSide;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.AnchorSidePair;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.CopiedLinkLayout;
 
+/**
+ * Contains link layout helpers for bends, labels, and association class placement.
+ */
 public interface LinkLayoutManager extends DiagramCanvasExt {
 
 	default void applyLinkLayout(final String linkId, final CopiedLinkLayout copiedLayout, final double offset) {
@@ -149,7 +152,7 @@ public interface LinkLayoutManager extends DiagramCanvasExt {
 		case LEFT, RIGHT -> otherBounds.getCenterY();
 		};
 	}
-	
+
 	default AnchorPair resolveConceptualAnchorPair(final Graphics2D g2, final LinkModel targetLink) {
 		getCanvas().ensureConceptualAnchorCache(g2);
 		return getCanvas().conceptualAnchorCache.get(targetLink.getId());

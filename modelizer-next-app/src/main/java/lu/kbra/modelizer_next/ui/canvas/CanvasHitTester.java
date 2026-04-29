@@ -19,6 +19,9 @@ import lu.kbra.modelizer_next.ui.canvas.datastruct.HitResult;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.LinkGeometry;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectedElement;
 
+/**
+ * Contains hit-testing helpers that map mouse positions to canvas elements.
+ */
 interface CanvasHitTester extends DiagramCanvasExt {
 
 	default FieldHitResult findFieldHit(final ClassModel classModel, final Rectangle2D classBounds, final Point2D.Double worldPoint) {

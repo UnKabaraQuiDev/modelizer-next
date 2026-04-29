@@ -16,6 +16,9 @@ import lu.kbra.modelizer_next.ui.dialogs.CommentEditorDialog;
 import lu.kbra.modelizer_next.ui.dialogs.FieldEditorDialog;
 import lu.kbra.modelizer_next.ui.dialogs.LinkEditorDialog;
 
+/**
+ * Contains edit dialogs and update helpers for canvas elements.
+ */
 public interface ElementEditor extends DiagramCanvasExt {
 
 	default void editClass(final String classId) {
@@ -97,8 +100,7 @@ public interface ElementEditor extends DiagramCanvasExt {
 			return;
 		}
 
-		final LinkEditorDialog.Result result = LinkEditorDialog
-				.showDialog(getCanvas(), getCanvas().document, linkModel, getPanelType());
+		final LinkEditorDialog.Result result = LinkEditorDialog.showDialog(getCanvas(), getCanvas().document, linkModel, getPanelType());
 		if (result == null || result.fromClassId() == null || result.toClassId() == null) {
 			return;
 		}

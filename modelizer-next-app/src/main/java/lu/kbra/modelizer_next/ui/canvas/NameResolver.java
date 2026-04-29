@@ -8,6 +8,9 @@ import lu.kbra.modelizer_next.domain.CommentModel;
 import lu.kbra.modelizer_next.domain.FieldModel;
 import lu.kbra.modelizer_next.layout.PanelType;
 
+/**
+ * Contains display-name and technical-name resolution helpers.
+ */
 interface NameResolver extends DiagramCanvasExt {
 
 	default String blankToFallback(final String primary, final String secondary, final String fallback) {

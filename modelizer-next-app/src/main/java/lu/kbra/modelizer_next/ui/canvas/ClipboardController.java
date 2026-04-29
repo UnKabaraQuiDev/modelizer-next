@@ -31,6 +31,9 @@ import lu.kbra.modelizer_next.ui.canvas.datastruct.CopiedLink;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectedElement;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectedType;
 
+/**
+ * Contains clipboard actions for copying, cutting, duplicating, and pasting canvas selections.
+ */
 interface ClipboardController extends DiagramCanvasExt {
 
 	default void copySelection() {

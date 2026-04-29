@@ -10,6 +10,9 @@ import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectedElement;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectionInfo;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.StylePreviewType;
 
+/**
+ * Contains selection state helpers and selection change actions.
+ */
 interface SelectionController extends DiagramCanvasExt {
 
 	default void addToSelection(final SelectedElement element) {

@@ -8,6 +8,9 @@ import lu.kbra.modelizer_next.domain.CommentKind;
 import lu.kbra.modelizer_next.domain.CommentModel;
 import lu.kbra.modelizer_next.domain.LinkModel;
 
+/**
+ * Contains visibility checks for classes, comments, fields, and links.
+ */
 public interface VisibilityManager extends DiagramCanvasExt {
 
 	default boolean isVisible(ClassModel c) {
