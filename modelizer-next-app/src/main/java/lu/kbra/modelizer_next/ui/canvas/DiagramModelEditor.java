@@ -29,47 +29,47 @@ interface DiagramModelEditor extends DiagramCanvasExt {
 		final CommentModel commentModel = new CommentModel();
 		commentModel.setKind(CommentKind.STANDALONE);
 		commentModel.setText("New comment");
-		commentModel.setVisibility(getCanvas().panelType);
-		getCanvas().applyDefaultPaletteToComment(commentModel);
+		commentModel.getVisibility().set(this.getPanelType());
+		this.getCanvas().applyDefaultPaletteToComment(commentModel);
 
-		if (getCanvas().selectedElement != null && getCanvas().selectedElement.type() == SelectedType.COMMENT) {
-			final CommentModel cm = getCanvas().findCommentById(getCanvas().selectedElement.commentId());
+		if (this.getCanvas().selectedElement != null && this.getCanvas().selectedElement.type() == SelectedType.COMMENT) {
+			final CommentModel cm = this.getCanvas().findCommentById(this.getCanvas().selectedElement.commentId());
 			final CommentBinding cb = cm.getBinding();
 			if (cm.getKind() != CommentKind.STANDALONE) {
 				commentModel.setKind(CommentKind.BOUND);
 				commentModel.setBinding(new CommentBinding(cb.getTargetType(), cb.getTargetId()));
 			}
-		} else if (getCanvas().selectedElement != null && getCanvas().selectedElement.type() != SelectedType.COMMENT
-				&& getCanvas().selectedElement.type() != SelectedType.NONE) {
+		} else if (this.getCanvas().selectedElement != null && this.getCanvas().selectedElement.type() != SelectedType.COMMENT
+				&& this.getCanvas().selectedElement.type() != SelectedType.NONE) {
 			commentModel.setKind(CommentKind.BOUND);
-			commentModel.setBinding(switch (getCanvas().selectedElement.type()) {
-			case CLASS -> new CommentBinding(BoundTargetType.CLASS, getCanvas().selectedElement.classId());
-			case LINK -> new CommentBinding(BoundTargetType.LINK, getCanvas().selectedElement.linkId());
-			case FIELD -> new CommentBinding(BoundTargetType.CLASS, getCanvas().selectedElement.classId());
-			default -> throw new IllegalStateException("Cannot bind comment to: " + getCanvas().selectedElement);
+			commentModel.setBinding(switch (this.getCanvas().selectedElement.type()) {
+			case CLASS -> new CommentBinding(BoundTargetType.CLASS, this.getCanvas().selectedElement.classId());
+			case LINK -> new CommentBinding(BoundTargetType.LINK, this.getCanvas().selectedElement.linkId());
+			case FIELD -> new CommentBinding(BoundTargetType.CLASS, this.getCanvas().selectedElement.classId());
+			default -> throw new IllegalStateException("Cannot bind comment to: " + this.getCanvas().selectedElement);
 			});
 		}
 
-		getCanvas().document.getModel().getComments().add(commentModel);
+		this.getCanvas().document.getModel().getComments().add(commentModel);
 
-		final NodeLayout layout = getCanvas()
-				.resolveRenderLayout(getCanvas().findOrCreateNodeLayout(LayoutObjectType.COMMENT, commentModel.getId()));
-		final Point2D.Double center = getCanvas().mouseWorldOrViewportCenter();
+		final NodeLayout layout = this.getCanvas()
+				.resolveRenderLayout(this.getCanvas().findOrCreateNodeLayout(LayoutObjectType.COMMENT, commentModel.getId()));
+		final Point2D.Double center = this.getCanvas().mouseWorldOrViewportCenter();
 		layout.setPosition(new Point2D.Double(center.getX() - 100, center.getY() - 30));
 		layout.setSize(new Size2D(220, 80));
 
-		getCanvas().select(SelectedElement.forComment(commentModel.getId()));
-		getCanvas().notifySelectionChanged();
-		getCanvas().notifyDocumentChanged();
-		getCanvas().repaint();
+		this.getCanvas().select(SelectedElement.forComment(commentModel.getId()));
+		this.getCanvas().notifySelectionChanged();
+		this.getCanvas().notifyDocumentChanged();
+		this.getCanvas().repaint();
 	}
 
 	default void addField() {
 		final ClassModel targetClass;
 
-		if (getCanvas().selectedElement != null && getCanvas().selectedElement.type() == SelectedType.CLASS
-				|| getCanvas().selectedElement != null && getCanvas().selectedElement.type() == SelectedType.FIELD) {
-			targetClass = getCanvas().findClassById(getCanvas().selectedElement.classId());
+		if (this.getCanvas().selectedElement != null && this.getCanvas().selectedElement.type() == SelectedType.CLASS
+				|| this.getCanvas().selectedElement != null && this.getCanvas().selectedElement.type() == SelectedType.FIELD) {
+			targetClass = this.getCanvas().findClassById(this.getCanvas().selectedElement.classId());
 		} else {
 			return;
 		}
@@ -80,25 +80,25 @@ interface DiagramModelEditor extends DiagramCanvasExt {
 
 		final FieldModel fieldModel = new FieldModel();
 		fieldModel.getNames().setConceptualName("New field");
-		getCanvas().applyDefaultPaletteToField(fieldModel);
+		this.getCanvas().applyDefaultPaletteToField(fieldModel);
 		targetClass.getFields().add(fieldModel);
 
-		getCanvas().select(SelectedElement.forField(targetClass.getId(), fieldModel.getId()));
-		getCanvas().notifySelectionChanged();
-		getCanvas().notifyDocumentChanged();
-		getCanvas().repaint();
+		this.getCanvas().select(SelectedElement.forField(targetClass.getId(), fieldModel.getId()));
+		this.getCanvas().notifySelectionChanged();
+		this.getCanvas().notifyDocumentChanged();
+		this.getCanvas().repaint();
 	}
 
 	default void addLink() {
 		final LinkModel linkModel = new LinkModel();
-		if (getCanvas().selectedElement != null && getCanvas().selectedElement.type() == SelectedType.CLASS) {
-			linkModel.setFrom(new LinkEnd(getCanvas().selectedElement.classId(), null));
+		if (this.getCanvas().selectedElement != null && this.getCanvas().selectedElement.type() == SelectedType.CLASS) {
+			linkModel.setFrom(new LinkEnd(this.getCanvas().selectedElement.classId(), null));
 		} else {
 			linkModel.setFrom(new LinkEnd(null, null));
 		}
 		linkModel.setTo(new LinkEnd(null, null));
 
-		if (getCanvas().panelType == PanelType.CONCEPTUAL) {
+		if (this.getPanelType() == PanelType.CONCEPTUAL) {
 			linkModel.setName("new relation");
 			linkModel.setCardinalityFrom(Cardinality.ONE);
 			linkModel.setCardinalityTo(Cardinality.ZERO_OR_MANY);
@@ -109,7 +109,7 @@ interface DiagramModelEditor extends DiagramCanvasExt {
 		}
 
 		final LinkEditorDialog.Result result = LinkEditorDialog
-				.showDialog(getCanvas(), getCanvas().document, linkModel, getCanvas().panelType);
+				.showDialog(this.getCanvas(), this.getCanvas().document, linkModel, this.getPanelType());
 		if (result == null || result.fromClassId() == null || result.toClassId() == null) {
 			return;
 		}
@@ -121,108 +121,109 @@ interface DiagramModelEditor extends DiagramCanvasExt {
 		createdLink.setFrom(new LinkEnd(result.fromClassId(), result.fromFieldId()));
 		createdLink.setTo(new LinkEnd(result.toClassId(), result.toFieldId()));
 
-		if (getCanvas().panelType == PanelType.CONCEPTUAL) {
+		if (this.getPanelType() == PanelType.CONCEPTUAL) {
 			createdLink.setCardinalityFrom(result.cardinalityFrom() == null ? Cardinality.ONE : result.cardinalityFrom());
 			createdLink.setCardinalityTo(result.cardinalityTo() == null ? Cardinality.ZERO_OR_MANY : result.cardinalityTo());
-			getCanvas().document.getModel().getConceptualLinks().add(createdLink);
+			this.getCanvas().document.getModel().getConceptualLinks().add(createdLink);
 		} else {
 			createdLink.setCardinalityFrom(null);
 			createdLink.setCardinalityTo(null);
-			getCanvas().document.getModel().getTechnicalLinks().add(createdLink);
+			this.getCanvas().document.getModel().getTechnicalLinks().add(createdLink);
 		}
-		getCanvas().applyDefaultPaletteToLink(createdLink);
+		this.getCanvas().applyDefaultPaletteToLink(createdLink);
 
-		getCanvas().findOrCreateLinkLayout(createdLink.getId());
-		getCanvas().select(SelectedElement.forLink(createdLink.getId()));
-		getCanvas().notifySelectionChanged();
-		getCanvas().notifyDocumentChanged();
-		getCanvas().repaint();
+		this.getCanvas().findOrCreateLinkLayout(createdLink.getId());
+		this.getCanvas().select(SelectedElement.forLink(createdLink.getId()));
+		this.getCanvas().notifySelectionChanged();
+		this.getCanvas().notifyDocumentChanged();
+		this.getCanvas().repaint();
 	}
 
 	default void addTable() {
 		final ClassModel classModel = new ClassModel();
 		classModel.getNames().setConceptualName("New table");
-		getCanvas().applyDefaultPaletteToClass(classModel);
+		this.getCanvas().applyDefaultPaletteToClass(classModel);
 
-		getCanvas().document.getModel().getClasses().add(classModel);
+		this.getCanvas().document.getModel().getClasses().add(classModel);
 
-		final NodeLayout layout = getCanvas()
-				.resolveRenderLayout(getCanvas().findOrCreateNodeLayout(LayoutObjectType.CLASS, classModel.getId()));
-		final Point2D.Double center = getCanvas().mouseWorldOrViewportCenter();
+		final NodeLayout layout = this.getCanvas()
+				.resolveRenderLayout(this.getCanvas().findOrCreateNodeLayout(LayoutObjectType.CLASS, classModel.getId()));
+		final Point2D.Double center = this.getCanvas().mouseWorldOrViewportCenter();
 		layout.setPosition(new Point2D.Double(center.getX() - 100, center.getY() - 40));
 		layout.setSize(new Size2D(180, 0));
 
-		getCanvas().select(SelectedElement.forClass(classModel.getId()));
-		getCanvas().notifySelectionChanged();
-		getCanvas().notifyDocumentChanged();
-		getCanvas().repaint();
+		this.getCanvas().select(SelectedElement.forClass(classModel.getId()));
+		this.getCanvas().notifySelectionChanged();
+		this.getCanvas().notifyDocumentChanged();
+		this.getCanvas().repaint();
 	}
 
 	default void deleteSelection() {
-		if (getCanvas().selectedElements.isEmpty()) {
+		if (this.getCanvas().selectedElements.isEmpty()) {
 			return;
 		}
 
-		final List<SelectedElement> snapshot = new ArrayList<>(getCanvas().selectedElements);
+		final List<SelectedElement> snapshot = new ArrayList<>(this.getCanvas().selectedElements);
 
 		for (final SelectedElement element : snapshot) {
 			switch (element.type()) {
-			case LINK -> getCanvas().deleteLink(element.linkId());
-			case COMMENT -> getCanvas().deleteComment(element.commentId());
-			case FIELD -> getCanvas().deleteField(element.classId(), element.fieldId());
-			case CLASS -> getCanvas().deleteClass(element.classId());
+			case LINK -> this.getCanvas().deleteLink(element.linkId());
+			case COMMENT -> this.getCanvas().deleteComment(element.commentId());
+			case FIELD -> this.getCanvas().deleteField(element.classId(), element.fieldId());
+			case CLASS -> this.getCanvas().deleteClass(element.classId());
 			default -> {
 			}
 			}
 		}
 
-		getCanvas().clearSelection();
-		getCanvas().notifyDocumentChanged();
-		getCanvas().repaint();
+		this.getCanvas().clearSelection();
+		this.getCanvas().notifyDocumentChanged();
+		this.getCanvas().repaint();
 	}
 
 	default void editSelected() {
-		if (getCanvas().selectedElement == null || getCanvas().selectedElement.type() == SelectedType.NONE) {
+		if (this.getCanvas().selectedElement == null || this.getCanvas().selectedElement.type() == SelectedType.NONE) {
 			return;
 		}
-		switch (getCanvas().selectedElement.type()) {
-		case CLASS -> getCanvas().editClass(getCanvas().selectedElement.classId());
-		case FIELD -> getCanvas().editField(getCanvas().selectedElement.classId(), getCanvas().selectedElement.fieldId());
-		case COMMENT -> getCanvas().editComment(getCanvas().selectedElement.commentId());
-		case LINK -> getCanvas().editLink(getCanvas().selectedElement.linkId());
+		switch (this.getCanvas().selectedElement.type()) {
+		case CLASS -> this.getCanvas().editClass(this.getCanvas().selectedElement.classId());
+		case FIELD -> this.getCanvas().editField(this.getCanvas().selectedElement.classId(), this.getCanvas().selectedElement.fieldId());
+		case COMMENT -> this.getCanvas().editComment(this.getCanvas().selectedElement.commentId());
+		case LINK -> this.getCanvas().editLink(this.getCanvas().selectedElement.linkId());
 		}
 	}
 
 	default void moveFieldSelection(final int delta) {
-		if (getCanvas().selectedElement != null && getCanvas().selectedElement.type() == SelectedType.CLASS) {
-			final ClassModel classModel = getCanvas().findClassById(getCanvas().selectedElement.classId());
+		if (this.getCanvas().selectedElement != null && this.getCanvas().selectedElement.type() == SelectedType.CLASS) {
+			final ClassModel classModel = this.getCanvas().findClassById(this.getCanvas().selectedElement.classId());
 			if (classModel.getFields().isEmpty()) {
 				return;
 			}
-			getCanvas().select(SelectedElement.forField(getCanvas().selectedElement.classId(), classModel.getFields().get(0).getId()));
+			this.getCanvas()
+					.select(SelectedElement.forField(this.getCanvas().selectedElement.classId(), classModel.getFields().get(0).getId()));
 			return;
 		}
 
-		if (getCanvas().selectedElement == null || getCanvas().selectedElement.type() != SelectedType.FIELD) {
+		if (this.getCanvas().selectedElement == null || this.getCanvas().selectedElement.type() != SelectedType.FIELD) {
 			return;
 		}
 
-		final ClassModel classModel = getCanvas().findClassById(getCanvas().selectedElement.classId());
+		final ClassModel classModel = this.getCanvas().findClassById(this.getCanvas().selectedElement.classId());
 		if (classModel == null) {
 			return;
 		}
 
-		final List<FieldModel> visibleFields = getCanvas().getVisibleFields(classModel);
+		final List<FieldModel> visibleFields = this.getCanvas().getVisibleFields(classModel);
 		int currentIndex = -1;
 		for (int i = 0; i < visibleFields.size(); i++) {
-			if (Objects.equals(visibleFields.get(i).getId(), getCanvas().selectedElement.fieldId())) {
+			if (Objects.equals(visibleFields.get(i).getId(), this.getCanvas().selectedElement.fieldId())) {
 				currentIndex = i;
 				break;
 			}
 		}
 
 		if (currentIndex == 0 && delta == -1) {
-			getCanvas().select(SelectedElement.forClass(classModel.getId()));
+			this.getCanvas().select(SelectedElement.forClass(classModel.getId()));
 			return;
 		}
 
@@ -235,22 +236,22 @@ interface DiagramModelEditor extends DiagramCanvasExt {
 			return;
 		}
 
-		getCanvas().select(SelectedElement.forField(classModel.getId(), visibleFields.get(newIndex).getId()));
+		this.getCanvas().select(SelectedElement.forField(classModel.getId(), visibleFields.get(newIndex).getId()));
 	}
 
 	default void moveSelectedFieldInList(final int delta) {
-		if (getCanvas().selectedElement == null || getCanvas().selectedElement.type() != SelectedType.FIELD) {
+		if (this.getCanvas().selectedElement == null || this.getCanvas().selectedElement.type() != SelectedType.FIELD) {
 			return;
 		}
 
-		final ClassModel classModel = getCanvas().findClassById(getCanvas().selectedElement.classId());
+		final ClassModel classModel = this.getCanvas().findClassById(this.getCanvas().selectedElement.classId());
 		if (classModel == null) {
 			return;
 		}
 
 		int currentIndex = -1;
 		for (int i = 0; i < classModel.getFields().size(); i++) {
-			if (Objects.equals(classModel.getFields().get(i).getId(), getCanvas().selectedElement.fieldId())) {
+			if (Objects.equals(classModel.getFields().get(i).getId(), this.getCanvas().selectedElement.fieldId())) {
 				currentIndex = i;
 				break;
 			}
@@ -268,46 +269,46 @@ interface DiagramModelEditor extends DiagramCanvasExt {
 		final FieldModel moved = classModel.getFields().remove(currentIndex);
 		classModel.getFields().add(newIndex, moved);
 
-		getCanvas().select(SelectedElement.forField(classModel.getId(), moved.getId()));
-		getCanvas().notifyDocumentChanged();
-		getCanvas().repaint();
+		this.getCanvas().select(SelectedElement.forField(classModel.getId(), moved.getId()));
+		this.getCanvas().notifyDocumentChanged();
+		this.getCanvas().repaint();
 	}
 
 	default void renameSelection() {
-		if (getCanvas().selectedElement == null || getCanvas().selectedElement.type() == SelectedType.NONE) {
+		if (this.getCanvas().selectedElement == null || this.getCanvas().selectedElement.type() == SelectedType.NONE) {
 			return;
 		}
 
 		final String title;
 		final String currentValue;
 
-		switch (getCanvas().selectedElement.type()) {
+		switch (this.getCanvas().selectedElement.type()) {
 		case CLASS -> {
-			final ClassModel classModel = getCanvas().findClassById(getCanvas().selectedElement.classId());
+			final ClassModel classModel = this.getCanvas().findClassById(this.getCanvas().selectedElement.classId());
 			if (classModel == null) {
 				return;
 			}
 			title = "Rename class";
-			currentValue = getCanvas().getEditableClassName(classModel);
+			currentValue = this.getCanvas().getEditableClassName(classModel);
 		}
 		case FIELD -> {
-			final FieldModel fieldModel = getCanvas().findFieldById(getCanvas().selectedElement.classId(),
-					getCanvas().selectedElement.fieldId());
+			final FieldModel fieldModel = this.getCanvas()
+					.findFieldById(this.getCanvas().selectedElement.classId(), this.getCanvas().selectedElement.fieldId());
 			if (fieldModel == null) {
 				return;
 			}
 			title = "Rename field";
-			currentValue = getCanvas().getEditableFieldName(fieldModel);
+			currentValue = this.getCanvas().getEditableFieldName(fieldModel);
 		}
 		case COMMENT -> {
 			title = "Rename comment";
-			currentValue = getCanvas().getEditableCommentText(getCanvas().selectedElement.commentId());
+			currentValue = this.getCanvas().getEditableCommentText(this.getCanvas().selectedElement.commentId());
 		}
 		case LINK -> {
-			if (getCanvas().panelType != PanelType.CONCEPTUAL) {
+			if (this.getPanelType() != PanelType.CONCEPTUAL) {
 				return;
 			}
-			final LinkModel linkModel = getCanvas().findLinkById(getCanvas().selectedElement.linkId());
+			final LinkModel linkModel = this.getCanvas().findLinkById(this.getCanvas().selectedElement.linkId());
 			if (linkModel == null) {
 				return;
 			}
@@ -319,27 +320,31 @@ interface DiagramModelEditor extends DiagramCanvasExt {
 		}
 		}
 
-		final String newValue = RenameDialog.showDialog(getCanvas(), title, currentValue);
+		final String newValue = RenameDialog.showDialog(this.getCanvas(), title, currentValue);
 		if (newValue == null) {
 			return;
 		}
 
-		switch (getCanvas().selectedElement.type()) {
-		case CLASS -> getCanvas().setEditableClassName(getCanvas().findClassById(getCanvas().selectedElement.classId()), newValue);
-		case FIELD -> getCanvas().setEditableFieldName(
-				getCanvas().findFieldById(getCanvas().selectedElement.classId(), getCanvas().selectedElement.fieldId()),
-				newValue);
-		case COMMENT -> getCanvas().setEditableCommentText(getCanvas().selectedElement.commentId(), newValue);
-		case LINK -> getCanvas().findLinkById(getCanvas().selectedElement.linkId()).setName(newValue);
+		switch (this.getCanvas().selectedElement.type()) {
+		case CLASS ->
+			this.getCanvas().setEditableClassName(this.getCanvas().findClassById(this.getCanvas().selectedElement.classId()), newValue);
+		case FIELD -> this.getCanvas()
+				.setEditableFieldName(
+						this.getCanvas()
+								.findFieldById(this.getCanvas().selectedElement.classId(), this.getCanvas().selectedElement.fieldId()),
+						newValue);
+		case COMMENT -> this.getCanvas().setEditableCommentText(this.getCanvas().selectedElement.commentId(), newValue);
+		case LINK -> this.getCanvas().findLinkById(this.getCanvas().selectedElement.linkId()).setName(newValue);
 		default -> {
 		}
 		}
 
-		getCanvas().notifySelectionChanged();
-		getCanvas().notifyDocumentChanged();
-		getCanvas().repaint();
+		this.getCanvas().notifySelectionChanged();
+		this.getCanvas().notifyDocumentChanged();
+		this.getCanvas().repaint();
 	}
 
+	@Override
 	DiagramCanvas getCanvas();
 
 }

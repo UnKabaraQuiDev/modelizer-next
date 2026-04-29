@@ -100,9 +100,10 @@ public final class OnlineModelizerImporter {
 		commentModel.setTextColor(Color.BLACK);
 		commentModel.setBackgroundColor(ImportJsonSupport.parseColor(dataNode.get("color"), new Color(0xFFF7CC)));
 		commentModel.setBorderColor(Color.BLACK);
-		commentModel.setVisibleInConceptual(dataNode.path("visibility").path("conceptual").asBoolean(true));
-		commentModel.setVisibleInLogical(dataNode.path("visibility").path("logical").asBoolean(true));
-		commentModel.setVisibleInPhysical(dataNode.path("visibility").path("physical").asBoolean(true));
+		commentModel.getVisibility()
+				.set(dataNode.path("visibility").path("conceptual").asBoolean(true),
+						dataNode.path("visibility").path("logical").asBoolean(true),
+						dataNode.path("visibility").path("physical").asBoolean(true));
 		return commentModel;
 	}
 
@@ -183,11 +184,10 @@ public final class OnlineModelizerImporter {
 
 			classModel.getNames().setConceptualName(conceptualName);
 			classModel.getNames().setTechnicalName(technicalName);
-//			classModel.setComment(ImportJsonSupport.readText(dataNode, "comment", ""));
-			classModel.setGroup(ImportJsonSupport.readText(dataNode, "group", ""));
-			classModel.getVisibility().setConceptual(dataNode.path("visibility").path("conceptual").asBoolean(true));
-			classModel.getVisibility().setLogical(dataNode.path("visibility").path("logical").asBoolean(true));
-			classModel.getVisibility().setPhysical(dataNode.path("visibility").path("physical").asBoolean(true));
+			classModel.getVisibility()
+					.set(dataNode.path("visibility").path("conceptual").asBoolean(true),
+							dataNode.path("visibility").path("logical").asBoolean(true),
+							dataNode.path("visibility").path("physical").asBoolean(true));
 			classModel.getStyle().setTextColor(Color.BLACK);
 			classModel.getStyle().setBackgroundColor(ImportJsonSupport.parseColor(dataNode.get("color"), Color.WHITE));
 			classModel.getStyle().setBorderColor(Color.BLACK);
@@ -199,7 +199,6 @@ public final class OnlineModelizerImporter {
 
 				fieldModel.getNames().setConceptualName(fieldName);
 				fieldModel.getNames().setTechnicalName(logicalName);
-				fieldModel.setComment(ImportJsonSupport.readText(attributeNode, "comment", ""));
 				fieldModel.setNotConceptual(!attributeNode.path("visibility").path("conceptual").asBoolean(true));
 				fieldModel.setPrimaryKey(attributeNode.path("primaryKey").asBoolean(false));
 				fieldModel.setUnique(attributeNode.path("unique").asBoolean(false));

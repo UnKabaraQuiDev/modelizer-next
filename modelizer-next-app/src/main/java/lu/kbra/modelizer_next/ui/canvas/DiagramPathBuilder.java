@@ -30,7 +30,7 @@ interface DiagramPathBuilder extends DiagramCanvasExt {
 		final String fromName = fromClass == null ? "?" : getCanvas().resolveClassTitle(fromClass);
 		final String toName = toClass == null ? "?" : getCanvas().resolveClassTitle(toClass);
 
-		if (getCanvas().panelType == PanelType.CONCEPTUAL) {
+		if (getPanelType() == PanelType.CONCEPTUAL) {
 			String middle = linkModel.getName() == null || linkModel.getName().isBlank() ? "link" : linkModel.getName();
 
 			if (linkModel.getAssociationClassId() != null && !linkModel.getAssociationClassId().isBlank()) {

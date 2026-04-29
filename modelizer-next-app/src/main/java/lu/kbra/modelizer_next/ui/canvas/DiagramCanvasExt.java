@@ -10,7 +10,7 @@ public interface DiagramCanvasExt {
 	ModelDocument getDocument();
 
 	default PanelType getPanelType() {
-		return getCanvas().getPanelType();
+		return getPanelType();
 	}
 
 }

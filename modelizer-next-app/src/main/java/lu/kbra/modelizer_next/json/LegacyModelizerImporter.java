@@ -121,9 +121,10 @@ public class LegacyModelizerImporter {
 		commentModel.setTextColor(LegacyModelizerImporter.parseColor(commentNode.get("foreground"), Color.BLACK));
 		commentModel.setBackgroundColor(LegacyModelizerImporter.parseColor(commentNode.get("background"), new Color(0xFFF7CC)));
 		commentModel.setBorderColor(LegacyModelizerImporter.parseColor(commentNode.get("foreground"), Color.BLACK));
-		commentModel.setVisibleInConceptual(commentNode.path("conceptual").asBoolean(true));
-		commentModel.setVisibleInLogical(commentNode.path("logical").asBoolean(true));
-		commentModel.setVisibleInPhysical(commentNode.path("physical").asBoolean(true));
+		commentModel.getVisibility()
+				.set(commentNode.path("conceptual").asBoolean(true),
+						commentNode.path("logical").asBoolean(true),
+						commentNode.path("physical").asBoolean(true));
 		return commentModel;
 	}
 
@@ -172,8 +173,6 @@ public class LegacyModelizerImporter {
 
 			classModel.getNames().setConceptualName(className);
 			classModel.getNames().setTechnicalName(technicalName);
-//			classModel.setComment(LegacyModelizerImporter.readText(tableNode, "comment", ""));
-			classModel.setGroup(LegacyModelizerImporter.readText(tableNode, "group", ""));
 			classModel.getVisibility().setConceptual(tableNode.path("conceptual").asBoolean(true));
 			classModel.getVisibility().setLogical(tableNode.path("logical").asBoolean(true));
 			classModel.getVisibility().setPhysical(tableNode.path("physical").asBoolean(true));
@@ -188,7 +187,6 @@ public class LegacyModelizerImporter {
 
 				fieldModel.getNames().setConceptualName(fieldName);
 				fieldModel.getNames().setTechnicalName(fieldTechnicalName);
-				fieldModel.setComment(LegacyModelizerImporter.readText(fieldNode, "comment", ""));
 				fieldModel.setNotConceptual(fieldNode.path("noConceptual").asBoolean(false));
 				fieldModel.setPrimaryKey(fieldNode.path("primary").asBoolean(false));
 				fieldModel.setUnique(fieldNode.path("unique").asBoolean(false));

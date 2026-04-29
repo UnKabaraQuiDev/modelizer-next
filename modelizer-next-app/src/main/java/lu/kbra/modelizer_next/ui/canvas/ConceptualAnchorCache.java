@@ -37,7 +37,7 @@ interface ConceptualAnchorCache extends DiagramCanvasExt {
 	}
 
 	default void ensureConceptualAnchorCache(final Graphics2D g2) {
-		if (getCanvas().panelType != PanelType.CONCEPTUAL || getCanvas().conceptualAnchorCacheValid) {
+		if (getPanelType() != PanelType.CONCEPTUAL || getCanvas().conceptualAnchorCacheValid) {
 			return;
 		}
 

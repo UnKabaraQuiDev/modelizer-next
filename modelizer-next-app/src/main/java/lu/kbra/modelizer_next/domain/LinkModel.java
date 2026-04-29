@@ -19,7 +19,7 @@ public class LinkModel {
 
 	public LinkModel() {
 		this.id = UUID.randomUUID().toString();
-		this.name = "";
+		this.name = null;
 		this.from = new LinkEnd();
 		this.to = new LinkEnd();
 		this.cardinalityFrom = Cardinality.ONE;

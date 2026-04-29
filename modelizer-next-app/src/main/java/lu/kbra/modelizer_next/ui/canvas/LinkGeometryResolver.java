@@ -135,14 +135,14 @@ interface LinkGeometryResolver extends DiagramCanvasExt {
 		final Point2D fromPoint;
 		final Point2D toPoint;
 
-		if (getCanvas().panelType == PanelType.CONCEPTUAL) {
+		if (getPanelType() == PanelType.CONCEPTUAL) {
 			final AnchorPair anchorPair = getCanvas().resolveConceptualAnchorPair(g2, linkModel);
 			if (anchorPair == null) {
 				return null;
 			}
 			fromPoint = anchorPair.from();
 			toPoint = anchorPair.to();
-		} else if (getCanvas().isSelfLink(linkModel)) {
+		} else if (linkModel.isSelfLinking()) {
 			final AnchorSide selfLinkSide = getCanvas().chooseTechnicalSelfLinkSide(g2, linkModel);
 			fromPoint = getCanvas()
 					.resolveTechnicalSelfLinkAnchor(g2, linkModel.getFrom().getClassId(), linkModel.getFrom().getFieldId(), selfLinkSide);
@@ -165,7 +165,7 @@ interface LinkGeometryResolver extends DiagramCanvasExt {
 		}
 
 		final List<Point2D> points;
-		if (getCanvas().isSelfLink(linkModel)) {
+		if (linkModel.isSelfLinking()) {
 			points = getCanvas().buildSelfLinkPoints(g2, linkModel, fromPoint, toPoint);
 		} else {
 			points = new ArrayList<>();
@@ -213,7 +213,7 @@ interface LinkGeometryResolver extends DiagramCanvasExt {
 			return getCanvas().resolveCommentCenterAnchor(g2, source.commentId());
 		}
 
-		if (getCanvas().panelType == PanelType.CONCEPTUAL) {
+		if (getPanelType() == PanelType.CONCEPTUAL) {
 			final Point2D reference = getCanvas().linkPreviewTarget != null
 					? getCanvas().resolvePreviewTargetAnchor(g2, getCanvas().linkPreviewTarget)
 					: getCanvas().linkPreviewMousePoint;
@@ -256,7 +256,7 @@ interface LinkGeometryResolver extends DiagramCanvasExt {
 			return getCanvas().resolveLinkMiddleAnchor(g2, target.linkId());
 		}
 
-		if (getCanvas().panelType == PanelType.CONCEPTUAL) {
+		if (getPanelType() == PanelType.CONCEPTUAL) {
 			final Point2D reference = getCanvas().resolvePreviewSourceAnchorReference(g2);
 			return getCanvas().resolveConceptualPreviewAnchor(g2, target.classId(), reference);
 		}
@@ -278,7 +278,7 @@ interface LinkGeometryResolver extends DiagramCanvasExt {
 			return points;
 		}
 
-		if (getCanvas().panelType != PanelType.CONCEPTUAL) {
+		if (getPanelType() != PanelType.CONCEPTUAL) {
 			final NodeLayout layout = getCanvas()
 					.resolveRenderLayout(getCanvas().findOrCreateNodeLayout(LayoutObjectType.CLASS, classModel.getId()));
 			final Rectangle2D bounds = getCanvas().computeClassBounds(g2, classModel, layout);

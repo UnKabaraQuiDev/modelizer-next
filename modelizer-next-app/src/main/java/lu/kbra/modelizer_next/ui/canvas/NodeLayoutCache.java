@@ -9,14 +9,14 @@ import lu.kbra.modelizer_next.layout.LinkLayout;
 import lu.kbra.modelizer_next.layout.NodeLayout;
 import lu.kbra.modelizer_next.layout.PanelState;
 
-interface LayoutCache extends DiagramCanvasExt {
+public interface NodeLayoutCache extends DiagramCanvasExt {
 
 	default Optional<NodeLayout> findNodeLayout(final LayoutObjectType objectType, final String objectId) {
 		if (objectId == null) {
 			return Optional.empty();
 		}
 
-		for (final NodeLayout layout : this.getPanelState().getNodeLayouts()) {
+		for (final NodeLayout layout : getCanvas().getPanelState().getNodeLayouts()) {
 			if (layout.getObjectType() == objectType && objectId.equals(layout.getObjectId())) {
 				return Optional.of(layout);
 			}
@@ -26,7 +26,7 @@ interface LayoutCache extends DiagramCanvasExt {
 	}
 
 	default LinkLayout findOrCreateLinkLayout(final String linkId) {
-		for (final LinkLayout linkLayout : this.getPanelState().getLinkLayouts()) {
+		for (final LinkLayout linkLayout : getCanvas().getPanelState().getLinkLayouts()) {
 			if (linkLayout.getLinkId().equals(linkId)) {
 				return linkLayout;
 			}
@@ -34,12 +34,12 @@ interface LayoutCache extends DiagramCanvasExt {
 
 		final LinkLayout linkLayout = new LinkLayout();
 		linkLayout.setLinkId(linkId);
-		this.getPanelState().getLinkLayouts().add(linkLayout);
+		getCanvas().getPanelState().getLinkLayouts().add(linkLayout);
 		return linkLayout;
 	}
 
 	default NodeLayout findOrCreateNodeLayout(final LayoutObjectType objectType, final String objectId) {
-		for (final NodeLayout layout : this.getPanelState().getNodeLayouts()) {
+		for (final NodeLayout layout : getCanvas().getPanelState().getNodeLayouts()) {
 			if (layout.getObjectType() == objectType && layout.getObjectId().equals(objectId)) {
 				return layout;
 			}
@@ -48,10 +48,10 @@ interface LayoutCache extends DiagramCanvasExt {
 		final NodeLayout layout = new NodeLayout();
 		layout.setObjectType(objectType);
 		layout.setObjectId(objectId);
-		layout.setPosition(new Point2D.Double(80 + this.getPanelState().getNodeLayouts().size() * 30,
-				80 + this.getPanelState().getNodeLayouts().size() * 30));
+		layout.setPosition(new Point2D.Double(80 + getCanvas().getPanelState().getNodeLayouts().size() * 30,
+				80 + getCanvas().getPanelState().getNodeLayouts().size() * 30));
 		layout.setSize(new Size2D(0, 0));
-		this.getPanelState().getNodeLayouts().add(layout);
+		getCanvas().getPanelState().getNodeLayouts().add(layout);
 		return layout;
 	}
 

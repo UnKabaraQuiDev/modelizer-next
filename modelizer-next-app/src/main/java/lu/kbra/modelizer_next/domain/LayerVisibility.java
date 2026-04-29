@@ -18,7 +18,7 @@ public class LayerVisibility {
 		set(pts);
 	}
 
-	public boolean is(PanelType pt) {
+	public boolean isVisible(PanelType pt) {
 		return switch (pt) {
 		case CONCEPTUAL -> conceptual;
 		case LOGICAL -> logical;
@@ -26,7 +26,7 @@ public class LayerVisibility {
 		};
 	}
 
-	public void set(PanelType[] pts) {
+	public void set(PanelType... pts) {
 		clear();
 		for (PanelType pt : pts) {
 			switch (pt) {

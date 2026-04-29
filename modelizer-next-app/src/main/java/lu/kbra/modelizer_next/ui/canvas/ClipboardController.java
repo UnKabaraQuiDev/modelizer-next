@@ -133,7 +133,7 @@ interface ClipboardController extends DiagramCanvasExt {
 			}
 		}
 
-		DiagramCanvas.clipboardSnapshot = new ClipboardSnapshot(getCanvas().panelType,
+		DiagramCanvas.clipboardSnapshot = new ClipboardSnapshot(getPanelType(),
 				List.copyOf(copiedClasses),
 				List.copyOf(copiedFields),
 				List.copyOf(copiedComments),
@@ -194,7 +194,6 @@ interface ClipboardController extends DiagramCanvasExt {
 			final ClassModel copy = new ClassModel();
 			copy.getNames().setConceptualName(source.getNames().getConceptualName() + " Copy");
 			copy.getNames().setTechnicalName(source.getNames().getTechnicalName() + "_COPY");
-			copy.setGroup(source.getGroup());
 			copy.getVisibility().setConceptual(source.getVisibility().isConceptual());
 			copy.getVisibility().setLogical(source.getVisibility().isLogical());
 			copy.getVisibility().setPhysical(source.getVisibility().isPhysical());
@@ -207,7 +206,6 @@ interface ClipboardController extends DiagramCanvasExt {
 				fieldCopy.getNames().setConceptualName(sourceField.getNames().getConceptualName());
 				fieldCopy.getNames().setTechnicalName(sourceField.getNames().getTechnicalName());
 				fieldCopy.setNotConceptual(sourceField.isNotConceptual());
-				fieldCopy.setComment(sourceField.getComment());
 				fieldCopy.setPrimaryKey(sourceField.isPrimaryKey());
 				fieldCopy.setUnique(sourceField.isUnique());
 				fieldCopy.setNotNull(sourceField.isNotNull());
@@ -245,7 +243,6 @@ interface ClipboardController extends DiagramCanvasExt {
 			copy.getNames().setConceptualName(source.getNames().getConceptualName() + " Copy");
 			copy.getNames().setTechnicalName(source.getNames().getTechnicalName() + "_COPY");
 			copy.setNotConceptual(source.isNotConceptual());
-			copy.setComment(source.getComment());
 			copy.setPrimaryKey(source.isPrimaryKey());
 			copy.setUnique(source.isUnique());
 			copy.setNotNull(source.isNotNull());
@@ -388,7 +385,6 @@ interface ClipboardController extends DiagramCanvasExt {
 
 			classCopy.getNames().setConceptualName(getCanvas().appendSuffix(copiedClass.conceptualName(), " Copy"));
 			classCopy.getNames().setTechnicalName(getCanvas().appendSuffix(copiedClass.technicalName(), "_COPY"));
-			classCopy.setGroup(copiedClass.group());
 
 			classCopy.getVisibility().setConceptual(copiedClass.visibleInConceptual());
 			classCopy.getVisibility().setLogical(copiedClass.visibleInLogical());
@@ -440,7 +436,7 @@ interface ClipboardController extends DiagramCanvasExt {
 			newSelection.add(SelectedElement.forField(owner.getId(), fieldCopy.getId()));
 		}
 
-		if (clipboard.panelType() == getCanvas().panelType) {
+		if (clipboard.panelType() == getPanelType()) {
 			for (final CopiedLink copiedLink : clipboard.links()) {
 				final LinkModel linkCopy = getCanvas().createLinkFromClipboard(copiedLink, pastedClassIds, pastedFieldIds);
 
@@ -465,10 +461,8 @@ interface ClipboardController extends DiagramCanvasExt {
 			commentCopy.setTextColor(copiedComment.textColor());
 			commentCopy.setBackgroundColor(copiedComment.backgroundColor());
 			commentCopy.setBorderColor(copiedComment.borderColor());
-
-			commentCopy.setVisibleInConceptual(copiedComment.visibleInConceptual());
-			commentCopy.setVisibleInLogical(copiedComment.visibleInLogical());
-			commentCopy.setVisibleInPhysical(copiedComment.visibleInPhysical());
+			commentCopy.getVisibility()
+					.set(copiedComment.visibleInConceptual(), copiedComment.visibleInLogical(), copiedComment.visibleInPhysical());
 
 			final CommentBinding binding = getCanvas().createRemappedCommentBinding(copiedComment, pastedClassIds, pastedLinkIds);
 			if (binding != null) {
