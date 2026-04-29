@@ -3,6 +3,8 @@ package lu.kbra.modelizer_next.domain;
 import java.awt.Color;
 import java.util.UUID;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class CommentModel {
 
 	private Color textColor;
@@ -101,24 +103,27 @@ public class CommentModel {
 	public void setVisibility(final LayerVisibility visibility) {
 		this.visibility = visibility;
 	}
-	
-//	public LayerVisibility getOrCreateVisibility() {
-//		return visibility == null ? (visibility = new LayerVisibility()) : visibility;
-//	}
-
-//	public void setVisibility(final PanelType... pts) {
-//		if (visibility == null) {
-//			this.visibility = new LayerVisibility(pts);
-//			return;
-//		}
-//		visibility.set(pts);
-//	}
 
 	@Override
 	public String toString() {
 		return "CommentModel@" + System.identityHashCode(this) + " [textColor=" + textColor + ", backgroundColor=" + backgroundColor
 				+ ", borderColor=" + borderColor + ", id=" + id + ", kind=" + kind + ", text=" + text + ", binding=" + binding
 				+ ", visibility=" + visibility + "]";
+	}
+
+	@JsonProperty("visibleInConceptual")
+	public void setVisibleInConceptualLegacy(boolean visibleInConceptual) {
+		this.visibility.setConceptual(visibleInConceptual);
+	}
+
+	@JsonProperty("visibleInLogical")
+	public void setVisibleInLogicalLegacy(boolean visibleInLogical) {
+		this.visibility.setLogical(visibleInLogical);
+	}
+
+	@JsonProperty("visibleInPhysical")
+	public void setVisibleInPhysicalLegacy(boolean visibleInPhysical) {
+		this.visibility.setPhysical(visibleInPhysical);
 	}
 
 }

@@ -151,7 +151,7 @@ public final class CommandLineExportParser {
 				  -o, --out <directory>      Output directory, default: current directory
 				  -s, --scope <scope>        selection|view|everything, default: everything
 				  -p, --panels <list>        Comma-separated PanelType names: conceptual (c), logical (l), physical (p)
-				  -n,  --pattern <pattern>    File name pattern, default: '%DEFAULT_FILE_PATTER%', available: %FILE_PATTERN_TOKENS%
+				  -n, --pattern <pattern>    File name pattern, default: '%DEFAULT_FILE_PATTER%', available: %FILE_PATTERN_TOKENS%
 				  -f, --force                Continue on legacy/newer-version warnings
 				  -h, --help                 Print this help
 				""".replace("%DEFAULT_FILE_PATTER%", ViewExporter.DEFAULT_FILE_PATTERN)
