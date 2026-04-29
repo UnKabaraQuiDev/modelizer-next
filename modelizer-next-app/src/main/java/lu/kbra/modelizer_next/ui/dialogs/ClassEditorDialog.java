@@ -13,6 +13,7 @@ import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -26,7 +27,8 @@ import lu.kbra.modelizer_next.ui.component.ColorButton;
 
 public final class ClassEditorDialog {
 
-	public record Result(String conceptualName, String technicalName, Color textColor, Color backgroundColor, Color borderColor) {
+	public record Result(String conceptualName, String technicalName, Color textColor, Color backgroundColor, Color borderColor,
+			boolean visibleInConceptual, boolean visibleInLogical, boolean visibleInPhysical) {
 	}
 
 	private static final class Holder {
@@ -55,6 +57,16 @@ public final class ClassEditorDialog {
 		form.add(ClassEditorDialog.row("Conceptual name", conceptualNameField));
 		form.add(ClassEditorDialog.row("Technical name", technicalNameField));
 
+		final JCheckBox conceptualBox = new JCheckBox("Conceptual", classModel.getVisibility().isConceptual());
+		final JCheckBox logicalBox = new JCheckBox("Logical", classModel.getVisibility().isLogical());
+		final JCheckBox physicalBox = new JCheckBox("Physical", classModel.getVisibility().isPhysical());
+
+		final JPanel visibilityRow = new JPanel(new GridLayout(1, 3, 8, 0));
+		visibilityRow.add(conceptualBox);
+		visibilityRow.add(logicalBox);
+		visibilityRow.add(physicalBox);
+		form.add(ClassEditorDialog.row("Visible in", visibilityRow));
+
 		final JPanel colorRow = new JPanel(new GridLayout(1, 3, 8, 0));
 		colorRow.add(textColorButton);
 		colorRow.add(backgroundColorButton);
@@ -70,7 +82,10 @@ public final class ClassEditorDialog {
 					technicalNameField.getText(),
 					textColorButton.getSelectedColor(),
 					backgroundColorButton.getSelectedColor(),
-					borderColorButton.getSelectedColor());
+					borderColorButton.getSelectedColor(),
+					conceptualBox.isSelected(),
+					logicalBox.isSelected(),
+					physicalBox.isSelected());
 			dialog.dispose();
 		});
 		cancelButton.addActionListener(event -> dialog.dispose());

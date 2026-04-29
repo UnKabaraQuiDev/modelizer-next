@@ -321,7 +321,6 @@ public class DiagramCanvas extends JPanel implements DiagramModelLookup, LayoutC
 		return new CopiedClass(classModel.getId(),
 				classModel.getNames().getConceptualName(),
 				classModel.getNames().getTechnicalName(),
-				classModel.getGroup(),
 				classModel.getVisibility().isConceptual(),
 				classModel.getVisibility().isLogical(),
 				classModel.getVisibility().isPhysical(),
@@ -341,9 +340,9 @@ public class DiagramCanvas extends JPanel implements DiagramModelLookup, LayoutC
 				commentModel.getTextColor(),
 				commentModel.getBackgroundColor(),
 				commentModel.getBorderColor(),
-				commentModel.isVisibleInConceptual(),
-				commentModel.isVisibleInLogical(),
-				commentModel.isVisibleInPhysical(),
+				commentModel.getVisibility().isConceptual(),
+				commentModel.getVisibility().isLogical(),
+				commentModel.getVisibility().isPhysical(),
 				binding == null ? null : binding.getTargetType(),
 				binding == null ? null : binding.getTargetId(),
 				this.captureNodeLayout(LayoutObjectType.COMMENT, commentModel.getId()));
@@ -355,7 +354,6 @@ public class DiagramCanvas extends JPanel implements DiagramModelLookup, LayoutC
 				fieldModel.getNames().getConceptualName(),
 				fieldModel.getNames().getTechnicalName(),
 				fieldModel.isNotConceptual(),
-				fieldModel.getComment(),
 				fieldModel.isPrimaryKey(),
 				fieldModel.isUnique(),
 				fieldModel.isNotNull(),
@@ -794,7 +792,6 @@ public class DiagramCanvas extends JPanel implements DiagramModelLookup, LayoutC
 				.setTechnicalName(rename ? this.appendSuffix(copiedField.technicalName(), "_COPY") : copiedField.technicalName());
 
 		fieldCopy.setNotConceptual(copiedField.notConceptual());
-		fieldCopy.setComment(copiedField.comment());
 		fieldCopy.setPrimaryKey(copiedField.primaryKey());
 		fieldCopy.setUnique(copiedField.unique());
 		fieldCopy.setNotNull(copiedField.notNull());
@@ -1284,6 +1281,7 @@ public class DiagramCanvas extends JPanel implements DiagramModelLookup, LayoutC
 		classModel.getStyle().setTextColor(result.textColor());
 		classModel.getStyle().setBackgroundColor(result.backgroundColor());
 		classModel.getStyle().setBorderColor(result.borderColor());
+		classModel.getVisibility().set(result.visibleInConceptual(), result.visibleInLogical(), result.visibleInPhysical());
 
 		this.notifySelectionChanged();
 		this.notifyDocumentChanged();
@@ -1307,9 +1305,7 @@ public class DiagramCanvas extends JPanel implements DiagramModelLookup, LayoutC
 		commentModel.setBorderColor(result.borderColor());
 		commentModel.setKind(result.kind());
 		commentModel.setBinding(result.binding());
-		commentModel.setVisibleInConceptual(result.visibleInConceptual());
-		commentModel.setVisibleInLogical(result.visibleInLogical());
-		commentModel.setVisibleInPhysical(result.visibleInPhysical());
+		commentModel.getVisibility().set(result.visibleInConceptual(), result.visibleInLogical(), result.visibleInPhysical());
 
 		this.notifySelectionChanged();
 		this.notifyDocumentChanged();

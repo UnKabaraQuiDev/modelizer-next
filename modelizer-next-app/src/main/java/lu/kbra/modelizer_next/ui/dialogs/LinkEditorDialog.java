@@ -18,6 +18,7 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
@@ -60,7 +61,7 @@ public final class LinkEditorDialog {
 
 		@Override
 		public Component getListCellRendererComponent(
-				final javax.swing.JList<?> list,
+				final JList<?> list,
 				final Object value,
 				final int index,
 				final boolean isSelected,
@@ -84,7 +85,7 @@ public final class LinkEditorDialog {
 
 		@Override
 		public Component getListCellRendererComponent(
-				final javax.swing.JList<?> list,
+				final JList<?> list,
 				final Object value,
 				final int index,
 				final boolean isSelected,
@@ -128,6 +129,29 @@ public final class LinkEditorDialog {
 
 		final JComboBox<Cardinality> fromCardinalityBox = new JComboBox<>(Cardinality.values());
 		final JComboBox<Cardinality> toCardinalityBox = new JComboBox<>(Cardinality.values());
+		final DefaultListCellRenderer cardinalityRenderer = new DefaultListCellRenderer() {
+
+			@Override
+			public Component getListCellRendererComponent(
+					JList<?> list,
+					Object value,
+					int index,
+					boolean isSelected,
+					boolean cellHasFocus) {
+
+				super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+
+				if (value instanceof Cardinality card) {
+					setText(card.getDisplayValue());
+				}
+
+				return this;
+			}
+
+		};
+		fromCardinalityBox.setRenderer(cardinalityRenderer);
+		toCardinalityBox.setRenderer(cardinalityRenderer);
+
 		final JTextField labelFrom = new JTextField(linkModel.getLabelFrom(), 24);
 		final JTextField labelTo = new JTextField(linkModel.getLabelTo(), 24);
 
@@ -137,7 +161,7 @@ public final class LinkEditorDialog {
 
 			@Override
 			public Component getListCellRendererComponent(
-					final javax.swing.JList<?> list,
+					final JList<?> list,
 					final Object value,
 					final int index,
 					final boolean isSelected,
@@ -148,6 +172,7 @@ public final class LinkEditorDialog {
 				}
 				return this;
 			}
+
 		});
 
 		fromClassBox.setSelectedItem(LinkEditorDialog.findClass(document.getModel().getClasses(), linkModel.getFrom().getClassId()));
@@ -317,6 +342,7 @@ public final class LinkEditorDialog {
 		});
 		dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		dialog.pack();
+		dialog.setSize(450, dialog.getHeight());
 		dialog.setLocationRelativeTo(parent);
 		dialog.setVisible(true);
 

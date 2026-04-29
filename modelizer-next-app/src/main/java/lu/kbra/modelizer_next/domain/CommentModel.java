@@ -3,8 +3,6 @@ package lu.kbra.modelizer_next.domain;
 import java.awt.Color;
 import java.util.UUID;
 
-import lu.kbra.modelizer_next.layout.PanelType;
-
 public class CommentModel {
 
 	private Color textColor;
@@ -15,15 +13,14 @@ public class CommentModel {
 	private CommentKind kind;
 	private String text;
 	private CommentBinding binding;
-	private boolean visibleInConceptual = true;
-	private boolean visibleInLogical = true;
-	private boolean visibleInPhysical = true;
+	private LayerVisibility visibility;
 
 	public CommentModel() {
 		this.id = UUID.randomUUID().toString();
 		this.kind = CommentKind.STANDALONE;
-		this.text = "";
+		this.text = null;
 		this.binding = null;
+		this.visibility = new LayerVisibility();
 	}
 
 	public Color getBackgroundColor() {
@@ -54,16 +51,23 @@ public class CommentModel {
 		return this.textColor;
 	}
 
+	@Deprecated
 	public boolean isVisibleInConceptual() {
-		return this.visibleInConceptual;
+		return visibility.isConceptual();
 	}
 
+	@Deprecated
 	public boolean isVisibleInLogical() {
-		return this.visibleInLogical;
+		return visibility.isLogical();
 	}
 
+	@Deprecated
 	public boolean isVisibleInPhysical() {
-		return this.visibleInPhysical;
+		return visibility.isPhysical();
+	}
+
+	public LayerVisibility getVisibility() {
+		return visibility;
 	}
 
 	public void setBackgroundColor(final Color backgroundColor) {
@@ -94,37 +98,27 @@ public class CommentModel {
 		this.textColor = textColor;
 	}
 
-	public void setVisibility(final PanelType... pts) {
-		this.visibleInConceptual = false;
-		this.visibleInLogical = false;
-		this.visibleInPhysical = false;
-		for (final PanelType pt : pts) {
-			switch (pt) {
-			case CONCEPTUAL -> this.visibleInConceptual = true;
-			case LOGICAL -> this.visibleInLogical = true;
-			case PHYSICAL -> this.visibleInPhysical = true;
-			}
-		}
+	public void setVisibility(final LayerVisibility visibility) {
+		this.visibility = visibility;
 	}
+	
+//	public LayerVisibility getOrCreateVisibility() {
+//		return visibility == null ? (visibility = new LayerVisibility()) : visibility;
+//	}
 
-	public void setVisibleInConceptual(final boolean visibleInConceptual) {
-		this.visibleInConceptual = visibleInConceptual;
-	}
-
-	public void setVisibleInLogical(final boolean visibleInLogical) {
-		this.visibleInLogical = visibleInLogical;
-	}
-
-	public void setVisibleInPhysical(final boolean visibleInPhysical) {
-		this.visibleInPhysical = visibleInPhysical;
-	}
+//	public void setVisibility(final PanelType... pts) {
+//		if (visibility == null) {
+//			this.visibility = new LayerVisibility(pts);
+//			return;
+//		}
+//		visibility.set(pts);
+//	}
 
 	@Override
 	public String toString() {
-		return "CommentModel@" + System.identityHashCode(this) + " [textColor=" + this.textColor + ", backgroundColor="
-				+ this.backgroundColor + ", borderColor=" + this.borderColor + ", id=" + this.id + ", kind=" + this.kind + ", text="
-				+ this.text + ", binding=" + this.binding + ", visibleInConceptual=" + this.visibleInConceptual + ", visibleInLogical="
-				+ this.visibleInLogical + ", visibleInPhysical=" + this.visibleInPhysical + "]";
+		return "CommentModel@" + System.identityHashCode(this) + " [textColor=" + textColor + ", backgroundColor=" + backgroundColor
+				+ ", borderColor=" + borderColor + ", id=" + id + ", kind=" + kind + ", text=" + text + ", binding=" + binding
+				+ ", visibility=" + visibility + "]";
 	}
 
 }

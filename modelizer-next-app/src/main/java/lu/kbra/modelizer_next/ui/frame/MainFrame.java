@@ -3,6 +3,7 @@ package lu.kbra.modelizer_next.ui.frame;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Desktop;
+import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
@@ -16,6 +17,7 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
@@ -47,12 +49,21 @@ import lu.kbra.modelizer_next.ui.export.ViewExportRequest;
 import lu.kbra.modelizer_next.ui.export.ViewExporter;
 import lu.kbra.modelizer_next.ui.impl.DocumentChangeListener;
 import lu.kbra.modelizer_next.ui.impl.DocumentLoadHandler;
+import lu.kbra.pclib.PCUtils;
 
 public class MainFrame extends JFrame implements MainFrameDocumentController, MainFrameStyleController, MainFrameWindowController {
 
 	private static final long serialVersionUID = 6643164008640695591L;
 
 	public static final int CTRL_MODIFIER = Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx();
+	public static final Image ICON;
+	public static final ImageIcon IMAGE_ICON;
+	static {
+		final ImageIcon rawIcon = new ImageIcon(PCUtils.readPackagedBytesFile(MainFrame.class, "/icons/icon.png"));
+		final Image scaled = rawIcon.getImage().getScaledInstance(34, 34, Image.SCALE_SMOOTH);
+		ICON = rawIcon.getImage();
+		IMAGE_ICON = new ImageIcon(scaled);
+	}
 
 	DocumentSession session;
 
@@ -75,6 +86,7 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 
 	public MainFrame(final DocumentSession session) {
 		super("Modelizer Next");
+		super.setIconImage(ICON);
 		this.setContent(session);
 		this.setSize(1200, 800);
 		this.setLocationRelativeTo(null);
