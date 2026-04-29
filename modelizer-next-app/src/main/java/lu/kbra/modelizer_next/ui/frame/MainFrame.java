@@ -3,6 +3,7 @@ package lu.kbra.modelizer_next.ui.frame;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Desktop;
+import java.awt.Toolkit;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.io.File;
@@ -50,6 +51,8 @@ import lu.kbra.modelizer_next.ui.impl.DocumentLoadHandler;
 public class MainFrame extends JFrame implements MainFrameDocumentController, MainFrameStyleController, MainFrameWindowController {
 
 	private static final long serialVersionUID = 6643164008640695591L;
+
+	public static final int CTRL_MODIFIER = Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx();
 
 	DocumentSession session;
 
@@ -336,7 +339,7 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 		final StringBuilder builder = new StringBuilder();
 
 		final int modifiers = keyStroke.getModifiers();
-		if ((modifiers & InputEvent.CTRL_DOWN_MASK) != 0) {
+		if ((modifiers & MainFrame.CTRL_MODIFIER) != 0) {
 			builder.append("Ctrl+");
 		}
 		if ((modifiers & InputEvent.SHIFT_DOWN_MASK) != 0) {

@@ -15,11 +15,12 @@ final class EditMenu extends JMenu {
 		super("Edit");
 
 		frame.undoMenuItem = new JMenuItem("Undo");
-		frame.undoMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Z, InputEvent.CTRL_DOWN_MASK));
+		frame.undoMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Z, MainFrame.CTRL_MODIFIER));
 		frame.undoMenuItem.addActionListener(event -> frame.undo());
 
 		frame.redoMenuItem = new JMenuItem("Redo");
-		frame.redoMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Z, InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK));
+		frame.redoMenuItem.setAccelerator(
+				KeyStroke.getKeyStroke(KeyEvent.VK_Z, MainFrame.CTRL_MODIFIER | InputEvent.SHIFT_DOWN_MASK));
 		frame.redoMenuItem.addActionListener(event -> frame.redo());
 
 		this.add(frame.undoMenuItem);

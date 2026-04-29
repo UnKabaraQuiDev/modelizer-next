@@ -10,7 +10,6 @@ import java.awt.GridBagLayout;
 import java.awt.Image;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
-import java.awt.event.InputEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
@@ -44,6 +43,7 @@ import lu.kbra.modelizer_next.ui.export.ViewExportFormat;
 import lu.kbra.modelizer_next.ui.export.ViewExportRequest;
 import lu.kbra.modelizer_next.ui.export.ViewExportScope;
 import lu.kbra.modelizer_next.ui.export.ViewExporter;
+import lu.kbra.modelizer_next.ui.frame.MainFrame;
 
 public class ViewExportDialog extends JDialog {
 
@@ -97,7 +97,7 @@ public class ViewExportDialog extends JDialog {
 
 		private PatternTextField(final String text) {
 			super(text);
-			this.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, InputEvent.CTRL_DOWN_MASK), "showTokenSuggestions");
+			this.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, MainFrame.CTRL_MODIFIER), "showTokenSuggestions");
 			this.getActionMap().put("showTokenSuggestions", new AbstractAction() {
 				private static final long serialVersionUID = 8970378556838542205L;
 

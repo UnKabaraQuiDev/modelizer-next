@@ -49,11 +49,11 @@ final class MainFrameMenuBar extends JMenuBar {
 	}
 
 	static KeyStroke ctrl(final int keyCode) {
-		return KeyStroke.getKeyStroke(keyCode, InputEvent.CTRL_DOWN_MASK);
+		return KeyStroke.getKeyStroke(keyCode, MainFrame.CTRL_MODIFIER);
 	}
 
 	static KeyStroke ctrlShift(final int keyCode) {
-		return KeyStroke.getKeyStroke(keyCode, InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK);
+		return KeyStroke.getKeyStroke(keyCode, MainFrame.CTRL_MODIFIER | InputEvent.SHIFT_DOWN_MASK);
 	}
 
 }
