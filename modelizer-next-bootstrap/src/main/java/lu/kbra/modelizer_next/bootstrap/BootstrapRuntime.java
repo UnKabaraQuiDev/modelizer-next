@@ -268,7 +268,9 @@ public class BootstrapRuntime implements UpdateRuntime {
 				this.currentApplication = inventory.readInstalledApplication(path)
 						.orElseThrow(() -> new IllegalArgumentException("File: '" + getForceJarName() + "' not found, resolved: " + path));
 			} else {
+				System.err.println(configuration.getUpdateChannel());
 				this.currentApplication = this.inventory.findLatestInstalled(configuration.getUpdateChannel()).orElse(null);
+				System.err.println(currentApplication);
 			}
 			System.out.println("Current version" + (getForceJarName() == null ? "" : " (forced)") + ": "
 					+ (currentApplication == null ? "none" : currentApplication.version()));

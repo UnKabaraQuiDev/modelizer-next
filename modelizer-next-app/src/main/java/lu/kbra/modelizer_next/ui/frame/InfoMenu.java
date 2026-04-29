@@ -77,10 +77,10 @@ final class InfoMenu extends JMenu {
 	}
 
 	private JMenuItem createVersionInfoItem(final MainFrame frame) {
-		final Optional<UpdateRuntime> bootstrapRuntime = frame.bootstrapRuntime();
-		final boolean updateRuntimeAvailable = bootstrapRuntime.isPresent();
 		final JMenuItem versionInfo = new JMenuItem("Version: " + App.VERSION + " [" + App.DISTRIBUTOR + "]");
 		versionInfo.setToolTipText("Click to copy version informations.");
+		final Optional<UpdateRuntime> bootstrapRuntime = frame.bootstrapRuntime();
+		final boolean updateRuntimeAvailable = bootstrapRuntime.isPresent();
 		versionInfo
 				.addActionListener(event -> Toolkit.getDefaultToolkit()
 						.getSystemClipboard()
