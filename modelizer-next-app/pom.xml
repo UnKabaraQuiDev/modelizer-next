@@ -30,12 +30,10 @@
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-databind</artifactId>
-			<version>2.21.0</version>
 		</dependency>
 		<dependency>
 			<groupId>com.fasterxml.jackson.datatype</groupId>
 			<artifactId>jackson-datatype-jsr310</artifactId>
-			<version>2.20.2</version>
 		</dependency>
 		<dependency>
 			<groupId>lu.kbra</groupId>
@@ -45,21 +43,22 @@
 		<dependency>
 			<groupId>com.formdev</groupId>
 			<artifactId>flatlaf</artifactId>
-			<version>3.7.1</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.xmlgraphics</groupId>
 			<artifactId>batik-svggen</artifactId>
-			<version>1.19</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.xmlgraphics</groupId>
 			<artifactId>batik-dom</artifactId>
-			<version>1.19</version>
 		</dependency>
 		<dependency>
 			<groupId>lu.kbra</groupId>
 			<artifactId>pclib-datastruct</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>io.github.andrewauclair</groupId>
+			<artifactId>modern-docking-single-app</artifactId>
 		</dependency>
 	</dependencies>
 

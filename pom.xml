@@ -34,7 +34,8 @@
 			https://raw.githubusercontent.com/UnKabaraQuiDev/modelizer-next/refs/heads/registry/registry/versions.json</modelizer.updatesManifestUrl>
 		<modelizer.issuesUrl>${modelizer.repositoryUrl}/issues</modelizer.issuesUrl>
 		<modelizer.website>https://modelizer.kbra.lu/</modelizer.website>
-		<modelizer.releasesManifestUrl>https://raw.githubusercontent.com/UnKabaraQuiDev/modelizer-next/refs/heads/registry/registry/release.json</modelizer.releasesManifestUrl>
+		<modelizer.releasesManifestUrl>
+			https://raw.githubusercontent.com/UnKabaraQuiDev/modelizer-next/refs/heads/registry/registry/release.json</modelizer.releasesManifestUrl>
 
 		<jpackage.linux.group>Programming</jpackage.linux.group>
 		<jpackage.linux.category>Programming,Utilities</jpackage.linux.category>
@@ -114,6 +115,36 @@
 				<groupId>lu.kbra</groupId>
 				<artifactId>modelizer-next-common</artifactId>
 				<version>${revision}</version>
+			</dependency>
+			<dependency>
+				<groupId>io.github.andrewauclair</groupId>
+				<artifactId>modern-docking-single-app</artifactId>
+				<version>1.4.8</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.xmlgraphics</groupId>
+				<artifactId>batik-dom</artifactId>
+				<version>1.19</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.xmlgraphics</groupId>
+				<artifactId>batik-svggen</artifactId>
+				<version>1.19</version>
+			</dependency>
+			<dependency>
+				<groupId>com.formdev</groupId>
+				<artifactId>flatlaf</artifactId>
+				<version>3.7.1</version>
+			</dependency>
+			<dependency>
+				<groupId>com.fasterxml.jackson.datatype</groupId>
+				<artifactId>jackson-datatype-jsr310</artifactId>
+				<version>2.20.2</version>
+			</dependency>
+			<dependency>
+				<groupId>com.fasterxml.jackson.core</groupId>
+				<artifactId>jackson-databind</artifactId>
+				<version>2.21.0</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
@@ -209,6 +240,10 @@
 							<createDependencyReducedPom>false</createDependencyReducedPom>
 							<shadedArtifactAttached>true</shadedArtifactAttached>
 							<shadedClassifierName>with-dependencies</shadedClassifierName>
+							<minimizeJar>true</minimizeJar>
+							<entryPoints>
+								<entryPoint>${app.mainClass}</entryPoint>
+							</entryPoints>
 							<transformers>
 								<transformer
 									implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">

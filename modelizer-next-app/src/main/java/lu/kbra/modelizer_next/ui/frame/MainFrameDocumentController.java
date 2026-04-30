@@ -113,7 +113,7 @@ public interface MainFrameDocumentController {
 		};
 
 		frame.getRootPane().setTransferHandler(fileDropHandler);
-		frame.tabbedPane.setTransferHandler(fileDropHandler);
+		frame.rootDockingPanel.setTransferHandler(fileDropHandler);
 	}
 
 	default void loadDocument() {

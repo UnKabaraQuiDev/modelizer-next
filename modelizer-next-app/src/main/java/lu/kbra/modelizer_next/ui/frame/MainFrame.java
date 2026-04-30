@@ -25,11 +25,15 @@ import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JTabbedPane;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
+import io.github.andrewauclair.moderndocking.DockableTabPreference;
+import io.github.andrewauclair.moderndocking.DockingRegion;
+import io.github.andrewauclair.moderndocking.app.Docking;
+import io.github.andrewauclair.moderndocking.app.RootDockingPanel;
+import io.github.andrewauclair.moderndocking.settings.Settings;
 import lu.kbra.modelizer_next.App;
 import lu.kbra.modelizer_next.AppConfig;
 import lu.kbra.modelizer_next.MNMain;
@@ -71,7 +75,8 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 
 	JLabel statusLabel;
 	JLabel selectionPathLabel;
-	JTabbedPane tabbedPane;
+	RootDockingPanel rootDockingPanel;
+	DiagramCanvas activeCanvas;
 	DiagramCanvas conceptualCanvas;
 	DiagramCanvas logicalCanvas;
 	DiagramCanvas physicalCanvas;
@@ -86,7 +91,7 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 
 	public MainFrame(final DocumentSession session) {
 		super("Modelizer Next");
-		super.setIconImage(ICON);
+		super.setIconImage(MainFrame.ICON);
 		this.setContent(session);
 		this.setSize(1200, 800);
 		this.setLocationRelativeTo(null);
@@ -168,14 +173,19 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 		this.physicalCanvas = new DiagramCanvas(this.document, PanelType.PHYSICAL, canvasListener);
 		this.setDefaultPaletteToCanvases();
 
-		this.tabbedPane = new JTabbedPane();
-		this.tabbedPane.addTab("Conceptual", this.conceptualCanvas);
-		this.tabbedPane.addTab("Logical", this.logicalCanvas);
-		this.tabbedPane.addTab("Physical", this.physicalCanvas);
-		this.tabbedPane.addChangeListener(event -> {
-			this.updateSelectionLabel(this.getActiveCanvas().getSelectionInfo());
-			this.refreshToolbarLabels();
-		});
+		Settings.setDefaultTabPreference(DockableTabPreference.BOTTOM_ALWAYS);
+		Docking.initialize(this);
+		this.rootDockingPanel = new RootDockingPanel(this);
+
+		final DockableDiagramPanel conceptualDock = this.createDockableCanvasPanel("conceptual", "Conceptual", this.conceptualCanvas);
+		final DockableDiagramPanel logicalDock = this.createDockableCanvasPanel("logical", "Logical", this.logicalCanvas);
+		final DockableDiagramPanel physicalDock = this.createDockableCanvasPanel("physical", "Physical", this.physicalCanvas);
+
+		this.activeCanvas = this.conceptualCanvas;
+		Docking.dock(conceptualDock, this);
+		Docking.dock(logicalDock, conceptualDock, DockingRegion.CENTER);
+		Docking.dock(physicalDock, conceptualDock, DockingRegion.CENTER);
+		Docking.bringToFront(conceptualDock);
 
 		this.setJMenuBar(new MainFrameMenuBar(this));
 
@@ -187,7 +197,7 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 
 		final JPanel statusPanel = this.createStatusPanel();
 
-		this.add(this.tabbedPane, BorderLayout.CENTER);
+		this.add(this.rootDockingPanel, BorderLayout.CENTER);
 		this.add(statusPanel, BorderLayout.SOUTH);
 
 		this.installFileDropSupport();
@@ -366,12 +376,15 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 	}
 
 	DiagramCanvas getActiveCanvas() {
-		return switch (this.tabbedPane.getSelectedIndex()) {
-		case 0 -> this.conceptualCanvas;
-		case 1 -> this.logicalCanvas;
-		case 2 -> this.physicalCanvas;
-		default -> this.conceptualCanvas;
-		};
+		return this.activeCanvas == null ? this.conceptualCanvas : this.activeCanvas;
+	}
+
+	DockableDiagramPanel createDockableCanvasPanel(final String id, final String title, final DiagramCanvas canvas) {
+		return new DockableDiagramPanel("modelizer-next." + System.identityHashCode(this) + "." + id, title, canvas, () -> {
+			this.activeCanvas = canvas;
+			this.updateSelectionLabel(canvas.getSelectionInfo());
+			this.refreshToolbarLabels();
+		});
 	}
 
 	Map<PanelType, DiagramCanvas> getCanvasesByPanelType() {
@@ -516,12 +529,12 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 		if (this.redoMenuItem != null) {
 			this.redoMenuItem.setEnabled(this.session.canRedo());
 		}
-		if (toolBar != null) {
-			if (toolBar.undoButton != null) {
-				toolBar.undoButton.setEnabled(this.session.canUndo());
+		if (this.toolBar != null) {
+			if (this.toolBar.undoButton != null) {
+				this.toolBar.undoButton.setEnabled(this.session.canUndo());
 			}
-			if (toolBar.redoButton != null) {
-				toolBar.redoButton.setEnabled(this.session.canRedo());
+			if (this.toolBar.redoButton != null) {
+				this.toolBar.redoButton.setEnabled(this.session.canRedo());
 			}
 		}
 	}
