@@ -1,0 +1,12 @@
+{
+  "name" : "Default",
+  "classTextColor" : "#000000",
+  "classBackgroundColor" : "#FFF59D",
+  "classBorderColor" : "#333333",
+  "fieldTextColor" : "#000000",
+  "fieldBackgroundColor" : "#FFFFFF",
+  "commentTextColor" : "#333333",
+  "commentBackgroundColor" : "#FFF8CC",
+  "commentBorderColor" : "#444444",
+  "linkColor" : "#555555"
+}

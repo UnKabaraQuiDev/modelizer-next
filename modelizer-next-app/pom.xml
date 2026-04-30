@@ -60,6 +60,11 @@
 			<groupId>io.github.andrewauclair</groupId>
 			<artifactId>modern-docking-single-app</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>io.github.andrewauclair</groupId>
+			<artifactId>modern-docking-ui</artifactId>
+			<version>1.4.8</version>
+		</dependency>
 	</dependencies>
 
 	<profiles>

@@ -29,11 +29,9 @@ import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
-import io.github.andrewauclair.moderndocking.DockableTabPreference;
 import io.github.andrewauclair.moderndocking.DockingRegion;
 import io.github.andrewauclair.moderndocking.app.Docking;
 import io.github.andrewauclair.moderndocking.app.RootDockingPanel;
-import io.github.andrewauclair.moderndocking.settings.Settings;
 import lu.kbra.modelizer_next.App;
 import lu.kbra.modelizer_next.AppConfig;
 import lu.kbra.modelizer_next.MNMain;
@@ -173,7 +171,6 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 		this.physicalCanvas = new DiagramCanvas(this.document, PanelType.PHYSICAL, canvasListener);
 		this.setDefaultPaletteToCanvases();
 
-		Settings.setDefaultTabPreference(DockableTabPreference.BOTTOM_ALWAYS);
 		Docking.initialize(this);
 		this.rootDockingPanel = new RootDockingPanel(this);
 
