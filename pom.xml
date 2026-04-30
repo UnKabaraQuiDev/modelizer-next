@@ -240,10 +240,22 @@
 							<createDependencyReducedPom>false</createDependencyReducedPom>
 							<shadedArtifactAttached>true</shadedArtifactAttached>
 							<shadedClassifierName>with-dependencies</shadedClassifierName>
+
 							<minimizeJar>true</minimizeJar>
 							<entryPoints>
 								<entryPoint>${app.mainClass}</entryPoint>
 							</entryPoints>
+							<filters>
+								<!-- Keep all FlatLaf classes/resources -->
+								<filter>
+									<artifact>com.formdev:flatlaf</artifact>
+									<includes>
+										<include>**</include>
+									</includes>
+								</filter>
+							</filters>
+
+
 							<transformers>
 								<transformer
 									implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
