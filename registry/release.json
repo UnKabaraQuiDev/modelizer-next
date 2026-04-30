@@ -1,10 +1,10 @@
 {
   "channel": "release",
-  "version": "5-RELEASE-178",
-  "tag": "5-RELEASE-178",
-  "releaseUrl": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/tag/5-RELEASE-178",
-  "assetUrl": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/5-RELEASE-178/modelizer-next-app-5-RELEASE-178.jar",
-  "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/5-RELEASE-178/modelizer-next-app-5-RELEASE-178.jar",
+  "version": "5-RELEASE-179",
+  "tag": "5-RELEASE-179",
+  "releaseUrl": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/tag/5-RELEASE-179",
+  "assetUrl": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/5-RELEASE-179/modelizer-next-app-5-RELEASE-179.jar",
+  "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/5-RELEASE-179/modelizer-next-app-5-RELEASE-179.jar",
   "platforms": [
     "unknown",
     "linux",
@@ -12,8 +12,85 @@
     "windows"
   ],
   "notes": "Latest release build.",
-  "updatedAt": "2026-04-30T13:59:32Z",
+  "updatedAt": "2026-04-30T14:30:38Z",
   "entries": [
+    {
+      "version": "5-RELEASE-179",
+      "tag": "5-RELEASE-179",
+      "releaseUrl": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/tag/5-RELEASE-179",
+      "assetUrl": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/5-RELEASE-179/modelizer-next-app-5-RELEASE-179.jar",
+      "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/5-RELEASE-179/modelizer-next-app-5-RELEASE-179.jar",
+      "platforms": [
+        "unknown",
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "notes": "Latest release build.",
+      "publishedAt": "2026-04-30T14:30:38Z",
+      "assets": [
+        {
+          "name": "modelizer-next-app-5-RELEASE-179.jar",
+          "platform": "unknown",
+          "kind": "app-standalone-jar",
+          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/5-RELEASE-179/modelizer-next-app-5-RELEASE-179.jar"
+        },
+        {
+          "name": "modelizer-next-app-portable-linux-5-RELEASE-179.zip",
+          "platform": "linux",
+          "kind": "app-portable-native",
+          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/5-RELEASE-179/modelizer-next-app-portable-linux-5-RELEASE-179.zip"
+        },
+        {
+          "name": "modelizer-next-app-portable-macos-5-RELEASE-179.zip",
+          "platform": "macos",
+          "kind": "app-portable-native",
+          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/5-RELEASE-179/modelizer-next-app-portable-macos-5-RELEASE-179.zip"
+        },
+        {
+          "name": "modelizer-next-app-portable-windows-5-RELEASE-179.zip",
+          "platform": "windows",
+          "kind": "app-portable-native",
+          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/5-RELEASE-179/modelizer-next-app-portable-windows-5-RELEASE-179.zip"
+        },
+        {
+          "name": "modelizer-next-app-standalone-linux-5-RELEASE-179.deb",
+          "platform": "linux",
+          "kind": "app-standalone-native",
+          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/5-RELEASE-179/modelizer-next-app-standalone-linux-5-RELEASE-179.deb"
+        },
+        {
+          "name": "modelizer-next-app-standalone-macos-5-RELEASE-179.dmg",
+          "platform": "macos",
+          "kind": "app-standalone-native",
+          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/5-RELEASE-179/modelizer-next-app-standalone-macos-5-RELEASE-179.dmg"
+        },
+        {
+          "name": "modelizer-next-app-standalone-windows-5-RELEASE-179.exe",
+          "platform": "windows",
+          "kind": "app-standalone-native",
+          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/5-RELEASE-179/modelizer-next-app-standalone-windows-5-RELEASE-179.exe"
+        },
+        {
+          "name": "modelizer-next-bootstrap-linux-5-RELEASE-179.deb",
+          "platform": "linux",
+          "kind": "bootstrap-native",
+          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/5-RELEASE-179/modelizer-next-bootstrap-linux-5-RELEASE-179.deb"
+        },
+        {
+          "name": "modelizer-next-bootstrap-macos-5-RELEASE-179.dmg",
+          "platform": "macos",
+          "kind": "bootstrap-native",
+          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/5-RELEASE-179/modelizer-next-bootstrap-macos-5-RELEASE-179.dmg"
+        },
+        {
+          "name": "modelizer-next-bootstrap-windows-5-RELEASE-179.exe",
+          "platform": "windows",
+          "kind": "bootstrap-native",
+          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/5-RELEASE-179/modelizer-next-bootstrap-windows-5-RELEASE-179.exe"
+        }
+      ]
+    },
     {
       "version": "5-RELEASE-178",
       "tag": "5-RELEASE-178",
