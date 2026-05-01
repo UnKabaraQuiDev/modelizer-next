@@ -7,11 +7,11 @@
     "tag": "5-RELEASE-179"
   },
   "snapshot": {
-    "version": "5-SNAPSHOT-175",
-    "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/5-SNAPSHOT-175/modelizer-next-app-5-SNAPSHOT-175.jar",
-    "releaseUrl": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/tag/5-SNAPSHOT-175",
+    "version": "6-SNAPSHOT-182",
+    "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/6-SNAPSHOT-182/modelizer-next-app-6-SNAPSHOT-182.jar",
+    "releaseUrl": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/tag/6-SNAPSHOT-182",
     "notes": "Latest snapshot build.",
-    "tag": "5-SNAPSHOT-175"
+    "tag": "6-SNAPSHOT-182"
   },
   "nightly": {
     "version": "5-NIGHTLY-179",
