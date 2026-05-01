@@ -17,7 +17,7 @@
 	</modules>
 
 	<properties>
-		<revision>5</revision>
+		<revision>6-SNAPSHOT</revision>
 
 		<java.version>21</java.version>
 		<maven.compiler.source>${java.version}</maven.compiler.source>

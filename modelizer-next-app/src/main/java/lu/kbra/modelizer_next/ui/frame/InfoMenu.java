@@ -19,6 +19,7 @@ import lu.kbra.modelizer_next.App;
 import lu.kbra.modelizer_next.bootstrap.BootstrapConfig;
 import lu.kbra.modelizer_next.bootstrap.UpdateChannel;
 import lu.kbra.modelizer_next.bootstrap.UpdateRuntime;
+import lu.kbra.pclib.PCUtils;
 
 final class InfoMenu extends JMenu {
 
@@ -31,6 +32,7 @@ final class InfoMenu extends JMenu {
 		this.add(this.createUpdateChannelMenu(frame));
 		this.add(this.createVersionInfoItem(frame));
 		this.addBootstrapVersionInfoIfAvailable(frame);
+		this.addBootstrapCleanupIfAvailable(frame);
 		this.add(this.createOpenUrlItem("Report issue...",
 				App.ISSUES_URL,
 				"Report an issue",
@@ -111,6 +113,42 @@ final class InfoMenu extends JMenu {
 														+ bootstrapRuntime.get().getBootstrapJson().toPrettyString()),
 										null));
 		this.add(bootstrapVersionInfo);
+	}
+
+	private void addBootstrapCleanupIfAvailable(final MainFrame frame) {
+		final Optional<UpdateRuntime> bootstrapRuntime = frame.bootstrapRuntime();
+		if (bootstrapRuntime.isEmpty()) {
+			return;
+		}
+
+		final JMenuItem bootstrapSpaceInfo = new JMenuItem("Used space: unknown");
+		bootstrapSpaceInfo.setToolTipText("Clear to remove unused application version files.");
+		final Runnable recomputeBoostrapSpaceUsage = () -> {
+			bootstrapSpaceInfo.setText("Used space: computing...");
+			try {
+				bootstrapSpaceInfo.setText(
+						"Used space: " + PCUtils.getHumanFormatFileSize(bootstrapRuntime.get().getInstalledUpdatesDiskUsageBytes()));
+			} catch (IOException e) {
+				bootstrapSpaceInfo.setText("Used space: An error occured (" + e.getMessage() + ")");
+			}
+		};
+		recomputeBoostrapSpaceUsage.run();
+		bootstrapSpaceInfo.addActionListener(event -> {
+			try {
+				final long size = bootstrapRuntime.get().freeUnusedInstalledUpdates();
+				JOptionPane.showMessageDialog(frame,
+						"Freed " + PCUtils.getHumanFormatFileSize(size) + " from disk.",
+						"Success",
+						JOptionPane.INFORMATION_MESSAGE);
+			} catch (IOException e) {
+				JOptionPane.showMessageDialog(frame,
+						"An error occured while freeing disk space:\n" + e.getMessage(),
+						"Error",
+						JOptionPane.ERROR_MESSAGE);
+			}
+			recomputeBoostrapSpaceUsage.run();
+		});
+		this.add(bootstrapSpaceInfo);
 	}
 
 	private JMenuItem createOpenUrlItem(final String text, final String url, final String title, final String fallbackMessage) {
