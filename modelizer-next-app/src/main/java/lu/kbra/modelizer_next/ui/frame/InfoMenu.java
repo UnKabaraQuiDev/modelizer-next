@@ -27,8 +27,9 @@ final class InfoMenu extends JMenu {
 
 	InfoMenu(final MainFrame frame) {
 		super("Info");
-		this.add(this.createCheckForUpdatesItem(frame));
+		this.add(this.createHelpItem(frame));
 		this.add(this.createAutoUpdateItem(frame));
+		this.add(this.createCheckForUpdatesItem(frame));
 		this.add(this.createUpdateChannelMenu(frame));
 		this.add(this.createVersionInfoItem(frame));
 		this.addBootstrapVersionInfoIfAvailable(frame);
@@ -39,6 +40,12 @@ final class InfoMenu extends JMenu {
 				"The issue link has been copied to your clipboard:"));
 		this.add(this
 				.createOpenUrlItem("Website...", App.WEBSITE_URL, "Visit website", "The website link has been copied to your clipboard:"));
+	}
+
+	private JMenuItem createHelpItem(final MainFrame frame) {
+		final JMenuItem checkForUpdates = new JMenuItem("Help...");
+		checkForUpdates.addActionListener(event -> new HelpDialog().setVisible(true));
+		return checkForUpdates;
 	}
 
 	private JMenuItem createCheckForUpdatesItem(final MainFrame frame) {
@@ -128,7 +135,7 @@ final class InfoMenu extends JMenu {
 			try {
 				bootstrapSpaceInfo.setText(
 						"Used space: " + PCUtils.getHumanFormatFileSize(bootstrapRuntime.get().getInstalledUpdatesDiskUsageBytes()));
-			} catch (IOException e) {
+			} catch (final IOException e) {
 				bootstrapSpaceInfo.setText("Used space: An error occured (" + e.getMessage() + ")");
 			}
 		};
@@ -140,7 +147,7 @@ final class InfoMenu extends JMenu {
 						"Freed " + PCUtils.getHumanFormatFileSize(size) + " from disk.",
 						"Success",
 						JOptionPane.INFORMATION_MESSAGE);
-			} catch (IOException e) {
+			} catch (final IOException e) {
 				JOptionPane.showMessageDialog(frame,
 						"An error occured while freeing disk space:\n" + e.getMessage(),
 						"Error",

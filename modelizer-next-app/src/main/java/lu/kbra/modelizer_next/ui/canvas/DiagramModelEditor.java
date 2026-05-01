@@ -418,8 +418,8 @@ interface DiagramModelEditor extends DiagramCanvasExt {
 		}
 
 		this.getCanvas().renamingElement = newRenamingElement;
-		getCanvas().selectedElements.clear();
-		getCanvas().select(newRenamingElement);
+		this.getCanvas().selectedElements.clear();
+		this.getCanvas().select(newRenamingElement);
 		final ClassModel classModel = this.getCanvas().findClassById(this.getCanvas().renamingElement.classId());
 		final NodeLayout nl = this.getCanvas().findOrCreateNodeLayout(LayoutObjectType.CLASS, this.getCanvas().renamingElement.classId());
 

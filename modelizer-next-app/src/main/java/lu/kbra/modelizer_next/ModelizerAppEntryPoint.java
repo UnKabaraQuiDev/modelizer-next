@@ -18,6 +18,7 @@ import lu.kbra.modelizer_next.common.FileOpenBridge;
 import lu.kbra.modelizer_next.common.SampleDocumentFactory;
 import lu.kbra.modelizer_next.ui.frame.DocumentSession;
 import lu.kbra.modelizer_next.ui.frame.MainFrame;
+import lu.kbra.pclib.PCUtils;
 
 public class ModelizerAppEntryPoint implements AppMain {
 
@@ -44,7 +45,8 @@ public class ModelizerAppEntryPoint implements AppMain {
 		}
 
 		SwingUtilities.invokeLater(() -> {
-			MNMain.applyConfiguredLookAndFeel();
+			System.out.println(
+					"Applying laf took: " + ((double) PCUtils.millisTime(() -> MNMain.applyConfiguredLookAndFeel())) / 1_000 + "s");
 			System.out.println("Args: " + Arrays.toString(args));
 			Optional<DocumentSession> document = Optional.empty();
 
