@@ -6,4 +6,8 @@ public enum PanelType {
 	LOGICAL,
 	PHYSICAL;
 
+	public boolean isTechnical() {
+		return this != CONCEPTUAL;
+	}
+
 }

@@ -133,14 +133,14 @@ public interface ElementRenderer extends DiagramCanvasExt {
 			g2.setColor(classModel.getStyle().getTextColor());
 			g2.drawString(this.getCanvas().resolveClassTitle(classModel),
 					(float) bounds.getX() + DiagramCanvas.PADDING,
-					(float) bounds.getY() + DiagramCanvas.HEADER_HEIGHT - 9);
+					(float) bounds.getY() + DiagramCanvas.CLASS_HEADER_HEIGHT - 9);
 
 			g2.setFont(DiagramCanvas.BODY_FONT);
-			double rowY = bounds.getY() + DiagramCanvas.HEADER_HEIGHT;
+			double rowY = bounds.getY() + DiagramCanvas.CLASS_HEADER_HEIGHT;
 			final List<FieldModel> visibleFields = this.getCanvas().getVisibleFields(classModel);
 
 			for (final FieldModel fieldModel : visibleFields) {
-				final Rectangle2D fieldBounds = new Rectangle2D.Double(bounds.getX(), rowY, bounds.getWidth(), DiagramCanvas.ROW_HEIGHT);
+				final Rectangle2D fieldBounds = new Rectangle2D.Double(bounds.getX(), rowY, bounds.getWidth(), DiagramCanvas.CLASS_ROW_HEIGHT);
 
 				g2.setColor(fieldModel.getStyle().getBackgroundColor());
 				g2.fill(fieldBounds);
@@ -165,7 +165,7 @@ public interface ElementRenderer extends DiagramCanvasExt {
 					g2.setStroke(DiagramCanvas.DEFAULT_STROKE);
 				}
 
-				rowY += DiagramCanvas.ROW_HEIGHT;
+				rowY += DiagramCanvas.CLASS_ROW_HEIGHT;
 			}
 
 			if (this.getCanvas().isClassSelected(classModel.getId())) {
@@ -178,9 +178,9 @@ public interface ElementRenderer extends DiagramCanvasExt {
 				g2.setStroke(DiagramCanvas.DEFAULT_STROKE);
 				g2.draw(bounds);
 				g2.draw(new Line2D.Double(bounds.getX(),
-						bounds.getY() + DiagramCanvas.HEADER_HEIGHT,
+						bounds.getY() + DiagramCanvas.CLASS_HEADER_HEIGHT,
 						bounds.getMaxX(),
-						bounds.getY() + DiagramCanvas.HEADER_HEIGHT));
+						bounds.getY() + DiagramCanvas.CLASS_HEADER_HEIGHT));
 			}
 		}
 	}

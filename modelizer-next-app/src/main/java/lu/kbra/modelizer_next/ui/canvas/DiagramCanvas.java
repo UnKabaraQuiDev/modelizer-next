@@ -7,6 +7,11 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
+import java.awt.event.ActionEvent;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
@@ -16,11 +21,23 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 
+import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.JComponent;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
+import javax.swing.border.CompoundBorder;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
 
 import lu.kbra.modelizer_next.document.ModelDocument;
 import lu.kbra.modelizer_next.domain.ClassModel;
+import lu.kbra.modelizer_next.domain.ElementStyle;
+import lu.kbra.modelizer_next.domain.FieldModel;
+import lu.kbra.modelizer_next.layout.LayoutObjectType;
+import lu.kbra.modelizer_next.layout.NodeLayout;
 import lu.kbra.modelizer_next.layout.PanelState;
 import lu.kbra.modelizer_next.layout.PanelType;
 import lu.kbra.modelizer_next.style.StylePalette;
@@ -41,23 +58,26 @@ public class DiagramCanvas extends JPanel
 		DiagramPathBuilder, MouseInteractionController, ElementEditor, ElementRenderer, ElementDeleter, ElementCreator, VisibilityManager,
 		CaptureManager, LinkLayoutManager, ExportManager, NodeLayoutManager, DiagramCanvasCoreSupport {
 
+	private static final long serialVersionUID = -768210073584363710L;
+
 	static final double PASTE_OFFSET = 30.0;
 
 	static ClipboardSnapshot clipboardSnapshot;
 
 	static final Font TITLE_FONT = new Font(Font.SANS_SERIF, Font.BOLD, 14);
 	static final Font BODY_FONT = new Font(Font.SANS_SERIF, Font.PLAIN, 12);
-	static final int CLASS_MIN_WIDTH = 140;
 
 	static final int COMMENT_MIN_WIDTH = 120;
-	static final int HEADER_HEIGHT = 28;
-	static final int ROW_HEIGHT = 22;
-
-	static final int PADDING = 8;
 	static final int COMMENT_RESIZE_HANDLE_SIZE = 12;
 	static final int COMMENT_MIN_HEIGHT = 40;
-
 	static final int COMMENT_MIN_WIDTH_VALUE = 120;
+
+	static final int CLASS_MIN_WIDTH = 140;
+	static final int CLASS_HEADER_HEIGHT = 28;
+	static final int CLASS_ROW_HEIGHT = 22;
+
+	static final int PADDING = 8;
+
 	static final Color CANVAS_BACKGROUND_COLOR = new Color(0xF2F2F2);
 	static final Color GRID_COLOR = new Color(0xE4E4E4);
 	static final Color SELECTION_COLOR = new Color(0x2F7DFF);
@@ -109,6 +129,9 @@ public class DiagramCanvas extends JPanel
 	LinkCreationState linkCreationState;
 	SelectedElement linkPreviewTarget;
 
+	JTextField renamingField;
+	SelectedElement renamingElement;
+
 	Point2D.Double linkPreviewMousePoint;
 	SelectedElement selectedElement;
 	final LinkedHashSet<SelectedElement> selectedElements = new LinkedHashSet<>();
@@ -150,16 +173,20 @@ public class DiagramCanvas extends JPanel
 		this.panelType = panelType;
 		this.documentEventListener = documentEventListener;
 
-		this.setBackground(DiagramCanvas.CANVAS_BACKGROUND_COLOR);
-		this.setOpaque(true);
-		this.setFocusable(true);
+		super.setBackground(DiagramCanvas.CANVAS_BACKGROUND_COLOR);
+		super.setOpaque(true);
+		super.setFocusable(true);
 
 		this.installKeyBindings();
 
-		final MouseAdapter mouseAdapter = createMouseAdapter();
-		this.addMouseListener(mouseAdapter);
-		this.addMouseMotionListener(mouseAdapter);
-		this.addMouseWheelListener(mouseAdapter);
+		final MouseAdapter mouseAdapter = this.createMouseAdapter();
+		super.addMouseListener(mouseAdapter);
+		super.addMouseMotionListener(mouseAdapter);
+		super.addMouseWheelListener(mouseAdapter);
+
+		this.renamingField = createRenamingField();
+		super.add(this.renamingField);
+		super.setLayout(null);
 	}
 
 	public Action getCanvasAction(final String actionKey) {
@@ -168,7 +195,7 @@ public class DiagramCanvas extends JPanel
 
 	@Override
 	public ModelDocument getDocument() {
-		return document;
+		return this.document;
 	}
 
 	@Override
@@ -197,6 +224,7 @@ public class DiagramCanvas extends JPanel
 		this.dragOccurred = false;
 
 		this.currentDragOffset = new Point2D.Double();
+		this.renamingField.setVisible(false);
 
 		this.setCursor(Cursor.getDefaultCursor());
 		this.notifySelectionChanged();
@@ -205,7 +233,7 @@ public class DiagramCanvas extends JPanel
 	}
 
 	@Override
-	public void paintComponent(Graphics g) {
+	public void paintComponent(final Graphics g) {
 		super.paintComponent(g);
 		this.invalidateConceptualAnchorCache();
 		this.ensureLayouts();
@@ -227,7 +255,6 @@ public class DiagramCanvas extends JPanel
 
 		g2.setTransform(oldTransform);
 		g2.dispose();
-
 	}
 
 }

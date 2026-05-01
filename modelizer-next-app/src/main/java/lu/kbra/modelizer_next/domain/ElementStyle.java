@@ -4,16 +4,28 @@ import java.awt.Color;
 
 import lu.kbra.modelizer_next.common.ColorUtils;
 
-public class ClassStyle {
+public class ElementStyle {
 
 	private Color textColor;
 	private Color backgroundColor;
 	private Color borderColor;
 
-	public ClassStyle() {
-		this.textColor = ColorUtils.ofRgb(0x000000);
-		this.backgroundColor = ColorUtils.ofRgb(0xFFF59D);
-		this.borderColor = ColorUtils.ofRgb(0x333333);
+	public ElementStyle() {
+	}
+
+	public static ElementStyle forClass() {
+		final ElementStyle style = new ElementStyle();
+		style.textColor = ColorUtils.ofRgb(0x000000);
+		style.backgroundColor = ColorUtils.ofRgb(0xFFF59D);
+		style.borderColor = ColorUtils.ofRgb(0x333333);
+		return style;
+	}
+
+	public static ElementStyle forField() {
+		final ElementStyle style = new ElementStyle();
+		style.textColor = ColorUtils.ofRgb(0x000000);
+		style.backgroundColor = ColorUtils.ofRgb(0xFFFFFF);
+		return style;
 	}
 
 	public Color getBackgroundColor() {

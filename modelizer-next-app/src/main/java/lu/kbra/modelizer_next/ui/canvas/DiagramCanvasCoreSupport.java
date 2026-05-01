@@ -68,16 +68,16 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 	}
 
 	default void ensureLayouts() {
-		for (final ClassModel classModel : getCanvas().document.getModel().getClasses()) {
-			if (getCanvas().isVisible(classModel)) {
-				getCanvas().findOrCreateNodeLayout(LayoutObjectType.CLASS, classModel.getId());
+		for (final ClassModel classModel : this.getCanvas().document.getModel().getClasses()) {
+			if (this.getCanvas().isVisible(classModel)) {
+				this.getCanvas().findOrCreateNodeLayout(LayoutObjectType.CLASS, classModel.getId());
 			}
 		}
 
-		for (final CommentModel commentModel : getCanvas().document.getModel().getComments()) {
-			final String text = getCanvas().resolveCommentText(commentModel);
-			if (getCanvas().isCommentVisible(commentModel) && text != null && !text.isBlank()) {
-				getCanvas().findOrCreateNodeLayout(LayoutObjectType.COMMENT, commentModel.getId());
+		for (final CommentModel commentModel : this.getCanvas().document.getModel().getComments()) {
+			final String text = this.getCanvas().resolveCommentText(commentModel);
+			if (this.getCanvas().isCommentVisible(commentModel) && text != null && !text.isBlank()) {
+				this.getCanvas().findOrCreateNodeLayout(LayoutObjectType.COMMENT, commentModel.getId());
 			}
 		}
 	}
@@ -90,8 +90,8 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 			return null;
 		}
 
-		final String baseTechnicalName = getCanvas().buildForeignKeyFieldTechnicalName(targetClass, targetField);
-		final String baseDisplayName = getCanvas().buildForeignKeyFieldName(targetClass, targetField);
+		final String baseTechnicalName = this.getCanvas().buildForeignKeyFieldTechnicalName(targetClass, targetField);
+		final String baseDisplayName = this.getCanvas().buildForeignKeyFieldName(targetClass, targetField);
 
 		for (int suffix = 1; suffix < 1000; suffix++) {
 			final String technicalName = suffix == 1 ? baseTechnicalName : baseTechnicalName + "_" + suffix;
@@ -111,7 +111,7 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 			}
 
 			if (matchingField != null) {
-				if (!getCanvas().hasOutgoingTechnicalLink(sourceClass.getId(), matchingField.getId())) {
+				if (!this.getCanvas().hasOutgoingTechnicalLink(sourceClass.getId(), matchingField.getId())) {
 					return matchingField;
 				}
 				continue;
@@ -125,7 +125,7 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 			fieldModel.setUnique(false);
 			fieldModel.setNotNull(false);
 			fieldModel.setType(targetField.getType());
-			getCanvas().applyDefaultPaletteToField(fieldModel);
+			this.getCanvas().applyDefaultPaletteToField(fieldModel);
 			sourceClass.getFields().add(fieldModel);
 			return fieldModel;
 		}
@@ -139,29 +139,29 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 		}
 
 		if (commentModel.getBinding().getTargetType() == BoundTargetType.CLASS) {
-			final ClassModel classModel = getCanvas().findClassById(commentModel.getBinding().getTargetId());
-			if (classModel == null || !getCanvas().isVisible(classModel)) {
+			final ClassModel classModel = this.getCanvas().findClassById(commentModel.getBinding().getTargetId());
+			if (classModel == null || !this.getCanvas().isVisible(classModel)) {
 				return null;
 			}
 
-			final NodeLayout layout = getCanvas()
-					.resolveRenderLayout(getCanvas().findOrCreateNodeLayout(LayoutObjectType.CLASS, classModel.getId()));
-			final Rectangle2D bounds = getCanvas().computeClassBounds(g2, classModel, layout);
+			final NodeLayout layout = this.getCanvas()
+					.resolveRenderLayout(this.getCanvas().findOrCreateNodeLayout(LayoutObjectType.CLASS, classModel.getId()));
+			final Rectangle2D bounds = this.getCanvas().computeClassBounds(g2, classModel, layout);
 			return new Point2D.Double(bounds.getCenterX(), bounds.getCenterY());
 		}
 
-		final LinkModel linkModel = getCanvas().findLinkById(commentModel.getBinding().getTargetId());
-		final LinkGeometry geometry = linkModel == null ? null : getCanvas().resolveLinkGeometry(g2, linkModel);
+		final LinkModel linkModel = this.getCanvas().findLinkById(commentModel.getBinding().getTargetId());
+		final LinkGeometry geometry = linkModel == null ? null : this.getCanvas().resolveLinkGeometry(g2, linkModel);
 		return geometry == null ? null : geometry.middlePoint();
 	}
 
 	default List<LinkModel> getActiveLinks() {
-		return getCanvas().panelType == PanelType.CONCEPTUAL ? getCanvas().document.getModel().getConceptualLinks()
-				: getCanvas().document.getModel().getTechnicalLinks();
+		return this.getCanvas().panelType == PanelType.CONCEPTUAL ? this.getCanvas().document.getModel().getConceptualLinks()
+				: this.getCanvas().document.getModel().getTechnicalLinks();
 	}
 
 	default SelectedElement getLinkCreationSource() {
-		return getCanvas().linkCreationState == null ? null : getCanvas().linkCreationState.toSelectedElement();
+		return this.getCanvas().linkCreationState == null ? null : this.getCanvas().linkCreationState.toSelectedElement();
 	}
 
 	default int getTechnicalSideLinkCount(final Graphics2D g2, final String classId, final AnchorSide side, final String ignoredLinkId) {
@@ -170,28 +170,30 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 		}
 
 		int count = 0;
-		for (final LinkModel linkModel : getCanvas().getActiveLinks()) {
+		for (final LinkModel linkModel : this.getCanvas().getActiveLinks()) {
 			if (linkModel == null || Objects.equals(linkModel.getId(), ignoredLinkId)) {
 				continue;
 			}
 			if (classId.equals(linkModel.getFrom().getClassId())) {
-				final AnchorSide endpointSide = getCanvas().resolveTechnicalEndpointSide(g2,
-						linkModel.getFrom().getClassId(),
-						linkModel.getFrom().getFieldId(),
-						linkModel.getTo().getClassId(),
-						linkModel.getTo().getFieldId(),
-						linkModel.isSelfLinking());
+				final AnchorSide endpointSide = this.getCanvas()
+						.resolveTechnicalEndpointSide(g2,
+								linkModel.getFrom().getClassId(),
+								linkModel.getFrom().getFieldId(),
+								linkModel.getTo().getClassId(),
+								linkModel.getTo().getFieldId(),
+								linkModel.isSelfLinking());
 				if (endpointSide == side) {
 					count++;
 				}
 			}
 			if (classId.equals(linkModel.getTo().getClassId())) {
-				final AnchorSide endpointSide = getCanvas().resolveTechnicalEndpointSide(g2,
-						linkModel.getTo().getClassId(),
-						linkModel.getTo().getFieldId(),
-						linkModel.getFrom().getClassId(),
-						linkModel.getFrom().getFieldId(),
-						linkModel.isSelfLinking());
+				final AnchorSide endpointSide = this.getCanvas()
+						.resolveTechnicalEndpointSide(g2,
+								linkModel.getTo().getClassId(),
+								linkModel.getTo().getFieldId(),
+								linkModel.getFrom().getClassId(),
+								linkModel.getFrom().getFieldId(),
+								linkModel.isSelfLinking());
 				if (endpointSide == side) {
 					count++;
 				}
@@ -204,7 +206,7 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 		final List<FieldModel> visibleFields = new ArrayList<>();
 
 		for (final FieldModel fieldModel : classModel.getFields()) {
-			if (getCanvas().panelType == PanelType.CONCEPTUAL && fieldModel.isNotConceptual()) {
+			if (this.getCanvas().panelType == PanelType.CONCEPTUAL && fieldModel.isNotConceptual()) {
 				continue;
 			}
 			visibleFields.add(fieldModel);
@@ -218,7 +220,7 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 	}
 
 	default boolean hasOutgoingTechnicalLink(final String classId, final String fieldId) {
-		for (final LinkModel linkModel : getCanvas().document.getModel().getTechnicalLinks()) {
+		for (final LinkModel linkModel : this.getCanvas().document.getModel().getTechnicalLinks()) {
 			if (linkModel.getFrom() == null || linkModel.getTo() == null || linkModel.getFrom().getFieldId() == null
 					|| linkModel.getTo().getFieldId() == null) {
 				continue;
@@ -232,24 +234,24 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 	}
 
 	default void installKeyBindings() {
-		DiagramCanvasActionRegistrar.installDefault(getCanvas(),
-				new DiagramCanvasActionRegistrar.DiagramCanvasActions(getCanvas()::renameSelection,
-						getCanvas()::moveFieldSelection,
-						getCanvas()::moveSelectedFieldInList,
-						getCanvas()::addTable,
-						getCanvas()::addField,
-						getCanvas()::addComment,
-						getCanvas()::deleteSelection,
-						getCanvas()::duplicateSelection,
-						getCanvas()::clearSelection,
-						getCanvas()::addLink,
-						getCanvas()::selectAll,
-						getCanvas()::editSelected,
-						getCanvas()::copySelection,
-						getCanvas()::cutSelection,
-						getCanvas()::pasteSelection,
-						getCanvas().documentEventListener::undo,
-						getCanvas().documentEventListener::redo));
+		DiagramCanvasActionRegistrar.installDefault(this.getCanvas(),
+				new DiagramCanvasActionRegistrar.DiagramCanvasActions(this.getCanvas()::renameSelection,
+						this.getCanvas()::moveFieldSelection,
+						this.getCanvas()::moveSelectedFieldInList,
+						this.getCanvas()::addTable,
+						this.getCanvas()::addField,
+						this.getCanvas()::addComment,
+						this.getCanvas()::deleteSelection,
+						this.getCanvas()::duplicateSelection,
+						this.getCanvas()::clearSelection,
+						this.getCanvas()::addLink,
+						this.getCanvas()::selectAll,
+						this.getCanvas()::editSelected,
+						this.getCanvas()::copySelection,
+						this.getCanvas()::cutSelection,
+						this.getCanvas()::pasteSelection,
+						this.getCanvas().documentEventListener::undo,
+						this.getCanvas().documentEventListener::redo));
 	}
 
 	default boolean isLinkConnectedTo(final LinkModel linkModel, final String classId) {
@@ -261,11 +263,11 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 	}
 
 	default boolean isValidPreviewTarget(final SelectedElement target) {
-		if (target == null || getCanvas().linkCreationState == null) {
+		if (target == null || this.getCanvas().linkCreationState == null) {
 			return false;
 		}
 
-		final SelectedElement source = getCanvas().getLinkCreationSource();
+		final SelectedElement source = this.getCanvas().getLinkCreationSource();
 		if (source == null) {
 			return false;
 		}
@@ -275,15 +277,15 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 		}
 
 		if (source.type() == SelectedType.CLASS && target.type() == SelectedType.LINK) {
-			return getCanvas().findLinkById(target.linkId()) != null
-					&& !getCanvas().isLinkConnectedTo(getCanvas().findLinkById(target.linkId()), source.classId());
+			return this.getCanvas().findLinkById(target.linkId()) != null
+					&& !this.getCanvas().isLinkConnectedTo(this.getCanvas().findLinkById(target.linkId()), source.classId());
 		}
 
-		if (getCanvas().panelType == PanelType.CONCEPTUAL) {
+		if (this.getCanvas().panelType == PanelType.CONCEPTUAL) {
 			return target.type() == SelectedType.CLASS;
 		}
 
-		final SelectedElement technicalTarget = getCanvas().resolveTechnicalTargetEndpoint(target);
+		final SelectedElement technicalTarget = this.getCanvas().resolveTechnicalTargetEndpoint(target);
 		if (technicalTarget == null) {
 			return false;
 		}
@@ -294,7 +296,7 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 				return false;
 			}
 
-			return !getCanvas().hasOutgoingTechnicalLink(source.classId(), source.fieldId());
+			return !this.getCanvas().hasOutgoingTechnicalLink(source.classId(), source.fieldId());
 		}
 
 		return source.type() == SelectedType.CLASS;
@@ -308,13 +310,13 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 	}
 
 	default Point2D.Double mouseWorldOrViewportCenter() {
-		final Point mousePoint = getCanvas().getMousePosition();
+		final Point mousePoint = this.getCanvas().getMousePosition();
 
 		if (mousePoint == null) {
-			return getCanvas().viewportCenterWorld();
+			return this.getCanvas().viewportCenterWorld();
 		}
 
-		return getCanvas().screenToWorld(mousePoint);
+		return this.getCanvas().screenToWorld(mousePoint);
 	}
 
 	default SelectedElement normalizeConnectionSourceSelection(final SelectedElement selection) {
@@ -325,17 +327,17 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 		return switch (selection.type()) {
 		case COMMENT -> SelectedElement.forComment(selection.commentId());
 		case CLASS -> SelectedElement.forClass(selection.classId());
-		case FIELD -> getCanvas().panelType == PanelType.CONCEPTUAL ? SelectedElement.forClass(selection.classId()) : selection;
+		case FIELD -> this.getCanvas().panelType == PanelType.CONCEPTUAL ? SelectedElement.forClass(selection.classId()) : selection;
 		default -> null;
 		};
 	}
 
 	default SelectedElement normalizeConnectionTargetSelection(final SelectedElement selection) {
-		if (selection == null || getCanvas().linkCreationState == null) {
+		if (selection == null || this.getCanvas().linkCreationState == null) {
 			return null;
 		}
 
-		final SelectedElement source = getCanvas().getLinkCreationSource();
+		final SelectedElement source = this.getCanvas().getLinkCreationSource();
 		if (source == null) {
 			return null;
 		}
@@ -348,7 +350,7 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 			};
 		}
 
-		if (getCanvas().panelType == PanelType.CONCEPTUAL) {
+		if (this.getCanvas().panelType == PanelType.CONCEPTUAL) {
 			return switch (selection.type()) {
 			case CLASS, FIELD -> SelectedElement.forClass(selection.classId());
 			case LINK -> source.type() == SelectedType.CLASS ? SelectedElement.forLink(selection.linkId()) : null;
@@ -365,41 +367,42 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 	}
 
 	default void notifyDocumentChanged() {
-		getCanvas().invalidateConceptualAnchorCache();
-		if (getCanvas().documentEventListener != null) {
-			getCanvas().documentEventListener.onDocumentChanged();
+		this.getCanvas().invalidateConceptualAnchorCache();
+		if (this.getCanvas().documentEventListener != null) {
+			this.getCanvas().documentEventListener.onDocumentChanged();
 		}
 	}
 
 	default void notifySelectionChanged() {
-		if (getCanvas().documentEventListener != null) {
-			getCanvas().documentEventListener.onSelectionChanged(getCanvas().getSelectionInfo());
+		if (this.getCanvas().documentEventListener != null) {
+			this.getCanvas().documentEventListener.onSelectionChanged(this.getCanvas().getSelectionInfo());
 		}
 	}
 
 	default void openEditDialogForSelection() {
-		if (getCanvas().selectedElement == null) {
+		if (this.getCanvas().selectedElement == null) {
 			return;
 		}
 
-		switch (getCanvas().selectedElement.type()) {
-		case FIELD -> getCanvas().editField(getCanvas().selectedElement.classId(), getCanvas().selectedElement.fieldId());
-		case COMMENT -> getCanvas().editComment(getCanvas().selectedElement.commentId());
-		case CLASS -> getCanvas().editClass(getCanvas().selectedElement.classId());
-		case LINK -> getCanvas().editLink(getCanvas().selectedElement.linkId());
+		switch (this.getCanvas().selectedElement.type()) {
+		case FIELD -> this.getCanvas().editField(this.getCanvas().selectedElement.classId(), this.getCanvas().selectedElement.fieldId());
+		case COMMENT -> this.getCanvas().editComment(this.getCanvas().selectedElement.commentId());
+		case CLASS -> this.getCanvas().editClass(this.getCanvas().selectedElement.classId());
+		case LINK -> this.getCanvas().editLink(this.getCanvas().selectedElement.linkId());
 		default -> {
 		}
 		}
 	}
 
 	default Point2D resolveConceptualPreviewAnchor(final Graphics2D g2, final String classId, final Point2D reference) {
-		final ClassModel classModel = getCanvas().findClassById(classId);
-		if (classModel == null || !getCanvas().isVisible(classModel)) {
+		final ClassModel classModel = this.getCanvas().findClassById(classId);
+		if (classModel == null || !this.getCanvas().isVisible(classModel)) {
 			return null;
 		}
 
-		final NodeLayout layout = getCanvas().resolveRenderLayout(getCanvas().findOrCreateNodeLayout(LayoutObjectType.CLASS, classId));
-		final Rectangle2D bounds = getCanvas().computeClassBounds(g2, classModel, layout);
+		final NodeLayout layout = this.getCanvas()
+				.resolveRenderLayout(this.getCanvas().findOrCreateNodeLayout(LayoutObjectType.CLASS, classId));
+		final Rectangle2D bounds = this.getCanvas().computeClassBounds(g2, classModel, layout);
 
 		final Point2D effectiveReference = reference == null ? new Point2D.Double(bounds.getCenterX(), bounds.getCenterY()) : reference;
 
@@ -423,23 +426,24 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 	}
 
 	default Point2D resolveOppositeReferencePoint(final Graphics2D g2, final String classId, final String fieldId) {
-		final ClassModel classModel = getCanvas().findClassById(classId);
-		if (classModel == null || !getCanvas().isVisible(classModel)) {
+		final ClassModel classModel = this.getCanvas().findClassById(classId);
+		if (classModel == null || !this.getCanvas().isVisible(classModel)) {
 			return null;
 		}
 
-		final NodeLayout layout = getCanvas().resolveRenderLayout(getCanvas().findOrCreateNodeLayout(LayoutObjectType.CLASS, classId));
-		final Rectangle2D classBounds = getCanvas().computeClassBounds(g2, classModel, layout);
+		final NodeLayout layout = this.getCanvas()
+				.resolveRenderLayout(this.getCanvas().findOrCreateNodeLayout(LayoutObjectType.CLASS, classId));
+		final Rectangle2D classBounds = this.getCanvas().computeClassBounds(g2, classModel, layout);
 
-		if (getCanvas().panelType == PanelType.CONCEPTUAL || fieldId == null) {
+		if (this.getCanvas().panelType == PanelType.CONCEPTUAL || fieldId == null) {
 			return new Point2D.Double(classBounds.getCenterX(), classBounds.getCenterY());
 		}
 
-		final List<FieldModel> visibleFields = getCanvas().getVisibleFields(classModel);
+		final List<FieldModel> visibleFields = this.getCanvas().getVisibleFields(classModel);
 		for (int i = 0; i < visibleFields.size(); i++) {
 			if (visibleFields.get(i).getId().equals(fieldId)) {
-				final double y = classBounds.getY() + DiagramCanvas.HEADER_HEIGHT + i * DiagramCanvas.ROW_HEIGHT
-						+ DiagramCanvas.ROW_HEIGHT / 2.0;
+				final double y = classBounds.getY() + DiagramCanvas.CLASS_HEADER_HEIGHT + i * DiagramCanvas.CLASS_ROW_HEIGHT
+						+ DiagramCanvas.CLASS_ROW_HEIGHT / 2.0;
 				return new Point2D.Double(classBounds.getCenterX(), y);
 			}
 		}
@@ -448,32 +452,32 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 	}
 
 	default Point2D resolvePreviewSourceAnchorReference(final Graphics2D g2) {
-		if (getCanvas().linkCreationState == null) {
-			return getCanvas().linkPreviewMousePoint;
+		if (this.getCanvas().linkCreationState == null) {
+			return this.getCanvas().linkPreviewMousePoint;
 		}
 
-		final SelectedElement source = getCanvas().getLinkCreationSource();
+		final SelectedElement source = this.getCanvas().getLinkCreationSource();
 		if (source == null) {
-			return getCanvas().linkPreviewMousePoint;
+			return this.getCanvas().linkPreviewMousePoint;
 		}
 
 		if (source.type() == SelectedType.COMMENT) {
-			return getCanvas().resolveCommentCenterAnchor(g2, source.commentId());
+			return this.getCanvas().resolveCommentCenterAnchor(g2, source.commentId());
 		}
 
-		if (getCanvas().panelType == PanelType.CONCEPTUAL) {
-			final ClassModel classModel = getCanvas().findClassById(source.classId());
-			if (classModel == null || !getCanvas().isVisible(classModel)) {
-				return getCanvas().linkPreviewMousePoint;
+		if (this.getCanvas().panelType == PanelType.CONCEPTUAL) {
+			final ClassModel classModel = this.getCanvas().findClassById(source.classId());
+			if (classModel == null || !this.getCanvas().isVisible(classModel)) {
+				return this.getCanvas().linkPreviewMousePoint;
 			}
 
-			final NodeLayout layout = getCanvas()
-					.resolveRenderLayout(getCanvas().findOrCreateNodeLayout(LayoutObjectType.CLASS, classModel.getId()));
-			final Rectangle2D bounds = getCanvas().computeClassBounds(g2, classModel, layout);
+			final NodeLayout layout = this.getCanvas()
+					.resolveRenderLayout(this.getCanvas().findOrCreateNodeLayout(LayoutObjectType.CLASS, classModel.getId()));
+			final Rectangle2D bounds = this.getCanvas().computeClassBounds(g2, classModel, layout);
 			return new Point2D.Double(bounds.getCenterX(), bounds.getCenterY());
 		}
 
-		return getCanvas().resolveOppositeReferencePoint(g2, source.classId(), source.fieldId());
+		return this.getCanvas().resolveOppositeReferencePoint(g2, source.classId(), source.fieldId());
 	}
 
 	default AnchorSide resolveTechnicalEndpointSide(
@@ -487,27 +491,28 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 			return AnchorSide.LEFT;
 		}
 
-		final ClassModel classModel = getCanvas().findClassById(classId);
-		if (classModel == null || !getCanvas().isVisible(classModel)) {
+		final ClassModel classModel = this.getCanvas().findClassById(classId);
+		if (classModel == null || !this.getCanvas().isVisible(classModel)) {
 			return AnchorSide.LEFT;
 		}
 
-		final NodeLayout layout = getCanvas().resolveRenderLayout(getCanvas().findOrCreateNodeLayout(LayoutObjectType.CLASS, classId));
-		final Rectangle2D classBounds = getCanvas().computeClassBounds(g2, classModel, layout);
-		final Point2D oppositeReference = getCanvas().resolveOppositeReferencePoint(g2, oppositeClassId, oppositeFieldId);
+		final NodeLayout layout = this.getCanvas()
+				.resolveRenderLayout(this.getCanvas().findOrCreateNodeLayout(LayoutObjectType.CLASS, classId));
+		final Rectangle2D classBounds = this.getCanvas().computeClassBounds(g2, classModel, layout);
+		final Point2D oppositeReference = this.getCanvas().resolveOppositeReferencePoint(g2, oppositeClassId, oppositeFieldId);
 		if (oppositeReference == null) {
 			return AnchorSide.LEFT;
 		}
 
 		double centerX = classBounds.getCenterX();
 		if (fieldId != null) {
-			final List<FieldModel> visibleFields = getCanvas().getVisibleFields(classModel);
+			final List<FieldModel> visibleFields = this.getCanvas().getVisibleFields(classModel);
 			for (int i = 0; i < visibleFields.size(); i++) {
 				if (visibleFields.get(i).getId().equals(fieldId)) {
 					final Rectangle2D fieldBounds = new Rectangle2D.Double(classBounds.getX(),
-							classBounds.getY() + DiagramCanvas.HEADER_HEIGHT + i * DiagramCanvas.ROW_HEIGHT,
+							classBounds.getY() + DiagramCanvas.CLASS_HEADER_HEIGHT + i * DiagramCanvas.CLASS_ROW_HEIGHT,
 							classBounds.getWidth(),
-							DiagramCanvas.ROW_HEIGHT);
+							DiagramCanvas.CLASS_ROW_HEIGHT);
 					centerX = fieldBounds.getCenterX();
 					break;
 				}
@@ -522,26 +527,27 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 			final String classId,
 			final String fieldId,
 			final Point2D oppositeReference) {
-		final ClassModel classModel = getCanvas().findClassById(classId);
-		if (classModel == null || !getCanvas().isVisible(classModel)) {
+		final ClassModel classModel = this.getCanvas().findClassById(classId);
+		if (classModel == null || !this.getCanvas().isVisible(classModel)) {
 			return null;
 		}
 
-		final NodeLayout layout = getCanvas().resolveRenderLayout(getCanvas().findOrCreateNodeLayout(LayoutObjectType.CLASS, classId));
-		final Rectangle2D classBounds = getCanvas().computeClassBounds(g2, classModel, layout);
+		final NodeLayout layout = this.getCanvas()
+				.resolveRenderLayout(this.getCanvas().findOrCreateNodeLayout(LayoutObjectType.CLASS, classId));
+		final Rectangle2D classBounds = this.getCanvas().computeClassBounds(g2, classModel, layout);
 
 		if (fieldId == null) {
 			final double x = oppositeReference.getX() < classBounds.getCenterX() ? classBounds.getX() : classBounds.getMaxX();
 			return new Point2D.Double(x, classBounds.getCenterY());
 		}
 
-		final List<FieldModel> visibleFields = getCanvas().getVisibleFields(classModel);
+		final List<FieldModel> visibleFields = this.getCanvas().getVisibleFields(classModel);
 		for (int i = 0; i < visibleFields.size(); i++) {
 			if (visibleFields.get(i).getId().equals(fieldId)) {
 				final Rectangle2D fieldBounds = new Rectangle2D.Double(classBounds.getX(),
-						classBounds.getY() + DiagramCanvas.HEADER_HEIGHT + i * DiagramCanvas.ROW_HEIGHT,
+						classBounds.getY() + DiagramCanvas.CLASS_HEADER_HEIGHT + i * DiagramCanvas.CLASS_ROW_HEIGHT,
 						classBounds.getWidth(),
-						DiagramCanvas.ROW_HEIGHT);
+						DiagramCanvas.CLASS_ROW_HEIGHT);
 				final double x = oppositeReference.getX() < fieldBounds.getCenterX() ? fieldBounds.getX() : fieldBounds.getMaxX();
 				return new Point2D.Double(x, fieldBounds.getCenterY());
 			}
@@ -557,15 +563,16 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 			final String fieldId,
 			final String oppositeClassId,
 			final String oppositeFieldId) {
-		final ClassModel classModel = getCanvas().findClassById(classId);
-		if (classModel == null || !getCanvas().isVisible(classModel)) {
+		final ClassModel classModel = this.getCanvas().findClassById(classId);
+		if (classModel == null || !this.getCanvas().isVisible(classModel)) {
 			return null;
 		}
 
-		final NodeLayout layout = getCanvas().resolveRenderLayout(getCanvas().findOrCreateNodeLayout(LayoutObjectType.CLASS, classId));
-		final Rectangle2D classBounds = getCanvas().computeClassBounds(g2, classModel, layout);
+		final NodeLayout layout = this.getCanvas()
+				.resolveRenderLayout(this.getCanvas().findOrCreateNodeLayout(LayoutObjectType.CLASS, classId));
+		final Rectangle2D classBounds = this.getCanvas().computeClassBounds(g2, classModel, layout);
 
-		final Point2D oppositeReference = getCanvas().resolveOppositeReferencePoint(g2, oppositeClassId, oppositeFieldId);
+		final Point2D oppositeReference = this.getCanvas().resolveOppositeReferencePoint(g2, oppositeClassId, oppositeFieldId);
 		if (oppositeReference == null) {
 			return null;
 		}
@@ -576,13 +583,13 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 			return left.distance(oppositeReference) <= right.distance(oppositeReference) ? left : right;
 		}
 
-		final List<FieldModel> visibleFields = getCanvas().getVisibleFields(classModel);
+		final List<FieldModel> visibleFields = this.getCanvas().getVisibleFields(classModel);
 		for (int i = 0; i < visibleFields.size(); i++) {
 			if (visibleFields.get(i).getId().equals(fieldId)) {
 				final Rectangle2D fieldBounds = new Rectangle2D.Double(classBounds.getX(),
-						classBounds.getY() + DiagramCanvas.HEADER_HEIGHT + i * DiagramCanvas.ROW_HEIGHT,
+						classBounds.getY() + DiagramCanvas.CLASS_HEADER_HEIGHT + i * DiagramCanvas.CLASS_ROW_HEIGHT,
 						classBounds.getWidth(),
-						DiagramCanvas.ROW_HEIGHT);
+						DiagramCanvas.CLASS_ROW_HEIGHT);
 
 				final Point2D left = new Point2D.Double(fieldBounds.getX(), fieldBounds.getCenterY());
 				final Point2D right = new Point2D.Double(fieldBounds.getMaxX(), fieldBounds.getCenterY());
@@ -597,26 +604,27 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 	}
 
 	default Point2D resolveTechnicalSelfLinkAnchor(final Graphics2D g2, final String classId, final String fieldId, final AnchorSide side) {
-		final ClassModel classModel = getCanvas().findClassById(classId);
-		if (classModel == null || !getCanvas().isVisible(classModel)) {
+		final ClassModel classModel = this.getCanvas().findClassById(classId);
+		if (classModel == null || !this.getCanvas().isVisible(classModel)) {
 			return null;
 		}
 
-		final NodeLayout layout = getCanvas().resolveRenderLayout(getCanvas().findOrCreateNodeLayout(LayoutObjectType.CLASS, classId));
-		final Rectangle2D classBounds = getCanvas().computeClassBounds(g2, classModel, layout);
+		final NodeLayout layout = this.getCanvas()
+				.resolveRenderLayout(this.getCanvas().findOrCreateNodeLayout(LayoutObjectType.CLASS, classId));
+		final Rectangle2D classBounds = this.getCanvas().computeClassBounds(g2, classModel, layout);
 		final double x = side == AnchorSide.LEFT ? classBounds.getX() : classBounds.getMaxX();
 
 		if (fieldId == null) {
 			return new Point2D.Double(x, classBounds.getCenterY());
 		}
 
-		final List<FieldModel> visibleFields = getCanvas().getVisibleFields(classModel);
+		final List<FieldModel> visibleFields = this.getCanvas().getVisibleFields(classModel);
 		for (int i = 0; i < visibleFields.size(); i++) {
 			if (visibleFields.get(i).getId().equals(fieldId)) {
 				final Rectangle2D fieldBounds = new Rectangle2D.Double(classBounds.getX(),
-						classBounds.getY() + DiagramCanvas.HEADER_HEIGHT + i * DiagramCanvas.ROW_HEIGHT,
+						classBounds.getY() + DiagramCanvas.CLASS_HEADER_HEIGHT + i * DiagramCanvas.CLASS_ROW_HEIGHT,
 						classBounds.getWidth(),
-						DiagramCanvas.ROW_HEIGHT);
+						DiagramCanvas.CLASS_ROW_HEIGHT);
 				return new Point2D.Double(x, fieldBounds.getCenterY());
 			}
 		}
@@ -637,15 +645,15 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 			return null;
 		}
 
-		final SelectedElement targetEndpoint = getCanvas().resolveTechnicalTargetEndpoint(target);
+		final SelectedElement targetEndpoint = this.getCanvas().resolveTechnicalTargetEndpoint(target);
 		if (targetEndpoint == null) {
 			return null;
 		}
 
-		final ClassModel sourceClass = getCanvas().findClassById(source.classId());
-		final ClassModel targetClass = getCanvas().findClassById(targetEndpoint.classId());
-		final FieldModel targetField = getCanvas().findFieldById(targetEndpoint.classId(), targetEndpoint.fieldId());
-		final FieldModel sourceField = getCanvas().ensureTechnicalSourceField(sourceClass, targetClass, targetField);
+		final ClassModel sourceClass = this.getCanvas().findClassById(source.classId());
+		final ClassModel targetClass = this.getCanvas().findClassById(targetEndpoint.classId());
+		final FieldModel targetField = this.getCanvas().findFieldById(targetEndpoint.classId(), targetEndpoint.fieldId());
+		final FieldModel sourceField = this.getCanvas().ensureTechnicalSourceField(sourceClass, targetClass, targetField);
 		return sourceField == null ? null : SelectedElement.forField(sourceClass.getId(), sourceField.getId());
 	}
 
@@ -655,7 +663,7 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 		}
 
 		if (target.type() == SelectedType.FIELD) {
-			final FieldModel fieldModel = getCanvas().findFieldById(target.classId(), target.fieldId());
+			final FieldModel fieldModel = this.getCanvas().findFieldById(target.classId(), target.fieldId());
 			return fieldModel != null && fieldModel.isPrimaryKey() ? target : null;
 		}
 
@@ -663,40 +671,52 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 			return null;
 		}
 
-		final FieldModel targetField = getCanvas().findPrimaryKeyField(target.classId());
+		final FieldModel targetField = this.getCanvas().findPrimaryKeyField(target.classId());
 		return targetField == null ? null : SelectedElement.forField(target.classId(), targetField.getId());
 	}
 
 	default Point2D.Double screenToWorld(final Point point) {
-		final PanelState state = getCanvas().getPanelState();
+		final PanelState state = this.getCanvas().getPanelState();
 		return new Point2D.Double((point.getX() - state.getPanX()) / state.getZoom(), (point.getY() - state.getPanY()) / state.getZoom());
 	}
 
+	default Point2D.Double worldToScreen(final Point2D world) {
+		final PanelState state = getCanvas().getPanelState();
+
+		return new Point2D.Double(world.getX() * state.getZoom() + state.getPanX(), world.getY() * state.getZoom() + state.getPanY());
+	}
+
+	default Point2D.Double worldToScreenZoom(final Point2D world) {
+		final PanelState state = getCanvas().getPanelState();
+
+		return new Point2D.Double(world.getX() * state.getZoom(), world.getY() * state.getZoom());
+	}
+
 	default void setAssociationClassForLink(final String classId, final String linkId) {
-		final LinkModel linkModel = getCanvas().findLinkById(linkId);
-		if (classId == null || linkModel == null || getCanvas().findClassById(classId) == null
-				|| getCanvas().isLinkConnectedTo(linkModel, classId)) {
+		final LinkModel linkModel = this.getCanvas().findLinkById(linkId);
+		if (classId == null || linkModel == null || this.getCanvas().findClassById(classId) == null
+				|| this.getCanvas().isLinkConnectedTo(linkModel, classId)) {
 			return;
 		}
-		final LinkModel alreadyExistingLinkModel = getCanvas().findLinkByAssociationClassId(classId);
+		final LinkModel alreadyExistingLinkModel = this.getCanvas().findLinkByAssociationClassId(classId);
 		if (alreadyExistingLinkModel != null && alreadyExistingLinkModel.getAssociationClassId().equals(classId)) {
 			alreadyExistingLinkModel.setAssociationClassId(null);
 		}
 
 		linkModel.setAssociationClassId(classId);
-		getCanvas().select(SelectedElement.forLink(linkId));
-		getCanvas().notifyDocumentChanged();
+		this.getCanvas().select(SelectedElement.forLink(linkId));
+		this.getCanvas().notifyDocumentChanged();
 	}
 
 	default boolean shouldExportClass(final ClassModel classModel) {
-		if (getCanvas().exportSelectionFilter == null) {
+		if (this.getCanvas().exportSelectionFilter == null) {
 			return true;
 		}
 		if (classModel == null) {
 			return false;
 		}
 
-		for (final SelectedElement element : getCanvas().exportSelectionFilter) {
+		for (final SelectedElement element : this.getCanvas().exportSelectionFilter) {
 			if (element.type() == SelectedType.CLASS && Objects.equals(element.classId(), classModel.getId())
 					|| element.type() == SelectedType.FIELD && Objects.equals(element.classId(), classModel.getId())) {
 				return true;
@@ -707,19 +727,19 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 	}
 
 	default boolean shouldExportComment(final CommentModel commentModel) {
-		return getCanvas().exportSelectionFilter == null
-				|| commentModel != null && getCanvas().exportSelectionFilter.contains(SelectedElement.forComment(commentModel.getId()));
+		return this.getCanvas().exportSelectionFilter == null || commentModel != null
+				&& this.getCanvas().exportSelectionFilter.contains(SelectedElement.forComment(commentModel.getId()));
 	}
 
 	default boolean shouldExportLink(final LinkModel linkModel) {
-		return getCanvas().exportSelectionFilter == null
-				|| linkModel != null && getCanvas().exportSelectionFilter.contains(SelectedElement.forLink(linkModel.getId()));
+		return this.getCanvas().exportSelectionFilter == null
+				|| linkModel != null && this.getCanvas().exportSelectionFilter.contains(SelectedElement.forLink(linkModel.getId()));
 	}
 
 	default Point2D.Double viewportCenterWorld() {
-		final PanelState state = getCanvas().getPanelState();
-		return new Point2D.Double((getCanvas().getWidth() / 2.0 - state.getPanX()) / state.getZoom(),
-				(getCanvas().getHeight() / 2.0 - state.getPanY()) / state.getZoom());
+		final PanelState state = this.getCanvas().getPanelState();
+		return new Point2D.Double((this.getCanvas().getWidth() / 2.0 - state.getPanX()) / state.getZoom(),
+				(this.getCanvas().getHeight() / 2.0 - state.getPanY()) / state.getZoom());
 	}
 
 	default List<String> wrapText(final String text, final FontMetrics metrics, final int maxWidth) {

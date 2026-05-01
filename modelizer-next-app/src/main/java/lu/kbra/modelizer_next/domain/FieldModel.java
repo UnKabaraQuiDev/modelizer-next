@@ -7,9 +7,9 @@ public class FieldModel {
 	public static final String[] SQL_TYPES = { null, "INT", "BIGINT", "TEXT", "BOOLEAN", "TINYINT", "DATE", "TIMESTAMP" };
 
 	private String id;
-	private FieldNames names;
+	private ElementNames names;
 	private boolean notConceptual;
-	private FieldStyle style;
+	private ElementStyle style;
 	private boolean primaryKey;
 	private boolean unique;
 	private boolean notNull;
@@ -17,9 +17,9 @@ public class FieldModel {
 
 	public FieldModel() {
 		this.id = UUID.randomUUID().toString();
-		this.names = new FieldNames();
+		this.names = new ElementNames();
 		this.notConceptual = false;
-		this.style = new FieldStyle();
+		this.style = ElementStyle.forField();
 		this.primaryKey = false;
 		this.unique = false;
 		this.notNull = false;
@@ -30,11 +30,11 @@ public class FieldModel {
 		return this.id;
 	}
 
-	public FieldNames getNames() {
+	public ElementNames getNames() {
 		return this.names;
 	}
 
-	public FieldStyle getStyle() {
+	public ElementStyle getStyle() {
 		return this.style;
 	}
 
@@ -62,7 +62,7 @@ public class FieldModel {
 		this.id = id;
 	}
 
-	public void setNames(final FieldNames names) {
+	public void setNames(final ElementNames names) {
 		this.names = names;
 	}
 
@@ -78,7 +78,7 @@ public class FieldModel {
 		this.primaryKey = primaryKey;
 	}
 
-	public void setStyle(final FieldStyle style) {
+	public void setStyle(final ElementStyle style) {
 		this.style = style;
 	}
 

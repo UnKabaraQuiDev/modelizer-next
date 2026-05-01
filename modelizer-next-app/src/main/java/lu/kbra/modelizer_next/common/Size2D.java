@@ -13,26 +13,40 @@ public class Size2D extends Double {
 		super(x, y);
 	}
 
-	public double getHeight() {
-		return super.y;
-	}
-
 	public double getWidth() {
 		return super.x;
 	}
 
-	public void setHeight(final double y) {
-		super.y = y;
+	public double getHeight() {
+		return super.y;
+	}
+
+	@Deprecated
+	@Override
+	public double getX() {
+		return x;
+	}
+
+	@Deprecated
+	@Override
+	public double getY() {
+		return y;
 	}
 
 	public void setWidth(final double x) {
 		super.x = x;
 	}
 
+	public void setHeight(final double y) {
+		super.y = y;
+	}
+
+	@Deprecated
 	public void setX(final double x) {
 		super.x = x;
 	}
 
+	@Deprecated
 	public void setY(final double y) {
 		super.y = y;
 	}

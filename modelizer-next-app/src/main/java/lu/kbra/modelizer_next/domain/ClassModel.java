@@ -7,16 +7,16 @@ import java.util.UUID;
 public class ClassModel {
 
 	private String id;
-	private ClassNames names;
+	private ElementNames names;
 	private LayerVisibility visibility;
-	private ClassStyle style;
+	private ElementStyle style;
 	private List<FieldModel> fields;
 
 	public ClassModel() {
 		this.id = UUID.randomUUID().toString();
-		this.names = new ClassNames();
+		this.names = new ElementNames();
 		this.visibility = new LayerVisibility();
-		this.style = new ClassStyle();
+		this.style = ElementStyle.forClass();
 		this.fields = new ArrayList<>();
 	}
 
@@ -28,11 +28,11 @@ public class ClassModel {
 		return this.id;
 	}
 
-	public ClassNames getNames() {
+	public ElementNames getNames() {
 		return this.names;
 	}
 
-	public ClassStyle getStyle() {
+	public ElementStyle getStyle() {
 		return this.style;
 	}
 
@@ -48,16 +48,26 @@ public class ClassModel {
 		this.id = id;
 	}
 
-	public void setNames(final ClassNames names) {
+	public void setNames(final ElementNames names) {
 		this.names = names;
 	}
 
-	public void setStyle(final ClassStyle style) {
+	public void setStyle(final ElementStyle style) {
 		this.style = style;
 	}
 
 	public void setVisibility(final LayerVisibility visibility) {
 		this.visibility = visibility;
+	}
+
+	public int getFieldIndex(String fieldId) {
+		for (int i = 0; i < fields.size(); i++) {
+			if (fieldId.equals(fields.get(i).getId())) {
+				return i;
+			}
+		}
+
+		return -1;
 	}
 
 	@Override

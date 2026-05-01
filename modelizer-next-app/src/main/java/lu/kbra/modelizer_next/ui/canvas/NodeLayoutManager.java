@@ -73,7 +73,7 @@ public interface NodeLayoutManager extends DiagramCanvasExt {
 		}
 
 		final int visibleFieldCount = getCanvas().getVisibleFields(classModel).size();
-		final int height = DiagramCanvas.HEADER_HEIGHT + visibleFieldCount * DiagramCanvas.ROW_HEIGHT;
+		final int height = DiagramCanvas.CLASS_HEADER_HEIGHT + visibleFieldCount * DiagramCanvas.CLASS_ROW_HEIGHT;
 
 		if (layout.getSize().getX() <= 0.0) {
 			layout.getSize().setWidth(width);

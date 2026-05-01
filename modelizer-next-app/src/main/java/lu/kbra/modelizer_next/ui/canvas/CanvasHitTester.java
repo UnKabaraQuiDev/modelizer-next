@@ -29,9 +29,9 @@ interface CanvasHitTester extends DiagramCanvasExt {
 
 		for (int i = 0; i < visibleFields.size(); i++) {
 			final Rectangle2D fieldBounds = new Rectangle2D.Double(classBounds.getX(),
-					classBounds.getY() + DiagramCanvas.HEADER_HEIGHT + i * DiagramCanvas.ROW_HEIGHT,
+					classBounds.getY() + DiagramCanvas.CLASS_HEADER_HEIGHT + i * DiagramCanvas.CLASS_ROW_HEIGHT,
 					classBounds.getWidth(),
-					DiagramCanvas.ROW_HEIGHT);
+					DiagramCanvas.CLASS_ROW_HEIGHT);
 
 			if (fieldBounds.contains(worldPoint.getX(), worldPoint.getY())) {
 				return new FieldHitResult(visibleFields.get(i), fieldBounds);
