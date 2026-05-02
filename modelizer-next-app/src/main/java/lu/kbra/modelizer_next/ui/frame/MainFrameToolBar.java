@@ -3,8 +3,12 @@ package lu.kbra.modelizer_next.ui.frame;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.Image;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
+import java.awt.image.BufferedImage;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.swing.Action;
 import javax.swing.BorderFactory;
@@ -17,6 +21,8 @@ import lu.kbra.modelizer_next.ui.canvas.DiagramCanvas;
 import lu.kbra.pclib.PCUtils;
 
 final class MainFrameToolBar extends JToolBar {
+
+	private final Map<String, ImageIcon> toolbarIconCache = new HashMap<>();
 
 	private static final long serialVersionUID = 1L;
 	JButton undoButton;
@@ -44,9 +50,8 @@ final class MainFrameToolBar extends JToolBar {
 
 	private JButton createToolbarButton(final MainFrame frame, final String icon, final String description, final String actionKey) {
 		final JButton button = new JButton();
-		final ImageIcon rawIcon = new ImageIcon(PCUtils.readPackagedBytesFile(frame.getClass(), "/icons/" + icon));
-		final Image scaled = rawIcon.getImage().getScaledInstance(34, 34, Image.SCALE_SMOOTH);
-		button.setIcon(new ImageIcon(scaled));
+		button.setIcon(getToolbarIcon(frame, icon));
+
 		button.putClientProperty("baseText", description);
 		button.putClientProperty("actionKey", actionKey);
 
@@ -57,6 +62,7 @@ final class MainFrameToolBar extends JToolBar {
 			}
 
 			final ActionEvent actionEvent = new ActionEvent(canvas, ActionEvent.ACTION_PERFORMED, actionKey);
+
 			final Action action = canvas.getActionMap().get(actionKey);
 			if (action != null) {
 				action.actionPerformed(actionEvent);
@@ -74,6 +80,31 @@ final class MainFrameToolBar extends JToolBar {
 
 		button.setPreferredSize(new Dimension(40, 40));
 		return button;
+	}
+
+	private ImageIcon getToolbarIcon(final MainFrame frame, final String icon) {
+		return toolbarIconCache.computeIfAbsent(icon, key -> {
+			final ImageIcon rawIcon = new ImageIcon(PCUtils.readPackagedBytesFile(frame.getClass(), "/icons/" + key));
+
+			return scaleIcon(rawIcon, 34, 34);
+		});
+	}
+
+	private static ImageIcon scaleIcon(final ImageIcon icon, final int width, final int height) {
+		final BufferedImage scaled = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+
+		final Graphics2D g = scaled.createGraphics();
+		try {
+			g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+			g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+			g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+			g.drawImage(icon.getImage(), 0, 0, width, height, null);
+		} finally {
+			g.dispose();
+		}
+
+		return new ImageIcon(scaled);
 	}
 
 }

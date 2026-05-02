@@ -10,6 +10,7 @@ import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.EventListener;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,6 +30,9 @@ import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
+import io.github.andrewauclair.moderndocking.DockingRegion;
+import io.github.andrewauclair.moderndocking.app.Docking;
+import io.github.andrewauclair.moderndocking.app.RootDockingPanel;
 import lu.kbra.modelizer_next.App;
 import lu.kbra.modelizer_next.AppConfig;
 import lu.kbra.modelizer_next.MNMain;
@@ -49,10 +53,6 @@ import lu.kbra.modelizer_next.ui.export.ViewExporter;
 import lu.kbra.modelizer_next.ui.impl.DocumentChangeListener;
 import lu.kbra.modelizer_next.ui.impl.DocumentLoadHandler;
 import lu.kbra.pclib.PCUtils;
-
-import io.github.andrewauclair.moderndocking.DockingRegion;
-import io.github.andrewauclair.moderndocking.app.Docking;
-import io.github.andrewauclair.moderndocking.app.RootDockingPanel;
 
 public class MainFrame extends JFrame implements MainFrameDocumentController, MainFrameStyleController, MainFrameWindowController {
 
@@ -91,7 +91,7 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 	public MainFrame(final DocumentSession session) {
 		super("Modelizer Next");
 		super.setIconImage(MainFrame.ICON);
-		this.setContent(session);
+		System.out.println("setContent took: " + ((double) PCUtils.millisTime(() -> this.setContent(session))) / 1_000 + "s");
 		this.setSize(1200, 800);
 		this.setLocationRelativeTo(null);
 	}
