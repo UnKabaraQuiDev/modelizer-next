@@ -1,1 +1,1 @@
-Sitemap: https://kbra.lu/sitemap.xml
+Sitemap: https://modelizer.kbra.lu/sitemap.xml
