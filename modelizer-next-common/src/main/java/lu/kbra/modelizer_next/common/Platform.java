@@ -3,6 +3,7 @@ package lu.kbra.modelizer_next.common;
 import java.util.Locale;
 
 public enum Platform {
+
 	WINDOWS("Windows", "windows", ".exe", true),
 	LINUX("Debian/Linux", "linux", ".deb", true),
 	MACOS("macOS", "macos", ".dmg", false),
@@ -59,4 +60,5 @@ public enum Platform {
 	public boolean adminRightsExpected() {
 		return this.adminRightsExpected;
 	}
+
 }

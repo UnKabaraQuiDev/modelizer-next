@@ -263,17 +263,15 @@ public class BootstrapRuntime implements UpdateRuntime {
 		loadingFrame.setVisible(true);
 		try {
 			loadingFrame.update("Checking installed application...", 0, 0);
+
 			if (getForceJarName() != null && Files.exists(BootstrapApp.getApplicationsDirectory().toPath().resolve(getForceJarName()))) {
 				final Path path = BootstrapApp.getApplicationsDirectory().toPath().resolve(getForceJarName());
 				this.currentApplication = inventory.readInstalledApplication(path)
 						.orElseThrow(() -> new IllegalArgumentException("File: '" + getForceJarName() + "' not found, resolved: " + path));
 			} else {
-				System.err.println(configuration.getUpdateChannel());
 				this.currentApplication = this.inventory.findLatestInstalled(configuration.getUpdateChannel()).orElse(null);
-				System.err.println(currentApplication);
 			}
-			System.out.println("Current version" + (getForceJarName() == null ? "" : " (forced)") + ": "
-					+ (currentApplication == null ? "none" : currentApplication.version()));
+
 			if (this.currentApplication == null) {
 				final AvailableUpdate bootstrapInstall = this.requireInstallableUpdate(this.configuration.getUpdateChannel(), null);
 				loadingFrame.update("Installing " + bootstrapInstall.latestVersion() + "...", 0, 1);
@@ -330,7 +328,7 @@ public class BootstrapRuntime implements UpdateRuntime {
 	}
 
 	private void handleOutdatedBootstrapLauncher(final AppLaunchException launchException, final boolean forced) throws Exception {
-		final ParsedVersion currentBootstrapVersion = lu.kbra.modelizer_next.common.VersionComparator.parse(BootstrapApp.VERSION);
+		final ParsedVersion currentBootstrapVersion = VersionComparator.parse(BootstrapApp.VERSION);
 		final BootstrapLoadingFrame loadingFrame = new BootstrapLoadingFrame();
 		loadingFrame.setVisible(true);
 		try {
@@ -354,7 +352,7 @@ public class BootstrapRuntime implements UpdateRuntime {
 					.download(update.installerUri(), installerPath, update.latestVersion().toString(), loadingFrame::update);
 			loadingFrame.dispose();
 
-			if (new BootstrapInstallerLauncher().promptAndStartInstaller(update, installerPath)) {
+			if (BootstrapInstallerLauncher.promptAndStartInstaller(update, installerPath)) {
 				System.exit(0);
 			}
 			throw new AppLaunchException(

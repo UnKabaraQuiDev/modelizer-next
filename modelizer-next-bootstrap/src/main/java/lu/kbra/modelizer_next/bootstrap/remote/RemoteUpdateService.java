@@ -108,9 +108,7 @@ public final class RemoteUpdateService {
 	public BootstrapInstallerUpdate findLatestBootstrapInstaller(final UpdateChannel channel, final ParsedVersion currentVersion)
 			throws IOException, InterruptedException {
 		final JsonNode manifest = this.fetchReleaseManifestJson();
-		System.err.println(manifest);
 		final JsonNode bootstrap = this.findBootstrapNode(manifest, channel);
-		System.err.println(bootstrap);
 		if (bootstrap == null || bootstrap.isMissingNode() || bootstrap.isNull()) {
 			return new BootstrapInstallerUpdate(currentVersion,
 					currentVersion,
@@ -207,8 +205,6 @@ public final class RemoteUpdateService {
 			for (final JsonNode entry : entries) {
 				if (entry != null && entry.isObject() && Objects.equals(latest, entry.path("version").asText())) {
 					return entry;
-				} else {
-					System.err.println("not matching: " + entry);
 				}
 			}
 		}
@@ -227,17 +223,9 @@ public final class RemoteUpdateService {
 				} catch (IllegalArgumentException e) {
 					return null;
 				}
-			} else {
-				System.err.println("not matching: " + node);
 			}
 		}
 		return null;
 	}
 
-	private URI toUri(final String value) {
-		if (value == null || value.isBlank()) {
-			return null;
-		}
-		return URI.create(value);
-	}
 }

@@ -1,9 +1,11 @@
 package lu.kbra.modelizer_next.ui.frame;
 
+import java.awt.AlphaComposite;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Graphics2D;
+import java.awt.Image;
 import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.image.BufferedImage;
@@ -90,21 +92,51 @@ final class MainFrameToolBar extends JToolBar {
 		});
 	}
 
-	private static ImageIcon scaleIcon(final ImageIcon icon, final int width, final int height) {
-		final BufferedImage scaled = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+	private static ImageIcon scaleIcon(final ImageIcon icon, final int targetWidth, final int targetHeight) {
+		BufferedImage current = toBufferedImage(icon.getImage());
 
-		final Graphics2D g = scaled.createGraphics();
+		int width = current.getWidth();
+		int height = current.getHeight();
+
+		while (width > targetWidth || height > targetHeight) {
+			width = Math.max(targetWidth, width / 2);
+			height = Math.max(targetHeight, height / 2);
+
+			final BufferedImage next = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+			final Graphics2D g = next.createGraphics();
+
+			try {
+				g.setComposite(AlphaComposite.Src);
+				g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+				g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+				g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+				g.drawImage(current, 0, 0, width, height, null);
+			} finally {
+				g.dispose();
+			}
+
+			current = next;
+		}
+
+		return new ImageIcon(current);
+	}
+
+	private static BufferedImage toBufferedImage(final Image image) {
+		if (image instanceof BufferedImage bufferedImage) {
+			return bufferedImage;
+		}
+
+		final BufferedImage buffered = new BufferedImage(image.getWidth(null), image.getHeight(null), BufferedImage.TYPE_INT_ARGB);
+
+		final Graphics2D g = buffered.createGraphics();
 		try {
-			g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-			g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-			g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-
-			g.drawImage(icon.getImage(), 0, 0, width, height, null);
+			g.setComposite(AlphaComposite.Src);
+			g.drawImage(image, 0, 0, null);
 		} finally {
 			g.dispose();
 		}
 
-		return new ImageIcon(scaled);
+		return buffered;
 	}
-
 }

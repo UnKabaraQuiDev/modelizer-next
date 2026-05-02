@@ -1,5 +1,10 @@
 package lu.kbra.modelizer_next.bootstrap;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
@@ -39,6 +44,22 @@ public final class BootstrapMain {
 				System.exit(1);
 			});
 		}
+	}
+
+	public static void restartSameCommand() throws Exception {
+		final ProcessHandle.Info info = ProcessHandle.current().info();
+
+		final String command = info.command().orElseThrow(() -> new IllegalStateException("Could not read current Java command"));
+
+		final String[] arguments = info.arguments().orElseThrow(() -> new IllegalStateException("Could not read current Java arguments"));
+
+		final List<String> restartCommand = new ArrayList<>();
+		restartCommand.add(command);
+		restartCommand.addAll(Arrays.asList(arguments));
+
+		new ProcessBuilder(restartCommand).directory(new File(System.getProperty("user.dir"))).inheritIO().start();
+
+		System.exit(0);
 	}
 
 	private BootstrapMain() {
