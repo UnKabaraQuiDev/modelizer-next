@@ -1,10 +1,10 @@
 {
   "channel": "snapshot",
-  "version": "6-SNAPSHOT-182",
-  "tag": "6-SNAPSHOT-182",
-  "releaseUrl": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/tag/6-SNAPSHOT-182",
-  "assetUrl": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/6-SNAPSHOT-182/modelizer-next-app-6-SNAPSHOT-182.jar",
-  "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/6-SNAPSHOT-182/modelizer-next-app-6-SNAPSHOT-182.jar",
+  "version": "6-SNAPSHOT-190",
+  "tag": "6-SNAPSHOT-190",
+  "releaseUrl": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/tag/6-SNAPSHOT-190",
+  "assetUrl": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/6-SNAPSHOT-190/modelizer-next-app-6-SNAPSHOT-190.jar",
+  "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/6-SNAPSHOT-190/modelizer-next-app-6-SNAPSHOT-190.jar",
   "platforms": [
     "unknown",
     "linux",
@@ -12,8 +12,85 @@
     "windows"
   ],
   "notes": "Latest snapshot build.",
-  "updatedAt": "2026-05-01T17:16:57Z",
+  "updatedAt": "2026-05-02T18:38:34Z",
   "entries": [
+    {
+      "version": "6-SNAPSHOT-190",
+      "tag": "6-SNAPSHOT-190",
+      "releaseUrl": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/tag/6-SNAPSHOT-190",
+      "assetUrl": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/6-SNAPSHOT-190/modelizer-next-app-6-SNAPSHOT-190.jar",
+      "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/6-SNAPSHOT-190/modelizer-next-app-6-SNAPSHOT-190.jar",
+      "platforms": [
+        "unknown",
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "notes": "Latest snapshot build.",
+      "publishedAt": "2026-05-02T18:38:34Z",
+      "assets": [
+        {
+          "name": "modelizer-next-app-6-SNAPSHOT-190.jar",
+          "platform": "unknown",
+          "kind": "app-standalone-jar",
+          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/6-SNAPSHOT-190/modelizer-next-app-6-SNAPSHOT-190.jar"
+        },
+        {
+          "name": "modelizer-next-app-portable-linux-6-SNAPSHOT-190.zip",
+          "platform": "linux",
+          "kind": "app-portable-native",
+          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/6-SNAPSHOT-190/modelizer-next-app-portable-linux-6-SNAPSHOT-190.zip"
+        },
+        {
+          "name": "modelizer-next-app-portable-macos-6-SNAPSHOT-190.zip",
+          "platform": "macos",
+          "kind": "app-portable-native",
+          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/6-SNAPSHOT-190/modelizer-next-app-portable-macos-6-SNAPSHOT-190.zip"
+        },
+        {
+          "name": "modelizer-next-app-portable-windows-6-SNAPSHOT-190.zip",
+          "platform": "windows",
+          "kind": "app-portable-native",
+          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/6-SNAPSHOT-190/modelizer-next-app-portable-windows-6-SNAPSHOT-190.zip"
+        },
+        {
+          "name": "modelizer-next-app-standalone-linux-6-SNAPSHOT-190.deb",
+          "platform": "linux",
+          "kind": "app-standalone-native",
+          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/6-SNAPSHOT-190/modelizer-next-app-standalone-linux-6-SNAPSHOT-190.deb"
+        },
+        {
+          "name": "modelizer-next-app-standalone-macos-6-SNAPSHOT-190.dmg",
+          "platform": "macos",
+          "kind": "app-standalone-native",
+          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/6-SNAPSHOT-190/modelizer-next-app-standalone-macos-6-SNAPSHOT-190.dmg"
+        },
+        {
+          "name": "modelizer-next-app-standalone-windows-6-SNAPSHOT-190.exe",
+          "platform": "windows",
+          "kind": "app-standalone-native",
+          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/6-SNAPSHOT-190/modelizer-next-app-standalone-windows-6-SNAPSHOT-190.exe"
+        },
+        {
+          "name": "modelizer-next-bootstrap-linux-6-SNAPSHOT-190.deb",
+          "platform": "linux",
+          "kind": "bootstrap-native",
+          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/6-SNAPSHOT-190/modelizer-next-bootstrap-linux-6-SNAPSHOT-190.deb"
+        },
+        {
+          "name": "modelizer-next-bootstrap-macos-6-SNAPSHOT-190.dmg",
+          "platform": "macos",
+          "kind": "bootstrap-native",
+          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/6-SNAPSHOT-190/modelizer-next-bootstrap-macos-6-SNAPSHOT-190.dmg"
+        },
+        {
+          "name": "modelizer-next-bootstrap-windows-6-SNAPSHOT-190.exe",
+          "platform": "windows",
+          "kind": "bootstrap-native",
+          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/6-SNAPSHOT-190/modelizer-next-bootstrap-windows-6-SNAPSHOT-190.exe"
+        }
+      ]
+    },
     {
       "version": "6-SNAPSHOT-182",
       "tag": "6-SNAPSHOT-182",
