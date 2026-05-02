@@ -38,8 +38,8 @@ final class MainFrameToolBar extends JToolBar {
 		final JPanel buttons = new JPanel();
 		buttons.setLayout(new FlowLayout(FlowLayout.LEFT, 6, 0));
 
-		buttons.add(undoButton = this.createToolbarButton(frame, "undo.png", "Undo", "undo"));
-		buttons.add(redoButton = this.createToolbarButton(frame, "redo.png", "Redo", "redo"));
+		buttons.add(this.undoButton = this.createToolbarButton(frame, "undo.png", "Undo", "undo"));
+		buttons.add(this.redoButton = this.createToolbarButton(frame, "redo.png", "Redo", "redo"));
 		buttons.add(this.createToolbarButton(frame, "add-table.png", "New table", "addTable"));
 		buttons.add(this.createToolbarButton(frame, "add-field.png", "New field", "addField"));
 		buttons.add(this.createToolbarButton(frame, "add-comment.png", "New comment", "addComment"));
@@ -52,7 +52,7 @@ final class MainFrameToolBar extends JToolBar {
 
 	private JButton createToolbarButton(final MainFrame frame, final String icon, final String description, final String actionKey) {
 		final JButton button = new JButton();
-		button.setIcon(getToolbarIcon(frame, icon));
+		button.setIcon(this.getToolbarIcon(frame, icon));
 
 		button.putClientProperty("baseText", description);
 		button.putClientProperty("actionKey", actionKey);
@@ -85,50 +85,41 @@ final class MainFrameToolBar extends JToolBar {
 	}
 
 	private ImageIcon getToolbarIcon(final MainFrame frame, final String icon) {
-		return toolbarIconCache.computeIfAbsent(icon, key -> {
+		return this.toolbarIconCache.computeIfAbsent(icon, key -> {
 			final ImageIcon rawIcon = new ImageIcon(PCUtils.readPackagedBytesFile(frame.getClass(), "/icons/" + key));
 
-			return scaleIcon(rawIcon, 34, 34);
+			return MainFrameToolBar.scaleIcon(rawIcon, 34, 34);
 		});
 	}
 
 	private static ImageIcon scaleIcon(final ImageIcon icon, final int targetWidth, final int targetHeight) {
-		BufferedImage current = toBufferedImage(icon.getImage());
-
+		BufferedImage current = MainFrameToolBar.toBufferedImage(icon.getImage());
 		int width = current.getWidth();
 		int height = current.getHeight();
-
 		while (width > targetWidth || height > targetHeight) {
 			width = Math.max(targetWidth, width / 2);
 			height = Math.max(targetHeight, height / 2);
-
 			final BufferedImage next = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
 			final Graphics2D g = next.createGraphics();
-
 			try {
 				g.setComposite(AlphaComposite.Src);
 				g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
 				g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
 				g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-
 				g.drawImage(current, 0, 0, width, height, null);
 			} finally {
 				g.dispose();
 			}
-
 			current = next;
 		}
-
 		return new ImageIcon(current);
 	}
 
 	private static BufferedImage toBufferedImage(final Image image) {
-		if (image instanceof BufferedImage bufferedImage) {
+		if (image instanceof final BufferedImage bufferedImage) {
 			return bufferedImage;
 		}
-
 		final BufferedImage buffered = new BufferedImage(image.getWidth(null), image.getHeight(null), BufferedImage.TYPE_INT_ARGB);
-
 		final Graphics2D g = buffered.createGraphics();
 		try {
 			g.setComposite(AlphaComposite.Src);
@@ -136,7 +127,7 @@ final class MainFrameToolBar extends JToolBar {
 		} finally {
 			g.dispose();
 		}
-
 		return buffered;
 	}
+
 }

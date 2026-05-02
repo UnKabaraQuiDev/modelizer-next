@@ -7,5 +7,6 @@
 	"issues": "@modelizer.issuesUrl@",
 	"entryPoint": "lu.kbra.modelizer_next.ModelizerAppEntryPoint",
 	"portable": @portable@,
-	"website": "@modelizer.website@"
+	"website": "@modelizer.website@",
+	"authorWebsite": "@author.website@"
 }

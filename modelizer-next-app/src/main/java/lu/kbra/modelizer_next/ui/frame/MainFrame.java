@@ -9,8 +9,8 @@ import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
+import java.util.Comparator;
 import java.util.EventListener;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -53,19 +53,29 @@ import lu.kbra.modelizer_next.ui.export.ViewExporter;
 import lu.kbra.modelizer_next.ui.impl.DocumentChangeListener;
 import lu.kbra.modelizer_next.ui.impl.DocumentLoadHandler;
 import lu.kbra.pclib.PCUtils;
+import lu.kbra.pclib.datastructure.pair.Pair;
 
 public class MainFrame extends JFrame implements MainFrameDocumentController, MainFrameStyleController, MainFrameWindowController {
 
 	private static final long serialVersionUID = 6643164008640695591L;
 
 	public static final int CTRL_MODIFIER = Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx();
+
+	private static final List<Integer> WINDOW_ICON_SIZES = List.of(16, 20, 24, 32, 40, 48, 64, 128, 256);
 	public static final Image ICON;
 	public static final ImageIcon IMAGE_ICON;
+	public static final List<Image> ICON_IMAGES;
+
 	static {
-		final ImageIcon rawIcon = new ImageIcon(PCUtils.readPackagedBytesFile(MainFrame.class, "/icons/icon.png"));
-		final Image scaled = rawIcon.getImage().getScaledInstance(34, 34, Image.SCALE_SMOOTH);
-		ICON = rawIcon.getImage();
-		IMAGE_ICON = new ImageIcon(scaled);
+		final Pair<List<Image>, Long> p = PCUtils.millisTime(() -> WINDOW_ICON_SIZES.stream()
+				.sorted(Comparator.naturalOrder())
+				.map(i -> new ImageIcon(PCUtils.readPackagedBytesFile(MainFrame.class, "/icons/icon-" + i + ".png")).getImage())
+				.toList());
+		ICON_IMAGES = p.getKey();
+		System.out.println("Scaling icons took: " + ((double) p.getValue()) / 1_000 + "s");
+
+		ICON = ICON_IMAGES.get(ICON_IMAGES.size() - 1);
+		IMAGE_ICON = new ImageIcon(ICON);
 	}
 
 	DocumentSession session;
@@ -90,7 +100,7 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 
 	public MainFrame(final DocumentSession session) {
 		super("Modelizer Next");
-		super.setIconImage(MainFrame.ICON);
+		super.setIconImages(MainFrame.ICON_IMAGES);
 		System.out.println("setContent took: " + ((double) PCUtils.millisTime(() -> this.setContent(session))) / 1_000 + "s");
 		this.setSize(1200, 800);
 		this.setLocationRelativeTo(null);

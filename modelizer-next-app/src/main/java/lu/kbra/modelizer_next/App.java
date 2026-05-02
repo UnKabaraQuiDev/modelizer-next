@@ -24,6 +24,7 @@ public class App {
 	public static String ISSUES_URL;
 	public static String WEBSITE_URL;
 	public static String ENTRY_POINT;
+	public static String AUTHOR_WEBSITE_URL;
 
 	public static void ensureDirsExists() {
 		App.getAppDirectory().mkdirs();
@@ -80,6 +81,7 @@ public class App {
 		App.ENTRY_POINT = App.JSON.path("entryPoint").asText();
 		App.PORTABLE = App.JSON.path("portable").asBoolean(false);
 		App.WEBSITE_URL = App.JSON.path("website").asText();
+		App.AUTHOR_WEBSITE_URL = App.JSON.path("authorWebsite").asText();
 
 		App.ensureDirsExists();
 	}

@@ -19,6 +19,7 @@ import lu.kbra.modelizer_next.App;
 import lu.kbra.modelizer_next.bootstrap.BootstrapConfig;
 import lu.kbra.modelizer_next.bootstrap.UpdateChannel;
 import lu.kbra.modelizer_next.bootstrap.UpdateRuntime;
+import lu.kbra.modelizer_next.ui.help.HelpDialog;
 import lu.kbra.pclib.PCUtils;
 
 final class InfoMenu extends JMenu {
@@ -27,22 +28,22 @@ final class InfoMenu extends JMenu {
 
 	InfoMenu(final MainFrame frame) {
 		super("Info");
-		this.add(this.createHelpItem(frame));
+		this.add(this.createHelpItem());
 		this.add(this.createAutoUpdateItem(frame));
 		this.add(this.createCheckForUpdatesItem(frame));
 		this.add(this.createUpdateChannelMenu(frame));
 		this.add(this.createVersionInfoItem(frame));
 		this.addBootstrapVersionInfoIfAvailable(frame);
 		this.addBootstrapCleanupIfAvailable(frame);
-		this.add(this.createOpenUrlItem("Report issue...",
-				App.ISSUES_URL,
-				"Report an issue",
-				"The issue link has been copied to your clipboard:"));
-		this.add(this
-				.createOpenUrlItem("Website...", App.WEBSITE_URL, "Visit website", "The website link has been copied to your clipboard:"));
+//		this.add(this.createOpenUrlItem("Report issue...",
+//				App.ISSUES_URL,
+//				"Report an issue",
+//				"The issue link has been copied to your clipboard:"));
+//		this.add(this
+//				.createOpenUrlItem("Website...", App.WEBSITE_URL, "Visit website", "The website link has been copied to your clipboard:"));
 	}
 
-	private JMenuItem createHelpItem(final MainFrame frame) {
+	private JMenuItem createHelpItem() {
 		final JMenuItem checkForUpdates = new JMenuItem("Help...");
 		checkForUpdates.addActionListener(event -> new HelpDialog().setVisible(true));
 		return checkForUpdates;

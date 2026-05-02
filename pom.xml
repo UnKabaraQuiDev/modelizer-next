@@ -25,7 +25,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
 		<distributor>Manual build</distributor>
-		<appVersion>3</appVersion>
+		<appVersion>6</appVersion>
 
 		<modelizer.repositoryUrl>
 			https://github.com/UnKabaraQuiDev/modelizer-next</modelizer.repositoryUrl>
@@ -36,6 +36,8 @@
 		<modelizer.website>https://modelizer.kbra.lu/</modelizer.website>
 		<modelizer.releasesManifestUrl>
 			https://raw.githubusercontent.com/UnKabaraQuiDev/modelizer-next/refs/heads/registry/registry/release.json</modelizer.releasesManifestUrl>
+
+		<author.website>https://kbra.lu/</author.website>
 
 		<jpackage.linux.group>Programming</jpackage.linux.group>
 		<jpackage.linux.category>Programming,Utilities</jpackage.linux.category>
