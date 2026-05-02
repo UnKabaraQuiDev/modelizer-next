@@ -140,7 +140,10 @@ public interface ElementRenderer extends DiagramCanvasExt {
 			final List<FieldModel> visibleFields = this.getCanvas().getVisibleFields(classModel);
 
 			for (final FieldModel fieldModel : visibleFields) {
-				final Rectangle2D fieldBounds = new Rectangle2D.Double(bounds.getX(), rowY, bounds.getWidth(), DiagramCanvas.CLASS_ROW_HEIGHT);
+				final Rectangle2D fieldBounds = new Rectangle2D.Double(bounds.getX(),
+						rowY,
+						bounds.getWidth(),
+						DiagramCanvas.CLASS_ROW_HEIGHT);
 
 				g2.setColor(fieldModel.getStyle().getBackgroundColor());
 				g2.fill(fieldBounds);
