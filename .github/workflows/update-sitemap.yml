@@ -1,0 +1,68 @@
+name: Update sitemap date
+
+on:
+  schedule:
+    - cron: "0 3 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update-sitemap:
+    runs-on: [self-hosted, linux]
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: pages
+          fetch-depth: 0
+
+      - name: Check for commits in last 26h
+        id: changes
+        if: github.event_name == 'schedule'
+        run: |
+          LOG_OUTPUT=$(git log \
+            --since='26 hours ago' \
+            --format='%s' \
+            -- . ':(exclude).github/**' \
+            | grep -Ev '^(\[NIGHTLY\]|\[bot\]|ci:)' \
+            || true)
+
+          echo "Git log output:"
+          echo "$LOG_OUTPUT"
+
+          if echo "$LOG_OUTPUT" | grep -q .; then
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+          else
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Update sitemap date
+        if: github.event_name == 'workflow_dispatch' || steps.changes.outputs.has_changes == 'true'
+        run: |
+          TODAY=$(date -u +"%Y-%m-%d")
+
+          if [ -f "docs/sitemap.xml" ]; then
+            SITEMAP="docs/sitemap.xml"
+          elif [ -f "sitemap.xml" ]; then
+            SITEMAP="sitemap.xml"
+          else
+            echo "No sitemap.xml found"
+            exit 1
+          fi
+
+          perl -0pi -e "s|<lastmod>[0-9]{4}-[0-9]{2}-[0-9]{2}</lastmod>|<lastmod>$TODAY</lastmod>|g" "$SITEMAP"
+
+          echo "Updated $SITEMAP to $TODAY"
+
+      - name: Commit updated sitemap
+        if: github.event_name == 'workflow_dispatch' || steps.changes.outputs.has_changes == 'true'
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+
+          git add docs/sitemap.xml sitemap.xml 2>/dev/null || true
+
+          git commit -m "ci: Update sitemap date" || exit 0
+          git push
