@@ -29,6 +29,7 @@ import lu.kbra.modelizer_next.bootstrap.subapp.InstalledApplication;
 import lu.kbra.modelizer_next.bootstrap.subapp.JarApplicationLauncher;
 import lu.kbra.modelizer_next.bootstrap.ui.BootstrapLoadingFrame;
 import lu.kbra.modelizer_next.common.Platform;
+import lu.kbra.modelizer_next.common.UnsupportedBootstrapVersionException;
 import lu.kbra.modelizer_next.common.VersionComparator;
 import lu.kbra.modelizer_next.common.VersionComparator.ParsedVersion;
 
@@ -368,7 +369,7 @@ public class BootstrapRuntime implements UpdateRuntime {
 
 	private boolean isCausedByClassNotFound(final Throwable throwable) {
 		for (Throwable current = throwable; current != null; current = current.getCause()) {
-			if (current instanceof ClassNotFoundException || current instanceof NoClassDefFoundError) {
+			if (current instanceof ClassNotFoundException || current instanceof NoClassDefFoundError || current instanceof UnsupportedBootstrapVersionException) {
 				return true;
 			}
 		}

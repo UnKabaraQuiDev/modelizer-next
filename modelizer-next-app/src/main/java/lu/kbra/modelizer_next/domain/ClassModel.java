@@ -8,6 +8,9 @@ import lu.kbra.modelizer_next.domain.impl.IdOwner;
 import lu.kbra.modelizer_next.domain.impl.NamesOwner;
 import lu.kbra.modelizer_next.domain.impl.StyleOwner;
 import lu.kbra.modelizer_next.domain.impl.VisibilityOwner;
+import lu.kbra.modelizer_next.domain.shared.ElementNames;
+import lu.kbra.modelizer_next.domain.shared.ElementStyle;
+import lu.kbra.modelizer_next.domain.shared.LayerVisibility;
 
 public class ClassModel implements VisibilityOwner, IdOwner, StyleOwner, NamesOwner {
 

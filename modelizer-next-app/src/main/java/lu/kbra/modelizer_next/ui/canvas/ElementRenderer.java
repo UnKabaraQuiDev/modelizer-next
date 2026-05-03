@@ -10,10 +10,10 @@ import java.awt.geom.Rectangle2D;
 import java.util.List;
 
 import lu.kbra.modelizer_next.domain.ClassModel;
-import lu.kbra.modelizer_next.domain.CommentKind;
 import lu.kbra.modelizer_next.domain.CommentModel;
 import lu.kbra.modelizer_next.domain.FieldModel;
 import lu.kbra.modelizer_next.domain.LinkModel;
+import lu.kbra.modelizer_next.domain.data.CommentKind;
 import lu.kbra.modelizer_next.layout.LayoutObjectType;
 import lu.kbra.modelizer_next.layout.NodeLayout;
 import lu.kbra.modelizer_next.layout.PanelType;

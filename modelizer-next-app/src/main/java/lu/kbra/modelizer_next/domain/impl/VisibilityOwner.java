@@ -1,6 +1,6 @@
 package lu.kbra.modelizer_next.domain.impl;
 
-import lu.kbra.modelizer_next.domain.LayerVisibility;
+import lu.kbra.modelizer_next.domain.shared.LayerVisibility;
 import lu.kbra.modelizer_next.layout.PanelType;
 
 public interface VisibilityOwner {

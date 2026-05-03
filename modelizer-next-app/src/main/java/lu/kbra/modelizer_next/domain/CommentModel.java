@@ -5,9 +5,12 @@ import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import lu.kbra.modelizer_next.domain.data.CommentKind;
 import lu.kbra.modelizer_next.domain.impl.IdOwner;
 import lu.kbra.modelizer_next.domain.impl.StyleOwner;
 import lu.kbra.modelizer_next.domain.impl.VisibilityOwner;
+import lu.kbra.modelizer_next.domain.shared.ElementStyle;
+import lu.kbra.modelizer_next.domain.shared.LayerVisibility;
 
 public class CommentModel implements StyleOwner, VisibilityOwner, IdOwner {
 

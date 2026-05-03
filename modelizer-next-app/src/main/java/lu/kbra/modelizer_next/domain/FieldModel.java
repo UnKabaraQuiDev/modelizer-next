@@ -5,6 +5,8 @@ import java.util.UUID;
 import lu.kbra.modelizer_next.domain.impl.IdOwner;
 import lu.kbra.modelizer_next.domain.impl.NamesOwner;
 import lu.kbra.modelizer_next.domain.impl.StyleOwner;
+import lu.kbra.modelizer_next.domain.shared.ElementNames;
+import lu.kbra.modelizer_next.domain.shared.ElementStyle;
 
 public class FieldModel implements NamesOwner, IdOwner, StyleOwner {
 

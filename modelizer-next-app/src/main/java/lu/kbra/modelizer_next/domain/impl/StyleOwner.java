@@ -2,7 +2,7 @@ package lu.kbra.modelizer_next.domain.impl;
 
 import java.awt.Color;
 
-import lu.kbra.modelizer_next.domain.ElementStyle;
+import lu.kbra.modelizer_next.domain.shared.ElementStyle;
 
 public interface StyleOwner {
 

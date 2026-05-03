@@ -1,4 +1,4 @@
-package lu.kbra.modelizer_next.domain;
+package lu.kbra.modelizer_next.domain.shared;
 
 import java.awt.Color;
 

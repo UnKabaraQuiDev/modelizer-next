@@ -260,7 +260,34 @@
 								</transformer>
 							</transformers>
 
+							<minimizeJar>true</minimizeJar>
+
 							<filters>
+								<!-- Keep FlatLaf fully -->
+								<filter>
+									<artifact>com.formdev:flatlaf</artifact>
+									<includes>
+										<include>**</include>
+									</includes>
+								</filter>
+
+								<!-- Keep Batik fully (reflection + services) -->
+								<filter>
+									<artifact>org.apache.xmlgraphics:batik-*</artifact>
+									<includes>
+										<include>**</include>
+									</includes>
+								</filter>
+
+								<!-- Keep docking framework -->
+								<filter>
+									<artifact>
+										io.github.andrewauclair:modern-docking-single-app</artifact>
+									<includes>
+										<include>**</include>
+									</includes>
+								</filter>
+
 								<filter>
 									<artifact>*:*</artifact>
 									<excludes>

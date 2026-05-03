@@ -1,11 +1,11 @@
 package lu.kbra.modelizer_next.ui.canvas;
 
 import lu.kbra.modelizer_next.domain.ClassModel;
-import lu.kbra.modelizer_next.domain.CommentKind;
 import lu.kbra.modelizer_next.domain.CommentModel;
 import lu.kbra.modelizer_next.domain.FieldModel;
 import lu.kbra.modelizer_next.domain.LinkModel;
 import lu.kbra.modelizer_next.domain.data.BoundTargetType;
+import lu.kbra.modelizer_next.domain.data.CommentKind;
 import lu.kbra.modelizer_next.layout.PanelType;
 
 /**

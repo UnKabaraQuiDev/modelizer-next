@@ -28,7 +28,24 @@ public final class BootstrapMain {
 		}
 	}
 
-	public static void main(final String[] args) {
+	public static void main(String[] args) {
+		for (final String arg : args) {
+			if (arg.startsWith("-D")) {
+				final String withoutPrefix = arg.substring(2);
+				final int eq = withoutPrefix.indexOf('=');
+
+				if (eq > 0) {
+					final String key = withoutPrefix.substring(0, eq);
+					final String value = withoutPrefix.substring(eq + 1);
+					System.setProperty(key, value);
+				} else {
+					System.setProperty(withoutPrefix, "true");
+				}
+			}
+		}
+
+		args = Arrays.stream(args).filter(a -> !a.startsWith("-D")).toArray(String[]::new);
+
 		try {
 			BootstrapMain.applyConfiguredLookAndFeel();
 			FileOpenBridge.installFileHandler();
