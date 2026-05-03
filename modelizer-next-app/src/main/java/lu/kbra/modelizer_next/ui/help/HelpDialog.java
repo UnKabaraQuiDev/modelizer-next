@@ -24,6 +24,18 @@ public class HelpDialog extends JFrame {
 	private static final Dimension MINIMUM_WINDOW_SIZE = new Dimension(560, 420);
 	private static final Dimension DEFAULT_WINDOW_SIZE = new Dimension(980, 720);
 
+	public static void main(final String[] args) {
+		if (SystemThemeDetector.isDark()) {
+			FlatDarkLaf.setup();
+		} else {
+			FlatLightLaf.setup();
+		}
+
+		final HelpDialog dialog = new HelpDialog();
+		dialog.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+		dialog.setVisible(true);
+	}
+
 	private final ShortcutsTab shortcutsTab = new ShortcutsTab();
 
 	public HelpDialog() {
@@ -36,18 +48,18 @@ public class HelpDialog extends JFrame {
 		super.addWindowListener(new WindowAdapter() {
 
 			@Override
-			public void windowOpened(final WindowEvent event) {
-				HelpDialog.this.shortcutsTab.registerKeyDispatcher();
-			}
-
-			@Override
 			public void windowClosed(final WindowEvent event) {
 				HelpDialog.this.shortcutsTab.unregisterKeyDispatcher();
 			}
+
+			@Override
+			public void windowOpened(final WindowEvent event) {
+				HelpDialog.this.shortcutsTab.registerKeyDispatcher();
+			}
 		});
 
-		super.setMinimumSize(MINIMUM_WINDOW_SIZE);
-		super.setSize(DEFAULT_WINDOW_SIZE);
+		super.setMinimumSize(HelpDialog.MINIMUM_WINDOW_SIZE);
+		super.setSize(HelpDialog.DEFAULT_WINDOW_SIZE);
 		super.setLocationRelativeTo(null);
 		super.setResizable(true);
 	}
@@ -66,18 +78,6 @@ public class HelpDialog extends JFrame {
 		tabs.addTab("Shortcuts", this.shortcutsTab);
 
 		return tabs;
-	}
-
-	public static void main(final String[] args) {
-		if (SystemThemeDetector.isDark()) {
-			FlatDarkLaf.setup();
-		} else {
-			FlatLightLaf.setup();
-		}
-
-		final HelpDialog dialog = new HelpDialog();
-		dialog.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-		dialog.setVisible(true);
 	}
 
 }

@@ -24,10 +24,50 @@ import lu.kbra.pclib.PCUtils;
 
 final class MainFrameToolBar extends JToolBar {
 
+	private static final long serialVersionUID = 1L;
+
+	private static ImageIcon scaleIcon(final ImageIcon icon, final int targetWidth, final int targetHeight) {
+		BufferedImage current = MainFrameToolBar.toBufferedImage(icon.getImage());
+		int width = current.getWidth();
+		int height = current.getHeight();
+		while (width > targetWidth || height > targetHeight) {
+			width = Math.max(targetWidth, width / 2);
+			height = Math.max(targetHeight, height / 2);
+			final BufferedImage next = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+			final Graphics2D g = next.createGraphics();
+			try {
+				g.setComposite(AlphaComposite.Src);
+				g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+				g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+				g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+				g.drawImage(current, 0, 0, width, height, null);
+			} finally {
+				g.dispose();
+			}
+			current = next;
+		}
+		return new ImageIcon(current);
+	}
+
+	private static BufferedImage toBufferedImage(final Image image) {
+		if (image instanceof final BufferedImage bufferedImage) {
+			return bufferedImage;
+		}
+		final BufferedImage buffered = new BufferedImage(image.getWidth(null), image.getHeight(null), BufferedImage.TYPE_INT_ARGB);
+		final Graphics2D g = buffered.createGraphics();
+		try {
+			g.setComposite(AlphaComposite.Src);
+			g.drawImage(image, 0, 0, null);
+		} finally {
+			g.dispose();
+		}
+		return buffered;
+	}
+
 	private final Map<String, ImageIcon> toolbarIconCache = new HashMap<>();
 
-	private static final long serialVersionUID = 1L;
 	JButton undoButton;
+
 	JButton redoButton;
 
 	MainFrameToolBar(final MainFrame frame) {
@@ -90,44 +130,6 @@ final class MainFrameToolBar extends JToolBar {
 
 			return MainFrameToolBar.scaleIcon(rawIcon, 34, 34);
 		});
-	}
-
-	private static ImageIcon scaleIcon(final ImageIcon icon, final int targetWidth, final int targetHeight) {
-		BufferedImage current = MainFrameToolBar.toBufferedImage(icon.getImage());
-		int width = current.getWidth();
-		int height = current.getHeight();
-		while (width > targetWidth || height > targetHeight) {
-			width = Math.max(targetWidth, width / 2);
-			height = Math.max(targetHeight, height / 2);
-			final BufferedImage next = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-			final Graphics2D g = next.createGraphics();
-			try {
-				g.setComposite(AlphaComposite.Src);
-				g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-				g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-				g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-				g.drawImage(current, 0, 0, width, height, null);
-			} finally {
-				g.dispose();
-			}
-			current = next;
-		}
-		return new ImageIcon(current);
-	}
-
-	private static BufferedImage toBufferedImage(final Image image) {
-		if (image instanceof final BufferedImage bufferedImage) {
-			return bufferedImage;
-		}
-		final BufferedImage buffered = new BufferedImage(image.getWidth(null), image.getHeight(null), BufferedImage.TYPE_INT_ARGB);
-		final Graphics2D g = buffered.createGraphics();
-		try {
-			g.setComposite(AlphaComposite.Src);
-			g.drawImage(image, 0, 0, null);
-		} finally {
-			g.dispose();
-		}
-		return buffered;
 	}
 
 }

@@ -14,19 +14,41 @@ import lu.kbra.modelizer_next.ui.export.ViewExporter;
 
 public final class CommandLineExportParser {
 
-	public static class InvalidArgumentException extends RuntimeException {
+	public static final class HelpRequestedException extends IOException {
 
-		public InvalidArgumentException(String message, Throwable cause) {
-			super(message, cause);
+		private static final long serialVersionUID = -6864019187574255936L;
+
+		public HelpRequestedException() {
 		}
 
-		public InvalidArgumentException(String message) {
+		public HelpRequestedException(final String message) {
 			super(message);
 		}
 
 	}
 
-	private CommandLineExportParser() {
+	public static class InvalidArgumentException extends RuntimeException {
+
+		private static final long serialVersionUID = 5775841553077652888L;
+
+		public InvalidArgumentException(final String message) {
+			super(message);
+		}
+
+		public InvalidArgumentException(final String message, final Throwable cause) {
+			super(message, cause);
+		}
+
+	}
+
+	public static class MissingArgumentException extends RuntimeException {
+
+		private static final long serialVersionUID = -2849535395312148162L;
+
+		public MissingArgumentException(final String message) {
+			super(message);
+		}
+
 	}
 
 	public static boolean isExportRequest(final String[] args) {
@@ -84,12 +106,22 @@ public final class CommandLineExportParser {
 		return new CommandLineExportOptions(inputFile, format, scope, panelTypes, outputDirectory, fileNamePattern, force);
 	}
 
-	private static String requireValue(final String[] args, final int index, final String option) throws IOException {
-		if (index >= args.length) {
-			throw new MissingArgumentException("Missing value for " + option);
-		}
+	public static void printHelp() {
+		System.out.println("""
+				Usage:
+				  modelizer --export <file> --type <svg|png> [options]
 
-		return args[index];
+				Options:
+				  -e, --export <file>        File to load and export
+				  -t, --type <svg|png>       Export format
+				  -o, --out <directory>      Output directory, default: current directory
+				  -s, --scope <scope>        selection|view|everything, default: everything
+				  -p, --panels <list>        Comma-separated PanelType names: conceptual (c), logical (l), physical (p)
+				  -n, --pattern <pattern>    File name pattern, default: '%DEFAULT_FILE_PATTER%', available: %FILE_PATTERN_TOKENS%
+				  -f, --force                Continue on legacy/newer-version warnings
+				  -h, --help                 Print this help
+				""".replace("%DEFAULT_FILE_PATTER%", ViewExporter.DEFAULT_FILE_PATTERN)
+				.replace("%FILE_PATTERN_TOKENS%", ViewExporter.FILE_PATTERN_TOKENS.stream().collect(Collectors.joining(", "))));
 	}
 
 	private static ViewExportFormat parseFormat(final String value) {
@@ -100,15 +132,6 @@ public final class CommandLineExportParser {
 		}
 
 		throw new MissingArgumentException("Unsupported export type: " + value);
-	}
-
-	private static ViewExportScope parseScope(final String value) {
-		return switch (value.toLowerCase()) {
-		case "selection" -> ViewExportScope.SELECTION;
-		case "view" -> ViewExportScope.VIEW;
-		case "everything", "all" -> ViewExportScope.EVERYTHING;
-		default -> throw new MissingArgumentException("Unsupported export scope: " + value);
-		};
 	}
 
 	private static List<PanelType> parsePanels(final String value) {
@@ -140,43 +163,24 @@ public final class CommandLineExportParser {
 		return result.stream().distinct().toList();
 	}
 
-	public static void printHelp() {
-		System.out.println("""
-				Usage:
-				  modelizer --export <file> --type <svg|png> [options]
-
-				Options:
-				  -e, --export <file>        File to load and export
-				  -t, --type <svg|png>       Export format
-				  -o, --out <directory>      Output directory, default: current directory
-				  -s, --scope <scope>        selection|view|everything, default: everything
-				  -p, --panels <list>        Comma-separated PanelType names: conceptual (c), logical (l), physical (p)
-				  -n, --pattern <pattern>    File name pattern, default: '%DEFAULT_FILE_PATTER%', available: %FILE_PATTERN_TOKENS%
-				  -f, --force                Continue on legacy/newer-version warnings
-				  -h, --help                 Print this help
-				""".replace("%DEFAULT_FILE_PATTER%", ViewExporter.DEFAULT_FILE_PATTERN)
-				.replace("%FILE_PATTERN_TOKENS%", ViewExporter.FILE_PATTERN_TOKENS.stream().collect(Collectors.joining(", "))));
+	private static ViewExportScope parseScope(final String value) {
+		return switch (value.toLowerCase()) {
+		case "selection" -> ViewExportScope.SELECTION;
+		case "view" -> ViewExportScope.VIEW;
+		case "everything", "all" -> ViewExportScope.EVERYTHING;
+		default -> throw new MissingArgumentException("Unsupported export scope: " + value);
+		};
 	}
 
-	public static final class HelpRequestedException extends IOException {
-
-		private static final long serialVersionUID = -6864019187574255936L;
-
-		public HelpRequestedException() {
+	private static String requireValue(final String[] args, final int index, final String option) throws IOException {
+		if (index >= args.length) {
+			throw new MissingArgumentException("Missing value for " + option);
 		}
 
-		public HelpRequestedException(String message) {
-			super(message);
-		}
-
+		return args[index];
 	}
 
-	public static class MissingArgumentException extends RuntimeException {
-
-		public MissingArgumentException(String message) {
-			super(message);
-		}
-
+	private CommandLineExportParser() {
 	}
 
 }

@@ -5,17 +5,18 @@ import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class CommentModel {
+import lu.kbra.modelizer_next.domain.impl.IdOwner;
+import lu.kbra.modelizer_next.domain.impl.StyleOwner;
+import lu.kbra.modelizer_next.domain.impl.VisibilityOwner;
 
-	private Color textColor;
-	private Color backgroundColor;
-	private Color borderColor;
+public class CommentModel implements StyleOwner, VisibilityOwner, IdOwner {
 
 	private String id;
 	private CommentKind kind;
 	private String text;
 	private CommentBinding binding;
 	private LayerVisibility visibility;
+	private ElementStyle style;
 
 	public CommentModel() {
 		this.id = UUID.randomUUID().toString();
@@ -23,20 +24,14 @@ public class CommentModel {
 		this.text = null;
 		this.binding = null;
 		this.visibility = new LayerVisibility();
-	}
-
-	public Color getBackgroundColor() {
-		return this.backgroundColor;
+		this.style = new ElementStyle();
 	}
 
 	public CommentBinding getBinding() {
 		return this.binding;
 	}
 
-	public Color getBorderColor() {
-		return this.borderColor;
-	}
-
+	@Override
 	public String getId() {
 		return this.id;
 	}
@@ -45,45 +40,37 @@ public class CommentModel {
 		return this.kind;
 	}
 
+	@Override
+	public ElementStyle getStyle() {
+		return this.style;
+	}
+
 	public String getText() {
 		return this.text;
 	}
 
-	public Color getTextColor() {
-		return this.textColor;
-	}
-
-	@Deprecated
-	public boolean isVisibleInConceptual() {
-		return visibility.isConceptual();
-	}
-
-	@Deprecated
-	public boolean isVisibleInLogical() {
-		return visibility.isLogical();
-	}
-
-	@Deprecated
-	public boolean isVisibleInPhysical() {
-		return visibility.isPhysical();
-	}
-
+	@Override
 	public LayerVisibility getVisibility() {
-		return visibility;
+		return this.visibility;
 	}
 
-	public void setBackgroundColor(final Color backgroundColor) {
-		this.backgroundColor = backgroundColor;
+	@JsonProperty("backgroundColor")
+	@Deprecated
+	public void setBackgroundColorLegacy(final Color color) {
+		this.style.setBackgroundColor(color);
 	}
 
 	public void setBinding(final CommentBinding binding) {
 		this.binding = binding;
 	}
 
-	public void setBorderColor(final Color borderColor) {
-		this.borderColor = borderColor;
+	@JsonProperty("borderColor")
+	@Deprecated
+	public void setBorderColorLegacy(final Color color) {
+		this.style.setBorderColor(color);
 	}
 
+	@Override
 	public void setId(final String id) {
 		this.id = id;
 	}
@@ -92,38 +79,48 @@ public class CommentModel {
 		this.kind = kind;
 	}
 
+	@Override
+	public void setStyle(final ElementStyle style) {
+		this.style = style;
+	}
+
 	public void setText(final String text) {
 		this.text = text;
 	}
 
-	public void setTextColor(final Color textColor) {
-		this.textColor = textColor;
+	@JsonProperty("textColor")
+	@Deprecated
+	public void setTextColorLegacy(final Color color) {
+		this.style.setTextColor(color);
 	}
 
+	@Override
 	public void setVisibility(final LayerVisibility visibility) {
 		this.visibility = visibility;
 	}
 
-	@Override
-	public String toString() {
-		return "CommentModel@" + System.identityHashCode(this) + " [textColor=" + textColor + ", backgroundColor=" + backgroundColor
-				+ ", borderColor=" + borderColor + ", id=" + id + ", kind=" + kind + ", text=" + text + ", binding=" + binding
-				+ ", visibility=" + visibility + "]";
-	}
-
 	@JsonProperty("visibleInConceptual")
-	public void setVisibleInConceptualLegacy(boolean visibleInConceptual) {
+	@Deprecated
+	public void setVisibleInConceptualLegacy(final boolean visibleInConceptual) {
 		this.visibility.setConceptual(visibleInConceptual);
 	}
 
 	@JsonProperty("visibleInLogical")
-	public void setVisibleInLogicalLegacy(boolean visibleInLogical) {
+	@Deprecated
+	public void setVisibleInLogicalLegacy(final boolean visibleInLogical) {
 		this.visibility.setLogical(visibleInLogical);
 	}
 
 	@JsonProperty("visibleInPhysical")
-	public void setVisibleInPhysicalLegacy(boolean visibleInPhysical) {
+	@Deprecated
+	public void setVisibleInPhysicalLegacy(final boolean visibleInPhysical) {
 		this.visibility.setPhysical(visibleInPhysical);
+	}
+
+	@Override
+	public String toString() {
+		return "CommentModel@" + System.identityHashCode(this) + " [id=" + this.id + ", kind=" + this.kind + ", text=" + this.text
+				+ ", binding=" + this.binding + ", visibility=" + this.visibility + ", elementStyle=" + this.style + "]";
 	}
 
 }

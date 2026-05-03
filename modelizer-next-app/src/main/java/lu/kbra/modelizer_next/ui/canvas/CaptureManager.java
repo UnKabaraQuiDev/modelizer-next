@@ -29,20 +29,20 @@ public interface CaptureManager extends DiagramCanvasExt {
 		final List<CopiedField> fields = new ArrayList<>();
 
 		for (final FieldModel fieldModel : classModel.getFields()) {
-			fields.add(getCanvas().captureField(classModel.getId(), fieldModel));
+			fields.add(this.getCanvas().captureField(classModel.getId(), fieldModel));
 		}
 
 		return new CopiedClass(classModel.getId(),
-				classModel.getNames().getConceptualName(),
-				classModel.getNames().getTechnicalName(),
-				classModel.getVisibility().isConceptual(),
-				classModel.getVisibility().isLogical(),
-				classModel.getVisibility().isPhysical(),
-				classModel.getStyle().getTextColor(),
-				classModel.getStyle().getBackgroundColor(),
-				classModel.getStyle().getBorderColor(),
+				classModel.getConceptualName(),
+				classModel.getTechnicalName(),
+				classModel.isVisibleInConceptual(),
+				classModel.isVisibleInLogical(),
+				classModel.isVisibleInPhysical(),
+				classModel.getTextColor(),
+				classModel.getBackgroundColor(),
+				classModel.getBorderColor(),
 				List.copyOf(fields),
-				getCanvas().captureNodeLayout(LayoutObjectType.CLASS, classModel.getId()));
+				this.getCanvas().captureNodeLayout(LayoutObjectType.CLASS, classModel.getId()));
 	}
 
 	default CopiedComment captureComment(final CommentModel commentModel) {
@@ -54,26 +54,26 @@ public interface CaptureManager extends DiagramCanvasExt {
 				commentModel.getTextColor(),
 				commentModel.getBackgroundColor(),
 				commentModel.getBorderColor(),
-				commentModel.getVisibility().isConceptual(),
-				commentModel.getVisibility().isLogical(),
-				commentModel.getVisibility().isPhysical(),
+				commentModel.isVisibleInConceptual(),
+				commentModel.isVisibleInLogical(),
+				commentModel.isVisibleInPhysical(),
 				binding == null ? null : binding.getTargetType(),
 				binding == null ? null : binding.getTargetId(),
-				getCanvas().captureNodeLayout(LayoutObjectType.COMMENT, commentModel.getId()));
+				this.getCanvas().captureNodeLayout(LayoutObjectType.COMMENT, commentModel.getId()));
 	}
 
 	default CopiedField captureField(final String ownerClassId, final FieldModel fieldModel) {
 		return new CopiedField(ownerClassId,
 				fieldModel.getId(),
-				fieldModel.getNames().getConceptualName(),
-				fieldModel.getNames().getTechnicalName(),
+				fieldModel.getConceptualName(),
+				fieldModel.getTechnicalName(),
 				fieldModel.isNotConceptual(),
 				fieldModel.isPrimaryKey(),
 				fieldModel.isUnique(),
 				fieldModel.isNotNull(),
 				fieldModel.getType(),
-				fieldModel.getStyle().getTextColor(),
-				fieldModel.getStyle().getBackgroundColor());
+				fieldModel.getTextColor(),
+				fieldModel.getBackgroundColor());
 	}
 
 	default CopiedLink captureLink(final LinkModel linkModel) {
@@ -92,11 +92,11 @@ public interface CaptureManager extends DiagramCanvasExt {
 				linkModel.getCardinalityTo(),
 				linkModel.getLabelFrom(),
 				linkModel.getLabelTo(),
-				getCanvas().captureLinkLayout(linkModel.getId()));
+				this.getCanvas().captureLinkLayout(linkModel.getId()));
 	}
 
 	default CopiedLinkLayout captureLinkLayout(final String linkId) {
-		final LinkLayout linkLayout = getCanvas().findOrCreateLinkLayout(linkId);
+		final LinkLayout linkLayout = this.getCanvas().findOrCreateLinkLayout(linkId);
 		final List<Point2D.Double> bendPoints = new ArrayList<>();
 
 		for (final Point2D.Double bendPoint : linkLayout.getBendPoints()) {
@@ -110,7 +110,7 @@ public interface CaptureManager extends DiagramCanvasExt {
 	}
 
 	default CopiedNodeLayout captureNodeLayout(final LayoutObjectType type, final String objectId) {
-		final NodeLayout layout = getCanvas().findOrCreateNodeLayout(type, objectId);
+		final NodeLayout layout = this.getCanvas().findOrCreateNodeLayout(type, objectId);
 
 		return new CopiedNodeLayout(layout.getPosition().getX(),
 				layout.getPosition().getY(),

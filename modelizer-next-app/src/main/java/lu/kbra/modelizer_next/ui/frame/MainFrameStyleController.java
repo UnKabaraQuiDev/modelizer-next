@@ -24,6 +24,37 @@ import lu.kbra.modelizer_next.ui.dialogs.StylePaletteEditorDialog;
 
 public interface MainFrameStyleController {
 
+	default JMenu createDefaultStyleMenu() {
+		final MainFrame frame = (MainFrame) this;
+		final JMenu defaultMenu = new JMenu("Default style");
+		final ButtonGroup defaultGroup = new ButtonGroup();
+
+		for (final StylePalette palette : frame.palettes) {
+			final JRadioButtonMenuItem item = new JRadioButtonMenuItem(palette.getName());
+			item.setSelected(palette.getName().equals(frame.appConfig.getDefaultPaletteName()));
+			item.addActionListener(event -> {
+				frame.appConfig.setDefaultPaletteName(palette.getName());
+				App.saveConfig(frame.appConfig);
+				this.setDefaultPaletteToCanvases();
+			});
+			defaultGroup.add(item);
+			defaultMenu.add(item);
+		}
+		return defaultMenu;
+	}
+
+	default JMenu createPinMenu() {
+		final MainFrame frame = (MainFrame) this;
+		final JMenu pinMenu = new JMenu("Pin to status bar");
+		for (final StylePalette palette : frame.palettes) {
+			final JCheckBoxMenuItem item = new JCheckBoxMenuItem(palette.getName(),
+					frame.appConfig.getPinnedPaletteNames().contains(palette.getName()));
+			item.addActionListener(event -> this.setPalettePinned(palette.getName(), item.isSelected()));
+			pinMenu.add(item);
+		}
+		return pinMenu;
+	}
+
 	default JButton createPinnedStyleButton(final StylePalette palette, final StylePreviewType previewType) {
 		final MainFrame frame = (MainFrame) this;
 		final JButton button = new JButton(palette.getName());
@@ -54,6 +85,12 @@ public interface MainFrameStyleController {
 		button.addMouseListener(dragListener);
 		button.addMouseMotionListener(dragListener);
 		return button;
+	}
+
+	default JMenuItem createReloadStylesItem() {
+		final JMenuItem reloadItem = new JMenuItem("Reload styles");
+		reloadItem.addActionListener(event -> this.reloadStyles());
+		return reloadItem;
 	}
 
 	default StylePalette findPaletteByName(final String paletteName) {
@@ -105,43 +142,6 @@ public interface MainFrameStyleController {
 		stylesMenu.add(this.createDefaultStyleMenu());
 		stylesMenu.addSeparator();
 		stylesMenu.add(this.createReloadStylesItem());
-	}
-
-	default JMenu createPinMenu() {
-		final MainFrame frame = (MainFrame) this;
-		final JMenu pinMenu = new JMenu("Pin to status bar");
-		for (final StylePalette palette : frame.palettes) {
-			final JCheckBoxMenuItem item = new JCheckBoxMenuItem(palette.getName(),
-					frame.appConfig.getPinnedPaletteNames().contains(palette.getName()));
-			item.addActionListener(event -> this.setPalettePinned(palette.getName(), item.isSelected()));
-			pinMenu.add(item);
-		}
-		return pinMenu;
-	}
-
-	default JMenu createDefaultStyleMenu() {
-		final MainFrame frame = (MainFrame) this;
-		final JMenu defaultMenu = new JMenu("Default style");
-		final ButtonGroup defaultGroup = new ButtonGroup();
-
-		for (final StylePalette palette : frame.palettes) {
-			final JRadioButtonMenuItem item = new JRadioButtonMenuItem(palette.getName());
-			item.setSelected(palette.getName().equals(frame.appConfig.getDefaultPaletteName()));
-			item.addActionListener(event -> {
-				frame.appConfig.setDefaultPaletteName(palette.getName());
-				App.saveConfig(frame.appConfig);
-				this.setDefaultPaletteToCanvases();
-			});
-			defaultGroup.add(item);
-			defaultMenu.add(item);
-		}
-		return defaultMenu;
-	}
-
-	default JMenuItem createReloadStylesItem() {
-		final JMenuItem reloadItem = new JMenuItem("Reload styles");
-		reloadItem.addActionListener(event -> this.reloadStyles());
-		return reloadItem;
 	}
 
 	default void reloadStyles() {

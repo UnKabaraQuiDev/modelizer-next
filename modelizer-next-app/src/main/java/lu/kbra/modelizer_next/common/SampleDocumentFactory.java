@@ -3,8 +3,6 @@ package lu.kbra.modelizer_next.common;
 import java.awt.geom.Point2D;
 
 import lu.kbra.modelizer_next.document.ModelDocument;
-import lu.kbra.modelizer_next.domain.BoundTargetType;
-import lu.kbra.modelizer_next.domain.Cardinality;
 import lu.kbra.modelizer_next.domain.ClassModel;
 import lu.kbra.modelizer_next.domain.CommentBinding;
 import lu.kbra.modelizer_next.domain.CommentKind;
@@ -12,6 +10,8 @@ import lu.kbra.modelizer_next.domain.CommentModel;
 import lu.kbra.modelizer_next.domain.FieldModel;
 import lu.kbra.modelizer_next.domain.LinkEnd;
 import lu.kbra.modelizer_next.domain.LinkModel;
+import lu.kbra.modelizer_next.domain.data.BoundTargetType;
+import lu.kbra.modelizer_next.domain.data.Cardinality;
 import lu.kbra.modelizer_next.layout.LayoutObjectType;
 import lu.kbra.modelizer_next.layout.NodeLayout;
 import lu.kbra.modelizer_next.layout.PanelState;
@@ -21,24 +21,21 @@ public final class SampleDocumentFactory {
 
 	public static final String META_NAME = "Demo model";
 
-	private SampleDocumentFactory() {
-	}
-
 	public static ModelDocument create() {
 		final ModelDocument document = new ModelDocument();
 		document.getMeta().setName(SampleDocumentFactory.META_NAME);
 
 		final ClassModel customer = new ClassModel();
-		customer.getNames().setConceptualName("Customer");
-		customer.getNames().setTechnicalName("T_CUSTOMER");
+		customer.setConceptualName("Customer");
+		customer.setTechnicalName("T_CUSTOMER");
 //		customer.setComment("Stores the master customer record.");
 		customer.getFields().add(SampleDocumentFactory.field("Customer ID", "CUSTOMER_ID", false, true, true, true));
 		customer.getFields().add(SampleDocumentFactory.field("Display name", "DISPLAY_NAME", false, false, false, true));
 		customer.getFields().add(SampleDocumentFactory.field("Email", "EMAIL", false, false, true, false));
 
 		final ClassModel order = new ClassModel();
-		order.getNames().setConceptualName("Order");
-		order.getNames().setTechnicalName("T_ORDER");
+		order.setConceptualName("Order");
+		order.setTechnicalName("T_ORDER");
 //		order.setComment("A placed order.");
 		order.getFields().add(SampleDocumentFactory.field("Order ID", "ORDER_ID", false, true, true, true));
 		order.getFields().add(SampleDocumentFactory.field("Customer ID", "CUSTOMER_ID", true, false, false, true));
@@ -108,8 +105,8 @@ public final class SampleDocumentFactory {
 			final boolean unique,
 			final boolean notNull) {
 		final FieldModel field = new FieldModel();
-		field.getNames().setConceptualName(conceptualName);
-		field.getNames().setTechnicalName(technicalName);
+		field.setConceptualName(conceptualName);
+		field.setTechnicalName(technicalName);
 		field.setNotConceptual(notConceptual);
 		field.setPrimaryKey(primaryKey);
 		field.setUnique(unique);
@@ -145,6 +142,9 @@ public final class SampleDocumentFactory {
 		layout.setPosition(new Point2D.Double(x, y));
 		layout.setSize(new Size2D(width, height));
 		panelState.getNodeLayouts().add(layout);
+	}
+
+	private SampleDocumentFactory() {
 	}
 
 }

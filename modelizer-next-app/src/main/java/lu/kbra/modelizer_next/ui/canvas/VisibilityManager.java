@@ -2,23 +2,19 @@ package lu.kbra.modelizer_next.ui.canvas;
 
 import java.awt.Graphics2D;
 
-import lu.kbra.modelizer_next.domain.BoundTargetType;
 import lu.kbra.modelizer_next.domain.ClassModel;
 import lu.kbra.modelizer_next.domain.CommentKind;
 import lu.kbra.modelizer_next.domain.CommentModel;
 import lu.kbra.modelizer_next.domain.LinkModel;
+import lu.kbra.modelizer_next.domain.data.BoundTargetType;
 
 /**
  * Contains visibility checks for classes, comments, fields, and links.
  */
 public interface VisibilityManager extends DiagramCanvasExt {
 
-	default boolean isVisible(ClassModel c) {
-		return c.getVisibility().isVisible(getPanelType());
-	}
-
 	default boolean isCommentVisible(final CommentModel commentModel) {
-		final boolean visibleInPanel = commentModel.getVisibility().isVisible(getPanelType());
+		final boolean visibleInPanel = commentModel.isVisible(this.getPanelType());
 
 		if (!visibleInPanel) {
 			return false;
@@ -33,18 +29,18 @@ public interface VisibilityManager extends DiagramCanvasExt {
 		}
 
 		if (commentModel.getBinding().getTargetType() == BoundTargetType.CLASS) {
-			final ClassModel classModel = getCanvas().findClassById(commentModel.getBinding().getTargetId());
-			return classModel != null && getCanvas().isVisible(classModel);
+			final ClassModel classModel = this.getCanvas().findClassById(commentModel.getBinding().getTargetId());
+			return classModel != null && classModel.isVisible(this.getPanelType());
 		}
 
-		final LinkModel linkModel = getCanvas().findLinkById(commentModel.getBinding().getTargetId());
+		final LinkModel linkModel = this.getCanvas().findLinkById(commentModel.getBinding().getTargetId());
 		if (linkModel == null) {
 			return false;
 		}
 
-		final Graphics2D g2 = getCanvas().createGraphicsContext();
+		final Graphics2D g2 = this.getCanvas().createGraphicsContext();
 		try {
-			return getCanvas().resolveLinkGeometry(g2, linkModel) != null;
+			return this.getCanvas().resolveLinkGeometry(g2, linkModel) != null;
 		} finally {
 			g2.dispose();
 		}

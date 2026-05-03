@@ -43,86 +43,6 @@ final class InfoMenu extends JMenu {
 //				.createOpenUrlItem("Website...", App.WEBSITE_URL, "Visit website", "The website link has been copied to your clipboard:"));
 	}
 
-	private JMenuItem createHelpItem() {
-		final JMenuItem checkForUpdates = new JMenuItem("Help...");
-		checkForUpdates.addActionListener(event -> new HelpDialog().setVisible(true));
-		return checkForUpdates;
-	}
-
-	private JMenuItem createCheckForUpdatesItem(final MainFrame frame) {
-		final JMenuItem checkForUpdates = new JMenuItem("Check for updates...");
-		checkForUpdates.addActionListener(event -> frame.checkForUpdatesManually());
-		return checkForUpdates;
-	}
-
-	private JCheckBoxMenuItem createAutoUpdateItem(final MainFrame frame) {
-		final Optional<UpdateRuntime> bootstrapRuntime = frame.bootstrapRuntime();
-		final boolean updateRuntimeAvailable = bootstrapRuntime.isPresent();
-		final JCheckBoxMenuItem autoCheckUpdates = new JCheckBoxMenuItem("Check for updates on startup",
-				updateRuntimeAvailable && bootstrapRuntime.get().isAutoCheckUpdates());
-		autoCheckUpdates.setEnabled(updateRuntimeAvailable && bootstrapRuntime.get().isAutomaticUpdateChecksEnabledByProperty());
-		autoCheckUpdates
-				.addActionListener(event -> frame.bootstrapRuntime().ifPresent(c -> c.setAutoCheckUpdates(autoCheckUpdates.isSelected())));
-		return autoCheckUpdates;
-	}
-
-	private JMenu createUpdateChannelMenu(final MainFrame frame) {
-		final Optional<UpdateRuntime> bootstrapRuntime = frame.bootstrapRuntime();
-		final boolean updateRuntimeAvailable = bootstrapRuntime.isPresent();
-		final JMenu channelMenu = new JMenu("Update channel");
-		channelMenu.setEnabled(updateRuntimeAvailable);
-		final ButtonGroup channelGroup = new ButtonGroup();
-		final UpdateChannel selectedChannel = updateRuntimeAvailable ? bootstrapRuntime.get().getSelectedChannel() : UpdateChannel.RELEASE;
-		for (final UpdateChannel updateChannel : UpdateChannel.values()) {
-			final JRadioButtonMenuItem item = new JRadioButtonMenuItem(updateChannel.displayName());
-			item.setSelected(updateChannel == selectedChannel);
-			item.addActionListener(event -> frame.bootstrapRuntime().ifPresent(c -> {
-				c.setSelectedChannel(updateChannel);
-				frame.checkForUpdatesManually();
-			}));
-			channelGroup.add(item);
-			channelMenu.add(item);
-		}
-		return channelMenu;
-	}
-
-	private JMenuItem createVersionInfoItem(final MainFrame frame) {
-		final JMenuItem versionInfo = new JMenuItem("Version: " + App.VERSION + " [" + App.DISTRIBUTOR + "]");
-		versionInfo.setToolTipText("Click to copy version informations.");
-		final Optional<UpdateRuntime> bootstrapRuntime = frame.bootstrapRuntime();
-		final boolean updateRuntimeAvailable = bootstrapRuntime.isPresent();
-		versionInfo
-				.addActionListener(event -> Toolkit.getDefaultToolkit()
-						.getSystemClipboard()
-						.setContents(
-								new StringSelection("==== APP INFO ====\n" + App.JSON.toPrettyString() + "\n==== BOOTSTRAP INFO ====\n"
-										+ (updateRuntimeAvailable ? bootstrapRuntime.get().getBootstrapJson().toPrettyString() : "NONE")),
-								null));
-		return versionInfo;
-	}
-
-	private void addBootstrapVersionInfoIfAvailable(final MainFrame frame) {
-		final Optional<UpdateRuntime> bootstrapRuntime = frame.bootstrapRuntime();
-		if (bootstrapRuntime.isEmpty()) {
-			return;
-		}
-
-		final BootstrapConfig bootstrapConfig = bootstrapRuntime.get().getBootstrapConfig();
-		final JMenuItem bootstrapVersionInfo = new JMenuItem(
-				"Bootstrap Version: " + bootstrapConfig.version() + " [" + bootstrapConfig.distributor() + "]");
-		bootstrapVersionInfo.setToolTipText("Click to copy bootstrap version informations.");
-		bootstrapVersionInfo
-				.addActionListener(
-						event -> Toolkit.getDefaultToolkit()
-								.getSystemClipboard()
-								.setContents(
-										new StringSelection(
-												"==== APP INFO ====\n" + App.JSON.toPrettyString() + "\n==== BOOTSTRAP INFO ====\n"
-														+ bootstrapRuntime.get().getBootstrapJson().toPrettyString()),
-										null));
-		this.add(bootstrapVersionInfo);
-	}
-
 	private void addBootstrapCleanupIfAvailable(final MainFrame frame) {
 		final Optional<UpdateRuntime> bootstrapRuntime = frame.bootstrapRuntime();
 		if (bootstrapRuntime.isEmpty()) {
@@ -159,6 +79,51 @@ final class InfoMenu extends JMenu {
 		this.add(bootstrapSpaceInfo);
 	}
 
+	private void addBootstrapVersionInfoIfAvailable(final MainFrame frame) {
+		final Optional<UpdateRuntime> bootstrapRuntime = frame.bootstrapRuntime();
+		if (bootstrapRuntime.isEmpty()) {
+			return;
+		}
+
+		final BootstrapConfig bootstrapConfig = bootstrapRuntime.get().getBootstrapConfig();
+		final JMenuItem bootstrapVersionInfo = new JMenuItem(
+				"Bootstrap Version: " + bootstrapConfig.version() + " [" + bootstrapConfig.distributor() + "]");
+		bootstrapVersionInfo.setToolTipText("Click to copy bootstrap version informations.");
+		bootstrapVersionInfo
+				.addActionListener(
+						event -> Toolkit.getDefaultToolkit()
+								.getSystemClipboard()
+								.setContents(
+										new StringSelection(
+												"==== APP INFO ====\n" + App.JSON.toPrettyString() + "\n==== BOOTSTRAP INFO ====\n"
+														+ bootstrapRuntime.get().getBootstrapJson().toPrettyString()),
+										null));
+		this.add(bootstrapVersionInfo);
+	}
+
+	private JCheckBoxMenuItem createAutoUpdateItem(final MainFrame frame) {
+		final Optional<UpdateRuntime> bootstrapRuntime = frame.bootstrapRuntime();
+		final boolean updateRuntimeAvailable = bootstrapRuntime.isPresent();
+		final JCheckBoxMenuItem autoCheckUpdates = new JCheckBoxMenuItem("Check for updates on startup",
+				updateRuntimeAvailable && bootstrapRuntime.get().isAutoCheckUpdates());
+		autoCheckUpdates.setEnabled(updateRuntimeAvailable && bootstrapRuntime.get().isAutomaticUpdateChecksEnabledByProperty());
+		autoCheckUpdates
+				.addActionListener(event -> frame.bootstrapRuntime().ifPresent(c -> c.setAutoCheckUpdates(autoCheckUpdates.isSelected())));
+		return autoCheckUpdates;
+	}
+
+	private JMenuItem createCheckForUpdatesItem(final MainFrame frame) {
+		final JMenuItem checkForUpdates = new JMenuItem("Check for updates...");
+		checkForUpdates.addActionListener(event -> frame.checkForUpdatesManually());
+		return checkForUpdates;
+	}
+
+	private JMenuItem createHelpItem() {
+		final JMenuItem checkForUpdates = new JMenuItem("Help...");
+		checkForUpdates.addActionListener(event -> new HelpDialog().setVisible(true));
+		return checkForUpdates;
+	}
+
 	private JMenuItem createOpenUrlItem(final String text, final String url, final String title, final String fallbackMessage) {
 		final JMenuItem item = new JMenuItem(text);
 		item.addActionListener(action -> {
@@ -174,6 +139,41 @@ final class InfoMenu extends JMenu {
 			JOptionPane.showMessageDialog(null, fallbackMessage + "\n" + url, title, JOptionPane.INFORMATION_MESSAGE);
 		});
 		return item;
+	}
+
+	private JMenu createUpdateChannelMenu(final MainFrame frame) {
+		final Optional<UpdateRuntime> bootstrapRuntime = frame.bootstrapRuntime();
+		final boolean updateRuntimeAvailable = bootstrapRuntime.isPresent();
+		final JMenu channelMenu = new JMenu("Update channel");
+		channelMenu.setEnabled(updateRuntimeAvailable);
+		final ButtonGroup channelGroup = new ButtonGroup();
+		final UpdateChannel selectedChannel = updateRuntimeAvailable ? bootstrapRuntime.get().getSelectedChannel() : UpdateChannel.RELEASE;
+		for (final UpdateChannel updateChannel : UpdateChannel.values()) {
+			final JRadioButtonMenuItem item = new JRadioButtonMenuItem(updateChannel.displayName());
+			item.setSelected(updateChannel == selectedChannel);
+			item.addActionListener(event -> frame.bootstrapRuntime().ifPresent(c -> {
+				c.setSelectedChannel(updateChannel);
+				frame.checkForUpdatesManually();
+			}));
+			channelGroup.add(item);
+			channelMenu.add(item);
+		}
+		return channelMenu;
+	}
+
+	private JMenuItem createVersionInfoItem(final MainFrame frame) {
+		final JMenuItem versionInfo = new JMenuItem("Version: " + App.VERSION + " [" + App.DISTRIBUTOR + "]");
+		versionInfo.setToolTipText("Click to copy version informations.");
+		final Optional<UpdateRuntime> bootstrapRuntime = frame.bootstrapRuntime();
+		final boolean updateRuntimeAvailable = bootstrapRuntime.isPresent();
+		versionInfo
+				.addActionListener(event -> Toolkit.getDefaultToolkit()
+						.getSystemClipboard()
+						.setContents(
+								new StringSelection("==== APP INFO ====\n" + App.JSON.toPrettyString() + "\n==== BOOTSTRAP INFO ====\n"
+										+ (updateRuntimeAvailable ? bootstrapRuntime.get().getBootstrapJson().toPrettyString() : "NONE")),
+								null));
+		return versionInfo;
 	}
 
 }

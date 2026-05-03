@@ -19,9 +19,6 @@ import lu.kbra.pclib.PCUtils;
 
 public final class DocumentSessionLoader {
 
-	private DocumentSessionLoader() {
-	}
-
 	public static boolean confirmModernDocumentVersion(final Component parent, final ModelDocument loadedDocument) {
 		final String fileVersion = loadedDocument.getMeta() == null ? null : loadedDocument.getMeta().getApplicationVersion();
 
@@ -95,6 +92,9 @@ public final class DocumentSessionLoader {
 			handler.error("Failed to load file", ex);
 			return Optional.empty();
 		}
+	}
+
+	private DocumentSessionLoader() {
 	}
 
 }

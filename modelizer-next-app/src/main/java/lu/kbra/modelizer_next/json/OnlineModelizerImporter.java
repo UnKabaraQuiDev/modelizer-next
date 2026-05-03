@@ -10,18 +10,15 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 import lu.kbra.modelizer_next.MNMain;
 import lu.kbra.modelizer_next.document.ModelDocument;
-import lu.kbra.modelizer_next.domain.Cardinality;
 import lu.kbra.modelizer_next.domain.ClassModel;
 import lu.kbra.modelizer_next.domain.CommentModel;
 import lu.kbra.modelizer_next.domain.FieldModel;
 import lu.kbra.modelizer_next.domain.LinkEnd;
 import lu.kbra.modelizer_next.domain.LinkModel;
+import lu.kbra.modelizer_next.domain.data.Cardinality;
 import lu.kbra.modelizer_next.layout.PanelType;
 
 public final class OnlineModelizerImporter {
-
-	private OnlineModelizerImporter() {
-	}
 
 	public static ModelDocument importFile(final File file) throws IOException {
 		final JsonNode root = MNMain.OBJECT_MAPPER.readTree(file);
@@ -100,10 +97,9 @@ public final class OnlineModelizerImporter {
 		commentModel.setTextColor(Color.BLACK);
 		commentModel.setBackgroundColor(ImportJsonSupport.parseColor(dataNode.get("color"), new Color(0xFFF7CC)));
 		commentModel.setBorderColor(Color.BLACK);
-		commentModel.getVisibility()
-				.set(dataNode.path("visibility").path("conceptual").asBoolean(true),
-						dataNode.path("visibility").path("logical").asBoolean(true),
-						dataNode.path("visibility").path("physical").asBoolean(true));
+		commentModel.setVisibility(dataNode.path("visibility").path("conceptual").asBoolean(true),
+				dataNode.path("visibility").path("logical").asBoolean(true),
+				dataNode.path("visibility").path("physical").asBoolean(true));
 		return commentModel;
 	}
 
@@ -182,29 +178,28 @@ public final class OnlineModelizerImporter {
 			final String conceptualName = ImportJsonSupport.readText(dataNode, "label", "Unnamed class");
 			final String technicalName = ImportJsonSupport.readText(dataNode, "logicalName", conceptualName);
 
-			classModel.getNames().setConceptualName(conceptualName);
-			classModel.getNames().setTechnicalName(technicalName);
-			classModel.getVisibility()
-					.set(dataNode.path("visibility").path("conceptual").asBoolean(true),
-							dataNode.path("visibility").path("logical").asBoolean(true),
-							dataNode.path("visibility").path("physical").asBoolean(true));
-			classModel.getStyle().setTextColor(Color.BLACK);
-			classModel.getStyle().setBackgroundColor(ImportJsonSupport.parseColor(dataNode.get("color"), Color.WHITE));
-			classModel.getStyle().setBorderColor(Color.BLACK);
+			classModel.setConceptualName(conceptualName);
+			classModel.setTechnicalName(technicalName);
+			classModel.setVisibility(dataNode.path("visibility").path("conceptual").asBoolean(true),
+					dataNode.path("visibility").path("logical").asBoolean(true),
+					dataNode.path("visibility").path("physical").asBoolean(true));
+			classModel.setTextColor(Color.BLACK);
+			classModel.setBackgroundColor(ImportJsonSupport.parseColor(dataNode.get("color"), Color.WHITE));
+			classModel.setBorderColor(Color.BLACK);
 
 			for (final JsonNode attributeNode : dataNode.path("attributes")) {
 				final FieldModel fieldModel = new FieldModel();
 				final String fieldName = ImportJsonSupport.readText(attributeNode, "name", "field");
 				final String logicalName = ImportJsonSupport.readText(attributeNode, "logicalName", fieldName);
 
-				fieldModel.getNames().setConceptualName(fieldName);
-				fieldModel.getNames().setTechnicalName(logicalName);
+				fieldModel.setConceptualName(fieldName);
+				fieldModel.setTechnicalName(logicalName);
 				fieldModel.setNotConceptual(!attributeNode.path("visibility").path("conceptual").asBoolean(true));
 				fieldModel.setPrimaryKey(attributeNode.path("primaryKey").asBoolean(false));
 				fieldModel.setUnique(attributeNode.path("unique").asBoolean(false));
 				fieldModel.setNotNull(!attributeNode.path("nullable").asBoolean(true));
-				fieldModel.getStyle().setTextColor(Color.BLACK);
-				fieldModel.getStyle().setBackgroundColor(Color.WHITE);
+				fieldModel.setTextColor(Color.BLACK);
+				fieldModel.setBackgroundColor(Color.WHITE);
 
 				classModel.getFields().add(fieldModel);
 
@@ -304,5 +299,8 @@ public final class OnlineModelizerImporter {
 			return bySourceId;
 		}
 		return fieldIdsByQualifiedName.get(rawFieldRef);
+	}
+
+	private OnlineModelizerImporter() {
 	}
 }

@@ -5,10 +5,16 @@ import lu.kbra.modelizer_next.layout.PanelType;
 
 public interface DiagramCanvasExt {
 
-	DiagramCanvas getCanvas();
+	default DiagramCanvas getCanvas() {
+		return (DiagramCanvas) this;
+	}
 
-	ModelDocument getDocument();
+	default ModelDocument getDocument() {
+		return ((DiagramCanvas) this).document;
+	}
 
-	PanelType getPanelType();
+	default PanelType getPanelType() {
+		return ((DiagramCanvas) this).panelType;
+	}
 
 }

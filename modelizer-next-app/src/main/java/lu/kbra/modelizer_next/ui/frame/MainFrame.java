@@ -9,6 +9,7 @@ import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.EventListener;
 import java.util.LinkedHashMap;
@@ -30,6 +31,9 @@ import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
+import io.github.andrewauclair.moderndocking.DockingRegion;
+import io.github.andrewauclair.moderndocking.app.Docking;
+import io.github.andrewauclair.moderndocking.app.RootDockingPanel;
 import lu.kbra.modelizer_next.App;
 import lu.kbra.modelizer_next.AppConfig;
 import lu.kbra.modelizer_next.MNMain;
@@ -52,10 +56,6 @@ import lu.kbra.modelizer_next.ui.impl.DocumentLoadHandler;
 import lu.kbra.pclib.PCUtils;
 import lu.kbra.pclib.datastructure.pair.Pair;
 
-import io.github.andrewauclair.moderndocking.DockingRegion;
-import io.github.andrewauclair.moderndocking.app.Docking;
-import io.github.andrewauclair.moderndocking.app.RootDockingPanel;
-
 public class MainFrame extends JFrame implements MainFrameDocumentController, MainFrameStyleController, MainFrameWindowController {
 
 	private static final long serialVersionUID = 6643164008640695591L;
@@ -68,41 +68,59 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 	public static final List<Image> ICON_IMAGES;
 
 	static {
-		final Pair<List<Image>, Long> p = PCUtils.millisTime(() -> WINDOW_ICON_SIZES.stream()
+		final Pair<List<Image>, Long> p = PCUtils.millisTime(() -> MainFrame.WINDOW_ICON_SIZES.stream()
 				.sorted(Comparator.naturalOrder())
 				.map(i -> new ImageIcon(PCUtils.readPackagedBytesFile(MainFrame.class, "/icons/icon-" + i + ".png")).getImage())
 				.toList());
 		ICON_IMAGES = p.getKey();
-		System.out.println("Scaling icons took: " + ((double) p.getValue()) / 1_000 + "s");
+		System.out.println("Scaling icons took: " + (double) p.getValue() / 1_000 + "s");
 
-		ICON = ICON_IMAGES.get(ICON_IMAGES.size() - 1);
-		IMAGE_ICON = new ImageIcon(ICON);
+		ICON = MainFrame.ICON_IMAGES.get(MainFrame.ICON_IMAGES.size() - 1);
+		IMAGE_ICON = new ImageIcon(MainFrame.ICON);
+	}
+
+	public static boolean confirmModernDocumentVersion(final Component parent, final ModelDocument loadedDocument) {
+		return DocumentSessionLoader.confirmModernDocumentVersion(parent, loadedDocument);
+	}
+
+	public static boolean confirmModernDocumentVersion(final ModelDocument loadedDocument, final DocumentLoadHandler handler) {
+		return DocumentSessionLoader.confirmModernDocumentVersion(loadedDocument, handler);
+	}
+
+	public static Optional<DocumentSession> createDocument(final Component parent, final File selectedFile) {
+		return DocumentSessionLoader.createDocument(parent, selectedFile);
+	}
+
+	public static Optional<DocumentSession> createDocument(final File selectedFile, final DocumentLoadHandler handler) {
+		return DocumentSessionLoader.createDocument(selectedFile, handler);
 	}
 
 	DocumentSession session;
-
 	ModelDocument document;
-
 	JLabel statusLabel;
 	JLabel selectionPathLabel;
 	RootDockingPanel rootDockingPanel;
 	DiagramCanvas activeCanvas;
 	DiagramCanvas conceptualCanvas;
+
 	DiagramCanvas logicalCanvas;
 	DiagramCanvas physicalCanvas;
+
 	MainFrameToolBar toolBar;
 	JPanel pinnedStylesPanel;
 
 	AppConfig appConfig;
+
 	List<StylePalette> palettes;
 
 	JMenuItem undoMenuItem;
+
 	JMenuItem redoMenuItem;
 
 	public MainFrame(final DocumentSession session) {
 		super("Modelizer Next");
 		super.setIconImages(MainFrame.ICON_IMAGES);
-		System.out.println("setContent took: " + ((double) PCUtils.millisTime(() -> this.setContent(session))) / 1_000 + "s");
+		System.out.println("setContent took: " + (double) PCUtils.millisTime(() -> this.setContent(session)) / 1_000 + "s");
 		this.setSize(1200, 800);
 		this.setLocationRelativeTo(null);
 	}
@@ -113,9 +131,11 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 
 	public void applyDefaultPaletteToCanvases() {
 		final StylePalette palette = this.findPaletteByName(this.appConfig.getDefaultPaletteName());
-		this.conceptualCanvas.applyPalette(palette);
-		this.logicalCanvas.applyPalette(palette);
-		this.physicalCanvas.applyPalette(palette);
+		getCanvases().forEach(c -> {
+			c.selectAll();
+			c.applyPalette(palette);
+			c.clearSelection();
+		});
 	}
 
 	@Override
@@ -130,6 +150,36 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 
 	public boolean loadDocument(final File selectedFile) {
 		return this.loadDocumentFromFile(selectedFile);
+	}
+
+	@Override
+	public void openInFrame(final DocumentSession session) {
+		SwingUtilities.invokeLater(() -> this.setContent(session));
+	}
+
+	@Override
+	public void refreshFrameTitle() {
+		final String source = this.document.getSource() == null || this.document.getSource().isBlank() ? "Untitled"
+				: this.document.getSource();
+		this.setTitle(App.title(source + (this.session.isDirty() ? " *" : "")));
+	}
+
+	@Override
+	public void updateUndoRedoMenuItems() {
+		if (this.undoMenuItem != null) {
+			this.undoMenuItem.setEnabled(this.session.canUndo());
+		}
+		if (this.redoMenuItem != null) {
+			this.redoMenuItem.setEnabled(this.session.canRedo());
+		}
+		if (this.toolBar != null) {
+			if (this.toolBar.undoButton != null) {
+				this.toolBar.undoButton.setEnabled(this.session.canUndo());
+			}
+			if (this.toolBar.redoButton != null) {
+				this.toolBar.redoButton.setEnabled(this.session.canRedo());
+			}
+		}
 	}
 
 	protected void setContent(final DocumentSession session) {
@@ -167,13 +217,13 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 			}
 
 			@Override
-			public void undo() {
-				MainFrame.this.undo();
+			public void redo() {
+				MainFrame.this.redo();
 			}
 
 			@Override
-			public void redo() {
-				MainFrame.this.redo();
+			public void undo() {
+				MainFrame.this.undo();
 			}
 
 		};
@@ -305,6 +355,14 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 		this.removeListener(this.getPropertyChangeListeners(), this::removePropertyChangeListener);
 	}
 
+	DockableDiagramPanel createDockableCanvasPanel(final String id, final String title, final DiagramCanvas canvas) {
+		return new DockableDiagramPanel("modelizer-next." + System.identityHashCode(this) + "." + id, title, canvas, () -> {
+			this.activeCanvas = canvas;
+			this.updateSelectionLabel(canvas.getSelectionInfo());
+			this.refreshToolbarLabels();
+		});
+	}
+
 	void exportImage() {
 		final DiagramCanvas activeCanvas = this.getActiveCanvas();
 		final ViewExportRequest request = ViewExportDialog.showDialog(this,
@@ -384,24 +442,20 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 		return builder.toString();
 	}
 
-	DiagramCanvas getActiveCanvas() {
+	public DiagramCanvas getActiveCanvas() {
 		return this.activeCanvas == null ? this.conceptualCanvas : this.activeCanvas;
 	}
 
-	DockableDiagramPanel createDockableCanvasPanel(final String id, final String title, final DiagramCanvas canvas) {
-		return new DockableDiagramPanel("modelizer-next." + System.identityHashCode(this) + "." + id, title, canvas, () -> {
-			this.activeCanvas = canvas;
-			this.updateSelectionLabel(canvas.getSelectionInfo());
-			this.refreshToolbarLabels();
-		});
-	}
-
-	Map<PanelType, DiagramCanvas> getCanvasesByPanelType() {
+	public Map<PanelType, DiagramCanvas> getCanvasesByPanelType() {
 		final Map<PanelType, DiagramCanvas> canvases = new LinkedHashMap<>();
 		canvases.put(PanelType.CONCEPTUAL, this.conceptualCanvas);
 		canvases.put(PanelType.LOGICAL, this.logicalCanvas);
 		canvases.put(PanelType.PHYSICAL, this.physicalCanvas);
 		return canvases;
+	}
+
+	public List<DiagramCanvas> getCanvases() {
+		return Arrays.asList(conceptualCanvas, logicalCanvas, physicalCanvas);
 	}
 
 	File getDefaultExportDirectory() {
@@ -431,11 +485,6 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 		this.refreshFrameTitle();
 	}
 
-	@Override
-	public void openInFrame(final DocumentSession session) {
-		SwingUtilities.invokeLater(() -> this.setContent(session));
-	}
-
 	boolean prepareForUpdateInstall() throws IOException {
 		return this.confirmCloseWithSave("Do you want to save changes before installing the update?");
 	}
@@ -458,13 +507,6 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 		this.refreshFrameTitle();
 		this.revalidate();
 		this.repaint();
-	}
-
-	@Override
-	public void refreshFrameTitle() {
-		final String source = this.document.getSource() == null || this.document.getSource().isBlank() ? "Untitled"
-				: this.document.getSource();
-		this.setTitle(App.title(source + (this.session.isDirty() ? " *" : "")));
 	}
 
 	void refreshPinnedStylesPanel() {
@@ -528,40 +570,6 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 				: selectionInfo.path();
 		this.selectionPathLabel.setText(path);
 		this.refreshPinnedStylesPanel();
-	}
-
-	@Override
-	public void updateUndoRedoMenuItems() {
-		if (this.undoMenuItem != null) {
-			this.undoMenuItem.setEnabled(this.session.canUndo());
-		}
-		if (this.redoMenuItem != null) {
-			this.redoMenuItem.setEnabled(this.session.canRedo());
-		}
-		if (this.toolBar != null) {
-			if (this.toolBar.undoButton != null) {
-				this.toolBar.undoButton.setEnabled(this.session.canUndo());
-			}
-			if (this.toolBar.redoButton != null) {
-				this.toolBar.redoButton.setEnabled(this.session.canRedo());
-			}
-		}
-	}
-
-	public static boolean confirmModernDocumentVersion(final Component parent, final ModelDocument loadedDocument) {
-		return DocumentSessionLoader.confirmModernDocumentVersion(parent, loadedDocument);
-	}
-
-	public static boolean confirmModernDocumentVersion(final ModelDocument loadedDocument, final DocumentLoadHandler handler) {
-		return DocumentSessionLoader.confirmModernDocumentVersion(loadedDocument, handler);
-	}
-
-	public static Optional<DocumentSession> createDocument(final Component parent, final File selectedFile) {
-		return DocumentSessionLoader.createDocument(parent, selectedFile);
-	}
-
-	public static Optional<DocumentSession> createDocument(final File selectedFile, final DocumentLoadHandler handler) {
-		return DocumentSessionLoader.createDocument(selectedFile, handler);
 	}
 
 }

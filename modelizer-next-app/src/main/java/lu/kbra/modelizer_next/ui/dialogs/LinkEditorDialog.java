@@ -26,10 +26,10 @@ import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 
 import lu.kbra.modelizer_next.document.ModelDocument;
-import lu.kbra.modelizer_next.domain.Cardinality;
 import lu.kbra.modelizer_next.domain.ClassModel;
 import lu.kbra.modelizer_next.domain.FieldModel;
 import lu.kbra.modelizer_next.domain.LinkModel;
+import lu.kbra.modelizer_next.domain.data.Cardinality;
 import lu.kbra.modelizer_next.layout.PanelType;
 import lu.kbra.modelizer_next.ui.component.ColorButton;
 
@@ -45,8 +45,7 @@ public final class LinkEditorDialog {
 		}
 
 		private static AssociationOption forClass(final ClassModel classModel, final PanelType panelType) {
-			final String label = panelType == PanelType.CONCEPTUAL ? classModel.getNames().getConceptualName()
-					: classModel.getNames().getTechnicalName();
+			final String label = panelType == PanelType.CONCEPTUAL ? classModel.getConceptualName() : classModel.getTechnicalName();
 			return new AssociationOption(classModel.getId(), label);
 		}
 	}
@@ -68,8 +67,7 @@ public final class LinkEditorDialog {
 				final boolean cellHasFocus) {
 			super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
 			if (value instanceof final ClassModel classModel) {
-				this.setText(this.panelType == PanelType.CONCEPTUAL ? classModel.getNames().getConceptualName()
-						: classModel.getNames().getTechnicalName());
+				this.setText(this.panelType == PanelType.CONCEPTUAL ? classModel.getConceptualName() : classModel.getTechnicalName());
 			}
 			return this;
 		}
@@ -92,8 +90,7 @@ public final class LinkEditorDialog {
 				final boolean cellHasFocus) {
 			super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
 			if (value instanceof final FieldModel fieldModel) {
-				this.setText(this.panelType == PanelType.CONCEPTUAL ? fieldModel.getNames().getConceptualName()
-						: fieldModel.getNames().getTechnicalName());
+				this.setText(this.panelType == PanelType.CONCEPTUAL ? fieldModel.getConceptualName() : fieldModel.getTechnicalName());
 			}
 			return this;
 		}
@@ -101,9 +98,6 @@ public final class LinkEditorDialog {
 
 	private static final class Holder {
 		private Result result;
-	}
-
-	private LinkEditorDialog() {
 	}
 
 	public static Result showDialog(
@@ -133,16 +127,16 @@ public final class LinkEditorDialog {
 
 			@Override
 			public Component getListCellRendererComponent(
-					JList<?> list,
-					Object value,
-					int index,
-					boolean isSelected,
-					boolean cellHasFocus) {
+					final JList<?> list,
+					final Object value,
+					final int index,
+					final boolean isSelected,
+					final boolean cellHasFocus) {
 
 				super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
 
-				if (value instanceof Cardinality card) {
-					setText(card.getDisplayValue());
+				if (value instanceof final Cardinality card) {
+					this.setText(card.getDisplayValue());
 				}
 
 				return this;
@@ -385,6 +379,9 @@ public final class LinkEditorDialog {
 		panel.add(new JLabel(labelText), BorderLayout.NORTH);
 		panel.add(component, BorderLayout.CENTER);
 		return panel;
+	}
+
+	private LinkEditorDialog() {
 	}
 
 }

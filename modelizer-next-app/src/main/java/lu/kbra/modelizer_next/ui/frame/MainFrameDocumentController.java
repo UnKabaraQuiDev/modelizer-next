@@ -21,16 +21,6 @@ import lu.kbra.modelizer_next.document.ModelDocument;
 
 public interface MainFrameDocumentController {
 
-	DocumentSession getSession();
-
-	ModelDocument getDocument();
-
-	void openInFrame(DocumentSession session);
-
-	void refreshFrameTitle();
-
-	void updateUndoRedoMenuItems();
-
 	default boolean confirmCloseWithSave(final String prompt) {
 		if (!this.getSession().isDirty()) {
 			return true;
@@ -60,6 +50,10 @@ public interface MainFrameDocumentController {
 		chooser.setFileFilter(new FileNameExtensionFilter("Modelizer Next (*.mn)", "mn"));
 		return chooser;
 	}
+
+	ModelDocument getDocument();
+
+	DocumentSession getSession();
 
 	default void installCloseHandling() {
 		final MainFrame frame = (MainFrame) this;
@@ -130,11 +124,25 @@ public interface MainFrameDocumentController {
 		}
 	}
 
+	default boolean loadDocumentFromFile(final File selectedFile) {
+		if (selectedFile == null || !selectedFile.isFile()) {
+			return false;
+		}
+
+		final Optional<DocumentSession> model = DocumentSessionLoader.createDocument((Component) this, selectedFile);
+		model.ifPresent(this::openInFrame);
+		return model.isPresent();
+	}
+
 	default void newDocument() {
 		final ModelDocument newDocument = new ModelDocument();
 		newDocument.setSource("New document");
 		this.openInFrame(new DocumentSession(newDocument));
 	}
+
+	void openInFrame(DocumentSession session);
+
+	void refreshFrameTitle();
 
 	default boolean saveDocument() {
 		if (this.getSession().getCurrentFile() == null) {
@@ -161,6 +169,8 @@ public interface MainFrameDocumentController {
 		return this.writeDocument(selectedFile);
 	}
 
+	void updateUndoRedoMenuItems();
+
 	default boolean writeDocument(final File file) {
 		try {
 			this.getDocument().getMeta().setUpdatedAt(Instant.now());
@@ -179,16 +189,6 @@ public interface MainFrameDocumentController {
 					JOptionPane.ERROR_MESSAGE);
 			return false;
 		}
-	}
-
-	default boolean loadDocumentFromFile(final File selectedFile) {
-		if (selectedFile == null || !selectedFile.isFile()) {
-			return false;
-		}
-
-		final Optional<DocumentSession> model = DocumentSessionLoader.createDocument((Component) this, selectedFile);
-		model.ifPresent(this::openInFrame);
-		return model.isPresent();
 	}
 
 }

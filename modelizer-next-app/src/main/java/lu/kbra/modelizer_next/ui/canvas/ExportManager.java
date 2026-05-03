@@ -28,94 +28,96 @@ import lu.kbra.modelizer_next.ui.export.ViewExportScope;
 public interface ExportManager extends DiagramCanvasExt {
 
 	default Rectangle2D.Double computeExportContentBounds(final Graphics2D g2, final ViewExportScope scope) {
-		final LinkedHashSet<SelectedElement> previousFilter = getCanvas().exportSelectionFilter;
-		if (scope == ViewExportScope.SELECTION && getCanvas().exportSelectionFilter == null) {
-			getCanvas().exportSelectionFilter = new LinkedHashSet<>(getCanvas().selectedElements);
+		final LinkedHashSet<SelectedElement> previousFilter = this.getCanvas().exportSelectionFilter;
+		if (scope == ViewExportScope.SELECTION && this.getCanvas().exportSelectionFilter == null) {
+			this.getCanvas().exportSelectionFilter = new LinkedHashSet<>(this.getCanvas().selectedElements);
 		}
 
 		try {
-			getCanvas().ensureLayouts();
+			this.getCanvas().ensureLayouts();
 
-			if (getPanelType() == PanelType.CONCEPTUAL) {
-				getCanvas().invalidateConceptualAnchorCache();
-				getCanvas().ensureConceptualAnchorCache(g2);
+			if (this.getPanelType() == PanelType.CONCEPTUAL) {
+				this.getCanvas().invalidateConceptualAnchorCache();
+				this.getCanvas().ensureConceptualAnchorCache(g2);
 			}
 
 			Rectangle2D.Double bounds = null;
 			final boolean onlySelection = scope == ViewExportScope.SELECTION;
 
-			for (final ClassModel classModel : getCanvas().document.getModel().getClasses()) {
-				if (!getCanvas().isVisible(classModel) || onlySelection && !getCanvas().shouldExportClass(classModel)) {
+			for (final ClassModel classModel : this.getCanvas().document.getModel().getClasses()) {
+				if (!classModel.isVisible(this.getPanelType()) || onlySelection && !this.getCanvas().shouldExportClass(classModel)) {
 					continue;
 				}
 
-				final NodeLayout layout = getCanvas()
-						.resolveRenderLayout(getCanvas().findOrCreateNodeLayout(LayoutObjectType.CLASS, classModel.getId()));
-				final Rectangle2D classBounds = getCanvas().computeClassBounds(g2, classModel, layout);
-				bounds = getCanvas()
+				final NodeLayout layout = this.getCanvas()
+						.resolveRenderLayout(this.getCanvas().findOrCreateNodeLayout(LayoutObjectType.CLASS, classModel.getId()));
+				final Rectangle2D classBounds = this.getCanvas().computeClassBounds(g2, classModel, layout);
+				bounds = this.getCanvas()
 						.expandBounds(bounds, classBounds.getX(), classBounds.getY(), classBounds.getWidth(), classBounds.getHeight());
 			}
 
-			for (final CommentModel commentModel : getCanvas().document.getModel().getComments()) {
-				final String text = getCanvas().resolveCommentText(commentModel);
-				if (text == null || text.isBlank() || !getCanvas().isCommentVisible(commentModel)
-						|| onlySelection && !getCanvas().shouldExportComment(commentModel)) {
+			for (final CommentModel commentModel : this.getCanvas().document.getModel().getComments()) {
+				final String text = this.getCanvas().resolveCommentText(commentModel);
+				if (text == null || text.isBlank() || !this.getCanvas().isCommentVisible(commentModel)
+						|| onlySelection && !this.getCanvas().shouldExportComment(commentModel)) {
 					continue;
 				}
 
-				final NodeLayout layout = getCanvas()
-						.resolveRenderLayout(getCanvas().findOrCreateNodeLayout(LayoutObjectType.COMMENT, commentModel.getId()));
-				final Rectangle2D commentBounds = getCanvas().computeCommentBounds(g2, text, layout);
-				bounds = getCanvas().expandBounds(bounds,
-						commentBounds.getX(),
-						commentBounds.getY(),
-						commentBounds.getWidth(),
-						commentBounds.getHeight());
+				final NodeLayout layout = this.getCanvas()
+						.resolveRenderLayout(this.getCanvas().findOrCreateNodeLayout(LayoutObjectType.COMMENT, commentModel.getId()));
+				final Rectangle2D commentBounds = this.getCanvas().computeCommentBounds(g2, text, layout);
+				bounds = this.getCanvas()
+						.expandBounds(bounds,
+								commentBounds.getX(),
+								commentBounds.getY(),
+								commentBounds.getWidth(),
+								commentBounds.getHeight());
 
-				final Point2D connectorAnchor = getCanvas().findBoundTargetAnchor(g2, commentModel);
+				final Point2D connectorAnchor = this.getCanvas().findBoundTargetAnchor(g2, commentModel);
 				if (connectorAnchor != null) {
-					bounds = getCanvas().expandBounds(bounds,
-							Math.min(connectorAnchor.getX(), commentBounds.getCenterX()),
-							Math.min(connectorAnchor.getY(), commentBounds.getCenterY()),
-							Math.abs(connectorAnchor.getX() - commentBounds.getCenterX()),
-							Math.abs(connectorAnchor.getY() - commentBounds.getCenterY()));
+					bounds = this.getCanvas()
+							.expandBounds(bounds,
+									Math.min(connectorAnchor.getX(), commentBounds.getCenterX()),
+									Math.min(connectorAnchor.getY(), commentBounds.getCenterY()),
+									Math.abs(connectorAnchor.getX() - commentBounds.getCenterX()),
+									Math.abs(connectorAnchor.getY() - commentBounds.getCenterY()));
 				}
 			}
 
-			for (final LinkModel linkModel : getCanvas().getActiveLinks()) {
-				if (onlySelection && !getCanvas().shouldExportLink(linkModel)) {
+			for (final LinkModel linkModel : this.getCanvas().getActiveLinks()) {
+				if (onlySelection && !this.getCanvas().shouldExportLink(linkModel)) {
 					continue;
 				}
 
-				final LinkGeometry geometry = getCanvas().resolveLinkGeometry(g2, linkModel);
+				final LinkGeometry geometry = this.getCanvas().resolveLinkGeometry(g2, linkModel);
 				if (geometry == null) {
 					continue;
 				}
 
 				for (final Point2D point : geometry.points()) {
-					bounds = getCanvas().expandBounds(bounds, point.getX(), point.getY(), 1.0, 1.0);
+					bounds = this.getCanvas().expandBounds(bounds, point.getX(), point.getY(), 1.0, 1.0);
 				}
 
 				if (geometry.labelPoint() != null) {
-					bounds = getCanvas()
+					bounds = this.getCanvas()
 							.expandBounds(bounds, geometry.labelPoint().getX() - 60, geometry.labelPoint().getY() - 20, 120, 40);
 				}
 			}
 
 			return bounds;
 		} finally {
-			getCanvas().exportSelectionFilter = previousFilter;
+			this.getCanvas().exportSelectionFilter = previousFilter;
 		}
 	}
 
 	default Dimension computeExportSize(final Graphics2D g2, final ViewExportScope scope) {
 		if (scope == ViewExportScope.VIEW) {
-			return getCanvas().getViewportExportSize();
+			return this.getCanvas().getViewportExportSize();
 		}
 
-		final Rectangle2D.Double contentBounds = getCanvas().computeExportContentBounds(g2, scope);
+		final Rectangle2D.Double contentBounds = this.getCanvas().computeExportContentBounds(g2, scope);
 		if (contentBounds == null) {
-			return getCanvas().getViewportExportSize();
+			return this.getCanvas().getViewportExportSize();
 		}
 
 		return new Dimension(Math.max(1, (int) Math.ceil(contentBounds.getWidth() + DiagramCanvas.EXPORT_MARGIN * 2.0)),
@@ -124,17 +126,17 @@ public interface ExportManager extends DiagramCanvasExt {
 
 	default Rectangle2D.Double computeExportWorldBounds(final Graphics2D g2, final ViewExportScope scope) {
 		if (scope == ViewExportScope.VIEW) {
-			final PanelState state = getCanvas().getPanelState();
-			final Dimension viewportSize = getCanvas().getViewportExportSize();
+			final PanelState state = this.getCanvas().getPanelState();
+			final Dimension viewportSize = this.getCanvas().getViewportExportSize();
 			return new Rectangle2D.Double(-state.getPanX() / state.getZoom(),
 					-state.getPanY() / state.getZoom(),
 					viewportSize.getWidth() / state.getZoom(),
 					viewportSize.getHeight() / state.getZoom());
 		}
 
-		final Rectangle2D.Double contentBounds = getCanvas().computeExportContentBounds(g2, scope);
+		final Rectangle2D.Double contentBounds = this.getCanvas().computeExportContentBounds(g2, scope);
 		if (contentBounds == null) {
-			return getCanvas().computeExportWorldBounds(g2, ViewExportScope.VIEW);
+			return this.getCanvas().computeExportWorldBounds(g2, ViewExportScope.VIEW);
 		}
 
 		return new Rectangle2D.Double(contentBounds.getX() - DiagramCanvas.EXPORT_MARGIN,
@@ -159,12 +161,13 @@ public interface ExportManager extends DiagramCanvasExt {
 					continue;
 				}
 
-				final NodeLayout layout = getCanvas().findOrCreateNodeLayout(LayoutObjectType.CLASS, element.classId());
-				bounds = getCanvas().expandBounds(bounds,
-						layout.getPosition().getX(),
-						layout.getPosition().getY(),
-						layout.getSize().getWidth(),
-						layout.getSize().getHeight());
+				final NodeLayout layout = this.getCanvas().findOrCreateNodeLayout(LayoutObjectType.CLASS, element.classId());
+				bounds = this.getCanvas()
+						.expandBounds(bounds,
+								layout.getPosition().getX(),
+								layout.getPosition().getY(),
+								layout.getSize().getWidth(),
+								layout.getSize().getHeight());
 			} else if (element.type() == SelectedType.COMMENT) {
 				final String key = LayoutObjectType.COMMENT + ":" + element.commentId();
 
@@ -172,21 +175,22 @@ public interface ExportManager extends DiagramCanvasExt {
 					continue;
 				}
 
-				final NodeLayout layout = getCanvas().findOrCreateNodeLayout(LayoutObjectType.COMMENT, element.commentId());
-				bounds = getCanvas().expandBounds(bounds,
-						layout.getPosition().getX(),
-						layout.getPosition().getY(),
-						layout.getSize().getWidth(),
-						layout.getSize().getHeight());
+				final NodeLayout layout = this.getCanvas().findOrCreateNodeLayout(LayoutObjectType.COMMENT, element.commentId());
+				bounds = this.getCanvas()
+						.expandBounds(bounds,
+								layout.getPosition().getX(),
+								layout.getPosition().getY(),
+								layout.getSize().getWidth(),
+								layout.getSize().getHeight());
 			} else if (element.type() == SelectedType.LINK) {
-				final LinkLayout layout = getCanvas().findOrCreateLinkLayout(element.linkId());
+				final LinkLayout layout = this.getCanvas().findOrCreateLinkLayout(element.linkId());
 
 				for (final Point2D.Double bendPoint : layout.getBendPoints()) {
-					bounds = getCanvas().expandBounds(bounds, bendPoint.getX(), bendPoint.getY(), 1.0, 1.0);
+					bounds = this.getCanvas().expandBounds(bounds, bendPoint.getX(), bendPoint.getY(), 1.0, 1.0);
 				}
 
 				if (layout.getNameLabelPosition() != null) {
-					bounds = getCanvas()
+					bounds = this.getCanvas()
 							.expandBounds(bounds, layout.getNameLabelPosition().getX(), layout.getNameLabelPosition().getY(), 1.0, 1.0);
 				}
 			}
@@ -196,8 +200,8 @@ public interface ExportManager extends DiagramCanvasExt {
 	}
 
 	default Dimension getViewportExportSize() {
-		return new Dimension(getCanvas().getWidth() <= 0 ? DiagramCanvas.DEFAULT_EXPORT_WIDTH : getCanvas().getWidth(),
-				getCanvas().getHeight() <= 0 ? DiagramCanvas.DEFAULT_EXPORT_HEIGHT : getCanvas().getHeight());
+		return new Dimension(this.getCanvas().getWidth() <= 0 ? DiagramCanvas.DEFAULT_EXPORT_WIDTH : this.getCanvas().getWidth(),
+				this.getCanvas().getHeight() <= 0 ? DiagramCanvas.DEFAULT_EXPORT_HEIGHT : this.getCanvas().getHeight());
 	}
 
 }

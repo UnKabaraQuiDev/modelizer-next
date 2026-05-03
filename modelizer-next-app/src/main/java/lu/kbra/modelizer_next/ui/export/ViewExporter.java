@@ -36,9 +36,6 @@ public final class ViewExporter {
 	private static final DateTimeFormatter TIME_FORMAT = DateTimeFormatter.ofPattern("HH-mm-ss");
 	private static final String SVG_NAMESPACE_URI = "http://www.w3.org/2000/svg";
 
-	private ViewExporter() {
-	}
-
 	public static List<File> exportViews(
 			final Map<PanelType, DiagramCanvas> canvases,
 			final ViewExportRequest request,
@@ -173,6 +170,9 @@ public final class ViewExporter {
 		try (FileWriter writer = new FileWriter(outputFile)) {
 			svgGraphics.stream(writer, true);
 		}
+	}
+
+	private ViewExporter() {
 	}
 
 }

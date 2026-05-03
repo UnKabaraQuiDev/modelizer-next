@@ -6,13 +6,6 @@ import lu.kbra.modelizer_next.common.ColorUtils;
 
 public class ElementStyle {
 
-	private Color textColor;
-	private Color backgroundColor;
-	private Color borderColor;
-
-	public ElementStyle() {
-	}
-
 	public static ElementStyle forClass() {
 		final ElementStyle style = new ElementStyle();
 		style.textColor = ColorUtils.ofRgb(0x000000);
@@ -26,6 +19,15 @@ public class ElementStyle {
 		style.textColor = ColorUtils.ofRgb(0x000000);
 		style.backgroundColor = ColorUtils.ofRgb(0xFFFFFF);
 		return style;
+	}
+
+	private Color textColor;
+
+	private Color backgroundColor;
+
+	private Color borderColor;
+
+	public ElementStyle() {
 	}
 
 	public Color getBackgroundColor() {

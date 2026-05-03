@@ -3,12 +3,12 @@ package lu.kbra.modelizer_next.ui.canvas;
 import java.awt.geom.Point2D;
 import java.util.Map;
 
-import lu.kbra.modelizer_next.domain.BoundTargetType;
-import lu.kbra.modelizer_next.domain.Cardinality;
 import lu.kbra.modelizer_next.domain.CommentBinding;
 import lu.kbra.modelizer_next.domain.FieldModel;
 import lu.kbra.modelizer_next.domain.LinkEnd;
 import lu.kbra.modelizer_next.domain.LinkModel;
+import lu.kbra.modelizer_next.domain.data.BoundTargetType;
+import lu.kbra.modelizer_next.domain.data.Cardinality;
 import lu.kbra.modelizer_next.layout.PanelType;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.CopiedComment;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.CopiedField;
@@ -21,64 +21,6 @@ import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectedType;
  * Contains creation actions for tables, fields, comments, and links.
  */
 public interface ElementCreator extends DiagramCanvasExt {
-
-	default void createTechnicalLink(final SelectedElement fromEndpoint, final SelectedElement toEndpoint) {
-		final LinkModel linkModel = new LinkModel();
-		linkModel.setFrom(new LinkEnd(fromEndpoint.classId(), fromEndpoint.fieldId()));
-		linkModel.setTo(new LinkEnd(toEndpoint.classId(), toEndpoint.fieldId()));
-		linkModel.setCardinalityFrom(null);
-		linkModel.setCardinalityTo(null);
-		this.getCanvas().applyDefaultPaletteToLink(linkModel);
-		this.getCanvas().document.getModel().getTechnicalLinks().add(linkModel);
-
-		this.getCanvas().findOrCreateLinkLayout(linkModel.getId());
-		this.getCanvas().select(SelectedElement.forLink(linkModel.getId()));
-		this.getCanvas().notifyDocumentChanged();
-	}
-
-	default void finishLinkCreation(final Point2D.Double worldPoint) {
-		if (this.getCanvas().linkCreationState == null) {
-			return;
-		}
-
-		final SelectedElement source = this.getCanvas().getLinkCreationSource();
-		if (source == null) {
-			return;
-		}
-
-		SelectedElement target = this.getCanvas().linkPreviewTarget;
-		if (target == null) {
-			final HitResult hitResult = this.getCanvas().findTopmostHit(worldPoint);
-			target = hitResult == null ? null : this.getCanvas().normalizeConnectionTargetSelection(hitResult.selection());
-		}
-
-		if (!this.getCanvas().isValidPreviewTarget(target)) {
-			return;
-		}
-
-		if (source.type() == SelectedType.COMMENT) {
-			this.getCanvas().bindCommentToTarget(source.commentId(), target);
-			return;
-		}
-
-		if (source.type() == SelectedType.CLASS && target.type() == SelectedType.LINK) {
-			this.getCanvas().setAssociationClassForLink(source.classId(), target.linkId());
-			return;
-		}
-
-		if (this.getPanelType() == PanelType.CONCEPTUAL) {
-			this.getCanvas().createConceptualLink(source.classId(), target.classId());
-			return;
-		}
-
-		final SelectedElement fromEndpoint = this.getCanvas().resolveTechnicalSourceEndpoint(source, target);
-		final SelectedElement toEndpoint = this.getCanvas().resolveTechnicalTargetEndpoint(target);
-		if (fromEndpoint == null || toEndpoint == null) {
-			return;
-		}
-
-		this.getCanvas().createTechnicalLink(fromEndpoint, toEndpoint);
-	}
 
 	default void createConceptualLink(final String fromClassId, final String toClassId) {
 		final LinkModel linkModel = new LinkModel();
@@ -97,7 +39,7 @@ public interface ElementCreator extends DiagramCanvasExt {
 	default FieldModel createFieldFromClipboard(final CopiedField copiedField, final boolean rename) {
 		final FieldModel fieldCopy = new FieldModel();
 
-		fieldCopy.getNames().setConceptualName(rename ? this.getCanvas().appendSuffix(copiedField.name(), " Copy") : copiedField.name());
+		fieldCopy.setConceptualName(rename ? this.getCanvas().appendSuffix(copiedField.name(), " Copy") : copiedField.name());
 		fieldCopy.getNames()
 				.setTechnicalName(
 						rename ? this.getCanvas().appendSuffix(copiedField.technicalName(), "_COPY") : copiedField.technicalName());
@@ -108,8 +50,8 @@ public interface ElementCreator extends DiagramCanvasExt {
 		fieldCopy.setNotNull(copiedField.notNull());
 		fieldCopy.setType(copiedField.type());
 
-		fieldCopy.getStyle().setTextColor(copiedField.textColor());
-		fieldCopy.getStyle().setBackgroundColor(copiedField.backgroundColor());
+		fieldCopy.setTextColor(copiedField.textColor());
+		fieldCopy.setBackgroundColor(copiedField.backgroundColor());
 
 		return fieldCopy;
 	}
@@ -168,6 +110,64 @@ public interface ElementCreator extends DiagramCanvasExt {
 		}
 
 		return new CommentBinding(copiedComment.bindingTargetType(), targetId);
+	}
+
+	default void createTechnicalLink(final SelectedElement fromEndpoint, final SelectedElement toEndpoint) {
+		final LinkModel linkModel = new LinkModel();
+		linkModel.setFrom(new LinkEnd(fromEndpoint.classId(), fromEndpoint.fieldId()));
+		linkModel.setTo(new LinkEnd(toEndpoint.classId(), toEndpoint.fieldId()));
+		linkModel.setCardinalityFrom(null);
+		linkModel.setCardinalityTo(null);
+		this.getCanvas().applyDefaultPaletteToLink(linkModel);
+		this.getCanvas().document.getModel().getTechnicalLinks().add(linkModel);
+
+		this.getCanvas().findOrCreateLinkLayout(linkModel.getId());
+		this.getCanvas().select(SelectedElement.forLink(linkModel.getId()));
+		this.getCanvas().notifyDocumentChanged();
+	}
+
+	default void finishLinkCreation(final Point2D.Double worldPoint) {
+		if (this.getCanvas().linkCreationState == null) {
+			return;
+		}
+
+		final SelectedElement source = this.getCanvas().getLinkCreationSource();
+		if (source == null) {
+			return;
+		}
+
+		SelectedElement target = this.getCanvas().linkPreviewTarget;
+		if (target == null) {
+			final HitResult hitResult = this.getCanvas().findTopmostHit(worldPoint);
+			target = hitResult == null ? null : this.getCanvas().normalizeConnectionTargetSelection(hitResult.selection());
+		}
+
+		if (!this.getCanvas().isValidPreviewTarget(target)) {
+			return;
+		}
+
+		if (source.type() == SelectedType.COMMENT) {
+			this.getCanvas().bindCommentToTarget(source.commentId(), target);
+			return;
+		}
+
+		if (source.type() == SelectedType.CLASS && target.type() == SelectedType.LINK) {
+			this.getCanvas().setAssociationClassForLink(source.classId(), target.linkId());
+			return;
+		}
+
+		if (this.getPanelType() == PanelType.CONCEPTUAL) {
+			this.getCanvas().createConceptualLink(source.classId(), target.classId());
+			return;
+		}
+
+		final SelectedElement fromEndpoint = this.getCanvas().resolveTechnicalSourceEndpoint(source, target);
+		final SelectedElement toEndpoint = this.getCanvas().resolveTechnicalTargetEndpoint(target);
+		if (fromEndpoint == null || toEndpoint == null) {
+			return;
+		}
+
+		this.getCanvas().createTechnicalLink(fromEndpoint, toEndpoint);
 	}
 
 }

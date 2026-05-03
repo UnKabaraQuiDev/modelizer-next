@@ -46,7 +46,7 @@ public class ModelizerAppEntryPoint implements AppMain {
 
 		SwingUtilities.invokeLater(() -> {
 			System.out.println(
-					"Applying laf took: " + ((double) PCUtils.millisTime(() -> MNMain.applyConfiguredLookAndFeel())) / 1_000 + "s");
+					"Applying laf took: " + (double) PCUtils.millisTime((Runnable) MNMain::applyConfiguredLookAndFeel) / 1_000 + "s");
 			System.out.println("Args: " + Arrays.toString(args));
 			Optional<DocumentSession> document = Optional.empty();
 

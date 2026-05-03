@@ -15,15 +15,6 @@ import lu.kbra.modelizer_next.App;
 
 public interface MainFrameWindowController {
 
-	default JLabel createStatusLabel() {
-		return new JLabel("Left drag: move object   |   Middle drag: pan   |   Mouse wheel: zoom   |   Right drag: create link",
-				SwingConstants.LEFT);
-	}
-
-	default JLabel createSelectionPathLabel() {
-		return new JLabel("No selection", SwingConstants.RIGHT);
-	}
-
 	default JPanel createPinnedStylesPanel() {
 		final MainFrame frame = (MainFrame) this;
 		final JPanel panel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 3, 3));
@@ -40,6 +31,15 @@ public interface MainFrameWindowController {
 		});
 		panel.setOpaque(false);
 		return panel;
+	}
+
+	default JLabel createSelectionPathLabel() {
+		return new JLabel("No selection", SwingConstants.RIGHT);
+	}
+
+	default JLabel createStatusLabel() {
+		return new JLabel("Left drag: move object   |   Middle drag: pan   |   Mouse wheel: zoom   |   Right drag: create link",
+				SwingConstants.LEFT);
 	}
 
 	default JPanel createStatusPanel() {

@@ -26,117 +26,119 @@ interface MouseInteractionController extends DiagramCanvasExt {
 
 			@Override
 			public void mouseDragged(final MouseEvent e) {
-				handleMouseDragged(e);
+				MouseInteractionController.this.handleMouseDragged(e);
 			}
 
 			@Override
 			public void mousePressed(final MouseEvent e) {
-				handleMousePressed(e);
+				MouseInteractionController.this.handleMousePressed(e);
 			}
 
 			@Override
 			public void mouseReleased(final MouseEvent e) {
-				handleMouseReleased(e);
+				MouseInteractionController.this.handleMouseReleased(e);
 			}
 
 			@Override
 			public void mouseWheelMoved(final MouseWheelEvent e) {
-				handleMouseWheelMoved(e);
+				MouseInteractionController.this.handleMouseWheelMoved(e);
 			}
 
 		};
 	}
 
 	default void handleMouseDragged(final MouseEvent event) {
-		if (getCanvas().panning && getCanvas().lastScreenPoint != null) {
-			final PanelState state = getCanvas().getPanelState();
-			state.setPanX(state.getPanX() + event.getX() - getCanvas().lastScreenPoint.x);
-			state.setPanY(state.getPanY() + event.getY() - getCanvas().lastScreenPoint.y);
-			getCanvas().lastScreenPoint = event.getPoint();
-			getCanvas().repaint();
+		if (this.getCanvas().panning && this.getCanvas().lastScreenPoint != null) {
+			final PanelState state = this.getCanvas().getPanelState();
+			state.setPanX(state.getPanX() + event.getX() - this.getCanvas().lastScreenPoint.x);
+			state.setPanY(state.getPanY() + event.getY() - this.getCanvas().lastScreenPoint.y);
+			this.getCanvas().lastScreenPoint = event.getPoint();
+			this.getCanvas().repaint();
 			return;
 		}
 
-		if (getCanvas().linkCreationState != null) {
-			final Point2D.Double worldPoint = getCanvas().screenToWorld(event.getPoint());
-			getCanvas().linkPreviewMousePoint = worldPoint;
+		if (this.getCanvas().linkCreationState != null) {
+			final Point2D.Double worldPoint = this.getCanvas().screenToWorld(event.getPoint());
+			this.getCanvas().linkPreviewMousePoint = worldPoint;
 
-			final HitResult hitResult = getCanvas().findTopmostHit(worldPoint);
-			getCanvas().linkPreviewTarget = hitResult == null ? null
-					: getCanvas().normalizeConnectionTargetSelection(hitResult.selection());
+			final HitResult hitResult = this.getCanvas().findTopmostHit(worldPoint);
+			this.getCanvas().linkPreviewTarget = hitResult == null ? null
+					: this.getCanvas().normalizeConnectionTargetSelection(hitResult.selection());
 
-			getCanvas().repaint();
+			this.getCanvas().repaint();
 			return;
 		}
 
-		if (getCanvas().resizingComment != null) {
-			final Point2D.Double worldPoint = getCanvas().screenToWorld(event.getPoint());
-			getCanvas().resizingComment.layout()
+		if (this.getCanvas().resizingComment != null) {
+			final Point2D.Double worldPoint = this.getCanvas().screenToWorld(event.getPoint());
+			this.getCanvas().resizingComment.layout()
 					.getSize()
 					.setWidth(Math.max(DiagramCanvas.COMMENT_MIN_WIDTH_VALUE,
-							getCanvas().resizingComment.initialWidth() + (worldPoint.getX() - getCanvas().resizingComment.startWorldX())));
-			getCanvas().resizingComment.layout()
+							this.getCanvas().resizingComment.initialWidth()
+									+ (worldPoint.getX() - this.getCanvas().resizingComment.startWorldX())));
+			this.getCanvas().resizingComment.layout()
 					.getSize()
 					.setHeight(Math.max(DiagramCanvas.COMMENT_MIN_HEIGHT,
-							getCanvas().resizingComment.initialHeight() + (worldPoint.getY() - getCanvas().resizingComment.startWorldY())));
-			getCanvas().repaint();
+							this.getCanvas().resizingComment.initialHeight()
+									+ (worldPoint.getY() - this.getCanvas().resizingComment.startWorldY())));
+			this.getCanvas().repaint();
 			return;
 		}
 
-		if (getCanvas().draggedSelection == null) {
+		if (this.getCanvas().draggedSelection == null) {
 			return;
 		}
 
-		getCanvas().dragOccurred = true;
+		this.getCanvas().dragOccurred = true;
 
-		final Point2D.Double worldPoint = getCanvas().screenToWorld(event.getPoint());
-		final double anchorX = worldPoint.getX() - getCanvas().draggedSelection.offsetX();
-		final double anchorY = worldPoint.getY() - getCanvas().draggedSelection.offsetY();
+		final Point2D.Double worldPoint = this.getCanvas().screenToWorld(event.getPoint());
+		final double anchorX = worldPoint.getX() - this.getCanvas().draggedSelection.offsetX();
+		final double anchorY = worldPoint.getY() - this.getCanvas().draggedSelection.offsetY();
 
-		final double deltaX = anchorX - getCanvas().draggedSelection.anchorStartX();
-		final double deltaY = anchorY - getCanvas().draggedSelection.anchorStartY();
+		final double deltaX = anchorX - this.getCanvas().draggedSelection.anchorStartX();
+		final double deltaY = anchorY - this.getCanvas().draggedSelection.anchorStartY();
 
-		final double zoom = getCanvas().getPanelState().getZoom();
-		getCanvas().currentDragOffset = new Point2D.Double(deltaX * zoom, deltaY * zoom);
+		final double zoom = this.getCanvas().getPanelState().getZoom();
+		this.getCanvas().currentDragOffset = new Point2D.Double(deltaX * zoom, deltaY * zoom);
 
-		getCanvas().repaint();
+		this.getCanvas().repaint();
 	}
 
 	default void handleMousePressed(final MouseEvent event) {
-		getCanvas().requestFocusInWindow();
-		getCanvas().lastScreenPoint = event.getPoint();
+		this.getCanvas().requestFocusInWindow();
+		this.getCanvas().lastScreenPoint = event.getPoint();
 
 		if (SwingUtilities.isMiddleMouseButton(event)) {
-			getCanvas().panning = true;
-			getCanvas().setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
+			this.getCanvas().panning = true;
+			this.getCanvas().setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
 			return;
 		}
 
-		final Point2D.Double worldPoint = getCanvas().screenToWorld(event.getPoint());
-		final HitResult hitResult = getCanvas().findTopmostHit(worldPoint);
+		final Point2D.Double worldPoint = this.getCanvas().screenToWorld(event.getPoint());
+		final HitResult hitResult = this.getCanvas().findTopmostHit(worldPoint);
 
 		if (SwingUtilities.isRightMouseButton(event)) {
 			if (hitResult == null) {
 				return;
 			}
 
-			final SelectedElement source = getCanvas().normalizeConnectionSourceSelection(hitResult.selection());
+			final SelectedElement source = this.getCanvas().normalizeConnectionSourceSelection(hitResult.selection());
 			if (source == null) {
 				return;
 			}
 
-			if (!getCanvas().selectedElements.contains(source)) {
-				getCanvas().select(source);
+			if (!this.getCanvas().selectedElements.contains(source)) {
+				this.getCanvas().select(source);
 			} else {
-				getCanvas().selectedElement = source;
-				getCanvas().notifySelectionChanged();
+				this.getCanvas().selectedElement = source;
+				this.getCanvas().notifySelectionChanged();
 			}
 
-			getCanvas().linkCreationState = LinkCreationState.fromSelection(source);
-			getCanvas().linkPreviewTarget = null;
-			getCanvas().linkPreviewMousePoint = worldPoint;
-			getCanvas().setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
-			getCanvas().repaint();
+			this.getCanvas().linkCreationState = LinkCreationState.fromSelection(source);
+			this.getCanvas().linkPreviewTarget = null;
+			this.getCanvas().linkPreviewMousePoint = worldPoint;
+			this.getCanvas().setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
+			this.getCanvas().repaint();
 			return;
 		}
 
@@ -144,123 +146,123 @@ interface MouseInteractionController extends DiagramCanvasExt {
 			return;
 		}
 
-		getCanvas().pendingClickSelection = hitResult == null ? null : hitResult.selection();
-		getCanvas().pendingModifierSelection = event.isShiftDown() || event.isControlDown();
-		getCanvas().dragOccurred = false;
+		this.getCanvas().pendingClickSelection = hitResult == null ? null : hitResult.selection();
+		this.getCanvas().pendingModifierSelection = event.isShiftDown() || event.isControlDown();
+		this.getCanvas().dragOccurred = false;
 
 		if (hitResult == null) {
-			if (!getCanvas().pendingModifierSelection) {
-				getCanvas().clearSelection();
+			if (!this.getCanvas().pendingModifierSelection) {
+				this.getCanvas().clearSelection();
 			}
 			return;
 		}
 
 		final SelectedElement clickedElement = hitResult.selection();
-		final boolean clickedAlreadySelected = getCanvas().isElementSelected(clickedElement);
+		final boolean clickedAlreadySelected = this.getCanvas().isElementSelected(clickedElement);
 
-		if (!getCanvas().pendingModifierSelection) {
+		if (!this.getCanvas().pendingModifierSelection) {
 			if (clickedAlreadySelected) {
-				getCanvas().selectedElement = clickedElement;
-				getCanvas().document.getModel().getClasses().sort(getCanvas().comparator);
-				getCanvas().notifySelectionChanged();
-				getCanvas().repaint();
+				this.getCanvas().selectedElement = clickedElement;
+				this.getCanvas().document.getModel().getClasses().sort(this.getCanvas().comparator);
+				this.getCanvas().notifySelectionChanged();
+				this.getCanvas().repaint();
 			} else {
-				getCanvas().select(clickedElement);
+				this.getCanvas().select(clickedElement);
 			}
 		}
 
-		if (!getCanvas().pendingModifierSelection && event.getClickCount() == 2) {
-			getCanvas().openEditDialogForSelection();
+		if (!this.getCanvas().pendingModifierSelection && event.getClickCount() == 2) {
+			this.getCanvas().openEditDialogForSelection();
 			return;
 		}
 
-		if (!getCanvas().pendingModifierSelection && hitResult.selection().type() == SelectedType.COMMENT && hitResult.bounds() != null
-				&& getCanvas().isInCommentResizeHandle(hitResult.bounds(), worldPoint)) {
-			getCanvas().resizingComment = new ResizingComment(hitResult
+		if (!this.getCanvas().pendingModifierSelection && hitResult.selection().type() == SelectedType.COMMENT && hitResult.bounds() != null
+				&& this.getCanvas().isInCommentResizeHandle(hitResult.bounds(), worldPoint)) {
+			this.getCanvas().resizingComment = new ResizingComment(hitResult
 					.layout(), hitResult.bounds().getWidth(), hitResult.bounds().getHeight(), worldPoint.getX(), worldPoint.getY());
-			getCanvas().setCursor(Cursor.getPredefinedCursor(Cursor.SE_RESIZE_CURSOR));
+			this.getCanvas().setCursor(Cursor.getPredefinedCursor(Cursor.SE_RESIZE_CURSOR));
 			return;
 		}
 
 		if (hitResult.layout() != null) {
-			if (getCanvas().pendingModifierSelection && !getCanvas().isElementSelected(clickedElement)) {
+			if (this.getCanvas().pendingModifierSelection && !this.getCanvas().isElementSelected(clickedElement)) {
 				return;
 			}
 
-			getCanvas().draggedSelection = getCanvas()
+			this.getCanvas().draggedSelection = this.getCanvas()
 					.createDraggedSelection(clickedElement, hitResult.layout(), worldPoint, hitResult.bounds());
-			getCanvas().setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+			this.getCanvas().setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		}
 	}
 
 	default void handleMouseReleased(final MouseEvent event) {
 		boolean documentChanged = false;
 
-		if (SwingUtilities.isRightMouseButton(event) && getCanvas().linkCreationState != null) {
-			getCanvas().finishLinkCreation(getCanvas().screenToWorld(event.getPoint()));
+		if (SwingUtilities.isRightMouseButton(event) && this.getCanvas().linkCreationState != null) {
+			this.getCanvas().finishLinkCreation(this.getCanvas().screenToWorld(event.getPoint()));
 		}
 
-		if (SwingUtilities.isLeftMouseButton(event) && getCanvas().draggedSelection != null && getCanvas().dragOccurred) {
-			final double zoom = getCanvas().getPanelState().getZoom();
-			final double deltaX = getCanvas().currentDragOffset.getX() / zoom;
-			final double deltaY = getCanvas().currentDragOffset.getY() / zoom;
+		if (SwingUtilities.isLeftMouseButton(event) && this.getCanvas().draggedSelection != null && this.getCanvas().dragOccurred) {
+			final double zoom = this.getCanvas().getPanelState().getZoom();
+			final double deltaX = this.getCanvas().currentDragOffset.getX() / zoom;
+			final double deltaY = this.getCanvas().currentDragOffset.getY() / zoom;
 
 			if (Math.abs(deltaX) > 0.0001 || Math.abs(deltaY) > 0.0001) {
-				for (final DraggedLayout draggedLayout : getCanvas().draggedSelection.layouts()) {
+				for (final DraggedLayout draggedLayout : this.getCanvas().draggedSelection.layouts()) {
 					draggedLayout.layout().getPosition().setLocation(draggedLayout.startX() + deltaX, draggedLayout.startY() + deltaY);
 				}
 				documentChanged = true;
 			}
 		}
 
-		if (SwingUtilities.isLeftMouseButton(event) && getCanvas().resizingComment != null) {
-			final double currentWidth = getCanvas().resizingComment.layout().getSize().getWidth();
-			final double currentHeight = getCanvas().resizingComment.layout().getSize().getHeight();
+		if (SwingUtilities.isLeftMouseButton(event) && this.getCanvas().resizingComment != null) {
+			final double currentWidth = this.getCanvas().resizingComment.layout().getSize().getWidth();
+			final double currentHeight = this.getCanvas().resizingComment.layout().getSize().getHeight();
 
-			if (Math.abs(currentWidth - getCanvas().resizingComment.initialWidth()) > 0.0001
-					|| Math.abs(currentHeight - getCanvas().resizingComment.initialHeight()) > 0.0001) {
+			if (Math.abs(currentWidth - this.getCanvas().resizingComment.initialWidth()) > 0.0001
+					|| Math.abs(currentHeight - this.getCanvas().resizingComment.initialHeight()) > 0.0001) {
 				documentChanged = true;
 			}
 		}
 
-		if (SwingUtilities.isLeftMouseButton(event) && getCanvas().pendingModifierSelection && !getCanvas().dragOccurred) {
-			getCanvas().updateSelectionFromMouse(getCanvas().pendingClickSelection, event);
+		if (SwingUtilities.isLeftMouseButton(event) && this.getCanvas().pendingModifierSelection && !this.getCanvas().dragOccurred) {
+			this.getCanvas().updateSelectionFromMouse(this.getCanvas().pendingClickSelection, event);
 		}
 
-		getCanvas().draggedSelection = null;
-		getCanvas().resizingComment = null;
-		getCanvas().panning = false;
-		getCanvas().lastScreenPoint = null;
-		getCanvas().linkCreationState = null;
-		getCanvas().linkPreviewTarget = null;
-		getCanvas().linkPreviewMousePoint = null;
+		this.getCanvas().draggedSelection = null;
+		this.getCanvas().resizingComment = null;
+		this.getCanvas().panning = false;
+		this.getCanvas().lastScreenPoint = null;
+		this.getCanvas().linkCreationState = null;
+		this.getCanvas().linkPreviewTarget = null;
+		this.getCanvas().linkPreviewMousePoint = null;
 
-		getCanvas().pendingClickSelection = null;
-		getCanvas().pendingModifierSelection = false;
-		getCanvas().dragOccurred = false;
+		this.getCanvas().pendingClickSelection = null;
+		this.getCanvas().pendingModifierSelection = false;
+		this.getCanvas().dragOccurred = false;
 
-		getCanvas().currentDragOffset = new Point2D.Double();
+		this.getCanvas().currentDragOffset = new Point2D.Double();
 
 		if (documentChanged) {
-			getCanvas().notifyDocumentChanged();
+			this.getCanvas().notifyDocumentChanged();
 		}
 
-		getCanvas().setCursor(Cursor.getDefaultCursor());
-		getCanvas().repaint();
+		this.getCanvas().setCursor(Cursor.getDefaultCursor());
+		this.getCanvas().repaint();
 	}
 
 	default void handleMouseWheelMoved(final MouseWheelEvent event) {
-		final PanelState state = getCanvas().getPanelState();
-		final Point2D.Double worldBefore = getCanvas().screenToWorld(event.getPoint());
+		final PanelState state = this.getCanvas().getPanelState();
+		final Point2D.Double worldBefore = this.getCanvas().screenToWorld(event.getPoint());
 
 		final double zoomFactor = event.getWheelRotation() < 0 ? 1.1 : 1.0 / 1.1;
-		final double newZoom = getCanvas().clamp(state.getZoom() * zoomFactor, 0.2, 4.0);
+		final double newZoom = this.getCanvas().clamp(state.getZoom() * zoomFactor, 0.2, 4.0);
 		state.setZoom(newZoom);
 
 		state.setPanX(event.getX() - worldBefore.getX() * newZoom);
 		state.setPanY(event.getY() - worldBefore.getY() * newZoom);
 
-		getCanvas().repaint();
+		this.getCanvas().repaint();
 	}
 
 }

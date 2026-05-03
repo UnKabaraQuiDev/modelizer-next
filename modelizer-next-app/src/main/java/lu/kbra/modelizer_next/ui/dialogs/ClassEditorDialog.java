@@ -35,19 +35,16 @@ public final class ClassEditorDialog {
 		private Result result;
 	}
 
-	private ClassEditorDialog() {
-	}
-
 	public static Result showDialog(final Component parent, final ClassModel classModel) {
 		final Window owner = parent == null ? null : SwingUtilities.getWindowAncestor(parent);
 		final JDialog dialog = new JDialog(owner, "Edit table", Dialog.ModalityType.APPLICATION_MODAL);
 
-		final JTextField conceptualNameField = new JTextField(classModel.getNames().getConceptualName(), 24);
-		final JTextField technicalNameField = new JTextField(classModel.getNames().getTechnicalName(), 24);
+		final JTextField conceptualNameField = new JTextField(classModel.getConceptualName(), 24);
+		final JTextField technicalNameField = new JTextField(classModel.getTechnicalName(), 24);
 
-		final ColorButton textColorButton = new ColorButton("Text color", classModel.getStyle().getTextColor());
-		final ColorButton backgroundColorButton = new ColorButton("Background color", classModel.getStyle().getBackgroundColor());
-		final ColorButton borderColorButton = new ColorButton("Border color", classModel.getStyle().getBorderColor());
+		final ColorButton textColorButton = new ColorButton("Text color", classModel.getTextColor());
+		final ColorButton backgroundColorButton = new ColorButton("Background color", classModel.getBackgroundColor());
+		final ColorButton borderColorButton = new ColorButton("Border color", classModel.getBorderColor());
 
 		final Holder holder = new Holder();
 
@@ -57,9 +54,9 @@ public final class ClassEditorDialog {
 		form.add(ClassEditorDialog.row("Conceptual name", conceptualNameField));
 		form.add(ClassEditorDialog.row("Technical name", technicalNameField));
 
-		final JCheckBox conceptualBox = new JCheckBox("Conceptual", classModel.getVisibility().isConceptual());
-		final JCheckBox logicalBox = new JCheckBox("Logical", classModel.getVisibility().isLogical());
-		final JCheckBox physicalBox = new JCheckBox("Physical", classModel.getVisibility().isPhysical());
+		final JCheckBox conceptualBox = new JCheckBox("Conceptual", classModel.isVisibleInConceptual());
+		final JCheckBox logicalBox = new JCheckBox("Logical", classModel.isVisibleInLogical());
+		final JCheckBox physicalBox = new JCheckBox("Physical", classModel.isVisibleInPhysical());
 
 		final JPanel visibilityRow = new JPanel(new GridLayout(1, 3, 8, 0));
 		visibilityRow.add(conceptualBox);
@@ -118,6 +115,9 @@ public final class ClassEditorDialog {
 		row.add(new JLabel(labelText), BorderLayout.NORTH);
 		row.add(component, BorderLayout.CENTER);
 		return row;
+	}
+
+	private ClassEditorDialog() {
 	}
 
 }

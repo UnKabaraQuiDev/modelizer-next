@@ -7,12 +7,12 @@ public interface DocumentChangeListener {
 	DocumentChangeListener NOOP = new DocumentChangeListener() {
 
 		@Override
-		public void onSelectionChanged(SelectionInfo selectionInfo) {
+		public void onDocumentChanged() {
 
 		}
 
 		@Override
-		public void onDocumentChanged() {
+		public void onSelectionChanged(final SelectionInfo selectionInfo) {
 
 		}
 

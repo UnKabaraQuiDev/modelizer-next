@@ -1,5 +1,7 @@
 package lu.kbra.modelizer_next.domain;
 
+import lu.kbra.modelizer_next.domain.data.BoundTargetType;
+
 public class CommentBinding {
 
 	private BoundTargetType targetType;

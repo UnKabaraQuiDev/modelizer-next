@@ -19,7 +19,7 @@ public interface NodeLayoutCache extends DiagramCanvasExt {
 			return Optional.empty();
 		}
 
-		for (final NodeLayout layout : getCanvas().getPanelState().getNodeLayouts()) {
+		for (final NodeLayout layout : this.getCanvas().getPanelState().getNodeLayouts()) {
 			if (layout.getObjectType() == objectType && objectId.equals(layout.getObjectId())) {
 				return Optional.of(layout);
 			}
@@ -29,7 +29,7 @@ public interface NodeLayoutCache extends DiagramCanvasExt {
 	}
 
 	default LinkLayout findOrCreateLinkLayout(final String linkId) {
-		for (final LinkLayout linkLayout : getCanvas().getPanelState().getLinkLayouts()) {
+		for (final LinkLayout linkLayout : this.getCanvas().getPanelState().getLinkLayouts()) {
 			if (linkLayout.getLinkId().equals(linkId)) {
 				return linkLayout;
 			}
@@ -37,12 +37,12 @@ public interface NodeLayoutCache extends DiagramCanvasExt {
 
 		final LinkLayout linkLayout = new LinkLayout();
 		linkLayout.setLinkId(linkId);
-		getCanvas().getPanelState().getLinkLayouts().add(linkLayout);
+		this.getCanvas().getPanelState().getLinkLayouts().add(linkLayout);
 		return linkLayout;
 	}
 
 	default NodeLayout findOrCreateNodeLayout(final LayoutObjectType objectType, final String objectId) {
-		for (final NodeLayout layout : getCanvas().getPanelState().getNodeLayouts()) {
+		for (final NodeLayout layout : this.getCanvas().getPanelState().getNodeLayouts()) {
 			if (layout.getObjectType() == objectType && layout.getObjectId().equals(objectId)) {
 				return layout;
 			}
@@ -51,15 +51,15 @@ public interface NodeLayoutCache extends DiagramCanvasExt {
 		final NodeLayout layout = new NodeLayout();
 		layout.setObjectType(objectType);
 		layout.setObjectId(objectId);
-		layout.setPosition(new Point2D.Double(80 + getCanvas().getPanelState().getNodeLayouts().size() * 30,
-				80 + getCanvas().getPanelState().getNodeLayouts().size() * 30));
+		layout.setPosition(new Point2D.Double(80 + this.getCanvas().getPanelState().getNodeLayouts().size() * 30,
+				80 + this.getCanvas().getPanelState().getNodeLayouts().size() * 30));
 		layout.setSize(new Size2D(0, 0));
-		getCanvas().getPanelState().getNodeLayouts().add(layout);
+		this.getCanvas().getPanelState().getNodeLayouts().add(layout);
 		return layout;
 	}
 
 	default PanelState getPanelState() {
-		return getDocument().getWorkspace().getPanels().get(getPanelType());
+		return this.getDocument().getWorkspace().getPanels().get(this.getPanelType());
 	}
 
 }

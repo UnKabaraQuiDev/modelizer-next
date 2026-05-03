@@ -58,6 +58,17 @@ public class ViewExportDialog extends JDialog {
 			this.setBackground(java.awt.Color.WHITE);
 		}
 
+		private void setPreview(final DiagramCanvas canvas, final ViewExportScope scope) {
+			if (canvas == null || scope == null) {
+				this.previewImage = null;
+				this.repaint();
+				return;
+			}
+
+			this.previewImage = canvas.createExportPreviewImage(scope, 900, 700);
+			this.repaint();
+		}
+
 		@Override
 		protected void paintComponent(final Graphics graphics) {
 			super.paintComponent(graphics);
@@ -76,17 +87,6 @@ public class ViewExportDialog extends JDialog {
 			final int y = (this.getHeight() - imageHeight) / 2;
 
 			graphics.drawImage(this.previewImage.getScaledInstance(imageWidth, imageHeight, Image.SCALE_SMOOTH), x, y, null);
-		}
-
-		private void setPreview(final DiagramCanvas canvas, final ViewExportScope scope) {
-			if (canvas == null || scope == null) {
-				this.previewImage = null;
-				this.repaint();
-				return;
-			}
-
-			this.previewImage = canvas.createExportPreviewImage(scope, 900, 700);
-			this.repaint();
 		}
 
 	}
@@ -161,11 +161,24 @@ public class ViewExportDialog extends JDialog {
 	}
 
 	private static final long serialVersionUID = -4894368238563345666L;
+
+	public static ViewExportRequest showDialog(
+			final Component parent,
+			final Map<PanelType, DiagramCanvas> canvases,
+			final PanelType activePanelType,
+			final File defaultOutputDirectory) {
+
+		final ViewExportDialog dialog = new ViewExportDialog(parent, canvases, activePanelType, defaultOutputDirectory);
+		dialog.setVisible(true);
+		return dialog.result;
+	}
+
 	private final Map<PanelType, DiagramCanvas> canvases;
 	private final PanelType activePanelType;
 	private final JComboBox<ViewExportFormat> formatSelector;
 	private final JComboBox<ViewExportScope> scopeSelector;
 	private final Map<PanelType, JCheckBox> panelTypeBoxes;
+
 	private final JTextField outputDirectoryField;
 
 	private final PatternTextField filePatternField;
@@ -369,17 +382,6 @@ public class ViewExportDialog extends JDialog {
 	private void updateExportButtonState() {
 		this.exportButton.setEnabled(!this.getSelectedPanelTypes().isEmpty() && !this.outputDirectoryField.getText().isBlank()
 				&& !this.filePatternField.getText().isBlank());
-	}
-
-	public static ViewExportRequest showDialog(
-			final Component parent,
-			final Map<PanelType, DiagramCanvas> canvases,
-			final PanelType activePanelType,
-			final File defaultOutputDirectory) {
-
-		final ViewExportDialog dialog = new ViewExportDialog(parent, canvases, activePanelType, defaultOutputDirectory);
-		dialog.setVisible(true);
-		return dialog.result;
 	}
 
 }

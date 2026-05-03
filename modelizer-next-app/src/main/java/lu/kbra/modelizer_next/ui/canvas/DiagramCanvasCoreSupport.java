@@ -13,11 +13,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import lu.kbra.modelizer_next.domain.BoundTargetType;
 import lu.kbra.modelizer_next.domain.ClassModel;
 import lu.kbra.modelizer_next.domain.CommentModel;
 import lu.kbra.modelizer_next.domain.FieldModel;
 import lu.kbra.modelizer_next.domain.LinkModel;
+import lu.kbra.modelizer_next.domain.data.BoundTargetType;
 import lu.kbra.modelizer_next.layout.LayoutObjectType;
 import lu.kbra.modelizer_next.layout.NodeLayout;
 import lu.kbra.modelizer_next.layout.PanelState;
@@ -69,7 +69,7 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 
 	default void ensureLayouts() {
 		for (final ClassModel classModel : this.getCanvas().document.getModel().getClasses()) {
-			if (this.getCanvas().isVisible(classModel)) {
+			if (classModel.isVisible(this.getPanelType())) {
 				this.getCanvas().findOrCreateNodeLayout(LayoutObjectType.CLASS, classModel.getId());
 			}
 		}
@@ -103,8 +103,8 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 					continue;
 				}
 
-				if (technicalName.equalsIgnoreCase(fieldModel.getNames().getTechnicalName())
-						|| displayName.equalsIgnoreCase(fieldModel.getNames().getConceptualName())) {
+				if (technicalName.equalsIgnoreCase(fieldModel.getTechnicalName())
+						|| displayName.equalsIgnoreCase(fieldModel.getConceptualName())) {
 					matchingField = fieldModel;
 					break;
 				}
@@ -118,8 +118,8 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 			}
 
 			final FieldModel fieldModel = new FieldModel();
-			fieldModel.getNames().setConceptualName(displayName);
-			fieldModel.getNames().setTechnicalName(technicalName.isBlank() ? displayName : technicalName);
+			fieldModel.setConceptualName(displayName);
+			fieldModel.setTechnicalName(technicalName.isBlank() ? displayName : technicalName);
 			fieldModel.setNotConceptual(true);
 			fieldModel.setPrimaryKey(false);
 			fieldModel.setUnique(false);
@@ -140,7 +140,7 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 
 		if (commentModel.getBinding().getTargetType() == BoundTargetType.CLASS) {
 			final ClassModel classModel = this.getCanvas().findClassById(commentModel.getBinding().getTargetId());
-			if (classModel == null || !this.getCanvas().isVisible(classModel)) {
+			if (classModel == null || !classModel.isVisible(this.getPanelType())) {
 				return null;
 			}
 
@@ -396,7 +396,7 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 
 	default Point2D resolveConceptualPreviewAnchor(final Graphics2D g2, final String classId, final Point2D reference) {
 		final ClassModel classModel = this.getCanvas().findClassById(classId);
-		if (classModel == null || !this.getCanvas().isVisible(classModel)) {
+		if (classModel == null || !classModel.isVisible(this.getPanelType())) {
 			return null;
 		}
 
@@ -427,7 +427,7 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 
 	default Point2D resolveOppositeReferencePoint(final Graphics2D g2, final String classId, final String fieldId) {
 		final ClassModel classModel = this.getCanvas().findClassById(classId);
-		if (classModel == null || !this.getCanvas().isVisible(classModel)) {
+		if (classModel == null || !classModel.isVisible(this.getPanelType())) {
 			return null;
 		}
 
@@ -467,7 +467,7 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 
 		if (this.getCanvas().panelType == PanelType.CONCEPTUAL) {
 			final ClassModel classModel = this.getCanvas().findClassById(source.classId());
-			if (classModel == null || !this.getCanvas().isVisible(classModel)) {
+			if (classModel == null || !classModel.isVisible(this.getPanelType())) {
 				return this.getCanvas().linkPreviewMousePoint;
 			}
 
@@ -492,7 +492,7 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 		}
 
 		final ClassModel classModel = this.getCanvas().findClassById(classId);
-		if (classModel == null || !this.getCanvas().isVisible(classModel)) {
+		if (classModel == null || !classModel.isVisible(this.getPanelType())) {
 			return AnchorSide.LEFT;
 		}
 
@@ -528,7 +528,7 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 			final String fieldId,
 			final Point2D oppositeReference) {
 		final ClassModel classModel = this.getCanvas().findClassById(classId);
-		if (classModel == null || !this.getCanvas().isVisible(classModel)) {
+		if (classModel == null || !classModel.isVisible(this.getPanelType())) {
 			return null;
 		}
 
@@ -564,7 +564,7 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 			final String oppositeClassId,
 			final String oppositeFieldId) {
 		final ClassModel classModel = this.getCanvas().findClassById(classId);
-		if (classModel == null || !this.getCanvas().isVisible(classModel)) {
+		if (classModel == null || !classModel.isVisible(this.getPanelType())) {
 			return null;
 		}
 
@@ -605,7 +605,7 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 
 	default Point2D resolveTechnicalSelfLinkAnchor(final Graphics2D g2, final String classId, final String fieldId, final AnchorSide side) {
 		final ClassModel classModel = this.getCanvas().findClassById(classId);
-		if (classModel == null || !this.getCanvas().isVisible(classModel)) {
+		if (classModel == null || !classModel.isVisible(this.getPanelType())) {
 			return null;
 		}
 
@@ -680,18 +680,6 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 		return new Point2D.Double((point.getX() - state.getPanX()) / state.getZoom(), (point.getY() - state.getPanY()) / state.getZoom());
 	}
 
-	default Point2D.Double worldToScreen(final Point2D world) {
-		final PanelState state = getCanvas().getPanelState();
-
-		return new Point2D.Double(world.getX() * state.getZoom() + state.getPanX(), world.getY() * state.getZoom() + state.getPanY());
-	}
-
-	default Point2D.Double worldToScreenZoom(final Point2D world) {
-		final PanelState state = getCanvas().getPanelState();
-
-		return new Point2D.Double(world.getX() * state.getZoom(), world.getY() * state.getZoom());
-	}
-
 	default void setAssociationClassForLink(final String classId, final String linkId) {
 		final LinkModel linkModel = this.getCanvas().findLinkById(linkId);
 		if (classId == null || linkModel == null || this.getCanvas().findClassById(classId) == null
@@ -740,6 +728,18 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 		final PanelState state = this.getCanvas().getPanelState();
 		return new Point2D.Double((this.getCanvas().getWidth() / 2.0 - state.getPanX()) / state.getZoom(),
 				(this.getCanvas().getHeight() / 2.0 - state.getPanY()) / state.getZoom());
+	}
+
+	default Point2D.Double worldToScreen(final Point2D world) {
+		final PanelState state = this.getCanvas().getPanelState();
+
+		return new Point2D.Double(world.getX() * state.getZoom() + state.getPanX(), world.getY() * state.getZoom() + state.getPanY());
+	}
+
+	default Point2D.Double worldToScreenZoom(final Point2D world) {
+		final PanelState state = this.getCanvas().getPanelState();
+
+		return new Point2D.Double(world.getX() * state.getZoom(), world.getY() * state.getZoom());
 	}
 
 	default List<String> wrapText(final String text, final FontMetrics metrics, final int maxWidth) {

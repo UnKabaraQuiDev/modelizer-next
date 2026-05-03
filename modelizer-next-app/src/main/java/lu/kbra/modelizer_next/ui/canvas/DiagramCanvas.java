@@ -168,9 +168,14 @@ public class DiagramCanvas extends JPanel
 		super.addMouseMotionListener(mouseAdapter);
 		super.addMouseWheelListener(mouseAdapter);
 
-		this.renamingField = createRenamingField();
+		this.renamingField = this.createRenamingField();
 		super.add(this.renamingField);
 		super.setLayout(null);
+	}
+
+	@Override
+	public DiagramCanvas getCanvas() {
+		return this;
 	}
 
 	public Action getCanvasAction(final String actionKey) {
@@ -183,37 +188,8 @@ public class DiagramCanvas extends JPanel
 	}
 
 	@Override
-	public DiagramCanvas getCanvas() {
-		return this;
-	}
-
-	@Override
 	public PanelType getPanelType() {
 		return this.panelType;
-	}
-
-	public void resetUiAfterDocumentRestore() {
-		this.draggedSelection = null;
-		this.lastScreenPoint = null;
-		this.panning = false;
-		this.linkCreationState = null;
-		this.linkPreviewTarget = null;
-		this.linkPreviewMousePoint = null;
-		this.selectedElement = null;
-		this.selectedElements.clear();
-		this.resizingComment = null;
-
-		this.pendingClickSelection = null;
-		this.pendingModifierSelection = false;
-		this.dragOccurred = false;
-
-		this.currentDragOffset = new Point2D.Double();
-		this.renamingField.setVisible(false);
-
-		this.setCursor(Cursor.getDefaultCursor());
-		this.notifySelectionChanged();
-		this.revalidate();
-		this.repaint();
 	}
 
 	@Override
@@ -239,6 +215,30 @@ public class DiagramCanvas extends JPanel
 
 		g2.setTransform(oldTransform);
 		g2.dispose();
+	}
+
+	public void resetUiAfterDocumentRestore() {
+		this.draggedSelection = null;
+		this.lastScreenPoint = null;
+		this.panning = false;
+		this.linkCreationState = null;
+		this.linkPreviewTarget = null;
+		this.linkPreviewMousePoint = null;
+		this.selectedElement = null;
+		this.selectedElements.clear();
+		this.resizingComment = null;
+
+		this.pendingClickSelection = null;
+		this.pendingModifierSelection = false;
+		this.dragOccurred = false;
+
+		this.currentDragOffset = new Point2D.Double();
+		this.renamingField.setVisible(false);
+
+		this.setCursor(Cursor.getDefaultCursor());
+		this.notifySelectionChanged();
+		this.revalidate();
+		this.repaint();
 	}
 
 }

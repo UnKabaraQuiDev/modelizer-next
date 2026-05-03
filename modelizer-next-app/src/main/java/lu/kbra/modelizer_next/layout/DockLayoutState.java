@@ -5,6 +5,12 @@ import java.util.List;
 
 public class DockLayoutState {
 
+	public static DockLayoutState createDefault() {
+		final DockLayoutState state = new DockLayoutState();
+		state.getTabGroups().add(DockedTabGroupState.createDefault());
+		return state;
+	}
+
 	private List<DockedTabGroupState> tabGroups;
 
 	public DockLayoutState() {
@@ -22,12 +28,6 @@ public class DockLayoutState {
 	@Override
 	public String toString() {
 		return "DockLayoutState@" + System.identityHashCode(this) + " [tabGroups=" + this.tabGroups + "]";
-	}
-
-	public static DockLayoutState createDefault() {
-		final DockLayoutState state = new DockLayoutState();
-		state.getTabGroups().add(DockedTabGroupState.createDefault());
-		return state;
 	}
 
 }

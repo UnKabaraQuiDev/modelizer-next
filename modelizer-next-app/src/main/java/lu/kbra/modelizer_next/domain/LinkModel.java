@@ -4,6 +4,8 @@ import java.awt.Color;
 import java.util.Objects;
 import java.util.UUID;
 
+import lu.kbra.modelizer_next.domain.data.Cardinality;
+
 public class LinkModel {
 
 	private String id;

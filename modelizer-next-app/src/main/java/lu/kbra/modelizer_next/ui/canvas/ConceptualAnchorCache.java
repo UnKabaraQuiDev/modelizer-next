@@ -36,78 +36,79 @@ interface ConceptualAnchorCache extends DiagramCanvasExt {
 	}
 
 	default Point2D computeConceptualSideCenter(final Rectangle2D bounds, final AnchorSide side) {
-		return getCanvas().computeConceptualAnchorPoint(bounds, side, 0, 1);
+		return this.getCanvas().computeConceptualAnchorPoint(bounds, side, 0, 1);
 	}
 
 	default void ensureConceptualAnchorCache(final Graphics2D g2) {
-		if (getPanelType() != PanelType.CONCEPTUAL || getCanvas().conceptualAnchorCacheValid) {
+		if (this.getPanelType() != PanelType.CONCEPTUAL || this.getCanvas().conceptualAnchorCacheValid) {
 			return;
 		}
 
-		getCanvas().rebuildConceptualAnchorCache(g2);
+		this.getCanvas().rebuildConceptualAnchorCache(g2);
 	}
 
 	default int getConceptualSideLinkCount(final String classId, final AnchorSide side) {
-		final List<String> links = getCanvas().conceptualSideLinkCache.get(new ClassSideKey(classId, side));
+		final List<String> links = this.getCanvas().conceptualSideLinkCache.get(new ClassSideKey(classId, side));
 		return links == null ? 0 : links.size();
 	}
 
 	default void invalidateConceptualAnchorCache() {
-		getCanvas().conceptualAnchorCache.clear();
-		getCanvas().conceptualAnchorPlacements.clear();
-		getCanvas().conceptualSideLinkCache.clear();
-		getCanvas().conceptualAnchorCacheValid = false;
+		this.getCanvas().conceptualAnchorCache.clear();
+		this.getCanvas().conceptualAnchorPlacements.clear();
+		this.getCanvas().conceptualSideLinkCache.clear();
+		this.getCanvas().conceptualAnchorCacheValid = false;
 	}
 
 	default void rebuildConceptualAnchorCache(final Graphics2D g2) {
-		getCanvas().invalidateConceptualAnchorCache();
+		this.getCanvas().invalidateConceptualAnchorCache();
 
 		final Map<String, Rectangle2D> boundsByClassId = new HashMap<>();
 		final List<LinkModel> visibleLinks = new ArrayList<>();
 		final Map<String, AnchorSidePair> sidePairs = new HashMap<>();
 
-		for (final LinkModel linkModel : getCanvas().getActiveLinks()) {
-			final ClassModel fromClass = getCanvas().findClassById(linkModel.getFrom().getClassId());
-			final ClassModel toClass = getCanvas().findClassById(linkModel.getTo().getClassId());
-			if (fromClass == null || toClass == null || !getCanvas().isVisible(fromClass) || !getCanvas().isVisible(toClass)) {
+		for (final LinkModel linkModel : this.getCanvas().getActiveLinks()) {
+			final ClassModel fromClass = this.getCanvas().findClassById(linkModel.getFrom().getClassId());
+			final ClassModel toClass = this.getCanvas().findClassById(linkModel.getTo().getClassId());
+			if (fromClass == null || toClass == null || !fromClass.isVisible(this.getPanelType())
+					|| !toClass.isVisible(this.getPanelType())) {
 				continue;
 			}
 
 			final Rectangle2D fromBounds = boundsByClassId.computeIfAbsent(fromClass.getId(), classId -> {
-				final NodeLayout layout = getCanvas()
-						.resolveRenderLayout(getCanvas().findOrCreateNodeLayout(LayoutObjectType.CLASS, classId));
-				return getCanvas().computeClassBounds(g2, fromClass, layout);
+				final NodeLayout layout = this.getCanvas()
+						.resolveRenderLayout(this.getCanvas().findOrCreateNodeLayout(LayoutObjectType.CLASS, classId));
+				return this.getCanvas().computeClassBounds(g2, fromClass, layout);
 			});
 			final Rectangle2D toBounds = boundsByClassId.computeIfAbsent(toClass.getId(), classId -> {
-				final NodeLayout layout = getCanvas()
-						.resolveRenderLayout(getCanvas().findOrCreateNodeLayout(LayoutObjectType.CLASS, classId));
-				return getCanvas().computeClassBounds(g2, toClass, layout);
+				final NodeLayout layout = this.getCanvas()
+						.resolveRenderLayout(this.getCanvas().findOrCreateNodeLayout(LayoutObjectType.CLASS, classId));
+				return this.getCanvas().computeClassBounds(g2, toClass, layout);
 			});
 
 			final AnchorSidePair sidePair;
 			if (linkModel.isSelfLinking()) {
-				final AnchorSide fromSide = getCanvas().chooseSelfLinkFromSide(fromClass.getId());
-				sidePair = new AnchorSidePair(fromSide, getCanvas().clockwise(fromSide));
+				final AnchorSide fromSide = this.getCanvas().chooseSelfLinkFromSide(fromClass.getId());
+				sidePair = new AnchorSidePair(fromSide, this.getCanvas().clockwise(fromSide));
 			} else {
-				sidePair = getCanvas().chooseBestConceptualSidePair(fromClass.getId(), fromBounds, toClass.getId(), toBounds);
+				sidePair = this.getCanvas().chooseBestConceptualSidePair(fromClass.getId(), fromBounds, toClass.getId(), toBounds);
 			}
 
 			sidePairs.put(linkModel.getId(), sidePair);
-			getCanvas().conceptualSideLinkCache
+			this.getCanvas().conceptualSideLinkCache
 					.computeIfAbsent(new ClassSideKey(fromClass.getId(), sidePair.fromSide()), key -> new ArrayList<>())
 					.add(linkModel.getId());
-			getCanvas().conceptualSideLinkCache
+			this.getCanvas().conceptualSideLinkCache
 					.computeIfAbsent(new ClassSideKey(toClass.getId(), sidePair.toSide()), key -> new ArrayList<>())
 					.add(linkModel.getId());
 			visibleLinks.add(linkModel);
 		}
 
 		final Map<ClassSideKey, Map<String, Integer>> indexByKey = new HashMap<>();
-		for (final Map.Entry<ClassSideKey, List<String>> entry : getCanvas().conceptualSideLinkCache.entrySet()) {
+		for (final Map.Entry<ClassSideKey, List<String>> entry : this.getCanvas().conceptualSideLinkCache.entrySet()) {
 			final ClassSideKey key = entry.getKey();
 			final List<String> linkIds = entry.getValue();
 			linkIds.sort(Comparator
-					.comparingDouble((final String linkId) -> getCanvas()
+					.comparingDouble((final String linkId) -> this.getCanvas()
 							.computeConceptualSortValue(linkId, key.classId(), key.side(), boundsByClassId, sidePairs))
 					.thenComparing(linkId -> linkId));
 
@@ -132,24 +133,24 @@ interface ConceptualAnchorCache extends DiagramCanvasExt {
 
 			final ClassSideKey fromKey = new ClassSideKey(linkModel.getFrom().getClassId(), sidePair.fromSide());
 			final ClassSideKey toKey = new ClassSideKey(linkModel.getTo().getClassId(), sidePair.toSide());
-			final List<String> fromLinks = getCanvas().conceptualSideLinkCache.get(fromKey);
-			final List<String> toLinks = getCanvas().conceptualSideLinkCache.get(toKey);
+			final List<String> fromLinks = this.getCanvas().conceptualSideLinkCache.get(fromKey);
+			final List<String> toLinks = this.getCanvas().conceptualSideLinkCache.get(toKey);
 			if (fromLinks == null || toLinks == null) {
 				continue;
 			}
 
 			final int fromIndex = indexByKey.get(fromKey).get(linkModel.getId());
 			final int toIndex = indexByKey.get(toKey).get(linkModel.getId());
-			final Point2D fromPoint = getCanvas()
+			final Point2D fromPoint = this.getCanvas()
 					.computeConceptualAnchorPoint(fromBounds, sidePair.fromSide(), fromIndex, fromLinks.size());
-			final Point2D toPoint = getCanvas().computeConceptualAnchorPoint(toBounds, sidePair.toSide(), toIndex, toLinks.size());
+			final Point2D toPoint = this.getCanvas().computeConceptualAnchorPoint(toBounds, sidePair.toSide(), toIndex, toLinks.size());
 
-			getCanvas().conceptualAnchorCache.put(linkModel.getId(), new AnchorPair(fromPoint, toPoint));
-			getCanvas().conceptualAnchorPlacements.put(linkModel.getId(),
+			this.getCanvas().conceptualAnchorCache.put(linkModel.getId(), new AnchorPair(fromPoint, toPoint));
+			this.getCanvas().conceptualAnchorPlacements.put(linkModel.getId(),
 					new LinkAnchorPlacement(sidePair.fromSide(), sidePair.toSide(), fromIndex, fromLinks.size(), toIndex, toLinks.size()));
 		}
 
-		getCanvas().conceptualAnchorCacheValid = true;
+		this.getCanvas().conceptualAnchorCacheValid = true;
 	}
 
 }

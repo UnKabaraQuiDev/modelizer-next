@@ -24,7 +24,7 @@ interface DragSelectionController extends DiagramCanvasExt {
 			final Set<String> seen,
 			final SelectedElement element,
 			final NodeLayout fallbackLayout) {
-		final NodeLayout layout = getCanvas().resolveNodeLayoutForSelection(element, fallbackLayout);
+		final NodeLayout layout = this.getCanvas().resolveNodeLayoutForSelection(element, fallbackLayout);
 		if (layout == null) {
 			return;
 		}
@@ -38,7 +38,7 @@ interface DragSelectionController extends DiagramCanvasExt {
 	}
 
 	default void buildDragRenderLayers(final DraggedSelection selection) {
-		getCanvas().currentDragOffset = new Point2D.Double();
+		this.getCanvas().currentDragOffset = new Point2D.Double();
 	}
 
 	default DraggedSelection createDraggedSelection(
@@ -49,15 +49,15 @@ interface DragSelectionController extends DiagramCanvasExt {
 		final List<DraggedLayout> layouts = new ArrayList<>();
 		final Set<String> seen = new HashSet<>();
 
-		if (getCanvas().selectedElements.isEmpty() || !getCanvas().isElementSelected(hitSelection)) {
-			getCanvas().addDraggedLayout(layouts, seen, hitSelection, hitLayout);
+		if (this.getCanvas().selectedElements.isEmpty() || !this.getCanvas().isElementSelected(hitSelection)) {
+			this.getCanvas().addDraggedLayout(layouts, seen, hitSelection, hitLayout);
 		} else {
-			for (final SelectedElement element : getCanvas().selectedElements) {
-				getCanvas().addDraggedLayout(layouts, seen, element, null);
+			for (final SelectedElement element : this.getCanvas().selectedElements) {
+				this.getCanvas().addDraggedLayout(layouts, seen, element, null);
 			}
 
 			if (layouts.isEmpty()) {
-				getCanvas().addDraggedLayout(layouts, seen, hitSelection, hitLayout);
+				this.getCanvas().addDraggedLayout(layouts, seen, hitSelection, hitLayout);
 			}
 		}
 
@@ -67,12 +67,12 @@ interface DragSelectionController extends DiagramCanvasExt {
 				hitLayout.getPosition().getX(),
 				hitLayout.getPosition().getY());
 
-		getCanvas().buildDragRenderLayers(selection);
+		this.getCanvas().buildDragRenderLayers(selection);
 		return selection;
 	}
 
 	default boolean isDragRenderingActive() {
-		return getCanvas().draggedSelection != null;
+		return this.getCanvas().draggedSelection != null;
 	}
 
 	default NodeLayout resolveNodeLayoutForSelection(final SelectedElement element, final NodeLayout fallbackLayout) {
@@ -81,8 +81,8 @@ interface DragSelectionController extends DiagramCanvasExt {
 		}
 
 		return (switch (element.type()) {
-		case CLASS, FIELD -> getCanvas().findNodeLayout(LayoutObjectType.CLASS, element.classId());
-		case COMMENT -> getCanvas().findNodeLayout(LayoutObjectType.COMMENT, element.commentId());
+		case CLASS, FIELD -> this.getCanvas().findNodeLayout(LayoutObjectType.CLASS, element.classId());
+		case COMMENT -> this.getCanvas().findNodeLayout(LayoutObjectType.COMMENT, element.commentId());
 		default -> Optional.<NodeLayout>empty();
 		}).orElse(fallbackLayout);
 	}

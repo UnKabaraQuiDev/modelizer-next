@@ -70,7 +70,7 @@ public class App {
 	}
 
 	public static void init() throws JsonProcessingException {
-		final String fileContent = PCUtils.readPackagedStringFile("/app.json");
+		final String fileContent = PCUtils.readPackagedStringFile(App.class, "/app.json");
 		App.JSON = MNMain.OBJECT_MAPPER.readTree(fileContent);
 
 		App.NAME = App.JSON.path("name").asText();

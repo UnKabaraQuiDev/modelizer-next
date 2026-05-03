@@ -52,6 +52,22 @@ public class MNMain {
 		new ModelizerAppEntryPoint().start(args);
 	}
 
+	public static void restartSameCommand() throws Exception {
+		final ProcessHandle.Info info = ProcessHandle.current().info();
+
+		final String command = info.command().orElseThrow(() -> new IllegalStateException("Could not read current Java command"));
+
+		final String[] arguments = info.arguments().orElseThrow(() -> new IllegalStateException("Could not read current Java arguments"));
+
+		final List<String> restartCommand = new ArrayList<>();
+		restartCommand.add(command);
+		restartCommand.addAll(Arrays.asList(arguments));
+
+		new ProcessBuilder(restartCommand).directory(new File(System.getProperty("user.dir"))).inheritIO().start();
+
+		System.exit(0);
+	}
+
 	private static ObjectMapper createMapper() {
 		final ObjectMapper mapper = new ObjectMapper(JsonFactory.builder()
 				.configure(StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION, true)
@@ -69,22 +85,6 @@ public class MNMain {
 		mapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
 
 		return mapper;
-	}
-
-	public static void restartSameCommand() throws Exception {
-		final ProcessHandle.Info info = ProcessHandle.current().info();
-
-		final String command = info.command().orElseThrow(() -> new IllegalStateException("Could not read current Java command"));
-
-		final String[] arguments = info.arguments().orElseThrow(() -> new IllegalStateException("Could not read current Java arguments"));
-
-		final List<String> restartCommand = new ArrayList<>();
-		restartCommand.add(command);
-		restartCommand.addAll(Arrays.asList(arguments));
-
-		new ProcessBuilder(restartCommand).directory(new File(System.getProperty("user.dir"))).inheritIO().start();
-
-		System.exit(0);
 	}
 
 }

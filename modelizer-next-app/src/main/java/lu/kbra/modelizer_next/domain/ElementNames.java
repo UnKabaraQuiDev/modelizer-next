@@ -24,6 +24,10 @@ public class ElementNames {
 		this.technicalName = technicalName;
 	}
 
+	public String get(final PanelType panelType) {
+		return panelType.isTechnical() && this.hasTechnicalName() ? this.getTechnicalName() : this.getConceptualName();
+	}
+
 	public String getConceptualName() {
 		return this.conceptualName;
 	}
@@ -34,6 +38,14 @@ public class ElementNames {
 
 	public boolean hasTechnicalName() {
 		return this.technicalName != null && !this.technicalName.isBlank();
+	}
+
+	public void set(final PanelType panelType, final String name) {
+		if (panelType.isTechnical() && this.hasTechnicalName()) {
+			this.setTechnicalName(name);
+		} else {
+			this.setConceptualName(name);
+		}
 	}
 
 	public void setConceptualName(final String name) {
@@ -48,22 +60,10 @@ public class ElementNames {
 		this.technicalName = technicalName;
 	}
 
-	public void set(final PanelType panelType, final String name) {
-		if (panelType.isTechnical() && this.hasTechnicalName()) {
-			this.setTechnicalName(name);
-		} else {
-			this.setConceptualName(name);
-		}
-	}
-
-	public String get(final PanelType panelType) {
-		return panelType.isTechnical() && this.hasTechnicalName() ? this.getTechnicalName() : this.getConceptualName();
-	}
-
 	@Override
 	public String toString() {
-		return "ElementNames@" + System.identityHashCode(this) + " [name=" + this.conceptualName + ", technicalName=" + this.technicalName
-				+ "]";
+		return "ElementNames@" + System.identityHashCode(this) + " [conceptualName=" + this.conceptualName + ", technicalName="
+				+ this.technicalName + "]";
 	}
 
 }

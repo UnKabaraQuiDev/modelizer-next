@@ -21,6 +21,14 @@ import lu.kbra.modelizer_next.App;
 
 public class InfoTab extends JPanel {
 
+	private interface PackageValueReader {
+
+		String read(Package appPackage);
+	}
+
+	private record LicenseItem(String name, String license, String description) {
+	}
+
 	private static final long serialVersionUID = 4519272106455377834L;
 
 	private static final List<LicenseItem> LICENSES = List.of(
@@ -41,30 +49,13 @@ public class InfoTab extends JPanel {
 		this.add(this.createInfoPage(), BorderLayout.CENTER);
 	}
 
-	private JScrollPane createInfoPage() {
-		final JPanel content = HelpUi.createPageContent();
+	private String appJsonText(final String key) {
+		final JsonNode json = App.JSON;
+		if (json == null) {
+			return "";
+		}
 
-		content.add(HelpUi.createHeading("Additional Information"));
-		content.add(Box.createVerticalStrut(18));
-		content.add(this.createAboutCard());
-		content.add(Box.createVerticalStrut(18));
-		content.add(this.createBuildCard());
-		content.add(Box.createVerticalStrut(18));
-		content.add(this.createBootstrapBuildCard());
-		content.add(Box.createVerticalStrut(18));
-		content.add(this.createLinksCard());
-		content.add(Box.createVerticalStrut(18));
-		content.add(this.createLicensesCard());
-
-		return HelpUi.createScrollPane(content);
-	}
-
-	private JPanel createLinksButtonPanel() {
-		final JPanel buttons = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
-		buttons.setOpaque(false);
-		buttons.setAlignmentX(Component.LEFT_ALIGNMENT);
-		buttons.setMaximumSize(HelpUi.FULL_WIDTH_MAXIMUM_SIZE);
-		return buttons;
+		return json.path(key).asText("");
 	}
 
 	private JComponent createAboutCard() {
@@ -79,21 +70,6 @@ public class InfoTab extends JPanel {
 //		body.add(HelpUi.infoRow("App", HelpUi.fallback(App.NAME, "Modelizer Next")));
 //		body.add(HelpUi.infoRow("Description", HelpUi.fallback(App.DESCRIPTION, "No description embedded in this build.")));
 //		body.add(HelpUi.infoRow("Distributor", HelpUi.fallback(App.DISTRIBUTOR, "Not embedded in this build.")));
-
-		card.add(body, BorderLayout.CENTER);
-		return card;
-	}
-
-	private JComponent createBuildCard() {
-		final HelpUi.CardPanel card = this.createCard();
-
-		card.add(HelpUi.cardTitle("Build information"), BorderLayout.NORTH);
-
-		final JPanel body = this.createVerticalBody();
-		body.add(HelpUi.infoRow("Version", HelpUi.fallback(App.VERSION, "Not embedded")));
-		body.add(HelpUi.infoRow("Revision", HelpUi.fallback(this.appJsonText("revision"), "Not embedded")));
-		body.add(HelpUi.infoRow("Portable", Boolean.toString(App.PORTABLE)));
-		body.add(HelpUi.infoRow("Distributor", HelpUi.fallback(App.DISTRIBUTOR, "Not embedded in this build.")));
 
 		card.add(body, BorderLayout.CENTER);
 		return card;
@@ -119,6 +95,107 @@ public class InfoTab extends JPanel {
 		return card;
 	}
 
+	private JComponent createBuildCard() {
+		final HelpUi.CardPanel card = this.createCard();
+
+		card.add(HelpUi.cardTitle("Build information"), BorderLayout.NORTH);
+
+		final JPanel body = this.createVerticalBody();
+		body.add(HelpUi.infoRow("Version", HelpUi.fallback(App.VERSION, "Not embedded")));
+		body.add(HelpUi.infoRow("Revision", HelpUi.fallback(this.appJsonText("revision"), "Not embedded")));
+		body.add(HelpUi.infoRow("Portable", Boolean.toString(App.PORTABLE)));
+		body.add(HelpUi.infoRow("Distributor", HelpUi.fallback(App.DISTRIBUTOR, "Not embedded in this build.")));
+
+		card.add(body, BorderLayout.CENTER);
+		return card;
+	}
+
+	private HelpUi.CardPanel createCard() {
+		final HelpUi.CardPanel card = new HelpUi.CardPanel(new BorderLayout(0, 14));
+		card.setAlignmentX(Component.LEFT_ALIGNMENT);
+		card.setMaximumSize(HelpUi.FULL_WIDTH_MAXIMUM_SIZE);
+		card.setBorder(HelpUi.CARD_BORDER);
+		return card;
+	}
+
+	private JScrollPane createInfoPage() {
+		final JPanel content = HelpUi.createPageContent();
+
+		content.add(HelpUi.createHeading("Additional Information"));
+		content.add(Box.createVerticalStrut(18));
+		content.add(this.createAboutCard());
+		content.add(Box.createVerticalStrut(18));
+		content.add(this.createBuildCard());
+		content.add(Box.createVerticalStrut(18));
+		content.add(this.createBootstrapBuildCard());
+		content.add(Box.createVerticalStrut(18));
+		content.add(this.createLinksCard());
+		content.add(Box.createVerticalStrut(18));
+		content.add(this.createLicensesCard());
+
+		return HelpUi.createScrollPane(content);
+	}
+
+	private JComponent createLicenseRow(final LicenseItem item) {
+		final JPanel row = new JPanel();
+		row.setOpaque(false);
+		row.setLayout(new BoxLayout(row, BoxLayout.Y_AXIS));
+		row.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+		final JLabel title = HelpUi.groupTitle(item.name() + " — " + item.license());
+		title.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+		final javax.swing.JTextArea description = HelpUi.paragraph(item.description());
+		description.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+		row.add(title);
+		row.add(Box.createVerticalStrut(3));
+		row.add(description);
+
+		return row;
+	}
+
+	private JComponent createLicensesCard() {
+		final HelpUi.CardPanel card = this.createCard();
+
+		card.add(HelpUi.cardTitle("Licenses"), BorderLayout.NORTH);
+
+		final JPanel body = this.createVerticalBody();
+//		body.add(HelpUi.paragraph("This list covers the app and the main runtime dependencies used by this build."));
+		body.add(Box.createVerticalStrut(12));
+
+		final JPanel list = new JPanel(new GridBagLayout());
+		list.setOpaque(false);
+		list.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+		for (int index = 0; index < InfoTab.LICENSES.size(); index++) {
+			final LicenseItem item = InfoTab.LICENSES.get(index);
+			final JComponent row = this.createLicenseRow(item);
+
+			final GridBagConstraints constraints = new GridBagConstraints();
+			constraints.gridx = 0;
+			constraints.gridy = index;
+			constraints.weightx = 1.0;
+			constraints.fill = GridBagConstraints.HORIZONTAL;
+			constraints.anchor = GridBagConstraints.NORTHWEST;
+			constraints.insets = new Insets(0, 0, index == InfoTab.LICENSES.size() - 1 ? 0 : 10, 0);
+			list.add(row, constraints);
+		}
+
+		body.add(list);
+
+		card.add(body, BorderLayout.CENTER);
+		return card;
+	}
+
+	private JPanel createLinksButtonPanel() {
+		final JPanel buttons = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
+		buttons.setOpaque(false);
+		buttons.setAlignmentX(Component.LEFT_ALIGNMENT);
+		buttons.setMaximumSize(HelpUi.FULL_WIDTH_MAXIMUM_SIZE);
+		return buttons;
+	}
+
 	private JComponent createLinksCard() {
 		final HelpUi.CardPanel card = this.createCard();
 
@@ -141,66 +218,6 @@ public class InfoTab extends JPanel {
 		return card;
 	}
 
-	private JComponent createLicensesCard() {
-		final HelpUi.CardPanel card = this.createCard();
-
-		card.add(HelpUi.cardTitle("Licenses"), BorderLayout.NORTH);
-
-		final JPanel body = this.createVerticalBody();
-//		body.add(HelpUi.paragraph("This list covers the app and the main runtime dependencies used by this build."));
-		body.add(Box.createVerticalStrut(12));
-
-		final JPanel list = new JPanel(new GridBagLayout());
-		list.setOpaque(false);
-		list.setAlignmentX(Component.LEFT_ALIGNMENT);
-
-		for (int index = 0; index < LICENSES.size(); index++) {
-			final LicenseItem item = LICENSES.get(index);
-			final JComponent row = this.createLicenseRow(item);
-
-			final GridBagConstraints constraints = new GridBagConstraints();
-			constraints.gridx = 0;
-			constraints.gridy = index;
-			constraints.weightx = 1.0;
-			constraints.fill = GridBagConstraints.HORIZONTAL;
-			constraints.anchor = GridBagConstraints.NORTHWEST;
-			constraints.insets = new Insets(0, 0, index == LICENSES.size() - 1 ? 0 : 10, 0);
-			list.add(row, constraints);
-		}
-
-		body.add(list);
-
-		card.add(body, BorderLayout.CENTER);
-		return card;
-	}
-
-	private JComponent createLicenseRow(final LicenseItem item) {
-		final JPanel row = new JPanel();
-		row.setOpaque(false);
-		row.setLayout(new BoxLayout(row, BoxLayout.Y_AXIS));
-		row.setAlignmentX(Component.LEFT_ALIGNMENT);
-
-		final JLabel title = HelpUi.groupTitle(item.name() + " — " + item.license());
-		title.setAlignmentX(Component.LEFT_ALIGNMENT);
-
-		final javax.swing.JTextArea description = HelpUi.paragraph(item.description());
-		description.setAlignmentX(Component.LEFT_ALIGNMENT);
-
-		row.add(title);
-		row.add(Box.createVerticalStrut(3));
-		row.add(description);
-
-		return row;
-	}
-
-	private HelpUi.CardPanel createCard() {
-		final HelpUi.CardPanel card = new HelpUi.CardPanel(new BorderLayout(0, 14));
-		card.setAlignmentX(Component.LEFT_ALIGNMENT);
-		card.setMaximumSize(HelpUi.FULL_WIDTH_MAXIMUM_SIZE);
-		card.setBorder(HelpUi.CARD_BORDER);
-		return card;
-	}
-
 	private JPanel createVerticalBody() {
 		final JPanel body = new JPanel();
 		body.setOpaque(false);
@@ -208,15 +225,6 @@ public class InfoTab extends JPanel {
 		body.setAlignmentX(Component.LEFT_ALIGNMENT);
 		body.setMaximumSize(HelpUi.FULL_WIDTH_MAXIMUM_SIZE);
 		return body;
-	}
-
-	private String appJsonText(final String key) {
-		final JsonNode json = App.JSON;
-		if (json == null) {
-			return "";
-		}
-
-		return json.path(key).asText("");
 	}
 
 	private String packageText(final PackageValueReader reader) {
@@ -231,14 +239,6 @@ public class InfoTab extends JPanel {
 
 	private String systemProperty(final String key) {
 		return System.getProperty(key, "Unknown");
-	}
-
-	private interface PackageValueReader {
-
-		String read(Package appPackage);
-	}
-
-	private record LicenseItem(String name, String license, String description) {
 	}
 
 }

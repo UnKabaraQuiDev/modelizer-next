@@ -66,7 +66,7 @@ public interface ElementRenderer extends DiagramCanvasExt {
 		}
 
 		final ClassModel associationClass = this.getCanvas().findClassById(linkModel.getAssociationClassId());
-		if (associationClass == null || !this.getCanvas().isVisible(associationClass) || geometry.middlePoint() == null) {
+		if (associationClass == null || !associationClass.isVisible(this.getPanelType()) || geometry.middlePoint() == null) {
 			return;
 		}
 
@@ -116,7 +116,7 @@ public interface ElementRenderer extends DiagramCanvasExt {
 
 	default void drawClasses(final Graphics2D g2) {
 		for (final ClassModel classModel : this.getCanvas().document.getModel().getClasses()) {
-			if (!this.getCanvas().isVisible(classModel) || !this.getCanvas().shouldExportClass(classModel)) {
+			if (!classModel.isVisible(this.getPanelType()) || !this.getCanvas().shouldExportClass(classModel)) {
 				continue;
 			}
 
@@ -126,11 +126,11 @@ public interface ElementRenderer extends DiagramCanvasExt {
 			this.getCanvas().findOrCreateNodeLayout(LayoutObjectType.CLASS, classModel.getId()).getSize().setWidth(bounds.getWidth());
 			this.getCanvas().findOrCreateNodeLayout(LayoutObjectType.CLASS, classModel.getId()).getSize().setHeight(bounds.getHeight());
 
-			g2.setColor(classModel.getStyle().getBackgroundColor());
+			g2.setColor(classModel.getBackgroundColor());
 			g2.fill(bounds);
 
 			g2.setFont(DiagramCanvas.TITLE_FONT);
-			g2.setColor(classModel.getStyle().getTextColor());
+			g2.setColor(classModel.getTextColor());
 			g2.drawString(this.getCanvas().resolveClassTitle(classModel),
 					(float) bounds.getX() + DiagramCanvas.PADDING,
 					(float) bounds.getY() + DiagramCanvas.CLASS_HEADER_HEIGHT - 9);
@@ -145,7 +145,7 @@ public interface ElementRenderer extends DiagramCanvasExt {
 						bounds.getWidth(),
 						DiagramCanvas.CLASS_ROW_HEIGHT);
 
-				g2.setColor(fieldModel.getStyle().getBackgroundColor());
+				g2.setColor(fieldModel.getBackgroundColor());
 				g2.fill(fieldBounds);
 
 				if (this.getCanvas().isFieldSelected(classModel.getId(), fieldModel.getId())) {
@@ -153,10 +153,10 @@ public interface ElementRenderer extends DiagramCanvasExt {
 					g2.fill(fieldBounds);
 				}
 
-				g2.setColor(classModel.getStyle().getBorderColor());
+				g2.setColor(classModel.getBorderColor());
 				g2.draw(new Line2D.Double(bounds.getX(), rowY, bounds.getMaxX(), rowY));
 
-				g2.setColor(fieldModel.getStyle().getTextColor());
+				g2.setColor(fieldModel.getTextColor());
 				g2.drawString(this.getCanvas().resolveFieldName(fieldModel),
 						(float) bounds.getX() + DiagramCanvas.PADDING,
 						(float) rowY + 15);
@@ -177,7 +177,7 @@ public interface ElementRenderer extends DiagramCanvasExt {
 				g2.draw(bounds);
 				g2.setStroke(DiagramCanvas.DEFAULT_STROKE);
 			} else {
-				g2.setColor(classModel.getStyle().getBorderColor());
+				g2.setColor(classModel.getBorderColor());
 				g2.setStroke(DiagramCanvas.DEFAULT_STROKE);
 				g2.draw(bounds);
 				g2.draw(new Line2D.Double(bounds.getX(),

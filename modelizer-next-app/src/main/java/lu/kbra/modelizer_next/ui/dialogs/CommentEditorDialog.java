@@ -32,12 +32,12 @@ import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 
 import lu.kbra.modelizer_next.document.ModelDocument;
-import lu.kbra.modelizer_next.domain.BoundTargetType;
 import lu.kbra.modelizer_next.domain.ClassModel;
 import lu.kbra.modelizer_next.domain.CommentBinding;
 import lu.kbra.modelizer_next.domain.CommentKind;
 import lu.kbra.modelizer_next.domain.CommentModel;
 import lu.kbra.modelizer_next.domain.LinkModel;
+import lu.kbra.modelizer_next.domain.data.BoundTargetType;
 import lu.kbra.modelizer_next.layout.PanelType;
 import lu.kbra.modelizer_next.ui.component.ColorButton;
 
@@ -57,9 +57,9 @@ public final class CommentEditorDialog {
 		}
 
 		private static AssociationTarget forClass(final ClassModel classModel) {
-			final String name = classModel.getNames().getConceptualName() != null && !classModel.getNames().getConceptualName().isBlank()
-					? classModel.getNames().getConceptualName()
-					: classModel.getNames().getTechnicalName();
+			final String name = classModel.getConceptualName() != null && !classModel.getConceptualName().isBlank()
+					? classModel.getConceptualName()
+					: classModel.getTechnicalName();
 			return new AssociationTarget("Class: " + name,
 					CommentKind.BOUND,
 					new CommentBinding(BoundTargetType.CLASS, classModel.getId()));
@@ -88,9 +88,6 @@ public final class CommentEditorDialog {
 			return Objects.equals(this.binding, other.binding) && this.kind == other.kind;
 		}
 
-	}
-
-	private CommentEditorDialog() {
 	}
 
 	public static Result showDialog(
@@ -258,6 +255,9 @@ public final class CommentEditorDialog {
 
 	private static String safe(final String value) {
 		return value == null ? "" : value;
+	}
+
+	private CommentEditorDialog() {
 	}
 
 }

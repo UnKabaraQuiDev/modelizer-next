@@ -25,7 +25,7 @@ import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectedElement;
 interface CanvasHitTester extends DiagramCanvasExt {
 
 	default FieldHitResult findFieldHit(final ClassModel classModel, final Rectangle2D classBounds, final Point2D.Double worldPoint) {
-		final List<FieldModel> visibleFields = getCanvas().getVisibleFields(classModel);
+		final List<FieldModel> visibleFields = this.getCanvas().getVisibleFields(classModel);
 
 		for (int i = 0; i < visibleFields.size(); i++) {
 			final Rectangle2D fieldBounds = new Rectangle2D.Double(classBounds.getX(),
@@ -48,48 +48,48 @@ interface CanvasHitTester extends DiagramCanvasExt {
 		g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 
 		try {
-			for (int i = getCanvas().getActiveLinks().size() - 1; i >= 0; i--) {
-				final LinkModel linkModel = getCanvas().getActiveLinks().get(i);
-				final LinkGeometry geometry = getCanvas().resolveLinkGeometry(g2, linkModel);
+			for (int i = this.getCanvas().getActiveLinks().size() - 1; i >= 0; i--) {
+				final LinkModel linkModel = this.getCanvas().getActiveLinks().get(i);
+				final LinkGeometry geometry = this.getCanvas().resolveLinkGeometry(g2, linkModel);
 
-				if (geometry != null && getCanvas().isPointNearGeometry(worldPoint, geometry)) {
+				if (geometry != null && this.getCanvas().isPointNearGeometry(worldPoint, geometry)) {
 					return new HitResult(null,
 							new Rectangle2D.Double(worldPoint.getX(), worldPoint.getY(), 1, 1),
 							SelectedElement.forLink(linkModel.getId()));
 				}
 			}
 
-			for (int i = getCanvas().document.getModel().getComments().size() - 1; i >= 0; i--) {
-				final CommentModel commentModel = getCanvas().document.getModel().getComments().get(i);
-				final String text = getCanvas().resolveCommentText(commentModel);
+			for (int i = this.getCanvas().document.getModel().getComments().size() - 1; i >= 0; i--) {
+				final CommentModel commentModel = this.getCanvas().document.getModel().getComments().get(i);
+				final String text = this.getCanvas().resolveCommentText(commentModel);
 
-				if (text == null || text.isBlank() || !getCanvas().isCommentVisible(commentModel)) {
+				if (text == null || text.isBlank() || !this.getCanvas().isCommentVisible(commentModel)) {
 					continue;
 				}
 
-				final NodeLayout layout = getCanvas().findOrCreateNodeLayout(LayoutObjectType.COMMENT, commentModel.getId());
-				final Rectangle2D bounds = getCanvas().computeCommentBounds(g2, text, layout);
+				final NodeLayout layout = this.getCanvas().findOrCreateNodeLayout(LayoutObjectType.COMMENT, commentModel.getId());
+				final Rectangle2D bounds = this.getCanvas().computeCommentBounds(g2, text, layout);
 
 				if (bounds.contains(worldPoint.getX(), worldPoint.getY())) {
 					return new HitResult(layout, bounds, SelectedElement.forComment(commentModel.getId()));
 				}
 			}
 
-			for (int i = getCanvas().document.getModel().getClasses().size() - 1; i >= 0; i--) {
-				final ClassModel classModel = getCanvas().document.getModel().getClasses().get(i);
-				if (!getCanvas().isVisible(classModel)) {
+			for (int i = this.getCanvas().document.getModel().getClasses().size() - 1; i >= 0; i--) {
+				final ClassModel classModel = this.getCanvas().document.getModel().getClasses().get(i);
+				if (!classModel.isVisible(this.getPanelType())) {
 					continue;
 				}
 
-				final NodeLayout layout = getCanvas()
-						.resolveRenderLayout(getCanvas().findOrCreateNodeLayout(LayoutObjectType.CLASS, classModel.getId()));
-				final Rectangle2D bounds = getCanvas().computeClassBounds(g2, classModel, layout);
+				final NodeLayout layout = this.getCanvas()
+						.resolveRenderLayout(this.getCanvas().findOrCreateNodeLayout(LayoutObjectType.CLASS, classModel.getId()));
+				final Rectangle2D bounds = this.getCanvas().computeClassBounds(g2, classModel, layout);
 
 				if (!bounds.contains(worldPoint.getX(), worldPoint.getY())) {
 					continue;
 				}
 
-				final FieldHitResult fieldHitResult = getCanvas().findFieldHit(classModel, bounds, worldPoint);
+				final FieldHitResult fieldHitResult = this.getCanvas().findFieldHit(classModel, bounds, worldPoint);
 				if (fieldHitResult != null) {
 					return new HitResult(layout,
 							fieldHitResult.bounds(),

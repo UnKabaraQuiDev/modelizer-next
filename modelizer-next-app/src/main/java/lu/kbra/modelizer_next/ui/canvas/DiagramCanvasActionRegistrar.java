@@ -21,7 +21,19 @@ final class DiagramCanvasActionRegistrar {
 			Runnable pasteSelection, Runnable undo, Runnable redo) {
 	}
 
-	private DiagramCanvasActionRegistrar() {
+	private static void bind(
+			final InputMap inputMap,
+			final ActionMap actionMap,
+			final KeyStroke keyStroke,
+			final String actionKey,
+			final Runnable action) {
+		inputMap.put(keyStroke, actionKey);
+		actionMap.put(actionKey, new AbstractAction() {
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				action.run();
+			}
+		});
 	}
 
 	static void installDefault(final JComponent component, final DiagramCanvasActions actions) {
@@ -107,18 +119,6 @@ final class DiagramCanvasActionRegistrar {
 				actions.pasteSelection());
 	}
 
-	private static void bind(
-			final InputMap inputMap,
-			final ActionMap actionMap,
-			final KeyStroke keyStroke,
-			final String actionKey,
-			final Runnable action) {
-		inputMap.put(keyStroke, actionKey);
-		actionMap.put(actionKey, new AbstractAction() {
-			@Override
-			public void actionPerformed(final ActionEvent e) {
-				action.run();
-			}
-		});
+	private DiagramCanvasActionRegistrar() {
 	}
 }

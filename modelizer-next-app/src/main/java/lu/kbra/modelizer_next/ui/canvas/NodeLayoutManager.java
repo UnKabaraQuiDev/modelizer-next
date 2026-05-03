@@ -31,32 +31,11 @@ public interface NodeLayoutManager extends DiagramCanvasExt {
 			final double deltaX,
 			final double deltaY) {
 
-		final NodeLayout layout = getCanvas().findOrCreateNodeLayout(type, objectId);
+		final NodeLayout layout = this.getCanvas().findOrCreateNodeLayout(type, objectId);
 
 		layout.setPosition(new Point2D.Double(copiedLayout.x() + deltaX, copiedLayout.y() + deltaY));
 
 		layout.setSize(new Size2D(copiedLayout.width(), copiedLayout.height()));
-	}
-
-	default Rectangle2D computeCommentBounds(final Graphics2D g2, final String text, final NodeLayout layout) {
-		g2.setFont(DiagramCanvas.BODY_FONT);
-		final FontMetrics metrics = g2.getFontMetrics();
-
-		final double width = layout.getSize().getWidth() > 0.0 ? layout.getSize().getWidth() : DiagramCanvas.COMMENT_MIN_WIDTH;
-		final List<String> wrappedLines = getCanvas().wrapText(text, metrics, (int) Math.max(40, width - DiagramCanvas.PADDING * 2));
-		final int contentHeight = wrappedLines.size() * (metrics.getHeight() + 2) + DiagramCanvas.PADDING * 2;
-
-		if (layout.getSize().getWidth() <= 0.0) {
-			layout.getSize().setWidth(Math.max(DiagramCanvas.COMMENT_MIN_WIDTH, width));
-		}
-		if (layout.getSize().getHeight() <= 0.0) {
-			layout.getSize().setHeight(Math.max(DiagramCanvas.COMMENT_MIN_HEIGHT, contentHeight));
-		}
-
-		return new Rectangle2D.Double(layout.getPosition().getX(),
-				layout.getPosition().getY(),
-				Math.max(DiagramCanvas.COMMENT_MIN_WIDTH_VALUE, layout.getSize().getWidth()),
-				Math.max(DiagramCanvas.COMMENT_MIN_HEIGHT, layout.getSize().getHeight()));
 	}
 
 	default Rectangle2D computeClassBounds(final Graphics2D g2, final ClassModel classModel, final NodeLayout layout) {
@@ -67,12 +46,12 @@ public interface NodeLayoutManager extends DiagramCanvasExt {
 		final FontMetrics bodyMetrics = g2.getFontMetrics();
 
 		int width = Math.max(DiagramCanvas.CLASS_MIN_WIDTH,
-				titleMetrics.stringWidth(getCanvas().resolveClassTitle(classModel)) + DiagramCanvas.PADDING * 2);
-		for (final FieldModel fieldModel : getCanvas().getVisibleFields(classModel)) {
-			width = Math.max(width, bodyMetrics.stringWidth(getCanvas().resolveFieldName(fieldModel)) + DiagramCanvas.PADDING * 2);
+				titleMetrics.stringWidth(this.getCanvas().resolveClassTitle(classModel)) + DiagramCanvas.PADDING * 2);
+		for (final FieldModel fieldModel : this.getCanvas().getVisibleFields(classModel)) {
+			width = Math.max(width, bodyMetrics.stringWidth(this.getCanvas().resolveFieldName(fieldModel)) + DiagramCanvas.PADDING * 2);
 		}
 
-		final int visibleFieldCount = getCanvas().getVisibleFields(classModel).size();
+		final int visibleFieldCount = this.getCanvas().getVisibleFields(classModel).size();
 		final int height = DiagramCanvas.CLASS_HEADER_HEIGHT + visibleFieldCount * DiagramCanvas.CLASS_ROW_HEIGHT;
 
 		if (layout.getSize().getX() <= 0.0) {
@@ -91,12 +70,12 @@ public interface NodeLayoutManager extends DiagramCanvasExt {
 
 		for (final CopiedClass copiedClass : clipboard.classes()) {
 			final CopiedNodeLayout layout = copiedClass.layout();
-			bounds = getCanvas().expandBounds(bounds, layout.x(), layout.y(), layout.width(), layout.height());
+			bounds = this.getCanvas().expandBounds(bounds, layout.x(), layout.y(), layout.width(), layout.height());
 		}
 
 		for (final CopiedComment copiedComment : clipboard.comments()) {
 			final CopiedNodeLayout layout = copiedComment.layout();
-			bounds = getCanvas().expandBounds(bounds, layout.x(), layout.y(), layout.width(), layout.height());
+			bounds = this.getCanvas().expandBounds(bounds, layout.x(), layout.y(), layout.width(), layout.height());
 		}
 
 		if (bounds != null) {
@@ -107,15 +86,37 @@ public interface NodeLayoutManager extends DiagramCanvasExt {
 			final CopiedLinkLayout layout = copiedLink.layout();
 
 			for (final Point2D.Double bendPoint : layout.bendPoints()) {
-				bounds = getCanvas().expandBounds(bounds, bendPoint.getX(), bendPoint.getY(), 1.0, 1.0);
+				bounds = this.getCanvas().expandBounds(bounds, bendPoint.getX(), bendPoint.getY(), 1.0, 1.0);
 			}
 
 			if (layout.nameLabelPosition() != null) {
-				bounds = getCanvas().expandBounds(bounds, layout.nameLabelPosition().getX(), layout.nameLabelPosition().getY(), 1.0, 1.0);
+				bounds = this.getCanvas()
+						.expandBounds(bounds, layout.nameLabelPosition().getX(), layout.nameLabelPosition().getY(), 1.0, 1.0);
 			}
 		}
 
 		return bounds;
+	}
+
+	default Rectangle2D computeCommentBounds(final Graphics2D g2, final String text, final NodeLayout layout) {
+		g2.setFont(DiagramCanvas.BODY_FONT);
+		final FontMetrics metrics = g2.getFontMetrics();
+
+		final double width = layout.getSize().getWidth() > 0.0 ? layout.getSize().getWidth() : DiagramCanvas.COMMENT_MIN_WIDTH;
+		final List<String> wrappedLines = this.getCanvas().wrapText(text, metrics, (int) Math.max(40, width - DiagramCanvas.PADDING * 2));
+		final int contentHeight = wrappedLines.size() * (metrics.getHeight() + 2) + DiagramCanvas.PADDING * 2;
+
+		if (layout.getSize().getWidth() <= 0.0) {
+			layout.getSize().setWidth(Math.max(DiagramCanvas.COMMENT_MIN_WIDTH, width));
+		}
+		if (layout.getSize().getHeight() <= 0.0) {
+			layout.getSize().setHeight(Math.max(DiagramCanvas.COMMENT_MIN_HEIGHT, contentHeight));
+		}
+
+		return new Rectangle2D.Double(layout.getPosition().getX(),
+				layout.getPosition().getY(),
+				Math.max(DiagramCanvas.COMMENT_MIN_WIDTH_VALUE, layout.getSize().getWidth()),
+				Math.max(DiagramCanvas.COMMENT_MIN_HEIGHT, layout.getSize().getHeight()));
 	}
 
 	default Rectangle2D.Double expandBounds(
@@ -142,15 +143,15 @@ public interface NodeLayoutManager extends DiagramCanvasExt {
 	}
 
 	default NodeLayout resolveRenderLayout(final NodeLayout layout) {
-		if (layout == null || !getCanvas().isDragRenderingActive()) {
+		if (layout == null || !this.getCanvas().isDragRenderingActive()) {
 			return layout;
 		}
 
-		for (final DraggedLayout dragged : getCanvas().draggedSelection.layouts()) {
+		for (final DraggedLayout dragged : this.getCanvas().draggedSelection.layouts()) {
 			if (dragged.layout() == layout) {
-				final double zoom = getCanvas().getPanelState().getZoom();
-				final double dx = getCanvas().currentDragOffset.getX() / zoom;
-				final double dy = getCanvas().currentDragOffset.getY() / zoom;
+				final double zoom = this.getCanvas().getPanelState().getZoom();
+				final double dx = this.getCanvas().currentDragOffset.getX() / zoom;
+				final double dy = this.getCanvas().currentDragOffset.getY() / zoom;
 
 				final NodeLayout copy = new NodeLayout();
 				copy.setObjectType(layout.getObjectType());

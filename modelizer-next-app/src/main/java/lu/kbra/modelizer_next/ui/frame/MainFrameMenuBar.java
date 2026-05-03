@@ -14,6 +14,14 @@ final class MainFrameMenuBar extends JMenuBar {
 
 	private static final long serialVersionUID = 1L;
 
+	static KeyStroke ctrl(final int keyCode) {
+		return KeyStroke.getKeyStroke(keyCode, MainFrame.CTRL_MODIFIER);
+	}
+
+	static KeyStroke ctrlShift(final int keyCode) {
+		return KeyStroke.getKeyStroke(keyCode, MainFrame.CTRL_MODIFIER | InputEvent.SHIFT_DOWN_MASK);
+	}
+
 	MainFrameMenuBar(final MainFrame frame) {
 		this.add(new FileMenu(frame));
 		this.add(new EditMenu(frame));
@@ -34,26 +42,18 @@ final class MainFrameMenuBar extends JMenuBar {
 		return appearanceMenu;
 	}
 
-	private JRadioButtonMenuItem createThemeItem(final MainFrame frame, final String text, final ThemeMode mode, final ButtonGroup group) {
-		final JRadioButtonMenuItem item = new JRadioButtonMenuItem(text);
-		item.setSelected(frame.appConfig.getThemeMode() == mode);
-		item.addActionListener(event -> frame.applyThemeAndReopen(mode));
-		group.add(item);
-		return item;
-	}
-
 	private JMenu createStylesMenu(final MainFrame frame) {
 		final JMenu stylesMenu = new JMenu("Styles");
 		frame.populateStylesMenu(stylesMenu);
 		return stylesMenu;
 	}
 
-	static KeyStroke ctrl(final int keyCode) {
-		return KeyStroke.getKeyStroke(keyCode, MainFrame.CTRL_MODIFIER);
-	}
-
-	static KeyStroke ctrlShift(final int keyCode) {
-		return KeyStroke.getKeyStroke(keyCode, MainFrame.CTRL_MODIFIER | InputEvent.SHIFT_DOWN_MASK);
+	private JRadioButtonMenuItem createThemeItem(final MainFrame frame, final String text, final ThemeMode mode, final ButtonGroup group) {
+		final JRadioButtonMenuItem item = new JRadioButtonMenuItem(text);
+		item.setSelected(frame.appConfig.getThemeMode() == mode);
+		item.addActionListener(event -> frame.applyThemeAndReopen(mode));
+		group.add(item);
+		return item;
 	}
 
 }

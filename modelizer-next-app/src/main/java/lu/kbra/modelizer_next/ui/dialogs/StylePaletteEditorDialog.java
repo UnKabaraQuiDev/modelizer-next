@@ -53,6 +53,11 @@ public final class StylePaletteEditorDialog {
 			this.setBorder(BorderFactory.createTitledBorder("Preview"));
 		}
 
+		private void setPalette(final StylePalette palette) {
+			this.palette = palette;
+			this.repaint();
+		}
+
 		@Override
 		protected void paintComponent(final Graphics graphics) {
 			super.paintComponent(graphics);
@@ -118,14 +123,6 @@ public final class StylePaletteEditorDialog {
 				g2.dispose();
 			}
 		}
-
-		private void setPalette(final StylePalette palette) {
-			this.palette = palette;
-			this.repaint();
-		}
-	}
-
-	private StylePaletteEditorDialog() {
 	}
 
 	public static StylePalette showDialog(final Component parent) {
@@ -328,6 +325,9 @@ public final class StylePaletteEditorDialog {
 		panel.add(new JLabel(label), BorderLayout.NORTH);
 		panel.add(component, BorderLayout.CENTER);
 		return panel;
+	}
+
+	private StylePaletteEditorDialog() {
 	}
 
 }

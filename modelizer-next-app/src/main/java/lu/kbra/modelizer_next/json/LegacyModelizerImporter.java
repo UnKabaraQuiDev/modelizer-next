@@ -14,12 +14,12 @@ import com.fasterxml.jackson.databind.JsonNode;
 import lu.kbra.modelizer_next.MNMain;
 import lu.kbra.modelizer_next.common.Size2D;
 import lu.kbra.modelizer_next.document.ModelDocument;
-import lu.kbra.modelizer_next.domain.Cardinality;
 import lu.kbra.modelizer_next.domain.ClassModel;
 import lu.kbra.modelizer_next.domain.CommentModel;
 import lu.kbra.modelizer_next.domain.FieldModel;
 import lu.kbra.modelizer_next.domain.LinkEnd;
 import lu.kbra.modelizer_next.domain.LinkModel;
+import lu.kbra.modelizer_next.domain.data.Cardinality;
 import lu.kbra.modelizer_next.layout.LayoutObjectType;
 import lu.kbra.modelizer_next.layout.NodeLayout;
 import lu.kbra.modelizer_next.layout.PanelState;
@@ -28,9 +28,6 @@ import lu.kbra.modelizer_next.layout.PanelType;
 public class LegacyModelizerImporter {
 
 	private record LegacyRef(String tableName, String fieldName) {
-	}
-
-	private LegacyModelizerImporter() {
 	}
 
 	public static ModelDocument importFile(final File file) throws IOException {
@@ -121,10 +118,9 @@ public class LegacyModelizerImporter {
 		commentModel.setTextColor(LegacyModelizerImporter.parseColor(commentNode.get("foreground"), Color.BLACK));
 		commentModel.setBackgroundColor(LegacyModelizerImporter.parseColor(commentNode.get("background"), new Color(0xFFF7CC)));
 		commentModel.setBorderColor(LegacyModelizerImporter.parseColor(commentNode.get("foreground"), Color.BLACK));
-		commentModel.getVisibility()
-				.set(commentNode.path("conceptual").asBoolean(true),
-						commentNode.path("logical").asBoolean(true),
-						commentNode.path("physical").asBoolean(true));
+		commentModel.setVisibility(commentNode.path("conceptual").asBoolean(true),
+				commentNode.path("logical").asBoolean(true),
+				commentNode.path("physical").asBoolean(true));
 		return commentModel;
 	}
 
@@ -171,28 +167,28 @@ public class LegacyModelizerImporter {
 			final String className = LegacyModelizerImporter.readText(tableNode, "name", "Unnamed table");
 			final String technicalName = LegacyModelizerImporter.readText(tableNode, "secName", className);
 
-			classModel.getNames().setConceptualName(className);
-			classModel.getNames().setTechnicalName(technicalName);
-			classModel.getVisibility().setConceptual(tableNode.path("conceptual").asBoolean(true));
-			classModel.getVisibility().setLogical(tableNode.path("logical").asBoolean(true));
-			classModel.getVisibility().setPhysical(tableNode.path("physical").asBoolean(true));
-			classModel.getStyle().setTextColor(LegacyModelizerImporter.parseColor(tableNode.get("foreground"), Color.BLACK));
-			classModel.getStyle().setBackgroundColor(LegacyModelizerImporter.parseColor(tableNode.get("background"), Color.WHITE));
-			classModel.getStyle().setBorderColor(LegacyModelizerImporter.parseColor(tableNode.get("foreground"), Color.BLACK));
+			classModel.setConceptualName(className);
+			classModel.setTechnicalName(technicalName);
+			classModel.setVisibleInConceptual(tableNode.path("conceptual").asBoolean(true));
+			classModel.setVisibleInLogical(tableNode.path("logical").asBoolean(true));
+			classModel.setVisibleInPhysical(tableNode.path("physical").asBoolean(true));
+			classModel.setTextColor(LegacyModelizerImporter.parseColor(tableNode.get("foreground"), Color.BLACK));
+			classModel.setBackgroundColor(LegacyModelizerImporter.parseColor(tableNode.get("background"), Color.WHITE));
+			classModel.setBorderColor(LegacyModelizerImporter.parseColor(tableNode.get("foreground"), Color.BLACK));
 
 			for (final JsonNode fieldNode : tableNode.path("fields")) {
 				final FieldModel fieldModel = new FieldModel();
 				final String fieldName = LegacyModelizerImporter.readText(fieldNode, "name", "field");
 				final String fieldTechnicalName = LegacyModelizerImporter.readText(fieldNode, "secName", fieldName);
 
-				fieldModel.getNames().setConceptualName(fieldName);
-				fieldModel.getNames().setTechnicalName(fieldTechnicalName);
+				fieldModel.setConceptualName(fieldName);
+				fieldModel.setTechnicalName(fieldTechnicalName);
 				fieldModel.setNotConceptual(fieldNode.path("noConceptual").asBoolean(false));
 				fieldModel.setPrimaryKey(fieldNode.path("primary").asBoolean(false));
 				fieldModel.setUnique(fieldNode.path("unique").asBoolean(false));
 				fieldModel.setNotNull(!fieldNode.path("null").asBoolean(true));
-				fieldModel.getStyle().setTextColor(LegacyModelizerImporter.parseColor(fieldNode.get("foreground"), Color.BLACK));
-				fieldModel.getStyle().setBackgroundColor(LegacyModelizerImporter.parseColor(fieldNode.get("background"), Color.WHITE));
+				fieldModel.setTextColor(LegacyModelizerImporter.parseColor(fieldNode.get("foreground"), Color.BLACK));
+				fieldModel.setBackgroundColor(LegacyModelizerImporter.parseColor(fieldNode.get("background"), Color.WHITE));
 
 				classModel.getFields().add(fieldModel);
 				LegacyModelizerImporter.putFieldMapping(fieldIdsByQualifiedName,
@@ -367,6 +363,9 @@ public class LegacyModelizerImporter {
 
 		final String value = valueNode.asText();
 		return value == null || value.isBlank() ? fallback : value;
+	}
+
+	private LegacyModelizerImporter() {
 	}
 
 }

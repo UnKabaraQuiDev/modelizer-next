@@ -17,9 +17,6 @@ import lu.kbra.modelizer_next.ui.impl.DocumentChangeListener;
 
 public final class CommandLineExporter {
 
-	private CommandLineExporter() {
-	}
-
 	public static int run(final String[] args) {
 		System.setProperty("java.awt.headless", "true");
 
@@ -36,7 +33,7 @@ public final class CommandLineExporter {
 
 			final ModelDocument document = session.get().getDocument();
 
-			final Map<PanelType, DiagramCanvas> canvases = createCanvases(document, options.panelTypes());
+			final Map<PanelType, DiagramCanvas> canvases = CommandLineExporter.createCanvases(document, options.panelTypes());
 
 			if (canvases.isEmpty()) {
 				System.err.println("Nothing to export.");
@@ -46,7 +43,8 @@ public final class CommandLineExporter {
 			final ViewExportRequest request = new ViewExportRequest(options
 					.format(), options.scope(), options.panelTypes(), options.outputDirectory(), options.fileNamePattern());
 
-			final List<File> exportedFiles = ViewExporter.exportViews(canvases, request, stripExtension(options.inputFile().getName()));
+			final List<File> exportedFiles = ViewExporter
+					.exportViews(canvases, request, CommandLineExporter.stripExtension(options.inputFile().getName()));
 
 			for (final File exportedFile : exportedFiles) {
 				System.out.println("Exported: " + exportedFile.getAbsolutePath());
@@ -90,6 +88,9 @@ public final class CommandLineExporter {
 		}
 
 		return fileName.substring(0, index);
+	}
+
+	private CommandLineExporter() {
 	}
 
 }

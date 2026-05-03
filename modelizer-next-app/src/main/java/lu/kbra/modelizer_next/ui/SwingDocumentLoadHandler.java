@@ -17,12 +17,10 @@ public final class SwingDocumentLoadHandler implements DocumentLoadHandler {
 
 	@Override
 	public boolean confirmLegacyImport(final File file) {
-		final int choice = JOptionPane.showConfirmDialog(this.parent,
-				"This file comes from an older version of Modelizer.\n" + "There may be errors or unsupported elements during import.\n"
-						+ "Do you want to continue?",
-				"Legacy Modelizer import",
-				JOptionPane.YES_NO_OPTION,
-				JOptionPane.WARNING_MESSAGE);
+		final int choice = JOptionPane.showConfirmDialog(this.parent, """
+				This file comes from an older version of Modelizer.
+				There may be errors or unsupported elements during import.
+				Do you want to continue?""", "Legacy Modelizer import", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
 
 		return choice == JOptionPane.YES_OPTION;
 	}

@@ -20,7 +20,7 @@ public interface LinkLayoutManager extends DiagramCanvasExt {
 
 	default void applyLinkLayout(final String linkId, final CopiedLinkLayout copiedLayout, final double offset) {
 
-		final LinkLayout linkLayout = getCanvas().findOrCreateLinkLayout(linkId);
+		final LinkLayout linkLayout = this.getCanvas().findOrCreateLinkLayout(linkId);
 
 		linkLayout.getBendPoints().clear();
 
@@ -36,7 +36,7 @@ public interface LinkLayoutManager extends DiagramCanvasExt {
 
 	default void applyLinkLayout(final String linkId, final CopiedLinkLayout copiedLayout, final double deltaX, final double deltaY) {
 
-		final LinkLayout linkLayout = getCanvas().findOrCreateLinkLayout(linkId);
+		final LinkLayout linkLayout = this.getCanvas().findOrCreateLinkLayout(linkId);
 
 		linkLayout.getBendPoints().clear();
 
@@ -65,12 +65,12 @@ public interface LinkLayoutManager extends DiagramCanvasExt {
 				new AnchorSidePair(AnchorSide.BOTTOM, AnchorSide.TOP));
 
 		for (final AnchorSidePair pair : allowedPairs) {
-			final Point2D fromCenter = getCanvas().computeConceptualSideCenter(fromBounds, pair.fromSide());
-			final Point2D toCenter = getCanvas().computeConceptualSideCenter(toBounds, pair.toSide());
+			final Point2D fromCenter = this.getCanvas().computeConceptualSideCenter(fromBounds, pair.fromSide());
+			final Point2D toCenter = this.getCanvas().computeConceptualSideCenter(toBounds, pair.toSide());
 
 			final double distance = fromCenter.distance(toCenter);
-			final double loadPenalty = (getCanvas().getConceptualSideLinkCount(fromClassId, pair.fromSide())
-					+ getCanvas().getConceptualSideLinkCount(toClassId, pair.toSide())) * 12.0;
+			final double loadPenalty = (this.getCanvas().getConceptualSideLinkCount(fromClassId, pair.fromSide())
+					+ this.getCanvas().getConceptualSideLinkCount(toClassId, pair.toSide())) * 12.0;
 
 			final double score = distance + loadPenalty;
 
@@ -88,7 +88,7 @@ public interface LinkLayoutManager extends DiagramCanvasExt {
 		int bestCount = Integer.MAX_VALUE;
 
 		for (final AnchorSide side : AnchorSide.values()) {
-			final int sideCount = getCanvas().getConceptualSideLinkCount(classId, side);
+			final int sideCount = this.getCanvas().getConceptualSideLinkCount(classId, side);
 			if (sideCount < bestCount) {
 				bestCount = sideCount;
 				bestSide = side;
@@ -100,8 +100,8 @@ public interface LinkLayoutManager extends DiagramCanvasExt {
 
 	default AnchorSide chooseTechnicalSelfLinkSide(final Graphics2D g2, final LinkModel linkModel) {
 		final String classId = linkModel.getFrom().getClassId();
-		final int leftCount = getCanvas().getTechnicalSideLinkCount(g2, classId, AnchorSide.LEFT, linkModel.getId());
-		final int rightCount = getCanvas().getTechnicalSideLinkCount(g2, classId, AnchorSide.RIGHT, linkModel.getId());
+		final int leftCount = this.getCanvas().getTechnicalSideLinkCount(g2, classId, AnchorSide.LEFT, linkModel.getId());
+		final int rightCount = this.getCanvas().getTechnicalSideLinkCount(g2, classId, AnchorSide.RIGHT, linkModel.getId());
 		return leftCount <= rightCount ? AnchorSide.LEFT : AnchorSide.RIGHT;
 	}
 
@@ -111,7 +111,7 @@ public interface LinkLayoutManager extends DiagramCanvasExt {
 			final AnchorSide side,
 			final Map<String, Rectangle2D> boundsByClassId,
 			final Map<String, AnchorSidePair> sidePairs) {
-		final LinkModel linkModel = getCanvas().findLinkById(linkId);
+		final LinkModel linkModel = this.getCanvas().findLinkById(linkId);
 		if (linkModel == null) {
 			return 0.0;
 		}
@@ -134,7 +134,7 @@ public interface LinkLayoutManager extends DiagramCanvasExt {
 			}
 
 			final AnchorSide oppositeSide = fromEndpoint ? sidePair.toSide() : sidePair.fromSide();
-			final Point2D oppositePoint = getCanvas().computeConceptualSideCenter(bounds, oppositeSide);
+			final Point2D oppositePoint = this.getCanvas().computeConceptualSideCenter(bounds, oppositeSide);
 			return switch (side) {
 			case TOP, BOTTOM -> oppositePoint.getX();
 			case LEFT, RIGHT -> oppositePoint.getY();
@@ -154,8 +154,8 @@ public interface LinkLayoutManager extends DiagramCanvasExt {
 	}
 
 	default AnchorPair resolveConceptualAnchorPair(final Graphics2D g2, final LinkModel targetLink) {
-		getCanvas().ensureConceptualAnchorCache(g2);
-		return getCanvas().conceptualAnchorCache.get(targetLink.getId());
+		this.getCanvas().ensureConceptualAnchorCache(g2);
+		return this.getCanvas().conceptualAnchorCache.get(targetLink.getId());
 	}
 
 }

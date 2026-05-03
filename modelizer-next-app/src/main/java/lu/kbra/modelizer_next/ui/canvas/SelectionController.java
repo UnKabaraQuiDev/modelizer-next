@@ -20,30 +20,30 @@ interface SelectionController extends DiagramCanvasExt {
 			return;
 		}
 
-		getDocument().getModel().getClasses().sort(getCanvas().comparator);
-		getCanvas().selectedElements.add(element);
-		getCanvas().selectedElement = element;
-		getCanvas().notifySelectionChanged();
-		getCanvas().repaint();
+		this.getDocument().getModel().getClasses().sort(this.getCanvas().comparator);
+		this.getCanvas().selectedElements.add(element);
+		this.getCanvas().selectedElement = element;
+		this.getCanvas().notifySelectionChanged();
+		this.getCanvas().repaint();
 	}
 
 	default void clearSelection() {
-		getCanvas().selectedElements.clear();
-		getCanvas().selectedElement = null;
-		getCanvas().notifySelectionChanged();
-		getCanvas().repaint();
+		this.getCanvas().selectedElements.clear();
+		this.getCanvas().selectedElement = null;
+		this.getCanvas().notifySelectionChanged();
+		this.getCanvas().repaint();
 	}
 
 	default SelectionInfo getSelectionInfo() {
-		return new SelectionInfo(getPanelType(), getCanvas().buildSelectionPath());
+		return new SelectionInfo(this.getPanelType(), this.getCanvas().buildSelectionPath());
 	}
 
 	default StylePreviewType getStylePreviewType() {
-		if (getCanvas().selectedElement == null) {
+		if (this.getCanvas().selectedElement == null) {
 			return StylePreviewType.NONE;
 		}
 
-		return switch (getCanvas().selectedElement.type()) {
+		return switch (this.getCanvas().selectedElement.type()) {
 		case CLASS -> StylePreviewType.CLASS;
 		case FIELD -> StylePreviewType.FIELD;
 		case COMMENT -> StylePreviewType.COMMENT;
@@ -53,28 +53,31 @@ interface SelectionController extends DiagramCanvasExt {
 	}
 
 	default boolean hasSelection() {
-		return !getCanvas().selectedElements.isEmpty();
+		return !this.getCanvas().selectedElements.isEmpty();
 	}
 
 	default boolean isClassSelected(final String classId) {
-		return !getCanvas().suppressSelectionDecorations && getCanvas().selectedElements.contains(SelectedElement.forClass(classId));
+		return !this.getCanvas().suppressSelectionDecorations
+				&& this.getCanvas().selectedElements.contains(SelectedElement.forClass(classId));
 	}
 
 	default boolean isCommentSelected(final String commentId) {
-		return !getCanvas().suppressSelectionDecorations && getCanvas().selectedElements.contains(SelectedElement.forComment(commentId));
+		return !this.getCanvas().suppressSelectionDecorations
+				&& this.getCanvas().selectedElements.contains(SelectedElement.forComment(commentId));
 	}
 
 	default boolean isElementSelected(final SelectedElement element) {
-		return element != null && getCanvas().selectedElements.contains(element);
+		return element != null && this.getCanvas().selectedElements.contains(element);
 	}
 
 	default boolean isFieldSelected(final String classId, final String fieldId) {
-		return !getCanvas().suppressSelectionDecorations
-				&& getCanvas().selectedElements.contains(SelectedElement.forField(classId, fieldId));
+		return !this.getCanvas().suppressSelectionDecorations
+				&& this.getCanvas().selectedElements.contains(SelectedElement.forField(classId, fieldId));
 	}
 
 	default boolean isLinkSelected(final String linkId) {
-		return !getCanvas().suppressSelectionDecorations && getCanvas().selectedElements.contains(SelectedElement.forLink(linkId));
+		return !this.getCanvas().suppressSelectionDecorations
+				&& this.getCanvas().selectedElements.contains(SelectedElement.forLink(linkId));
 	}
 
 	default void removeFromSelection(final SelectedElement element) {
@@ -82,50 +85,51 @@ interface SelectionController extends DiagramCanvasExt {
 			return;
 		}
 
-		getCanvas().selectedElements.remove(element);
+		this.getCanvas().selectedElements.remove(element);
 
-		if (Objects.equals(getCanvas().selectedElement, element)) {
-			getCanvas().selectedElement = getCanvas().selectedElements.isEmpty() ? null : getCanvas().selectedElements.getLast();
+		if (Objects.equals(this.getCanvas().selectedElement, element)) {
+			this.getCanvas().selectedElement = this.getCanvas().selectedElements.isEmpty() ? null
+					: this.getCanvas().selectedElements.getLast();
 		}
 
-		getCanvas().notifySelectionChanged();
-		getCanvas().repaint();
+		this.getCanvas().notifySelectionChanged();
+		this.getCanvas().repaint();
 	}
 
 	default void select(final SelectedElement element) {
-		getCanvas().selectedElements.clear();
+		this.getCanvas().selectedElements.clear();
 		if (element != null) {
-			getCanvas().selectedElements.add(element);
+			this.getCanvas().selectedElements.add(element);
 		}
-		getDocument().getModel().getClasses().sort(getCanvas().comparator);
-		getCanvas().selectedElement = element;
-		getCanvas().notifySelectionChanged();
-		getCanvas().repaint();
+		this.getDocument().getModel().getClasses().sort(this.getCanvas().comparator);
+		this.getCanvas().selectedElement = element;
+		this.getCanvas().notifySelectionChanged();
+		this.getCanvas().repaint();
 	}
 
 	default void selectAll() {
-		getCanvas().selectedElements.clear();
+		this.getCanvas().selectedElements.clear();
 
-		for (final ClassModel classModel : getDocument().getModel().getClasses()) {
-			if (getCanvas().isVisible(classModel)) {
-				getCanvas().selectedElements.add(SelectedElement.forClass(classModel.getId()));
+		for (final ClassModel classModel : this.getDocument().getModel().getClasses()) {
+			if (classModel.isVisible(this.getPanelType())) {
+				this.getCanvas().selectedElements.add(SelectedElement.forClass(classModel.getId()));
 			}
 		}
 
-		for (final CommentModel commentModel : getDocument().getModel().getComments()) {
-			final String text = getCanvas().resolveCommentText(commentModel);
-			if (getCanvas().isCommentVisible(commentModel) && text != null && !text.isBlank()) {
-				getCanvas().selectedElements.add(SelectedElement.forComment(commentModel.getId()));
+		for (final CommentModel commentModel : this.getDocument().getModel().getComments()) {
+			final String text = this.getCanvas().resolveCommentText(commentModel);
+			if (this.getCanvas().isCommentVisible(commentModel) && text != null && !text.isBlank()) {
+				this.getCanvas().selectedElements.add(SelectedElement.forComment(commentModel.getId()));
 			}
 		}
 
-		for (final LinkModel linkModel : getCanvas().getActiveLinks()) {
-			getCanvas().selectedElements.add(SelectedElement.forLink(linkModel.getId()));
+		for (final LinkModel linkModel : this.getCanvas().getActiveLinks()) {
+			this.getCanvas().selectedElements.add(SelectedElement.forLink(linkModel.getId()));
 		}
 
-		getCanvas().selectedElement = getCanvas().selectedElements.isEmpty() ? null : getCanvas().selectedElements.getLast();
-		getCanvas().notifySelectionChanged();
-		getCanvas().repaint();
+		this.getCanvas().selectedElement = this.getCanvas().selectedElements.isEmpty() ? null : this.getCanvas().selectedElements.getLast();
+		this.getCanvas().notifySelectionChanged();
+		this.getCanvas().repaint();
 	}
 
 	default void updateSelectionFromMouse(final SelectedElement element, final MouseEvent event) {

@@ -37,15 +37,12 @@ public final class FieldEditorDialog {
 		private Result result;
 	}
 
-	private FieldEditorDialog() {
-	}
-
 	public static Result showDialog(final Component parent, final FieldModel fieldModel, final IntConsumer moveCallback) {
 		final Window owner = parent == null ? null : SwingUtilities.getWindowAncestor(parent);
 		final JDialog dialog = new JDialog(owner, "Edit field", Dialog.ModalityType.APPLICATION_MODAL);
 
-		final JTextField nameField = new JTextField(fieldModel.getNames().getConceptualName(), 24);
-		final JTextField technicalNameField = new JTextField(fieldModel.getNames().getTechnicalName(), 24);
+		final JTextField nameField = new JTextField(fieldModel.getConceptualName(), 24);
+		final JTextField technicalNameField = new JTextField(fieldModel.getTechnicalName(), 24);
 
 		final JComboBox<String> sqlTypeBox = new JComboBox<>(FieldModel.SQL_TYPES);
 		sqlTypeBox.setSelectedItem(fieldModel.getType());
@@ -55,8 +52,8 @@ public final class FieldEditorDialog {
 		final JCheckBox uniqueBox = new JCheckBox("UQ", fieldModel.isUnique());
 		final JCheckBox notNullBox = new JCheckBox("NN", fieldModel.isNotNull());
 
-		final ColorButton textColorButton = new ColorButton("Text color", fieldModel.getStyle().getTextColor());
-		final ColorButton backgroundColorButton = new ColorButton("Background color", fieldModel.getStyle().getBackgroundColor());
+		final ColorButton textColorButton = new ColorButton("Text color", fieldModel.getTextColor());
+		final ColorButton backgroundColorButton = new ColorButton("Background color", fieldModel.getBackgroundColor());
 
 		final Holder holder = new Holder();
 
@@ -160,13 +157,13 @@ public final class FieldEditorDialog {
 			final ColorButton textColorButton,
 			final ColorButton backgroundColorButton,
 			final JComboBox<String> typeField) {
-		fieldModel.getNames().setConceptualName(nameField.getText());
-		fieldModel.getNames().setTechnicalName(technicalNameField.getText());
+		fieldModel.setConceptualName(nameField.getText());
+		fieldModel.setTechnicalName(technicalNameField.getText());
 		fieldModel.setPrimaryKey(primaryKeyBox.isSelected());
 		fieldModel.setUnique(uniqueBox.isSelected());
 		fieldModel.setNotNull(notNullBox.isSelected());
-		fieldModel.getStyle().setTextColor(textColorButton.getSelectedColor());
-		fieldModel.getStyle().setBackgroundColor(backgroundColorButton.getSelectedColor());
+		fieldModel.setTextColor(textColorButton.getSelectedColor());
+		fieldModel.setBackgroundColor(backgroundColorButton.getSelectedColor());
 		fieldModel.setType(typeField.getSelectedItem() == null ? null : typeField.getSelectedItem().toString().trim());
 	}
 
@@ -176,6 +173,9 @@ public final class FieldEditorDialog {
 		row.add(new JLabel(labelText), BorderLayout.NORTH);
 		row.add(component, BorderLayout.CENTER);
 		return row;
+	}
+
+	private FieldEditorDialog() {
 	}
 
 }

@@ -24,12 +24,11 @@ interface NameResolver extends DiagramCanvasExt {
 	}
 
 	default String getEditableClassName(final ClassModel classModel) {
-		return getPanelType() == PanelType.CONCEPTUAL ? classModel.getNames().getConceptualName()
-				: classModel.getNames().getTechnicalName();
+		return this.getPanelType() == PanelType.CONCEPTUAL ? classModel.getConceptualName() : classModel.getTechnicalName();
 	}
 
 	default String getEditableCommentText(final String commentId) {
-		final CommentModel commentModel = getCanvas().findCommentById(commentId);
+		final CommentModel commentModel = this.getCanvas().findCommentById(commentId);
 		if (commentModel == null) {
 			return "";
 		}
@@ -38,16 +37,14 @@ interface NameResolver extends DiagramCanvasExt {
 	}
 
 	default String getEditableFieldName(final FieldModel fieldModel) {
-		return getPanelType() == PanelType.CONCEPTUAL ? fieldModel.getNames().getConceptualName()
-				: fieldModel.getNames().getTechnicalName();
+		return this.getPanelType() == PanelType.CONCEPTUAL ? fieldModel.getConceptualName() : fieldModel.getTechnicalName();
 	}
 
 	default String resolveClassTitle(final ClassModel classModel) {
-		if (getPanelType() == PanelType.CONCEPTUAL) {
-			return this
-					.blankToFallback(classModel.getNames().getConceptualName(), classModel.getNames().getTechnicalName(), "Unnamed class");
+		if (this.getPanelType() == PanelType.CONCEPTUAL) {
+			return this.blankToFallback(classModel.getConceptualName(), classModel.getTechnicalName(), "Unnamed class");
 		}
-		return this.blankToFallback(classModel.getNames().getTechnicalName(), classModel.getNames().getConceptualName(), "Unnamed class");
+		return this.blankToFallback(classModel.getTechnicalName(), classModel.getConceptualName(), "Unnamed class");
 	}
 
 	default String resolveCommentText(final CommentModel commentModel) {
@@ -58,15 +55,13 @@ interface NameResolver extends DiagramCanvasExt {
 
 	default String resolveFieldName(final FieldModel fieldModel) {
 		final String baseName;
-		if (getPanelType() == PanelType.CONCEPTUAL) {
-			baseName = this
-					.blankToFallback(fieldModel.getNames().getConceptualName(), fieldModel.getNames().getTechnicalName(), "Unnamed field");
+		if (this.getPanelType() == PanelType.CONCEPTUAL) {
+			baseName = this.blankToFallback(fieldModel.getConceptualName(), fieldModel.getTechnicalName(), "Unnamed field");
 		} else {
-			baseName = this
-					.blankToFallback(fieldModel.getNames().getTechnicalName(), fieldModel.getNames().getConceptualName(), "Unnamed field");
+			baseName = this.blankToFallback(fieldModel.getTechnicalName(), fieldModel.getConceptualName(), "Unnamed field");
 		}
 
-		if (getPanelType() != PanelType.PHYSICAL) {
+		if (this.getPanelType() != PanelType.PHYSICAL) {
 			return baseName;
 		}
 
@@ -93,15 +88,15 @@ interface NameResolver extends DiagramCanvasExt {
 			return;
 		}
 
-		if (getPanelType() == PanelType.CONCEPTUAL) {
-			classModel.getNames().setConceptualName(value);
+		if (this.getPanelType() == PanelType.CONCEPTUAL) {
+			classModel.setConceptualName(value);
 		} else {
-			classModel.getNames().setTechnicalName(value);
+			classModel.setTechnicalName(value);
 		}
 	}
 
 	default void setEditableCommentText(final String commentId, final String value) {
-		final CommentModel commentModel = getCanvas().findCommentById(commentId);
+		final CommentModel commentModel = this.getCanvas().findCommentById(commentId);
 		if (commentModel == null) {
 			return;
 		}
@@ -114,10 +109,10 @@ interface NameResolver extends DiagramCanvasExt {
 			return;
 		}
 
-		if (getPanelType() == PanelType.CONCEPTUAL) {
-			fieldModel.getNames().setConceptualName(value);
+		if (this.getPanelType() == PanelType.CONCEPTUAL) {
+			fieldModel.setConceptualName(value);
 		} else {
-			fieldModel.getNames().setTechnicalName(value);
+			fieldModel.setTechnicalName(value);
 		}
 	}
 

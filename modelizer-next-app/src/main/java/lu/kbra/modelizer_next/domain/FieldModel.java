@@ -2,7 +2,11 @@ package lu.kbra.modelizer_next.domain;
 
 import java.util.UUID;
 
-public class FieldModel {
+import lu.kbra.modelizer_next.domain.impl.IdOwner;
+import lu.kbra.modelizer_next.domain.impl.NamesOwner;
+import lu.kbra.modelizer_next.domain.impl.StyleOwner;
+
+public class FieldModel implements NamesOwner, IdOwner, StyleOwner {
 
 	public static final String[] SQL_TYPES = { null, "INT", "BIGINT", "TEXT", "BOOLEAN", "TINYINT", "DATE", "TIMESTAMP" };
 
@@ -26,14 +30,17 @@ public class FieldModel {
 		this.type = null;
 	}
 
+	@Override
 	public String getId() {
 		return this.id;
 	}
 
+	@Override
 	public ElementNames getNames() {
 		return this.names;
 	}
 
+	@Override
 	public ElementStyle getStyle() {
 		return this.style;
 	}
@@ -58,10 +65,12 @@ public class FieldModel {
 		return this.unique;
 	}
 
+	@Override
 	public void setId(final String id) {
 		this.id = id;
 	}
 
+	@Override
 	public void setNames(final ElementNames names) {
 		this.names = names;
 	}
@@ -78,6 +87,7 @@ public class FieldModel {
 		this.primaryKey = primaryKey;
 	}
 
+	@Override
 	public void setStyle(final ElementStyle style) {
 		this.style = style;
 	}
@@ -92,9 +102,9 @@ public class FieldModel {
 
 	@Override
 	public String toString() {
-		return "FieldModel@" + System.identityHashCode(this) + " [id=" + id + ", names=" + names + ", notConceptual=" + notConceptual
-				+ ", style=" + style + ", primaryKey=" + primaryKey + ", unique=" + unique + ", notNull=" + notNull + ", type=" + type
-				+ "]";
+		return "FieldModel@" + System.identityHashCode(this) + " [id=" + this.id + ", names=" + this.names + ", notConceptual="
+				+ this.notConceptual + ", style=" + this.style + ", primaryKey=" + this.primaryKey + ", unique=" + this.unique
+				+ ", notNull=" + this.notNull + ", type=" + this.type + "]";
 	}
 
 }

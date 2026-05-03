@@ -12,9 +12,6 @@ import lu.kbra.modelizer_next.MNMain;
 
 public final class StylePaletteService {
 
-	private StylePaletteService() {
-	}
-
 	public static void deleteByName(final String paletteName) {
 		if (paletteName == null || paletteName.isBlank()) {
 			return;
@@ -79,6 +76,9 @@ public final class StylePaletteService {
 			return "unnamed";
 		}
 		return name.replaceAll("[^a-zA-Z0-9._-]", "_");
+	}
+
+	private StylePaletteService() {
 	}
 
 }

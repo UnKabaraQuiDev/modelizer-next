@@ -8,10 +8,10 @@ import lu.kbra.modelizer_next.document.ModelDocument;
 
 public final class ModernModelizerImporter {
 
-	private ModernModelizerImporter() {
-	}
-
 	public static ModelDocument importFile(final File file) throws IOException {
 		return MNMain.OBJECT_MAPPER.readValue(file, ModelDocument.class);
+	}
+
+	private ModernModelizerImporter() {
 	}
 }

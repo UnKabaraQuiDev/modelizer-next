@@ -14,39 +14,14 @@ public class LayerVisibility {
 		this.physical = true;
 	}
 
-	public LayerVisibility(PanelType... pts) {
-		set(pts);
-	}
-
-	public boolean isVisible(PanelType pt) {
-		return switch (pt) {
-		case CONCEPTUAL -> conceptual;
-		case LOGICAL -> logical;
-		case PHYSICAL -> physical;
-		};
-	}
-
-	public void set(PanelType... pts) {
-		clear();
-		for (PanelType pt : pts) {
-			switch (pt) {
-			case CONCEPTUAL -> conceptual = true;
-			case LOGICAL -> logical = true;
-			case PHYSICAL -> physical = true;
-			}
-		}
+	public LayerVisibility(final PanelType... pts) {
+		this.set(pts);
 	}
 
 	public void clear() {
 		this.conceptual = false;
 		this.logical = false;
 		this.physical = false;
-	}
-
-	public void set(boolean c, boolean l, boolean p) {
-		this.conceptual = c;
-		this.logical = l;
-		this.physical = p;
 	}
 
 	public boolean isConceptual() {
@@ -59,6 +34,31 @@ public class LayerVisibility {
 
 	public boolean isPhysical() {
 		return this.physical;
+	}
+
+	public boolean isVisible(final PanelType pt) {
+		return switch (pt) {
+		case CONCEPTUAL -> this.conceptual;
+		case LOGICAL -> this.logical;
+		case PHYSICAL -> this.physical;
+		};
+	}
+
+	public void set(final boolean c, final boolean l, final boolean p) {
+		this.conceptual = c;
+		this.logical = l;
+		this.physical = p;
+	}
+
+	public void set(final PanelType... pts) {
+		this.clear();
+		for (final PanelType pt : pts) {
+			switch (pt) {
+			case CONCEPTUAL -> this.conceptual = true;
+			case LOGICAL -> this.logical = true;
+			case PHYSICAL -> this.physical = true;
+			}
+		}
 	}
 
 	public void setConceptual(final boolean conceptual) {
