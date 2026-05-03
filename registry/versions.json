@@ -14,10 +14,10 @@
     "tag": "6-SNAPSHOT-190"
   },
   "nightly": {
-    "version": "6-NIGHTLY-190",
-    "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/6-NIGHTLY-190/modelizer-next-app-6-NIGHTLY-190.jar",
-    "releaseUrl": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/tag/6-NIGHTLY-190",
+    "version": "6-NIGHTLY-193",
+    "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/6-NIGHTLY-193/modelizer-next-app-6-NIGHTLY-193.jar",
+    "releaseUrl": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/tag/6-NIGHTLY-193",
     "notes": "Latest nightly build.",
-    "tag": "6-NIGHTLY-190"
+    "tag": "6-NIGHTLY-193"
   }
 }
