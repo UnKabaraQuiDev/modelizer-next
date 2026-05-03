@@ -208,8 +208,10 @@ public class BootstrapRuntime implements UpdateRuntime {
 	}
 
 	@Override
-	public boolean installUpdateAndExit(final Component parentComponent, final AvailableUpdate update, final UpdatePreparation preparation)
-			throws IOException {
+	public boolean installUpdateAndRestart(
+			final Component parentComponent,
+			final AvailableUpdate update,
+			final UpdatePreparation preparation) throws IOException {
 		if (update == null || !update.isUpdateAvailable()) {
 			JOptionPane.showMessageDialog(parentComponent,
 					"You are already using the latest version for the selected channel.",
@@ -236,7 +238,11 @@ public class BootstrapRuntime implements UpdateRuntime {
 			loadingFrame.dispose();
 		}
 
-		System.exit(0);
+		try {
+			BootstrapMain.restartSameCommand();
+		} catch (Exception e) {
+			System.exit(0);
+		}
 		return true;
 	}
 
@@ -369,7 +375,8 @@ public class BootstrapRuntime implements UpdateRuntime {
 
 	private boolean isCausedByClassNotFound(final Throwable throwable) {
 		for (Throwable current = throwable; current != null; current = current.getCause()) {
-			if (current instanceof ClassNotFoundException || current instanceof NoClassDefFoundError || current instanceof UnsupportedBootstrapVersionException) {
+			if (current instanceof ClassNotFoundException || current instanceof NoClassDefFoundError
+					|| current instanceof UnsupportedBootstrapVersionException) {
 				return true;
 			}
 		}

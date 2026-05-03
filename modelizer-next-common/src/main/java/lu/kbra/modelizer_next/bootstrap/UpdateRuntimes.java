@@ -59,7 +59,7 @@ public final class UpdateRuntimes {
 		}
 
 		@Override
-		public boolean installUpdateAndExit(
+		public boolean installUpdateAndRestart(
 				final Component parentComponent,
 				final AvailableUpdate update,
 				final UpdatePreparation preparation) throws IOException {

@@ -317,7 +317,7 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 					if (update.notes() != null && !update.notes().isBlank()) {
 						message.append("\n\n").append(update.notes());
 					}
-					message.append("\n\nThe application will close after the update is installed.");
+					message.append("\n\nThe application will restart after the update is installed.");
 
 					final int choice = JOptionPane.showConfirmDialog(MainFrame.this,
 							message.toString(),
@@ -325,7 +325,7 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 							JOptionPane.YES_NO_OPTION,
 							JOptionPane.INFORMATION_MESSAGE);
 					if (choice == JOptionPane.YES_OPTION) {
-						runtime.get().installUpdateAndExit(MainFrame.this, update, MainFrame.this::prepareForUpdateInstall);
+						runtime.get().installUpdateAndRestart(MainFrame.this, update, MainFrame.this::prepareForUpdateInstall);
 					}
 				} catch (final Exception ex) {
 					final Throwable cause = ex.getCause() == null ? ex : ex.getCause();

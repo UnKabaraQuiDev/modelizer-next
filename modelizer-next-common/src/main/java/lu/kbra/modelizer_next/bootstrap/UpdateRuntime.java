@@ -33,7 +33,7 @@ public interface UpdateRuntime {
 
 	UpdateChannel getSelectedChannel();
 
-	boolean installUpdateAndExit(Component parentComponent, AvailableUpdate update, UpdatePreparation preparation) throws IOException;
+	boolean installUpdateAndRestart(Component parentComponent, AvailableUpdate update, UpdatePreparation preparation) throws IOException;
 
 	boolean isAutoCheckUpdates();
 
