@@ -1,7 +1,6 @@
 package lu.kbra.modelizer_next;
 
 import java.io.File;
-import java.lang.management.ManagementFactory;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
