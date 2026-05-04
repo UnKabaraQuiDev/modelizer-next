@@ -40,7 +40,7 @@ public class DiagramCanvas extends JPanel
 		implements DiagramModelLookup, NodeLayoutCache, SelectionController, NameResolver, PaletteController, ClipboardController,
 		LinkGeometryResolver, ConceptualAnchorCache, CanvasHitTester, CanvasExportRenderer, DiagramModelEditor, DragSelectionController,
 		DiagramPathBuilder, MouseInteractionController, ElementEditor, ElementRenderer, ElementDeleter, ElementCreator, VisibilityManager,
-		CaptureManager, LinkLayoutManager, ExportManager, NodeLayoutManager, DiagramCanvasCoreSupport {
+		CaptureManager, LinkLayoutManager, ExportManager, NodeLayoutManager, DiagramCanvasCoreSupport, DiagramCanvasActionRegistrar {
 
 	private static final long serialVersionUID = -768210073584363710L;
 

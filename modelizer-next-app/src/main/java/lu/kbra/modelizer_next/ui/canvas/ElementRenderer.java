@@ -231,11 +231,11 @@ public interface ElementRenderer extends DiagramCanvasExt {
 
 	default void drawComments(final Graphics2D g2) {
 		for (final CommentModel commentModel : this.getCanvas().document.getModel().getComments()) {
-			final String commentText = this.getCanvas().resolveCommentText(commentModel);
-			if (commentText == null || commentText.isBlank() || !this.getCanvas().isCommentVisible(commentModel)
+			if (commentModel == null || !this.getCanvas().isCommentVisible(commentModel)
 					|| !this.getCanvas().shouldExportComment(commentModel)) {
 				continue;
 			}
+			final String commentText = commentModel.getText();
 
 			final NodeLayout layout = this.getCanvas()
 					.resolveRenderLayout(this.getCanvas().findOrCreateNodeLayout(LayoutObjectType.COMMENT, commentModel.getId()));

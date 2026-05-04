@@ -113,6 +113,54 @@ public final class CommentEditorDialog {
 		final JCheckBox logicalBox = new JCheckBox("Logical", initialComment == null || initialComment.isVisibleInLogical());
 		final JCheckBox physicalBox = new JCheckBox("Physical", initialComment == null || initialComment.isVisibleInPhysical());
 
+		disableCheckboxes: {
+			if (initialComment != null && initialComment.getKind() != CommentKind.STANDALONE && initialComment.getBinding() != null) {
+				final CommentBinding commentBinding = initialComment.getBinding();
+				final String targetId = commentBinding.getTargetId();
+				switch (commentBinding.getTargetType()) {
+				case CLASS -> {
+					final ClassModel classModel = document.getModel()
+							.getClasses()
+							.stream()
+							.filter(c -> Objects.equals(c.getId(), targetId))
+							.findFirst()
+							.orElse(null);
+					if (classModel == null) {
+						break disableCheckboxes;
+					}
+
+					conceptualBox.setEnabled(classModel.isVisible(PanelType.CONCEPTUAL));
+					logicalBox.setEnabled(classModel.isVisible(PanelType.LOGICAL));
+					physicalBox.setEnabled(classModel.isVisible(PanelType.PHYSICAL));
+				}
+				case LINK -> {
+					final boolean technicalLink;
+					LinkModel linkModel = document.getModel()
+							.getConceptualLinks()
+							.stream()
+							.filter(c -> Objects.equals(c.getId(), targetId))
+							.findFirst()
+							.orElse(null);
+					if (linkModel == null) {
+						linkModel = document.getModel()
+								.getTechnicalLinks()
+								.stream()
+								.filter(c -> Objects.equals(c.getId(), targetId))
+								.findFirst()
+								.orElse(null);
+						technicalLink = true;
+					} else {
+						technicalLink = false;
+					}
+
+					conceptualBox.setEnabled(!technicalLink);
+					logicalBox.setEnabled(technicalLink);
+					physicalBox.setEnabled(technicalLink);
+				}
+				}
+			}
+		}
+
 		final List<AssociationTarget> associationList = new ArrayList<>();
 		associationList.add(AssociationTarget.standalone());
 		if (document != null) {

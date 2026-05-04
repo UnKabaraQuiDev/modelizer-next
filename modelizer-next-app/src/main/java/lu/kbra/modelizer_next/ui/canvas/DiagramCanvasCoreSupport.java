@@ -9,6 +9,7 @@ import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -23,6 +24,7 @@ import lu.kbra.modelizer_next.layout.NodeLayout;
 import lu.kbra.modelizer_next.layout.PanelState;
 import lu.kbra.modelizer_next.layout.PanelType;
 import lu.kbra.modelizer_next.ui.canvas.data.AnchorSide;
+import lu.kbra.modelizer_next.ui.canvas.datastruct.DiagramCanvasActions;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.LinkGeometry;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectedElement;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectedType;
@@ -75,8 +77,7 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 		}
 
 		for (final CommentModel commentModel : this.getCanvas().document.getModel().getComments()) {
-			final String text = this.getCanvas().resolveCommentText(commentModel);
-			if (this.getCanvas().isCommentVisible(commentModel) && text != null && !text.isBlank()) {
+			if (this.getCanvas().isCommentVisible(commentModel)) {
 				this.getCanvas().findOrCreateNodeLayout(LayoutObjectType.COMMENT, commentModel.getId());
 			}
 		}
@@ -234,24 +235,23 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 	}
 
 	default void installKeyBindings() {
-		DiagramCanvasActionRegistrar.installDefault(this.getCanvas(),
-				new DiagramCanvasActionRegistrar.DiagramCanvasActions(this.getCanvas()::renameSelection,
-						this.getCanvas()::moveFieldSelection,
-						this.getCanvas()::moveSelectedFieldInList,
-						this.getCanvas()::addTable,
-						this.getCanvas()::addField,
-						this.getCanvas()::addComment,
-						this.getCanvas()::deleteSelection,
-						this.getCanvas()::duplicateSelection,
-						this.getCanvas()::clearSelection,
-						this.getCanvas()::addLink,
-						this.getCanvas()::selectAll,
-						this.getCanvas()::editSelected,
-						this.getCanvas()::copySelection,
-						this.getCanvas()::cutSelection,
-						this.getCanvas()::pasteSelection,
-						this.getCanvas().documentEventListener::undo,
-						this.getCanvas().documentEventListener::redo));
+		getCanvas().installDefaultKeyBindings(new DiagramCanvasActions(this.getCanvas()::renameSelection,
+				this.getCanvas()::moveFieldSelection,
+				this.getCanvas()::moveSelectedFieldInList,
+				this.getCanvas()::addTable,
+				this.getCanvas()::addField,
+				this.getCanvas()::addComment,
+				this.getCanvas()::deleteSelection,
+				this.getCanvas()::duplicateSelection,
+				this.getCanvas()::clearSelection,
+				this.getCanvas()::addLink,
+				this.getCanvas()::selectAll,
+				this.getCanvas()::editSelected,
+				this.getCanvas()::copySelection,
+				this.getCanvas()::cutSelection,
+				this.getCanvas()::pasteSelection,
+				this.getCanvas().documentEventListener::undo,
+				this.getCanvas().documentEventListener::redo));
 	}
 
 	default boolean isLinkConnectedTo(final LinkModel linkModel, final String classId) {
@@ -743,6 +743,10 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 	}
 
 	default List<String> wrapText(final String text, final FontMetrics metrics, final int maxWidth) {
+		if (text == null || text.isEmpty()) {
+			return Collections.emptyList();
+		}
+
 		final List<String> lines = new ArrayList<>();
 		for (final String paragraph : text.split("\\R", -1)) {
 			if (paragraph.isEmpty()) {

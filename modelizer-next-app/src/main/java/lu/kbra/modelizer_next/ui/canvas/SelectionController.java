@@ -117,8 +117,7 @@ interface SelectionController extends DiagramCanvasExt {
 		}
 
 		for (final CommentModel commentModel : this.getDocument().getModel().getComments()) {
-			final String text = this.getCanvas().resolveCommentText(commentModel);
-			if (this.getCanvas().isCommentVisible(commentModel) && text != null && !text.isBlank()) {
+			if (this.getCanvas().isCommentVisible(commentModel)) {
 				this.getCanvas().selectedElements.add(SelectedElement.forComment(commentModel.getId()));
 			}
 		}

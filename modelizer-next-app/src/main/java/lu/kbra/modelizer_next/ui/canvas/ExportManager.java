@@ -57,15 +57,14 @@ public interface ExportManager extends DiagramCanvasExt {
 			}
 
 			for (final CommentModel commentModel : this.getCanvas().document.getModel().getComments()) {
-				final String text = this.getCanvas().resolveCommentText(commentModel);
-				if (text == null || text.isBlank() || !this.getCanvas().isCommentVisible(commentModel)
+				if (commentModel == null || !this.getCanvas().isCommentVisible(commentModel)
 						|| onlySelection && !this.getCanvas().shouldExportComment(commentModel)) {
 					continue;
 				}
 
 				final NodeLayout layout = this.getCanvas()
 						.resolveRenderLayout(this.getCanvas().findOrCreateNodeLayout(LayoutObjectType.COMMENT, commentModel.getId()));
-				final Rectangle2D commentBounds = this.getCanvas().computeCommentBounds(g2, text, layout);
+				final Rectangle2D commentBounds = this.getCanvas().computeCommentBounds(g2, commentModel.getText(), layout);
 				bounds = this.getCanvas()
 						.expandBounds(bounds,
 								commentBounds.getX(),

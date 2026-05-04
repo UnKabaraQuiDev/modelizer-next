@@ -1,6 +1,6 @@
 package lu.kbra.modelizer_next.ui.canvas;
 
-import java.awt.Graphics2D;
+import java.util.Objects;
 
 import lu.kbra.modelizer_next.domain.ClassModel;
 import lu.kbra.modelizer_next.domain.CommentModel;
@@ -33,17 +33,34 @@ public interface VisibilityManager extends DiagramCanvasExt {
 			return classModel != null && classModel.isVisible(this.getPanelType());
 		}
 
-		final LinkModel linkModel = this.getCanvas().findLinkById(commentModel.getBinding().getTargetId());
+		final String targetId = commentModel.getBinding().getTargetId();
+		final boolean technicalLink;
+		LinkModel linkModel = getDocument().getModel()
+				.getConceptualLinks()
+				.stream()
+				.filter(c -> Objects.equals(c.getId(), targetId))
+				.findFirst()
+				.orElse(null);
 		if (linkModel == null) {
-			return false;
+			linkModel = getDocument().getModel()
+					.getTechnicalLinks()
+					.stream()
+					.filter(c -> Objects.equals(c.getId(), targetId))
+					.findFirst()
+					.orElse(null);
+			technicalLink = true;
+		} else {
+			technicalLink = false;
 		}
 
-		final Graphics2D g2 = this.getCanvas().createGraphicsContext();
-		try {
-			return this.getCanvas().resolveLinkGeometry(g2, linkModel) != null;
-		} finally {
-			g2.dispose();
-		}
+		return getPanelType().isTechnical() == technicalLink;
+
+//		final Graphics2D g2 = this.getCanvas().createGraphicsContext();
+//		try {
+//			return this.getCanvas().resolveLinkGeometry(g2, linkModel) != null;
+//		} finally {
+//			g2.dispose();
+//		}
 	}
 
 }

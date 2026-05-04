@@ -205,7 +205,7 @@ interface LinkGeometryResolver extends DiagramCanvasExt {
 
 		final NodeLayout layout = this.getCanvas()
 				.resolveRenderLayout(this.getCanvas().findOrCreateNodeLayout(LayoutObjectType.COMMENT, commentModel.getId()));
-		final Rectangle2D bounds = this.getCanvas().computeCommentBounds(g2, this.getCanvas().resolveCommentText(commentModel), layout);
+		final Rectangle2D bounds = this.getCanvas().computeCommentBounds(g2, commentModel.getText(), layout);
 		return new Point2D.Double(bounds.getCenterX(), bounds.getCenterY());
 	}
 

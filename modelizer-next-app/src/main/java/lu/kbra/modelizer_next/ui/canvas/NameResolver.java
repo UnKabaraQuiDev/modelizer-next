@@ -47,12 +47,6 @@ interface NameResolver extends DiagramCanvasExt {
 		return this.blankToFallback(classModel.getTechnicalName(), classModel.getConceptualName(), "Unnamed class");
 	}
 
-	default String resolveCommentText(final CommentModel commentModel) {
-		return commentModel == null ? ""
-				: commentModel.getText() == null ? ""
-				: commentModel.getText();
-	}
-
 	default String resolveFieldName(final FieldModel fieldModel) {
 		final String baseName;
 		if (this.getPanelType() == PanelType.CONCEPTUAL) {

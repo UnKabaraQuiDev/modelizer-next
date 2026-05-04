@@ -61,14 +61,12 @@ interface CanvasHitTester extends DiagramCanvasExt {
 
 			for (int i = this.getCanvas().document.getModel().getComments().size() - 1; i >= 0; i--) {
 				final CommentModel commentModel = this.getCanvas().document.getModel().getComments().get(i);
-				final String text = this.getCanvas().resolveCommentText(commentModel);
-
-				if (text == null || text.isBlank() || !this.getCanvas().isCommentVisible(commentModel)) {
+				if (commentModel == null || !this.getCanvas().isCommentVisible(commentModel)) {
 					continue;
 				}
 
 				final NodeLayout layout = this.getCanvas().findOrCreateNodeLayout(LayoutObjectType.COMMENT, commentModel.getId());
-				final Rectangle2D bounds = this.getCanvas().computeCommentBounds(g2, text, layout);
+				final Rectangle2D bounds = this.getCanvas().computeCommentBounds(g2, commentModel.getText(), layout);
 
 				if (bounds.contains(worldPoint.getX(), worldPoint.getY())) {
 					return new HitResult(layout, bounds, SelectedElement.forComment(commentModel.getId()));
