@@ -1,5 +1,6 @@
 package lu.kbra.modelizer_next.ui.canvas;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FontMetrics;
@@ -17,6 +18,7 @@ import lu.kbra.modelizer_next.domain.data.CommentKind;
 import lu.kbra.modelizer_next.layout.LayoutObjectType;
 import lu.kbra.modelizer_next.layout.NodeLayout;
 import lu.kbra.modelizer_next.layout.PanelType;
+import lu.kbra.modelizer_next.ui.canvas.data.Direction2D;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.LinkGeometry;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectedElement;
 
@@ -25,7 +27,13 @@ import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectedElement;
  */
 public interface ElementRenderer extends DiagramCanvasExt {
 
-	default void drawAlignedLinkLabel(final Graphics2D g2, final String text, final Point2D center, final double angle) {
+	default void drawAlignedLinkLabel(
+			final Graphics2D g2,
+			final String text,
+			final Point2D point,
+			final double angle,
+			final boolean bottom,
+			final Direction2D dir) {
 		final Graphics2D labelGraphics = (Graphics2D) g2.create();
 		try {
 			final FontMetrics metrics = labelGraphics.getFontMetrics();
@@ -33,14 +41,40 @@ public interface ElementRenderer extends DiagramCanvasExt {
 
 			final double normalX = -Math.sin(angle);
 			final double normalY = Math.cos(angle);
-			final double offset = -8;
+			final double offset = !bottom ? -8 : 8;
 
-			labelGraphics.translate(center.getX() + normalX * offset, center.getY() + normalY * offset);
+			if (DiagramCanvas.DEBUG_DRAW_LINK_ANCHORS) {
+				labelGraphics.setStroke(new BasicStroke(4));
+				labelGraphics.setColor(Color.BLUE);
+				labelGraphics.drawLine((int) point.getX(), (int) point.getY(), (int) point.getX(), (int) point.getY());
+			}
+
+			labelGraphics.translate(point.getX() + normalX * offset, point.getY() + normalY * offset);
 			labelGraphics.rotate(angle);
 
 			labelGraphics.setColor(g2.getColor());
-			labelGraphics
-					.drawString(text, (float) (-textBounds.getWidth() / 2.0), (float) (metrics.getAscent() - textBounds.getHeight() / 2.0));
+
+			final double textX;
+			switch (dir) {
+			case HEADING -> {
+				textX = 2;
+			}
+			default -> {
+				textX = -textBounds.getWidth() / 2;
+			}
+			case TRAILING -> {
+				textX = -textBounds.getWidth() - 2;
+			}
+			}
+
+			labelGraphics.setStroke(g2.getStroke());
+			labelGraphics.drawString(text, (float) textX, (float) (metrics.getAscent() - textBounds.getHeight() / 2.0));
+
+			if (DiagramCanvas.DEBUG_DRAW_LINK_ANCHORS) {
+				labelGraphics.setStroke(new BasicStroke(4));
+				labelGraphics.setColor(Color.RED);
+				labelGraphics.drawLine(0, 0, (int) textX, 0);
+			}
 		} finally {
 			labelGraphics.dispose();
 		}
@@ -95,23 +129,12 @@ public interface ElementRenderer extends DiagramCanvasExt {
 			final String text,
 			final Point2D anchor,
 			final Point2D adjacentPoint,
-			final double angle) {
-		final double dx = adjacentPoint.getX() - anchor.getX();
-		final double dy = adjacentPoint.getY() - anchor.getY();
+			final double angle,
+			final boolean bottom) {
+		final double curAngle = Math.atan2(adjacentPoint.getY() - anchor.getY(), adjacentPoint.getX() - anchor.getX());
+		final boolean flipText = curAngle > Math.PI / 2 || curAngle < -Math.PI / 2;
 
-		double ux = 0.0;
-		double uy = 0.0;
-		final double length = Math.hypot(dx, dy);
-		if (length > 0.0) {
-			ux = dx / length;
-			uy = dy / length;
-		}
-
-		final double alongOffset = 16.0;
-
-		final Point2D center = new Point2D.Double(anchor.getX() + ux * alongOffset, anchor.getY() + uy * alongOffset);
-
-		this.getCanvas().drawAlignedLinkLabel(g2, text, center, angle);
+		drawAlignedLinkLabel(g2, text, anchor, angle, bottom, flipText ? Direction2D.TRAILING : Direction2D.HEADING);
 	}
 
 	default void drawClasses(final Graphics2D g2) {
@@ -132,7 +155,7 @@ public interface ElementRenderer extends DiagramCanvasExt {
 			g2.setFont(DiagramCanvas.TITLE_FONT);
 			g2.setColor(classModel.getTextColor());
 			g2.drawString(this.getCanvas().resolveClassTitle(classModel),
-					(float) bounds.getX() + DiagramCanvas.PADDING,
+					(float) bounds.getX() + DiagramCanvas.TEXT_PADDING,
 					(float) bounds.getY() + DiagramCanvas.CLASS_HEADER_HEIGHT - 9);
 
 			g2.setFont(DiagramCanvas.BODY_FONT);
@@ -158,7 +181,7 @@ public interface ElementRenderer extends DiagramCanvasExt {
 
 				g2.setColor(fieldModel.getTextColor());
 				g2.drawString(this.getCanvas().resolveFieldName(fieldModel),
-						(float) bounds.getX() + DiagramCanvas.PADDING,
+						(float) bounds.getX() + DiagramCanvas.TEXT_PADDING,
 						(float) rowY + 15);
 
 				if (this.getCanvas().isFieldSelected(classModel.getId(), fieldModel.getId())) {
@@ -234,7 +257,7 @@ public interface ElementRenderer extends DiagramCanvasExt {
 
 			g2.setFont(DiagramCanvas.BODY_FONT);
 			g2.setColor(commentModel.getTextColor());
-			this.getCanvas().drawMultilineText(g2, commentText, bounds, DiagramCanvas.PADDING);
+			this.getCanvas().drawMultilineText(g2, commentText, bounds, DiagramCanvas.TEXT_PADDING);
 
 			if (this.getCanvas().isCommentSelected(commentModel.getId())) {
 				g2.setColor(DiagramCanvas.SELECTION_COLOR);
@@ -332,26 +355,52 @@ public interface ElementRenderer extends DiagramCanvasExt {
 			g2.setStroke(DiagramCanvas.DEFAULT_STROKE);
 
 			if (this.getPanelType() == PanelType.CONCEPTUAL && linkModel.getName() != null && !linkModel.getName().isBlank()) {
-				this.getCanvas().drawAlignedLinkLabel(g2, linkModel.getName(), geometry.labelPoint(), geometry.labelAngle());
+				this.getCanvas()
+						.drawAlignedLinkLabel(g2,
+								linkModel.getName(),
+								geometry.labelPoint(),
+								geometry.labelAngle(),
+								false,
+								Direction2D.CENTER);
 			}
 
 			if (this.getPanelType() == PanelType.CONCEPTUAL) {
-				// TODO: fix getCanvas()
-				final String from = (linkModel.getCardinalityFrom() != null ? linkModel.getCardinalityFrom().getDisplayValue() : "") + " "
-						+ (linkModel.getLabelFrom() != null ? linkModel.getLabelFrom() : "");
-				if (!from.isBlank()) {
-					this.getCanvas().drawCardinalityLabel(g2, from, geometry.fromPoint(), geometry.points().get(1), geometry.labelAngle());
-				}
-
-				final String to = (linkModel.getCardinalityTo() != null ? linkModel.getCardinalityTo().getDisplayValue() : "") + " "
-						+ (linkModel.getLabelTo() != null ? linkModel.getLabelTo() : "");
-				if (!to.isBlank()) {
+				if (linkModel.getCardinalityFrom() != null) {
 					this.getCanvas()
 							.drawCardinalityLabel(g2,
-									to,
+									linkModel.getCardinalityFrom().getDisplayValue(),
+									geometry.fromPoint(),
+									geometry.points().get(1),
+									geometry.labelAngle(),
+									false);
+				}
+				if (linkModel.getLabelFrom() != null) {
+					this.getCanvas()
+							.drawCardinalityLabel(g2,
+									linkModel.getLabelFrom(),
+									geometry.fromPoint(),
+									geometry.points().get(1),
+									geometry.labelAngle(),
+									true);
+				}
+
+				if (linkModel.getCardinalityTo() != null) {
+					this.getCanvas()
+							.drawCardinalityLabel(g2,
+									linkModel.getCardinalityTo().getDisplayValue(),
 									geometry.toPoint(),
 									geometry.points().get(geometry.points().size() - 2),
-									geometry.labelAngle());
+									geometry.labelAngle(),
+									false);
+				}
+				if (linkModel.getLabelTo() != null) {
+					this.getCanvas()
+							.drawCardinalityLabel(g2,
+									linkModel.getLabelTo(),
+									geometry.toPoint(),
+									geometry.points().get(geometry.points().size() - 2),
+									geometry.labelAngle(),
+									true);
 				}
 			}
 

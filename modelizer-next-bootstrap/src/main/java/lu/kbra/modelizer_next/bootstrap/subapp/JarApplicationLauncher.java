@@ -7,6 +7,7 @@ import java.net.URLClassLoader;
 import java.util.Queue;
 
 import lu.kbra.modelizer_next.bootstrap.AppMain;
+import lu.kbra.modelizer_next.common.UnsupportedBootstrapVersionException;
 
 public final class JarApplicationLauncher {
 
@@ -34,7 +35,7 @@ public final class JarApplicationLauncher {
 			}
 		} catch (final AppLaunchException ex) {
 			throw ex;
-		} catch (final ClassNotFoundException | NoClassDefFoundError ex) {
+		} catch (final ClassNotFoundException | NoClassDefFoundError | UnsupportedBootstrapVersionException ex) {
 			throw new AppLaunchException("Failed to launch application because the bootstrap launcher is outdated.", ex);
 		} catch (final Exception ex) {
 			throw new AppLaunchException("Failed to launch application from " + application.jarFile(), ex);

@@ -18,8 +18,8 @@ import lu.kbra.modelizer_next.App;
 import lu.kbra.modelizer_next.style.StylePalette;
 import lu.kbra.modelizer_next.style.StylePaletteService;
 import lu.kbra.modelizer_next.ui.canvas.DiagramCanvas;
+import lu.kbra.modelizer_next.ui.canvas.data.StylePreviewType;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.StatusStyleAppearance;
-import lu.kbra.modelizer_next.ui.canvas.datastruct.StylePreviewType;
 import lu.kbra.modelizer_next.ui.dialogs.StylePaletteEditorDialog;
 
 public interface MainFrameStyleController {

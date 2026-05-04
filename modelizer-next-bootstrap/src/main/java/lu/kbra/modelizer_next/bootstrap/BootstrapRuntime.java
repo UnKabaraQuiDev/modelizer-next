@@ -306,7 +306,7 @@ public class BootstrapRuntime implements UpdateRuntime {
 			}
 			this.applicationLauncher.launch(args, toBeOpened, this.currentApplication);
 		} catch (final AppLaunchException ex) {
-			if (!this.isCausedByClassNotFound(ex)) {
+			if (!this.needsBootstrappUpdate(ex)) {
 				throw ex;
 			}
 			this.handleOutdatedBootstrapLauncher(ex, false);
@@ -373,7 +373,7 @@ public class BootstrapRuntime implements UpdateRuntime {
 		}
 	}
 
-	private boolean isCausedByClassNotFound(final Throwable throwable) {
+	private boolean needsBootstrappUpdate(final Throwable throwable) {
 		for (Throwable current = throwable; current != null; current = current.getCause()) {
 			if (current instanceof ClassNotFoundException || current instanceof NoClassDefFoundError
 					|| current instanceof UnsupportedBootstrapVersionException) {

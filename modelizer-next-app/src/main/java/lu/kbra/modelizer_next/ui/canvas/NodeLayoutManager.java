@@ -46,9 +46,9 @@ public interface NodeLayoutManager extends DiagramCanvasExt {
 		final FontMetrics bodyMetrics = g2.getFontMetrics();
 
 		int width = Math.max(DiagramCanvas.CLASS_MIN_WIDTH,
-				titleMetrics.stringWidth(this.getCanvas().resolveClassTitle(classModel)) + DiagramCanvas.PADDING * 2);
+				titleMetrics.stringWidth(this.getCanvas().resolveClassTitle(classModel)) + DiagramCanvas.TEXT_PADDING * 2);
 		for (final FieldModel fieldModel : this.getCanvas().getVisibleFields(classModel)) {
-			width = Math.max(width, bodyMetrics.stringWidth(this.getCanvas().resolveFieldName(fieldModel)) + DiagramCanvas.PADDING * 2);
+			width = Math.max(width, bodyMetrics.stringWidth(this.getCanvas().resolveFieldName(fieldModel)) + DiagramCanvas.TEXT_PADDING * 2);
 		}
 
 		final int visibleFieldCount = this.getCanvas().getVisibleFields(classModel).size();
@@ -103,8 +103,8 @@ public interface NodeLayoutManager extends DiagramCanvasExt {
 		final FontMetrics metrics = g2.getFontMetrics();
 
 		final double width = layout.getSize().getWidth() > 0.0 ? layout.getSize().getWidth() : DiagramCanvas.COMMENT_MIN_WIDTH;
-		final List<String> wrappedLines = this.getCanvas().wrapText(text, metrics, (int) Math.max(40, width - DiagramCanvas.PADDING * 2));
-		final int contentHeight = wrappedLines.size() * (metrics.getHeight() + 2) + DiagramCanvas.PADDING * 2;
+		final List<String> wrappedLines = this.getCanvas().wrapText(text, metrics, (int) Math.max(40, width - DiagramCanvas.TEXT_PADDING * 2));
+		final int contentHeight = wrappedLines.size() * (metrics.getHeight() + 2) + DiagramCanvas.TEXT_PADDING * 2;
 
 		if (layout.getSize().getWidth() <= 0.0) {
 			layout.getSize().setWidth(Math.max(DiagramCanvas.COMMENT_MIN_WIDTH, width));

@@ -1,4 +1,4 @@
-package lu.kbra.modelizer_next.ui.canvas.datastruct;
+package lu.kbra.modelizer_next.ui.canvas.data;
 
 public enum AnchorSide {
 	TOP,

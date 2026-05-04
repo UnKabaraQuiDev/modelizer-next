@@ -138,6 +138,10 @@ public class LinkModel {
 		this.to = to;
 	}
 
+	public boolean hasLabel() {
+		return (labelTo != null && !labelTo.isBlank()) || (labelFrom != null && !labelFrom.isBlank());
+	}
+
 	@Override
 	public String toString() {
 		return "LinkModel [id=" + this.id + ", name=" + this.name + ", from=" + this.from + ", to=" + this.to + ", cardinalityFrom="

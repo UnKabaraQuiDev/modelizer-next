@@ -44,63 +44,66 @@ public class DiagramCanvas extends JPanel
 
 	private static final long serialVersionUID = -768210073584363710L;
 
-	static final double PASTE_OFFSET = 30.0;
+	public static final double PASTE_OFFSET = 30.0;
 
-	static ClipboardSnapshot clipboardSnapshot;
+	public static final String DEBUG_DRAW_LINK_ANCHORS_PROPERTY = DiagramCanvas.class.getSimpleName() + ".debug_draw_link_anchors";
+	public static boolean DEBUG_DRAW_LINK_ANCHORS = Boolean.getBoolean(DEBUG_DRAW_LINK_ANCHORS_PROPERTY);
 
-	static final Font TITLE_FONT = new Font(Font.SANS_SERIF, Font.BOLD, 14);
-	static final Font BODY_FONT = new Font(Font.SANS_SERIF, Font.PLAIN, 12);
+	public static ClipboardSnapshot clipboardSnapshot;
 
-	static final int COMMENT_MIN_WIDTH = 120;
-	static final int COMMENT_RESIZE_HANDLE_SIZE = 12;
-	static final int COMMENT_MIN_HEIGHT = 40;
-	static final int COMMENT_MIN_WIDTH_VALUE = 120;
+	public static final Font TITLE_FONT = new Font(Font.SANS_SERIF, Font.BOLD, 14);
+	public static final Font BODY_FONT = new Font(Font.SANS_SERIF, Font.PLAIN, 12);
 
-	static final int CLASS_MIN_WIDTH = 140;
-	static final int CLASS_HEADER_HEIGHT = 28;
-	static final int CLASS_ROW_HEIGHT = 22;
+	public static final int COMMENT_MIN_WIDTH = 120;
+	public static final int COMMENT_RESIZE_HANDLE_SIZE = 12;
+	public static final int COMMENT_MIN_HEIGHT = 40;
+	public static final int COMMENT_MIN_WIDTH_VALUE = 120;
 
-	static final int PADDING = 8;
+	public static final int CLASS_MIN_WIDTH = 140;
+	public static final int CLASS_HEADER_HEIGHT = 28;
+	public static final int CLASS_ROW_HEIGHT = 22;
 
-	static final Color CANVAS_BACKGROUND_COLOR = new Color(0xF2F2F2);
-	static final Color GRID_COLOR = new Color(0xE4E4E4);
-	static final Color SELECTION_COLOR = new Color(0x2F7DFF);
-	static final Color SELECTION_FILL_COLOR = new Color(DiagramCanvas.SELECTION_COLOR.getRed(),
+	public static final int TEXT_PADDING = 8;
+
+	public static final Color CANVAS_BACKGROUND_COLOR = new Color(0xF2F2F2);
+	public static final Color GRID_COLOR = new Color(0xE4E4E4);
+	public static final Color SELECTION_COLOR = new Color(0x2F7DFF);
+	public static final Color SELECTION_FILL_COLOR = new Color(DiagramCanvas.SELECTION_COLOR.getRed(),
 			DiagramCanvas.SELECTION_COLOR.getGreen(),
 			DiagramCanvas.SELECTION_COLOR.getBlue(),
 			60);
-	static final Color COMMENT_CONNECTOR_COLOR = new Color(0x777777);
-	static final BasicStroke DEFAULT_STROKE = new BasicStroke(1.0f);
+	public static final Color COMMENT_CONNECTOR_COLOR = new Color(0x777777);
+	public static final BasicStroke DEFAULT_STROKE = new BasicStroke(1.0f);
 
-	static final BasicStroke FIELD_SELECTION_STROKE = new BasicStroke(2.0f);
-	static final BasicStroke SELECTION_STROKE = new BasicStroke(2.5f);
-	static final BasicStroke LINK_DEFAULT_STROKE = new BasicStroke(1.2f);
-	static final BasicStroke COMMENT_CONNECTOR_SELECTION_STROKE = new BasicStroke(2.0f);
-	static final BasicStroke ASSOCIATION_CONNECTOR_DEFAULT_STROKE = new BasicStroke(1.0f,
+	public static final BasicStroke FIELD_SELECTION_STROKE = new BasicStroke(2.0f);
+	public static final BasicStroke SELECTION_STROKE = new BasicStroke(2.5f);
+	public static final BasicStroke LINK_DEFAULT_STROKE = new BasicStroke(1.2f);
+	public static final BasicStroke COMMENT_CONNECTOR_SELECTION_STROKE = new BasicStroke(2.0f);
+	public static final BasicStroke ASSOCIATION_CONNECTOR_DEFAULT_STROKE = new BasicStroke(1.0f,
 			BasicStroke.CAP_BUTT,
 			BasicStroke.JOIN_MITER,
 			10.0f,
 			new float[] { 5.0f, 5.0f },
 			0.0f);
-	static final BasicStroke ASSOCIATION_CONNECTOR_SELECTION_STROKE = new BasicStroke(2.0f,
+	public static final BasicStroke ASSOCIATION_CONNECTOR_SELECTION_STROKE = new BasicStroke(2.0f,
 			BasicStroke.CAP_BUTT,
 			BasicStroke.JOIN_MITER,
 			10.0f,
 			new float[] { 5.0f, 5.0f },
 			0.0f);
-	static final BasicStroke LINK_PREVIEW_STROKE = new BasicStroke(1.5f,
+	public static final BasicStroke LINK_PREVIEW_STROKE = new BasicStroke(1.5f,
 			BasicStroke.CAP_BUTT,
 			BasicStroke.JOIN_MITER,
 			10.0f,
 			new float[] { 6.0f, 6.0f },
 			0.0f);
-	static final double LINK_HIT_DISTANCE = 6.0;
+	public static final double LINK_HIT_DISTANCE = 6.0;
 
-	static final double CONCEPTUAL_ANCHOR_SPACING = 18.0;
-	static final double SELF_LINK_OUTSIDE_OFFSET = 40.0;
-	static final int EXPORT_MARGIN = 32;
-	static final int DEFAULT_EXPORT_WIDTH = 1200;
-	static final int DEFAULT_EXPORT_HEIGHT = 800;
+	public static final double CONCEPTUAL_ANCHOR_SPACING = 18.0;
+	public static final double SELF_LINK_OUTSIDE_OFFSET = 40.0;
+	public static final int EXPORT_MARGIN = 32;
+	public static final int DEFAULT_EXPORT_WIDTH = 1200;
+	public static final int DEFAULT_EXPORT_HEIGHT = 800;
 
 	final ModelDocument document;
 

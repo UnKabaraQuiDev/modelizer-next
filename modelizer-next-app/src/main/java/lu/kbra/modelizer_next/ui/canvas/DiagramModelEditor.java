@@ -374,7 +374,7 @@ interface DiagramModelEditor extends DiagramCanvasExt {
 		this.getCanvas().renamingField.setBackground(style.getBackgroundColor());
 		this.getCanvas().renamingField.setForeground(style.getTextColor());
 		this.getCanvas().renamingField.setBorder(new CompoundBorder(new LineBorder(style.getBorderColor()),
-				new EmptyBorder(0, DiagramCanvas.PADDING, 0, DiagramCanvas.PADDING)));
+				new EmptyBorder(0, DiagramCanvas.TEXT_PADDING, 0, DiagramCanvas.TEXT_PADDING)));
 
 		SwingUtilities.invokeLater(() -> {
 			this.getCanvas().renamingField.setText(currentValue);

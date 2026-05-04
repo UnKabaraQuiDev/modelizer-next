@@ -8,8 +8,8 @@ import java.util.Map;
 
 import lu.kbra.modelizer_next.domain.LinkModel;
 import lu.kbra.modelizer_next.layout.LinkLayout;
+import lu.kbra.modelizer_next.ui.canvas.data.AnchorSide;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.AnchorPair;
-import lu.kbra.modelizer_next.ui.canvas.datastruct.AnchorSide;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.AnchorSidePair;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.CopiedLinkLayout;
 
@@ -54,7 +54,8 @@ public interface LinkLayoutManager extends DiagramCanvasExt {
 			final String fromClassId,
 			final Rectangle2D fromBounds,
 			final String toClassId,
-			final Rectangle2D toBounds) {
+			final Rectangle2D toBounds,
+			final boolean big) {
 
 		AnchorSidePair bestPair = new AnchorSidePair(AnchorSide.LEFT, AnchorSide.RIGHT);
 		double bestScore = Double.POSITIVE_INFINITY;
@@ -65,8 +66,8 @@ public interface LinkLayoutManager extends DiagramCanvasExt {
 				new AnchorSidePair(AnchorSide.BOTTOM, AnchorSide.TOP));
 
 		for (final AnchorSidePair pair : allowedPairs) {
-			final Point2D fromCenter = this.getCanvas().computeConceptualSideCenter(fromBounds, pair.fromSide());
-			final Point2D toCenter = this.getCanvas().computeConceptualSideCenter(toBounds, pair.toSide());
+			final Point2D fromCenter = this.getCanvas().computeConceptualSideCenter(fromBounds, pair.fromSide(), big);
+			final Point2D toCenter = this.getCanvas().computeConceptualSideCenter(toBounds, pair.toSide(), big);
 
 			final double distance = fromCenter.distance(toCenter);
 			final double loadPenalty = (this.getCanvas().getConceptualSideLinkCount(fromClassId, pair.fromSide())
@@ -134,7 +135,7 @@ public interface LinkLayoutManager extends DiagramCanvasExt {
 			}
 
 			final AnchorSide oppositeSide = fromEndpoint ? sidePair.toSide() : sidePair.fromSide();
-			final Point2D oppositePoint = this.getCanvas().computeConceptualSideCenter(bounds, oppositeSide);
+			final Point2D oppositePoint = this.getCanvas().computeConceptualSideCenter(bounds, oppositeSide, linkModel.hasLabel());
 			return switch (side) {
 			case TOP, BOTTOM -> oppositePoint.getX();
 			case LEFT, RIGHT -> oppositePoint.getY();
