@@ -194,7 +194,7 @@ public final class OnlineModelizerImporter {
 
 				fieldModel.setConceptualName(fieldName);
 				fieldModel.setTechnicalName(logicalName);
-				fieldModel.setNotConceptual(!attributeNode.path("visibility").path("conceptual").asBoolean(true));
+				fieldModel.setTechnicalOnly(!attributeNode.path("visibility").path("conceptual").asBoolean(true));
 				fieldModel.setPrimaryKey(attributeNode.path("primaryKey").asBoolean(false));
 				fieldModel.setUnique(attributeNode.path("unique").asBoolean(false));
 				fieldModel.setNotNull(!attributeNode.path("nullable").asBoolean(true));

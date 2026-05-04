@@ -112,7 +112,7 @@ public final class SampleDocumentFactory {
 		final FieldModel field = new FieldModel();
 		field.setConceptualName(conceptualName);
 		field.setTechnicalName(technicalName);
-		field.setNotConceptual(notConceptual);
+		field.setTechnicalOnly(notConceptual);
 		field.setPrimaryKey(primaryKey);
 		field.setUnique(unique);
 		field.setNotNull(notNull);

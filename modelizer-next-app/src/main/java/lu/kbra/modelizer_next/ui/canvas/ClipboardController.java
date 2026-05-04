@@ -208,7 +208,7 @@ interface ClipboardController extends DiagramCanvasExt {
 				final FieldModel fieldCopy = new FieldModel();
 				fieldCopy.setConceptualName(sourceField.getConceptualName());
 				fieldCopy.setTechnicalName(sourceField.getTechnicalName());
-				fieldCopy.setNotConceptual(sourceField.isNotConceptual());
+				fieldCopy.setTechnicalOnly(sourceField.isTechnicalOnly());
 				fieldCopy.setPrimaryKey(sourceField.isPrimaryKey());
 				fieldCopy.setUnique(sourceField.isUnique());
 				fieldCopy.setNotNull(sourceField.isNotNull());
@@ -245,7 +245,7 @@ interface ClipboardController extends DiagramCanvasExt {
 			final FieldModel copy = new FieldModel();
 			copy.setConceptualName(source.getConceptualName() + " Copy");
 			copy.setTechnicalName(source.getTechnicalName() + "_COPY");
-			copy.setNotConceptual(source.isNotConceptual());
+			copy.setTechnicalOnly(source.isTechnicalOnly());
 			copy.setPrimaryKey(source.isPrimaryKey());
 			copy.setUnique(source.isUnique());
 			copy.setNotNull(source.isNotNull());

@@ -183,7 +183,7 @@ public class LegacyModelizerImporter {
 
 				fieldModel.setConceptualName(fieldName);
 				fieldModel.setTechnicalName(fieldTechnicalName);
-				fieldModel.setNotConceptual(fieldNode.path("noConceptual").asBoolean(false));
+				fieldModel.setTechnicalOnly(fieldNode.path("noConceptual").asBoolean(false));
 				fieldModel.setPrimaryKey(fieldNode.path("primary").asBoolean(false));
 				fieldModel.setUnique(fieldNode.path("unique").asBoolean(false));
 				fieldModel.setNotNull(!fieldNode.path("null").asBoolean(true));

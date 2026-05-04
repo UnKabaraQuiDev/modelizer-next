@@ -11,6 +11,7 @@ import lu.kbra.modelizer_next.domain.impl.VisibilityOwner;
 import lu.kbra.modelizer_next.domain.shared.ElementNames;
 import lu.kbra.modelizer_next.domain.shared.ElementStyle;
 import lu.kbra.modelizer_next.domain.shared.LayerVisibility;
+import lu.kbra.modelizer_next.layout.PanelType;
 
 public class ClassModel implements VisibilityOwner, IdOwner, StyleOwner, NamesOwner {
 
@@ -36,6 +37,68 @@ public class ClassModel implements VisibilityOwner, IdOwner, StyleOwner, NamesOw
 		}
 
 		return -1;
+	}
+
+	public int getFieldIndex(final String fieldId, final PanelType panelType) {
+		int j = 0;
+
+		for (final FieldModel field : this.fields) {
+			final boolean visible = !field.isTechnicalOnly() || panelType.isTechnical();
+
+			if (visible) {
+				if (fieldId.equals(field.getId())) {
+					return j;
+				}
+				j++;
+			}
+		}
+
+		return -1;
+	}
+
+	public FieldModel getField(final int i, final PanelType panelType) {
+		int j = 0;
+
+		for (final FieldModel field : this.fields) {
+			final boolean visible = !field.isTechnicalOnly() || panelType.isTechnical();
+
+			if (visible) {
+				if (j == i) {
+					return field;
+				}
+				j++;
+			}
+		}
+
+		return null;
+	}
+
+	public List<FieldModel> getFields(final PanelType panelType) {
+		final List<FieldModel> result = new ArrayList<>();
+
+		for (final FieldModel field : this.fields) {
+			final boolean visible = !field.isTechnicalOnly() || panelType.isTechnical();
+
+			if (visible) {
+				result.add(field);
+			}
+		}
+
+		return result;
+	}
+
+	public int getFieldCount(final PanelType panelType) {
+		int count = 0;
+
+		for (final FieldModel field : this.fields) {
+			final boolean visible = !field.isTechnicalOnly() || panelType.isTechnical();
+
+			if (visible) {
+				count++;
+			}
+		}
+
+		return count;
 	}
 
 	public List<FieldModel> getFields() {

@@ -1,6 +1,6 @@
 package lu.kbra.modelizer_next.domain.data;
 
-public enum Cardinality {
+public enum Cardinality implements DisplayValueOwner {
 
 	ZERO_OR_ONE("0..1"),
 	ONE("1..1"),
@@ -13,6 +13,7 @@ public enum Cardinality {
 		this.displayValue = displayValue;
 	}
 
+	@Override
 	public String getDisplayValue() {
 		return this.displayValue;
 	}

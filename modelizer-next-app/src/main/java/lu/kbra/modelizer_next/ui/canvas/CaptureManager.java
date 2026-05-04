@@ -67,7 +67,7 @@ public interface CaptureManager extends DiagramCanvasExt {
 				fieldModel.getId(),
 				fieldModel.getConceptualName(),
 				fieldModel.getTechnicalName(),
-				fieldModel.isNotConceptual(),
+				fieldModel.isTechnicalOnly(),
 				fieldModel.isPrimaryKey(),
 				fieldModel.isUnique(),
 				fieldModel.isNotNull(),

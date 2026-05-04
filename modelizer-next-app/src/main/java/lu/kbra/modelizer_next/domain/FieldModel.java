@@ -2,6 +2,8 @@ package lu.kbra.modelizer_next.domain;
 
 import java.util.UUID;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
+
 import lu.kbra.modelizer_next.domain.impl.IdOwner;
 import lu.kbra.modelizer_next.domain.impl.NamesOwner;
 import lu.kbra.modelizer_next.domain.impl.StyleOwner;
@@ -14,7 +16,8 @@ public class FieldModel implements NamesOwner, IdOwner, StyleOwner {
 
 	private String id;
 	private ElementNames names;
-	private boolean notConceptual;
+	@JsonAlias("notConceptual")
+	private boolean technicalOnly;
 	private ElementStyle style;
 	private boolean primaryKey;
 	private boolean unique;
@@ -24,7 +27,7 @@ public class FieldModel implements NamesOwner, IdOwner, StyleOwner {
 	public FieldModel() {
 		this.id = UUID.randomUUID().toString();
 		this.names = new ElementNames();
-		this.notConceptual = false;
+		this.technicalOnly = false;
 		this.style = ElementStyle.forField();
 		this.primaryKey = false;
 		this.unique = false;
@@ -51,8 +54,8 @@ public class FieldModel implements NamesOwner, IdOwner, StyleOwner {
 		return this.type;
 	}
 
-	public boolean isNotConceptual() {
-		return this.notConceptual;
+	public boolean isTechnicalOnly() {
+		return this.technicalOnly;
 	}
 
 	public boolean isNotNull() {
@@ -77,8 +80,8 @@ public class FieldModel implements NamesOwner, IdOwner, StyleOwner {
 		this.names = names;
 	}
 
-	public void setNotConceptual(final boolean notConceptual) {
-		this.notConceptual = notConceptual;
+	public void setTechnicalOnly(final boolean notConceptual) {
+		this.technicalOnly = notConceptual;
 	}
 
 	public void setNotNull(final boolean notNull) {
@@ -105,7 +108,7 @@ public class FieldModel implements NamesOwner, IdOwner, StyleOwner {
 	@Override
 	public String toString() {
 		return "FieldModel@" + System.identityHashCode(this) + " [id=" + this.id + ", names=" + this.names + ", notConceptual="
-				+ this.notConceptual + ", style=" + this.style + ", primaryKey=" + this.primaryKey + ", unique=" + this.unique
+				+ this.technicalOnly + ", style=" + this.style + ", primaryKey=" + this.primaryKey + ", unique=" + this.unique
 				+ ", notNull=" + this.notNull + ", type=" + this.type + "]";
 	}
 

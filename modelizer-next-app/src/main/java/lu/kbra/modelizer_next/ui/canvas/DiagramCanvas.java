@@ -18,7 +18,6 @@ import java.util.Map;
 
 import javax.swing.Action;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
 
 import lu.kbra.modelizer_next.document.ModelDocument;
 import lu.kbra.modelizer_next.domain.ClassModel;
@@ -31,6 +30,7 @@ import lu.kbra.modelizer_next.ui.canvas.datastruct.ClipboardSnapshot;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.DraggedSelection;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.LinkAnchorPlacement;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.LinkCreationState;
+import lu.kbra.modelizer_next.ui.canvas.datastruct.RenamingComponents;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.RenamingElement;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.ResizingComment;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectedElement;
@@ -117,7 +117,7 @@ public class DiagramCanvas extends JPanel
 	LinkCreationState linkCreationState;
 	SelectedElement linkPreviewTarget;
 
-	JTextField renamingField;
+	RenamingComponents renamingComponents;
 	RenamingElement renamingElement;
 
 	Point2D.Double linkPreviewMousePoint;
@@ -172,8 +172,8 @@ public class DiagramCanvas extends JPanel
 		super.addMouseMotionListener(mouseAdapter);
 		super.addMouseWheelListener(mouseAdapter);
 
-		this.renamingField = this.createRenamingField();
-		super.add(this.renamingField);
+		this.renamingComponents = this.createRenamingField();
+		this.renamingComponents.forEach(super::add);
 		super.setLayout(null);
 	}
 
@@ -237,7 +237,7 @@ public class DiagramCanvas extends JPanel
 		this.dragOccurred = false;
 
 		this.currentDragOffset = new Point2D.Double();
-		this.renamingField.setVisible(false);
+		this.renamingComponents.forEach(c -> c.setVisible(false));
 
 		this.setCursor(Cursor.getDefaultCursor());
 		this.notifySelectionChanged();

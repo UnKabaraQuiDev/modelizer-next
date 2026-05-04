@@ -44,7 +44,7 @@ public interface ElementCreator extends DiagramCanvasExt {
 				.setTechnicalName(
 						rename ? this.getCanvas().appendSuffix(copiedField.technicalName(), "_COPY") : copiedField.technicalName());
 
-		fieldCopy.setNotConceptual(copiedField.notConceptual());
+		fieldCopy.setTechnicalOnly(copiedField.notConceptual());
 		fieldCopy.setPrimaryKey(copiedField.primaryKey());
 		fieldCopy.setUnique(copiedField.unique());
 		fieldCopy.setNotNull(copiedField.notNull());

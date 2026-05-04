@@ -2,6 +2,8 @@ package lu.kbra.modelizer_next.ui.canvas.datastruct;
 
 import java.util.Objects;
 
+import javax.swing.JComponent;
+
 import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectedElement.SelectedType;
 
 public record RenamingElement(RenamingType type, String classId, String fieldId, String commentId, String linkId) {
@@ -111,6 +113,17 @@ public record RenamingElement(RenamingType type, String classId, String fieldId,
 			return false;
 		}
 		return ((RenamingElement) other).type == this.type && Objects.equals(((RenamingElement) other).getActualId(), this.getActualId());
+	}
+
+	@Deprecated
+	public JComponent getRenamingComponent(RenamingComponents component) {
+		return switch (type) {
+		case CLASS -> component.textField();
+		case CLASS_FIELD -> component.textField();
+		case COMMENT -> component.textArea();
+		case LINK_LABEL, LINK_FROM_CARDINALITY, LINK_FROM_LABEL, LINK_TO_CARDINALITY, LINK_TO_LABEL -> component.comboBox();
+		default -> throw new IllegalArgumentException("Unexpected value: " + type);
+		};
 	}
 
 }

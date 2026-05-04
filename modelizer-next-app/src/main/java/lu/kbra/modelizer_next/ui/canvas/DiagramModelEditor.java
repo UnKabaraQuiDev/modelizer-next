@@ -11,7 +11,10 @@ import java.util.List;
 import java.util.Objects;
 
 import javax.swing.AbstractAction;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.JComboBox;
 import javax.swing.JComponent;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
@@ -33,8 +36,8 @@ import lu.kbra.modelizer_next.domain.shared.ElementStyle;
 import lu.kbra.modelizer_next.layout.LayoutObjectType;
 import lu.kbra.modelizer_next.layout.NodeLayout;
 import lu.kbra.modelizer_next.layout.PanelType;
+import lu.kbra.modelizer_next.ui.canvas.datastruct.RenamingComponents;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.RenamingElement;
-import lu.kbra.modelizer_next.ui.canvas.datastruct.RenamingElement.RenamingType;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectedElement;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectedElement.SelectedType;
 import lu.kbra.modelizer_next.ui.dialogs.LinkEditorDialog;
@@ -104,9 +107,9 @@ interface DiagramModelEditor extends DiagramCanvasExt {
 		this.getCanvas().applyDefaultPaletteToField(fieldModel);
 		targetClass.getFields().add(fieldModel);
 
-		if (isRenamingElement() && getCanvas().renamingElement.type().isClass()
-				&& getCanvas().renamingElement.classId().equals(targetClass.getId())) {
-			confirmRenamingElement(0);
+		if (this.isRenamingElement() && this.getCanvas().renamingElement.type().isClass()
+				&& this.getCanvas().renamingElement.classId().equals(targetClass.getId())) {
+			this.confirmRenamingElement(0);
 		}
 		this.getCanvas().select(SelectedElement.forField(targetClass.getId(), fieldModel.getId()));
 		this.getCanvas().notifySelectionChanged();
@@ -184,21 +187,21 @@ interface DiagramModelEditor extends DiagramCanvasExt {
 		this.getCanvas().notifySelectionChanged();
 		this.getCanvas().notifyDocumentChanged();
 		this.getCanvas().repaint();
-		invokeRenamingElement(RenamingElement.forClass(classModel.getId()));
+		this.invokeRenamingElement(RenamingElement.forClass(classModel.getId()));
 	}
 
 	default void cancelRenamingElement() {
-		if (!isRenamingElement()) {
+		if (!this.isRenamingElement()) {
 			return;
 		}
-		this.getCanvas().renamingField.setVisible(false);
+		this.getCanvas().renamingComponents.setVisible(false);
 		this.getCanvas().renamingElement = null;
 		this.getCanvas().repaint();
 	}
 
 	default void confirmRenamingElement(final int nextDir) {
-		if (!isRenamingElement()) {
-			this.getCanvas().renamingField.setVisible(false);
+		if (!this.isRenamingElement()) {
+			this.getCanvas().renamingComponents.setVisible(false);
 			this.getCanvas().repaint();
 			return;
 		}
@@ -207,7 +210,7 @@ interface DiagramModelEditor extends DiagramCanvasExt {
 		switch (this.getCanvas().renamingElement.type()) {
 		case CLASS -> {
 			final ClassModel classModel = this.getCanvas().findClassById(this.getCanvas().renamingElement.classId());
-			classModel.getNames().set(this.getCanvas().getPanelType(), this.getCanvas().renamingField.getText());
+			classModel.getNames().set(this.getCanvas().getPanelType(), this.getCanvas().renamingComponents.textField().getText());
 
 			if (next) {
 				if (classModel.getFields().size() > 0) {
@@ -222,28 +225,32 @@ interface DiagramModelEditor extends DiagramCanvasExt {
 		case CLASS_FIELD -> {
 			final FieldModel fieldModel = this.getCanvas()
 					.findFieldById(this.getCanvas().renamingElement.classId(), this.getCanvas().renamingElement.fieldId());
-			fieldModel.getNames().set(this.getCanvas().getPanelType(), this.getCanvas().renamingField.getText());
+			fieldModel.getNames().set(this.getCanvas().getPanelType(), this.getCanvas().renamingComponents.textField().getText());
 
 			if (next) {
 				final ClassModel classModel = this.getCanvas().findClassById(this.getCanvas().renamingElement.classId());
-				final int idx = classModel.getFieldIndex(fieldModel.getId());
-				if (idx + nextDir < 0 || idx + nextDir > classModel.getFields().size() - 1) {
+				final int idx = classModel.getFieldIndex(fieldModel.getId(), this.getPanelType());
+				if (idx + nextDir < 0 || idx + nextDir > classModel.getFieldCount(this.getPanelType()) - 1) {
 					this.getCanvas().invokeRenamingElement(RenamingElement.forClass(classModel.getId()));
 				} else {
 					this.getCanvas()
-							.invokeRenamingElement(
-									RenamingElement.forField(classModel.getId(), classModel.getFields().get(idx + nextDir).getId()));
+							.invokeRenamingElement(RenamingElement.forField(classModel.getId(),
+									classModel.getField(idx + nextDir, this.getPanelType()).getId()));
 				}
 			}
 		}
-		default -> throw new UnsupportedOperationException("Unsupported type: " + getCanvas().renamingElement);
+		case COMMENT -> {
+			final CommentModel commentModel = this.getCanvas().findCommentById(this.getCanvas().renamingElement.commentId());
+			commentModel.setText(this.getCanvas().renamingComponents.textArea().getText());
+		}
+		default -> throw new UnsupportedOperationException("Unsupported type: " + this.getCanvas().renamingElement);
 		}
 
 		this.getCanvas().notifyDocumentChanged();
 		this.getCanvas().notifySelectionChanged();
 
 		if (!next) {
-			this.getCanvas().renamingField.setVisible(false);
+			this.getCanvas().renamingComponents.setVisible(false);
 			this.getCanvas().renamingElement = null;
 			SwingUtilities.invokeLater(this.getCanvas()::requestFocusInWindow);
 			this.getCanvas().repaint();
@@ -254,63 +261,70 @@ interface DiagramModelEditor extends DiagramCanvasExt {
 		return this.getCanvas().renamingElement != null;
 	}
 
-	default JTextField createRenamingField() {
-		final JTextField renamingField = new JTextField("editing");
-		renamingField.setVisible(false);
-		renamingField.setFocusTraversalKeysEnabled(false);
-		renamingField.addFocusListener(new FocusAdapter() {
+	default RenamingComponents createRenamingField() {
+		final JTextField textField = new JTextField("editing");
+		final JTextArea textArea = new JTextArea("editing");
+		textArea.setLineWrap(true);
+		textArea.setWrapStyleWord(true);
+		final JComboBox<String> comboBox = new JComboBox<>(new DefaultComboBoxModel<>());
 
-			@Override
-			public void focusLost(final FocusEvent e) {
-				if (!e.isTemporary() && renamingField.isVisible() && e.getOppositeComponent() != renamingField) {
-					SwingUtilities.invokeLater(() -> {
-						if (!renamingField.hasFocus()) {
-							DiagramModelEditor.this.cancelRenamingElement();
-						}
-					});
+		for (final JComponent renamingField : new JComponent[] { textField, textArea, comboBox }) {
+			renamingField.setVisible(false);
+			renamingField.setFocusTraversalKeysEnabled(false);
+			renamingField.addFocusListener(new FocusAdapter() {
+
+				@Override
+				public void focusLost(final FocusEvent e) {
+					if (!e.isTemporary() && renamingField.isVisible() && e.getOppositeComponent() != renamingField) {
+						SwingUtilities.invokeLater(() -> {
+							if (!renamingField.hasFocus()) {
+								DiagramModelEditor.this.cancelRenamingElement();
+							}
+						});
+					}
 				}
-			}
 
-		});
-		renamingField.getInputMap(JComponent.WHEN_FOCUSED).put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "cancel");
-		renamingField.getInputMap(JComponent.WHEN_FOCUSED).put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "submit");
-		renamingField.getInputMap(JComponent.WHEN_FOCUSED).put(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, 0), "submit-next");
-		renamingField.getInputMap(JComponent.WHEN_FOCUSED)
-				.put(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, InputEvent.SHIFT_DOWN_MASK), "submit-previous");
-		renamingField.getActionMap().put("cancel", new AbstractAction() {
+			});
+			renamingField.getInputMap(JComponent.WHEN_FOCUSED).put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "cancel");
+			renamingField.getInputMap(JComponent.WHEN_FOCUSED).put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "submit");
+			renamingField.getInputMap(JComponent.WHEN_FOCUSED).put(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, 0), "submitNext");
+			renamingField.getInputMap(JComponent.WHEN_FOCUSED)
+					.put(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, InputEvent.SHIFT_DOWN_MASK), "submitPrevious");
+			renamingField.getActionMap().put("cancel", new AbstractAction() {
 
-			@Override
-			public void actionPerformed(final ActionEvent e) {
-				DiagramModelEditor.this.cancelRenamingElement();
-			}
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					DiagramModelEditor.this.cancelRenamingElement();
+				}
 
-		});
-		renamingField.getActionMap().put("submit", new AbstractAction() {
+			});
+			renamingField.getActionMap().put("submit", new AbstractAction() {
 
-			@Override
-			public void actionPerformed(final ActionEvent e) {
-				DiagramModelEditor.this.confirmRenamingElement(0);
-			}
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					DiagramModelEditor.this.confirmRenamingElement(0);
+				}
 
-		});
-		renamingField.getActionMap().put("submit-next", new AbstractAction() {
+			});
+			renamingField.getActionMap().put("submitNext", new AbstractAction() {
 
-			@Override
-			public void actionPerformed(final ActionEvent e) {
-				DiagramModelEditor.this.confirmRenamingElement(1);
-			}
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					DiagramModelEditor.this.confirmRenamingElement(1);
+				}
 
-		});
-		renamingField.getActionMap().put("submit-previous", new AbstractAction() {
+			});
+			renamingField.getActionMap().put("submitPrevious", new AbstractAction() {
 
-			@Override
-			public void actionPerformed(final ActionEvent e) {
-				DiagramModelEditor.this.confirmRenamingElement(-1);
-			}
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					DiagramModelEditor.this.confirmRenamingElement(-1);
+				}
 
-		});
+			});
+		}
 
-		return renamingField;
+		return new RenamingComponents(textField, textArea, comboBox);
 	}
 
 	default void deleteSelection() {
@@ -349,64 +363,136 @@ interface DiagramModelEditor extends DiagramCanvasExt {
 		}
 	}
 
-	default void invokeRenamingElement(final RenamingElement newRenamingElement) {
-		if (isRenamingElement()) {
-			this.getCanvas().renamingField.setVisible(false);
+	record RenamingContext(Point2D pos, Point2D size, String value, Object style, Class<?> valueType, Object owner) {
+	}
+
+	default void invokeRenamingElement(final RenamingElement element) {
+		if (this.isRenamingElement()) {
+			this.getCanvas().renamingComponents.setVisible(false);
 			this.getCanvas().renamingElement = null;
 		}
 
-		this.getCanvas().renamingElement = newRenamingElement;
-		this.getCanvas().selectedElements.clear();
-		this.getCanvas().select(newRenamingElement.asSelectedElement());
-		final ClassModel classModel = this.getCanvas().findClassById(this.getCanvas().renamingElement.classId());
-		final NodeLayout nl = this.getCanvas().findOrCreateNodeLayout(LayoutObjectType.CLASS, this.getCanvas().renamingElement.classId());
+		final var canvas = this.getCanvas();
 
-		final Point2D pos;
-		final Point2D size;
-		final String currentValue;
-		final ElementStyle style;
+		canvas.renamingElement = element;
+		canvas.selectedElements.clear();
+		canvas.select(element.asSelectedElement());
 
-		switch (newRenamingElement.type()) {
-		case CLASS -> {
-			pos = this.getCanvas().worldToScreen(nl.getPosition());
-			size = this.getCanvas().worldToScreenZoom(new Point2D.Double(nl.getSize().getX(), DiagramCanvas.CLASS_HEADER_HEIGHT));
-			currentValue = classModel.getNames().get(this.getCanvas().panelType);
-			style = classModel.getStyle();
-		}
-		case CLASS_FIELD -> {
-			final FieldModel fieldModel = this.getCanvas().findFieldById(newRenamingElement.classId(), newRenamingElement.fieldId());
-			final Point2D fieldPos = new Point2D.Double(nl.getPosition().getX(),
-					nl.getPosition().getY() + DiagramCanvas.CLASS_ROW_HEIGHT * (classModel.getFieldIndex(fieldModel.getId()) + 1) + 6);
-			pos = this.getCanvas().worldToScreen(fieldPos);
-			size = this.getCanvas().worldToScreenZoom(new Point2D.Double(nl.getSize().getX(), DiagramCanvas.CLASS_ROW_HEIGHT));
-			currentValue = fieldModel.getNames().get(this.getCanvas().panelType);
-			style = fieldModel.getStyle();
-		}
-		case COMMENT -> {
-			final CommentModel commentModel = this.getCanvas().findCommentById(newRenamingElement.commentId());
-			final Point2D fieldPos = new Point2D.Double(nl.getPosition().getX(),
-					nl.getPosition().getY() + DiagramCanvas.CLASS_ROW_HEIGHT * (classModel.getFieldIndex(commentModel.getId()) + 1) + 6);
-			pos = this.getCanvas().worldToScreen(fieldPos);
-			size = this.getCanvas().worldToScreenZoom(new Point2D.Double(nl.getSize().getX(), DiagramCanvas.CLASS_ROW_HEIGHT));
-			currentValue = commentModel.getText();
-			style = commentModel.getStyle();
-		}
-		default -> throw new IllegalArgumentException("Unsupported element: " + newRenamingElement);
-		}
+		final RenamingContext ctx = switch (element.type()) {
+		case CLASS -> this.buildClassContext(element);
+		case CLASS_FIELD -> this.buildClassFieldContext(element);
+		case COMMENT -> this.buildCommentContext(element);
+		case LINK_LABEL, LINK_TO_LABEL, LINK_FROM_LABEL -> this.buildLinkLabelContext(element);
+		case LINK_TO_CARDINALITY, LINK_FROM_CARDINALITY -> this.buildLinkCardinalityContext(element);
+		default -> throw new IllegalArgumentException("Unexpected value: " + element.type());
+		};
 
-		this.getCanvas().renamingField.setBounds((int) pos.getX(), (int) pos.getY(), (int) size.getX(), (int) size.getY());
+		this.applyRenamingContext(ctx);
+	}
 
-		this.getCanvas().renamingField.setBackground(style.getBackgroundColor());
-		this.getCanvas().renamingField.setForeground(style.getTextColor());
-		this.getCanvas().renamingField.setBorder(new CompoundBorder(new LineBorder(style.getBorderColor()),
-				new EmptyBorder(0, DiagramCanvas.TEXT_PADDING, 0, DiagramCanvas.TEXT_PADDING)));
+	default RenamingContext buildClassContext(final RenamingElement e) {
+		final var canvas = this.getCanvas();
+
+		final NodeLayout nl = canvas.findOrCreateNodeLayout(LayoutObjectType.CLASS, e.classId());
+		final ClassModel model = canvas.findClassById(e.classId());
+
+		final Point2D pos = canvas.worldToScreen(nl.getPosition());
+		final Point2D size = canvas.worldToScreenZoom(new Point2D.Double(nl.getSize().getX(), DiagramCanvas.CLASS_HEADER_HEIGHT));
+
+		return new RenamingContext(pos, size, model.getNames().get(canvas.panelType), model.getStyle(), String.class, model);
+	}
+
+	default RenamingContext buildClassFieldContext(final RenamingElement e) {
+		final var canvas = this.getCanvas();
+
+		final NodeLayout nl = canvas.findOrCreateNodeLayout(LayoutObjectType.CLASS, e.classId());
+		final ClassModel classModel = canvas.findClassById(e.classId());
+		final FieldModel field = canvas.findFieldById(e.classId(), e.fieldId());
+
+		final int index = classModel.getFieldIndex(field.getId(), canvas.panelType);
+
+		final Point2D fieldPos = new Point2D.Double(nl.getPosition().getX(),
+				nl.getPosition().getY() + DiagramCanvas.CLASS_ROW_HEIGHT * (index + 1) + 6);
+
+		final Point2D size = canvas.worldToScreenZoom(new Point2D.Double(nl.getSize().getX(), DiagramCanvas.CLASS_ROW_HEIGHT));
+
+		return new RenamingContext(canvas
+				.worldToScreen(fieldPos), size, field.getNames().get(canvas.panelType), field.getStyle(), String.class, field);
+	}
+
+	default RenamingContext buildCommentContext(final RenamingElement e) {
+		final var canvas = this.getCanvas();
+
+		final NodeLayout nl = canvas.findOrCreateNodeLayout(LayoutObjectType.COMMENT, e.commentId());
+		final CommentModel comment = canvas.findCommentById(e.commentId());
+
+		final Point2D pos = canvas.worldToScreen(nl.getPosition());
+		final Point2D size = canvas.worldToScreenZoom(nl.getSize());
+
+		return new RenamingContext(pos, size, comment.getText(), comment.getStyle(), String.class, comment);
+	}
+
+	default RenamingContext buildLinkLabelContext(final RenamingElement e) {
+		return null;
+//		final var canvas = this.getCanvas();
+//
+//		final NodeLayout nl = canvas.findOrCreateNodeLayout(LayoutObjectType.LINK_LABEL, e.linkId());
+//
+//		final LinkModel link = canvas.findLinkById(e.linkId());
+//
+//		final Point2D pos = canvas.worldToScreen(nl.getPosition());
+//		final Point2D size = canvas.worldToScreenZoom(nl.getSize());
+//
+//		final String value = e.type().isToLabel() ? link.getToLabel() : link.getFromLabel();
+//
+//		return new RenamingContext(pos, size, value, null, String.class, link);
+	}
+
+	default RenamingContext buildLinkCardinalityContext(final RenamingElement e) {
+		return null;
+//		final var canvas = this.getCanvas();
+//
+//		final NodeLayout nl = canvas.findOrCreateNodeLayout(LayoutObjectType.LINK_CARDINALITY, e.linkId());
+//
+//		final LinkModel link = canvas.findLinkById(e.linkId());
+//
+//		final Point2D pos = canvas.worldToScreen(nl.getPosition());
+//		final Point2D size = canvas.worldToScreenZoom(nl.getSize());
+//
+//		final Enum<?> value = e.type().isToCardinality() ? link.getToCardinality() : link.getFromCardinality();
+//
+//		return new RenamingContext(pos, size, value.name(), null, value.getClass(), link);
+	}
+
+	default void applyRenamingContext(final RenamingContext ctx) {
+		final var canvas = this.getCanvas();
+
+		canvas.renamingComponents
+				.setBounds((int) ctx.pos().getX(), (int) ctx.pos().getY(), (int) ctx.size().getX(), (int) ctx.size().getY());
+
+		// style only when present
+		if (ctx.style() instanceof final ElementStyle style) {
+			canvas.renamingComponents.setBackground(style.getBackgroundColor());
+			canvas.renamingComponents.setForeground(style.getTextColor());
+			canvas.renamingComponents.setBorder(new CompoundBorder(new LineBorder(style.getBorderColor()),
+					new EmptyBorder(0, DiagramCanvas.TEXT_PADDING, 0, DiagramCanvas.TEXT_PADDING)));
+		}
 
 		SwingUtilities.invokeLater(() -> {
-			this.getCanvas().renamingField.setText(currentValue);
-			this.getCanvas().renamingField.setVisible(true);
-			this.getCanvas().renamingField.requestFocusInWindow();
-			this.getCanvas().renamingField.selectAll();
-			this.getCanvas().repaint();
+			final JComponent comp = canvas.renamingElement.getRenamingComponent(canvas.renamingComponents);
+
+			if (ctx.valueType() == String.class) {
+				canvas.renamingComponents.setText(ctx.value());
+			} else if (Enum.class.isAssignableFrom(ctx.valueType())) {
+				canvas.renamingComponents.setValues((Class) ctx.valueType(), ctx.value());
+			} else {
+				throw new IllegalArgumentException("Unsupported type: " + ctx.valueType());
+			}
+
+			canvas.renamingComponents.setVisible(true);
+			comp.requestFocusInWindow();
+			canvas.renamingComponents.selectAll();
+			canvas.repaint();
 		});
 	}
 

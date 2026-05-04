@@ -121,7 +121,7 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 			final FieldModel fieldModel = new FieldModel();
 			fieldModel.setConceptualName(displayName);
 			fieldModel.setTechnicalName(technicalName.isBlank() ? displayName : technicalName);
-			fieldModel.setNotConceptual(true);
+			fieldModel.setTechnicalOnly(true);
 			fieldModel.setPrimaryKey(false);
 			fieldModel.setUnique(false);
 			fieldModel.setNotNull(false);
@@ -207,7 +207,7 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 		final List<FieldModel> visibleFields = new ArrayList<>();
 
 		for (final FieldModel fieldModel : classModel.getFields()) {
-			if (this.getCanvas().panelType == PanelType.CONCEPTUAL && fieldModel.isNotConceptual()) {
+			if (this.getCanvas().panelType == PanelType.CONCEPTUAL && fieldModel.isTechnicalOnly()) {
 				continue;
 			}
 			visibleFields.add(fieldModel);
