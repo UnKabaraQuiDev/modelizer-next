@@ -27,7 +27,7 @@ import lu.kbra.modelizer_next.ui.canvas.data.AnchorSide;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.DiagramCanvasActions;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.LinkGeometry;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectedElement;
-import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectedType;
+import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectedElement.SelectedType;
 
 /**
  * Contains shared canvas helpers that do not own one specific feature area. It groups small
@@ -235,23 +235,24 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 	}
 
 	default void installKeyBindings() {
-		getCanvas().installDefaultKeyBindings(new DiagramCanvasActions(this.getCanvas()::renameSelection,
-				this.getCanvas()::moveFieldSelection,
-				this.getCanvas()::moveSelectedFieldInList,
-				this.getCanvas()::addTable,
-				this.getCanvas()::addField,
-				this.getCanvas()::addComment,
-				this.getCanvas()::deleteSelection,
-				this.getCanvas()::duplicateSelection,
-				this.getCanvas()::clearSelection,
-				this.getCanvas()::addLink,
-				this.getCanvas()::selectAll,
-				this.getCanvas()::editSelected,
-				this.getCanvas()::copySelection,
-				this.getCanvas()::cutSelection,
-				this.getCanvas()::pasteSelection,
-				this.getCanvas().documentEventListener::undo,
-				this.getCanvas().documentEventListener::redo));
+		this.getCanvas()
+				.installDefaultKeyBindings(new DiagramCanvasActions(this.getCanvas()::renameSelection,
+						this.getCanvas()::moveFieldSelection,
+						this.getCanvas()::moveSelectedFieldInList,
+						this.getCanvas()::addTable,
+						this.getCanvas()::addField,
+						this.getCanvas()::addComment,
+						this.getCanvas()::deleteSelection,
+						this.getCanvas()::duplicateSelection,
+						this.getCanvas()::clearSelection,
+						this.getCanvas()::addLink,
+						this.getCanvas()::selectAll,
+						this.getCanvas()::editSelected,
+						this.getCanvas()::copySelection,
+						this.getCanvas()::cutSelection,
+						this.getCanvas()::pasteSelection,
+						this.getCanvas().documentEventListener::undo,
+						this.getCanvas().documentEventListener::redo));
 	}
 
 	default boolean isLinkConnectedTo(final LinkModel linkModel, final String classId) {
@@ -557,7 +558,7 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 		return new Point2D.Double(x, classBounds.getCenterY());
 	}
 
-	default Point2D resolveTechnicalFieldAnchor(
+	default FieldAnchor resolveTechnicalFieldAnchor(
 			final Graphics2D g2,
 			final String classId,
 			final String fieldId,
@@ -580,7 +581,8 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 		if (fieldId == null) {
 			final Point2D left = new Point2D.Double(classBounds.getX(), classBounds.getCenterY());
 			final Point2D right = new Point2D.Double(classBounds.getMaxX(), classBounds.getCenterY());
-			return left.distance(oppositeReference) <= right.distance(oppositeReference) ? left : right;
+			return left.distance(oppositeReference) <= right.distance(oppositeReference) ? new FieldAnchor(left, AnchorSide.LEFT)
+					: new FieldAnchor(right, AnchorSide.RIGHT);
 		}
 
 		final List<FieldModel> visibleFields = this.getCanvas().getVisibleFields(classModel);
@@ -594,13 +596,15 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 				final Point2D left = new Point2D.Double(fieldBounds.getX(), fieldBounds.getCenterY());
 				final Point2D right = new Point2D.Double(fieldBounds.getMaxX(), fieldBounds.getCenterY());
 
-				return left.distance(oppositeReference) <= right.distance(oppositeReference) ? left : right;
+				return left.distance(oppositeReference) <= right.distance(oppositeReference) ? new FieldAnchor(left, AnchorSide.LEFT)
+						: new FieldAnchor(right, AnchorSide.RIGHT);
 			}
 		}
 
 		final Point2D left = new Point2D.Double(classBounds.getX(), classBounds.getCenterY());
 		final Point2D right = new Point2D.Double(classBounds.getMaxX(), classBounds.getCenterY());
-		return left.distance(oppositeReference) <= right.distance(oppositeReference) ? left : right;
+		return left.distance(oppositeReference) <= right.distance(oppositeReference) ? new FieldAnchor(left, AnchorSide.LEFT)
+				: new FieldAnchor(right, AnchorSide.RIGHT);
 	}
 
 	default Point2D resolveTechnicalSelfLinkAnchor(final Graphics2D g2, final String classId, final String fieldId, final AnchorSide side) {

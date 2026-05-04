@@ -152,7 +152,7 @@ interface ConceptualAnchorCache extends DiagramCanvasExt {
 			final Point2D toPoint = this.getCanvas()
 					.computeConceptualAnchorPoint(toBounds, sidePair.toSide(), toIndex, linkModel.hasLabel(), toLinks.size());
 
-			this.getCanvas().conceptualAnchorCache.put(linkModel.getId(), new AnchorPair(fromPoint, toPoint));
+			this.getCanvas().conceptualAnchorCache.put(linkModel.getId(), new AnchorPair(fromPoint, toPoint, fromKey.side(), toKey.side()));
 			this.getCanvas().conceptualAnchorPlacements.put(linkModel.getId(),
 					new LinkAnchorPlacement(sidePair.fromSide(), sidePair.toSide(), fromIndex, fromLinks.size(), toIndex, toLinks.size()));
 		}

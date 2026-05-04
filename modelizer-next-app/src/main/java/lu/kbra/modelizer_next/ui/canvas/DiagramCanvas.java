@@ -31,9 +31,10 @@ import lu.kbra.modelizer_next.ui.canvas.datastruct.ClipboardSnapshot;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.DraggedSelection;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.LinkAnchorPlacement;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.LinkCreationState;
+import lu.kbra.modelizer_next.ui.canvas.datastruct.RenamingElement;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.ResizingComment;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectedElement;
-import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectedType;
+import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectedElement.SelectedType;
 import lu.kbra.modelizer_next.ui.impl.DocumentChangeListener;
 
 public class DiagramCanvas extends JPanel
@@ -47,7 +48,7 @@ public class DiagramCanvas extends JPanel
 	public static final double PASTE_OFFSET = 30.0;
 
 	public static final String DEBUG_DRAW_LINK_ANCHORS_PROPERTY = DiagramCanvas.class.getSimpleName() + ".debug_draw_link_anchors";
-	public static boolean DEBUG_DRAW_LINK_ANCHORS = Boolean.getBoolean(DEBUG_DRAW_LINK_ANCHORS_PROPERTY);
+	public static boolean DEBUG_DRAW_LINK_ANCHORS = Boolean.getBoolean(DiagramCanvas.DEBUG_DRAW_LINK_ANCHORS_PROPERTY);
 
 	public static ClipboardSnapshot clipboardSnapshot;
 
@@ -117,7 +118,7 @@ public class DiagramCanvas extends JPanel
 	SelectedElement linkPreviewTarget;
 
 	JTextField renamingField;
-	SelectedElement renamingElement;
+	RenamingElement renamingElement;
 
 	Point2D.Double linkPreviewMousePoint;
 	SelectedElement selectedElement;

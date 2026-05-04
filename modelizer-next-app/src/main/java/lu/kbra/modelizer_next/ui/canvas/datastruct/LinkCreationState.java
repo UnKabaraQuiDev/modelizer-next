@@ -1,5 +1,7 @@
 package lu.kbra.modelizer_next.ui.canvas.datastruct;
 
+import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectedElement.SelectedType;
+
 public record LinkCreationState(SelectedType sourceType, String classId, String fieldId, String commentId, String linkId) {
 
 	public static LinkCreationState fromSelection(final SelectedElement selection) {

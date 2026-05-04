@@ -28,7 +28,7 @@ public class ModelizerAppEntryPoint implements AppMain {
 		try {
 			PCUtils.readPackagedBytesFile("/app.json");
 			throw new UnsupportedBootstrapVersionException("Bootstrap loader is too old.");
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			// ok
 		}
 

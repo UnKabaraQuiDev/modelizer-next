@@ -61,13 +61,17 @@ public final class SampleDocumentFactory {
 		note.setKind(CommentKind.STANDALONE);
 		note.setText("Standalone notes can live anywhere on the canvas.");
 
-		final CommentModel customerComment = new CommentModel();
+		final CommentModel customerComment = new CommentModel("Comments can be bound to a class.");
 		customerComment.setKind(CommentKind.BOUND);
 		customerComment.setBinding(new CommentBinding(BoundTargetType.CLASS, customer.getId()));
 
-		final CommentModel conceptualLinkComment = new CommentModel();
+		final CommentModel conceptualLinkComment = new CommentModel("Comments can be bound to a conceptual link.");
 		conceptualLinkComment.setKind(CommentKind.BOUND);
 		conceptualLinkComment.setBinding(new CommentBinding(BoundTargetType.LINK, conceptualCustomerOrders.getId()));
+
+		final CommentModel technicalLinkComment = new CommentModel("Comments can be bound to a technical link.");
+		technicalLinkComment.setKind(CommentKind.BOUND);
+		technicalLinkComment.setBinding(new CommentBinding(BoundTargetType.LINK, logicalCustomerOrders.getId()));
 
 		document.getModel().getClasses().add(customer);
 		document.getModel().getClasses().add(order);
@@ -76,6 +80,7 @@ public final class SampleDocumentFactory {
 		document.getModel().getComments().add(note);
 		document.getModel().getComments().add(customerComment);
 		document.getModel().getComments().add(conceptualLinkComment);
+		document.getModel().getComments().add(technicalLinkComment);
 
 		SampleDocumentFactory.seedClass(document.getWorkspace().getPanels().get(PanelType.CONCEPTUAL), customer, 120, 120, 220, 0);
 		SampleDocumentFactory.seedClass(document.getWorkspace().getPanels().get(PanelType.CONCEPTUAL), order, 450, 170, 220, 0);

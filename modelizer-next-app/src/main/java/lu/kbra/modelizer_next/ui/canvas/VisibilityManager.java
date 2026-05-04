@@ -35,14 +35,16 @@ public interface VisibilityManager extends DiagramCanvasExt {
 
 		final String targetId = commentModel.getBinding().getTargetId();
 		final boolean technicalLink;
-		LinkModel linkModel = getDocument().getModel()
+		LinkModel linkModel = this.getDocument()
+				.getModel()
 				.getConceptualLinks()
 				.stream()
 				.filter(c -> Objects.equals(c.getId(), targetId))
 				.findFirst()
 				.orElse(null);
 		if (linkModel == null) {
-			linkModel = getDocument().getModel()
+			linkModel = this.getDocument()
+					.getModel()
 					.getTechnicalLinks()
 					.stream()
 					.filter(c -> Objects.equals(c.getId(), targetId))
@@ -53,7 +55,7 @@ public interface VisibilityManager extends DiagramCanvasExt {
 			technicalLink = false;
 		}
 
-		return getPanelType().isTechnical() == technicalLink;
+		return this.getPanelType().isTechnical() == technicalLink;
 
 //		final Graphics2D g2 = this.getCanvas().createGraphicsContext();
 //		try {

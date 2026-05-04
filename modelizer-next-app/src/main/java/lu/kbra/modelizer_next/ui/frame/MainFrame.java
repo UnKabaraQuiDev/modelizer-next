@@ -31,6 +31,9 @@ import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
+import io.github.andrewauclair.moderndocking.DockingRegion;
+import io.github.andrewauclair.moderndocking.app.Docking;
+import io.github.andrewauclair.moderndocking.app.RootDockingPanel;
 import lu.kbra.modelizer_next.App;
 import lu.kbra.modelizer_next.AppConfig;
 import lu.kbra.modelizer_next.MNMain;
@@ -52,10 +55,6 @@ import lu.kbra.modelizer_next.ui.impl.DocumentChangeListener;
 import lu.kbra.modelizer_next.ui.impl.DocumentLoadHandler;
 import lu.kbra.pclib.PCUtils;
 import lu.kbra.pclib.datastructure.pair.Pair;
-
-import io.github.andrewauclair.moderndocking.DockingRegion;
-import io.github.andrewauclair.moderndocking.app.Docking;
-import io.github.andrewauclair.moderndocking.app.RootDockingPanel;
 
 public class MainFrame extends JFrame implements MainFrameDocumentController, MainFrameStyleController, MainFrameWindowController {
 
@@ -132,11 +131,27 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 
 	public void applyDefaultPaletteToCanvases() {
 		final StylePalette palette = this.findPaletteByName(this.appConfig.getDefaultPaletteName());
-		getCanvases().forEach(c -> {
+		this.getCanvases().forEach(c -> {
 			c.selectAll();
 			c.applyPalette(palette);
 			c.clearSelection();
 		});
+	}
+
+	public DiagramCanvas getActiveCanvas() {
+		return this.activeCanvas == null ? this.conceptualCanvas : this.activeCanvas;
+	}
+
+	public List<DiagramCanvas> getCanvases() {
+		return Arrays.asList(this.conceptualCanvas, this.logicalCanvas, this.physicalCanvas);
+	}
+
+	public Map<PanelType, DiagramCanvas> getCanvasesByPanelType() {
+		final Map<PanelType, DiagramCanvas> canvases = new LinkedHashMap<>();
+		canvases.put(PanelType.CONCEPTUAL, this.conceptualCanvas);
+		canvases.put(PanelType.LOGICAL, this.logicalCanvas);
+		canvases.put(PanelType.PHYSICAL, this.physicalCanvas);
+		return canvases;
 	}
 
 	@Override
@@ -441,22 +456,6 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 
 		builder.append(KeyEvent.getKeyText(keyStroke.getKeyCode()));
 		return builder.toString();
-	}
-
-	public DiagramCanvas getActiveCanvas() {
-		return this.activeCanvas == null ? this.conceptualCanvas : this.activeCanvas;
-	}
-
-	public Map<PanelType, DiagramCanvas> getCanvasesByPanelType() {
-		final Map<PanelType, DiagramCanvas> canvases = new LinkedHashMap<>();
-		canvases.put(PanelType.CONCEPTUAL, this.conceptualCanvas);
-		canvases.put(PanelType.LOGICAL, this.logicalCanvas);
-		canvases.put(PanelType.PHYSICAL, this.physicalCanvas);
-		return canvases;
-	}
-
-	public List<DiagramCanvas> getCanvases() {
-		return Arrays.asList(conceptualCanvas, logicalCanvas, physicalCanvas);
 	}
 
 	File getDefaultExportDirectory() {

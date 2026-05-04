@@ -30,6 +30,11 @@ public class CommentModel implements StyleOwner, VisibilityOwner, IdOwner {
 		this.style = new ElementStyle();
 	}
 
+	public CommentModel(String txt) {
+		this();
+		this.text = txt;
+	}
+
 	public CommentBinding getBinding() {
 		return this.binding;
 	}

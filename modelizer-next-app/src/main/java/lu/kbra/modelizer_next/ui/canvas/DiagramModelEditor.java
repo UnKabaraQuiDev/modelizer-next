@@ -33,8 +33,10 @@ import lu.kbra.modelizer_next.domain.shared.ElementStyle;
 import lu.kbra.modelizer_next.layout.LayoutObjectType;
 import lu.kbra.modelizer_next.layout.NodeLayout;
 import lu.kbra.modelizer_next.layout.PanelType;
+import lu.kbra.modelizer_next.ui.canvas.datastruct.RenamingElement;
+import lu.kbra.modelizer_next.ui.canvas.datastruct.RenamingElement.RenamingType;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectedElement;
-import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectedType;
+import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectedElement.SelectedType;
 import lu.kbra.modelizer_next.ui.dialogs.LinkEditorDialog;
 import lu.kbra.modelizer_next.ui.dialogs.RenameDialog;
 
@@ -76,6 +78,7 @@ interface DiagramModelEditor extends DiagramCanvasExt {
 		layout.setPosition(new Point2D.Double(center.getX() - 100, center.getY() - 30));
 		layout.setSize(new Size2D(220, 80));
 
+//		confirmRenamingElement(0);
 		this.getCanvas().select(SelectedElement.forComment(commentModel.getId()));
 		this.getCanvas().notifySelectionChanged();
 		this.getCanvas().notifyDocumentChanged();
@@ -101,11 +104,15 @@ interface DiagramModelEditor extends DiagramCanvasExt {
 		this.getCanvas().applyDefaultPaletteToField(fieldModel);
 		targetClass.getFields().add(fieldModel);
 
+		if (isRenamingElement() && getCanvas().renamingElement.type().isClass()
+				&& getCanvas().renamingElement.classId().equals(targetClass.getId())) {
+			confirmRenamingElement(0);
+		}
 		this.getCanvas().select(SelectedElement.forField(targetClass.getId(), fieldModel.getId()));
 		this.getCanvas().notifySelectionChanged();
 		this.getCanvas().notifyDocumentChanged();
 		this.getCanvas().repaint();
-		this.getCanvas().invokeRenamingElement(SelectedElement.forField(targetClass.getId(), fieldModel.getId()));
+		this.getCanvas().invokeRenamingElement(RenamingElement.forField(targetClass.getId(), fieldModel.getId()));
 	}
 
 	default void addLink() {
@@ -151,6 +158,7 @@ interface DiagramModelEditor extends DiagramCanvasExt {
 		}
 		this.getCanvas().applyDefaultPaletteToLink(createdLink);
 
+//		confirmRenamingElement(0);
 		this.getCanvas().findOrCreateLinkLayout(createdLink.getId());
 		this.getCanvas().select(SelectedElement.forLink(createdLink.getId()));
 		this.getCanvas().notifySelectionChanged();
@@ -171,15 +179,16 @@ interface DiagramModelEditor extends DiagramCanvasExt {
 		layout.setPosition(new Point2D.Double(center.getX() - 100, center.getY() - 40));
 		layout.setSize(new Size2D(180, DiagramCanvas.CLASS_HEADER_HEIGHT));
 
+//		confirmRenamingElement(0);
 		this.getCanvas().select(SelectedElement.forClass(classModel.getId()));
 		this.getCanvas().notifySelectionChanged();
 		this.getCanvas().notifyDocumentChanged();
 		this.getCanvas().repaint();
-		this.getCanvas().invokeRenamingElement(SelectedElement.forClass(classModel.getId()));
+		invokeRenamingElement(RenamingElement.forClass(classModel.getId()));
 	}
 
 	default void cancelRenamingElement() {
-		if (this.getCanvas().renamingElement == null) {
+		if (!isRenamingElement()) {
 			return;
 		}
 		this.getCanvas().renamingField.setVisible(false);
@@ -187,9 +196,8 @@ interface DiagramModelEditor extends DiagramCanvasExt {
 		this.getCanvas().repaint();
 	}
 
-	@SuppressWarnings("incomplete-switch")
 	default void confirmRenamingElement(final int nextDir) {
-		if (this.getCanvas().renamingElement == null) {
+		if (!isRenamingElement()) {
 			this.getCanvas().renamingField.setVisible(false);
 			this.getCanvas().repaint();
 			return;
@@ -204,14 +212,14 @@ interface DiagramModelEditor extends DiagramCanvasExt {
 			if (next) {
 				if (classModel.getFields().size() > 0) {
 					this.getCanvas()
-							.invokeRenamingElement(SelectedElement.forField(classModel.getId(),
+							.invokeRenamingElement(RenamingElement.forField(classModel.getId(),
 									(nextDir < 0 ? classModel.getFields().getLast() : classModel.getFields().getFirst()).getId()));
 				} else {
 					next = false;
 				}
 			}
 		}
-		case FIELD -> {
+		case CLASS_FIELD -> {
 			final FieldModel fieldModel = this.getCanvas()
 					.findFieldById(this.getCanvas().renamingElement.classId(), this.getCanvas().renamingElement.fieldId());
 			fieldModel.getNames().set(this.getCanvas().getPanelType(), this.getCanvas().renamingField.getText());
@@ -220,14 +228,15 @@ interface DiagramModelEditor extends DiagramCanvasExt {
 				final ClassModel classModel = this.getCanvas().findClassById(this.getCanvas().renamingElement.classId());
 				final int idx = classModel.getFieldIndex(fieldModel.getId());
 				if (idx + nextDir < 0 || idx + nextDir > classModel.getFields().size() - 1) {
-					this.getCanvas().invokeRenamingElement(SelectedElement.forClass(classModel.getId()));
+					this.getCanvas().invokeRenamingElement(RenamingElement.forClass(classModel.getId()));
 				} else {
 					this.getCanvas()
 							.invokeRenamingElement(
-									SelectedElement.forField(classModel.getId(), classModel.getFields().get(idx + nextDir).getId()));
+									RenamingElement.forField(classModel.getId(), classModel.getFields().get(idx + nextDir).getId()));
 				}
 			}
 		}
+		default -> throw new UnsupportedOperationException("Unsupported type: " + getCanvas().renamingElement);
 		}
 
 		this.getCanvas().notifyDocumentChanged();
@@ -239,6 +248,10 @@ interface DiagramModelEditor extends DiagramCanvasExt {
 			SwingUtilities.invokeLater(this.getCanvas()::requestFocusInWindow);
 			this.getCanvas().repaint();
 		}
+	}
+
+	default boolean isRenamingElement() {
+		return this.getCanvas().renamingElement != null;
 	}
 
 	default JTextField createRenamingField() {
@@ -336,15 +349,15 @@ interface DiagramModelEditor extends DiagramCanvasExt {
 		}
 	}
 
-	default void invokeRenamingElement(final SelectedElement newRenamingElement) {
-		if (this.getCanvas().renamingElement != null) {
+	default void invokeRenamingElement(final RenamingElement newRenamingElement) {
+		if (isRenamingElement()) {
 			this.getCanvas().renamingField.setVisible(false);
 			this.getCanvas().renamingElement = null;
 		}
 
 		this.getCanvas().renamingElement = newRenamingElement;
 		this.getCanvas().selectedElements.clear();
-		this.getCanvas().select(newRenamingElement);
+		this.getCanvas().select(newRenamingElement.asSelectedElement());
 		final ClassModel classModel = this.getCanvas().findClassById(this.getCanvas().renamingElement.classId());
 		final NodeLayout nl = this.getCanvas().findOrCreateNodeLayout(LayoutObjectType.CLASS, this.getCanvas().renamingElement.classId());
 
@@ -353,20 +366,32 @@ interface DiagramModelEditor extends DiagramCanvasExt {
 		final String currentValue;
 		final ElementStyle style;
 
-		if (this.getCanvas().renamingElement.type() == SelectedType.CLASS) {
+		switch (newRenamingElement.type()) {
+		case CLASS -> {
 			pos = this.getCanvas().worldToScreen(nl.getPosition());
 			size = this.getCanvas().worldToScreenZoom(new Point2D.Double(nl.getSize().getX(), DiagramCanvas.CLASS_HEADER_HEIGHT));
 			currentValue = classModel.getNames().get(this.getCanvas().panelType);
 			style = classModel.getStyle();
-		} else {
-			final FieldModel fieldModel = this.getCanvas()
-					.findFieldById(this.getCanvas().renamingElement.classId(), this.getCanvas().renamingElement.fieldId());
+		}
+		case CLASS_FIELD -> {
+			final FieldModel fieldModel = this.getCanvas().findFieldById(newRenamingElement.classId(), newRenamingElement.fieldId());
 			final Point2D fieldPos = new Point2D.Double(nl.getPosition().getX(),
 					nl.getPosition().getY() + DiagramCanvas.CLASS_ROW_HEIGHT * (classModel.getFieldIndex(fieldModel.getId()) + 1) + 6);
 			pos = this.getCanvas().worldToScreen(fieldPos);
 			size = this.getCanvas().worldToScreenZoom(new Point2D.Double(nl.getSize().getX(), DiagramCanvas.CLASS_ROW_HEIGHT));
 			currentValue = fieldModel.getNames().get(this.getCanvas().panelType);
 			style = fieldModel.getStyle();
+		}
+		case COMMENT -> {
+			final CommentModel commentModel = this.getCanvas().findCommentById(newRenamingElement.commentId());
+			final Point2D fieldPos = new Point2D.Double(nl.getPosition().getX(),
+					nl.getPosition().getY() + DiagramCanvas.CLASS_ROW_HEIGHT * (classModel.getFieldIndex(commentModel.getId()) + 1) + 6);
+			pos = this.getCanvas().worldToScreen(fieldPos);
+			size = this.getCanvas().worldToScreenZoom(new Point2D.Double(nl.getSize().getX(), DiagramCanvas.CLASS_ROW_HEIGHT));
+			currentValue = commentModel.getText();
+			style = commentModel.getStyle();
+		}
+		default -> throw new IllegalArgumentException("Unsupported element: " + newRenamingElement);
 		}
 
 		this.getCanvas().renamingField.setBounds((int) pos.getX(), (int) pos.getY(), (int) size.getX(), (int) size.getY());
@@ -475,13 +500,9 @@ interface DiagramModelEditor extends DiagramCanvasExt {
 		final String currentValue;
 
 		switch (this.getCanvas().selectedElement.type()) {
-		case CLASS, FIELD -> {
-			this.getCanvas().invokeRenamingElement(this.getCanvas().selectedElement);
+		case CLASS, FIELD, COMMENT -> {
+			this.getCanvas().invokeRenamingElement(this.getCanvas().selectedElement.asRenamingElement());
 			return;
-		}
-		case COMMENT -> {
-			title = "Rename comment";
-			currentValue = this.getCanvas().getEditableCommentText(this.getCanvas().selectedElement.commentId());
 		}
 		case LINK -> {
 			if (this.getPanelType() != PanelType.CONCEPTUAL) {

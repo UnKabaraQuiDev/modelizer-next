@@ -9,6 +9,7 @@ import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.List;
+import java.util.Optional;
 
 import lu.kbra.modelizer_next.domain.ClassModel;
 import lu.kbra.modelizer_next.domain.CommentModel;
@@ -18,6 +19,7 @@ import lu.kbra.modelizer_next.domain.data.CommentKind;
 import lu.kbra.modelizer_next.layout.LayoutObjectType;
 import lu.kbra.modelizer_next.layout.NodeLayout;
 import lu.kbra.modelizer_next.layout.PanelType;
+import lu.kbra.modelizer_next.ui.canvas.data.AnchorSide;
 import lu.kbra.modelizer_next.ui.canvas.data.Direction2D;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.LinkGeometry;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectedElement;
@@ -52,8 +54,6 @@ public interface ElementRenderer extends DiagramCanvasExt {
 			labelGraphics.translate(point.getX() + normalX * offset, point.getY() + normalY * offset);
 			labelGraphics.rotate(angle);
 
-			labelGraphics.setColor(g2.getColor());
-
 			final double textX;
 			switch (dir) {
 			case HEADING -> {
@@ -67,14 +67,16 @@ public interface ElementRenderer extends DiagramCanvasExt {
 			}
 			}
 
-			labelGraphics.setStroke(g2.getStroke());
-			labelGraphics.drawString(text, (float) textX, (float) (metrics.getAscent() - textBounds.getHeight() / 2.0));
-
 			if (DiagramCanvas.DEBUG_DRAW_LINK_ANCHORS) {
 				labelGraphics.setStroke(new BasicStroke(4));
 				labelGraphics.setColor(Color.RED);
 				labelGraphics.drawLine(0, 0, (int) textX, 0);
 			}
+
+			labelGraphics.setColor(g2.getColor());
+
+			labelGraphics.setStroke(g2.getStroke());
+			labelGraphics.drawString(text, (float) textX, (float) (metrics.getAscent() - textBounds.getHeight() / 2.0));
 		} finally {
 			labelGraphics.dispose();
 		}
@@ -124,17 +126,21 @@ public interface ElementRenderer extends DiagramCanvasExt {
 		}
 	}
 
+	@Deprecated
 	default void drawCardinalityLabel(
 			final Graphics2D g2,
 			final String text,
 			final Point2D anchor,
 			final Point2D adjacentPoint,
 			final double angle,
-			final boolean bottom) {
-		final double curAngle = Math.atan2(adjacentPoint.getY() - anchor.getY(), adjacentPoint.getX() - anchor.getX());
-		final boolean flipText = curAngle > Math.PI / 2 || curAngle < -Math.PI / 2;
+			final boolean bottom,
+			final Optional<Direction2D> forcedDirection) {
 
-		drawAlignedLinkLabel(g2, text, anchor, angle, bottom, flipText ? Direction2D.TRAILING : Direction2D.HEADING);
+		this.drawAlignedLinkLabel(g2, text, anchor, angle, bottom, forcedDirection.orElseGet(() -> {
+			final double curAngle = Math.atan2(adjacentPoint.getY() - anchor.getY(), adjacentPoint.getX() - anchor.getX());
+			final boolean flipText = curAngle > Math.PI / 2 || curAngle < -Math.PI / 2;
+			return flipText ? Direction2D.TRAILING : Direction2D.HEADING;
+		}));
 	}
 
 	default void drawClasses(final Graphics2D g2) {
@@ -365,42 +371,67 @@ public interface ElementRenderer extends DiagramCanvasExt {
 			}
 
 			if (this.getPanelType() == PanelType.CONCEPTUAL) {
-				if (linkModel.getCardinalityFrom() != null) {
-					this.getCanvas()
-							.drawCardinalityLabel(g2,
-									linkModel.getCardinalityFrom().getDisplayValue(),
-									geometry.fromPoint(),
-									geometry.points().get(1),
-									geometry.labelAngle(),
-									false);
-				}
-				if (linkModel.getLabelFrom() != null) {
-					this.getCanvas()
-							.drawCardinalityLabel(g2,
-									linkModel.getLabelFrom(),
-									geometry.fromPoint(),
-									geometry.points().get(1),
-									geometry.labelAngle(),
-									true);
+				final boolean isEdgeLink = linkModel.isSelfLinking();
+
+				{
+					final Point2D anchor = geometry.fromPoint();
+					final Point2D adjacentPoint = geometry.points().get(1);
+					final double angle = geometry.labelAngle();
+
+					final double currentAngle = Math.atan2(adjacentPoint.getY() - anchor.getY(), adjacentPoint.getX() - anchor.getX());
+					final boolean shouldFlipText = currentAngle > Math.PI / 2 || currentAngle < -Math.PI / 2;
+					final Direction2D defaultDirection = shouldFlipText ? Direction2D.TRAILING : Direction2D.HEADING;
+
+					if (linkModel.getCardinalityFrom() != null) {
+						this.getCanvas()
+								.drawAlignedLinkLabel(g2,
+										linkModel.getCardinalityFrom().getDisplayValue(),
+										anchor,
+										angle,
+										isEdgeLink && geometry.fromSide() == AnchorSide.BOTTOM,
+										defaultDirection);
+					}
+					if (linkModel.getLabelFrom() != null) {
+						this.getCanvas()
+								.drawAlignedLinkLabel(g2,
+										linkModel.getLabelFrom(),
+										anchor,
+										angle,
+										isEdgeLink ? geometry.fromSide().isLeftRight() || geometry.fromSide() == AnchorSide.BOTTOM : true,
+										isEdgeLink && (geometry.fromSide().isTopBottom() || geometry.fromSide() == AnchorSide.LEFT)
+												? Direction2D.TRAILING
+												: defaultDirection);
+					}
 				}
 
-				if (linkModel.getCardinalityTo() != null) {
-					this.getCanvas()
-							.drawCardinalityLabel(g2,
-									linkModel.getCardinalityTo().getDisplayValue(),
-									geometry.toPoint(),
-									geometry.points().get(geometry.points().size() - 2),
-									geometry.labelAngle(),
-									false);
-				}
-				if (linkModel.getLabelTo() != null) {
-					this.getCanvas()
-							.drawCardinalityLabel(g2,
-									linkModel.getLabelTo(),
-									geometry.toPoint(),
-									geometry.points().get(geometry.points().size() - 2),
-									geometry.labelAngle(),
-									true);
+				{
+					final Point2D anchor = geometry.toPoint();
+					final Point2D adjacentPoint = geometry.points().get(geometry.points().size() - 2);
+					final double angle = geometry.labelAngle();
+
+					final double currentAngle = Math.atan2(adjacentPoint.getY() - anchor.getY(), adjacentPoint.getX() - anchor.getX());
+					final boolean shouldFlipText = currentAngle > Math.PI / 2 || currentAngle < -Math.PI / 2;
+					final Direction2D defaultDirection = shouldFlipText ? Direction2D.TRAILING : Direction2D.HEADING;
+					if (linkModel.getCardinalityTo() != null) {
+						this.getCanvas()
+								.drawAlignedLinkLabel(g2,
+										linkModel.getCardinalityTo().getDisplayValue(),
+										anchor,
+										angle,
+										isEdgeLink && geometry.toSide() == AnchorSide.BOTTOM,
+										defaultDirection);
+					}
+					if (linkModel.getLabelTo() != null) {
+						this.getCanvas()
+								.drawAlignedLinkLabel(g2,
+										linkModel.getLabelTo(),
+										anchor,
+										angle,
+										isEdgeLink ? geometry.toSide().isLeftRight() || geometry.toSide() == AnchorSide.BOTTOM : true,
+										isEdgeLink && (geometry.toSide().isTopBottom() || geometry.toSide() == AnchorSide.LEFT)
+												? Direction2D.TRAILING
+												: defaultDirection);
+					}
 				}
 			}
 

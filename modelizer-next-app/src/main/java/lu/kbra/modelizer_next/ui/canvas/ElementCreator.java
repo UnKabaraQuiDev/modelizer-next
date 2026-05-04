@@ -15,7 +15,7 @@ import lu.kbra.modelizer_next.ui.canvas.datastruct.CopiedField;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.CopiedLink;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.HitResult;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectedElement;
-import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectedType;
+import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectedElement.SelectedType;
 
 /**
  * Contains creation actions for tables, fields, comments, and links.

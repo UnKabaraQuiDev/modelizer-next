@@ -18,7 +18,7 @@ import lu.kbra.modelizer_next.ui.canvas.datastruct.AnchorPair;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.LinkAnchorPlacement;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.LinkGeometry;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectedElement;
-import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectedType;
+import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectedElement.SelectedType;
 
 /**
  * Contains anchor and geometry resolution for links and link labels.
@@ -212,33 +212,49 @@ interface LinkGeometryResolver extends DiagramCanvasExt {
 	default LinkGeometry resolveLinkGeometry(final Graphics2D g2, final LinkModel linkModel) {
 		final Point2D fromPoint;
 		final Point2D toPoint;
+		final AnchorSide fromSide;
+		final AnchorSide toSide;
 
 		if (this.getPanelType() == PanelType.CONCEPTUAL) {
 			final AnchorPair anchorPair = this.getCanvas().resolveConceptualAnchorPair(g2, linkModel);
 			if (anchorPair == null) {
 				return null;
 			}
+
 			fromPoint = anchorPair.from();
 			toPoint = anchorPair.to();
+
+			fromSide = anchorPair.fromSide();
+			toSide = anchorPair.toSide();
 		} else if (linkModel.isSelfLinking()) {
 			final AnchorSide selfLinkSide = this.getCanvas().chooseTechnicalSelfLinkSide(g2, linkModel);
+
 			fromPoint = this.getCanvas()
 					.resolveTechnicalSelfLinkAnchor(g2, linkModel.getFrom().getClassId(), linkModel.getFrom().getFieldId(), selfLinkSide);
 			toPoint = this.getCanvas()
 					.resolveTechnicalSelfLinkAnchor(g2, linkModel.getTo().getClassId(), linkModel.getTo().getFieldId(), selfLinkSide);
+
+			fromSide = selfLinkSide;
+			toSide = selfLinkSide.clockwise();
 		} else {
-			fromPoint = this.getCanvas()
+			final FieldAnchor fromFieldAnchor = this.getCanvas()
 					.resolveTechnicalFieldAnchor(g2,
 							linkModel.getFrom().getClassId(),
 							linkModel.getFrom().getFieldId(),
 							linkModel.getTo().getClassId(),
 							linkModel.getTo().getFieldId());
-			toPoint = this.getCanvas()
+			final FieldAnchor toFieldAnchor = this.getCanvas()
 					.resolveTechnicalFieldAnchor(g2,
 							linkModel.getTo().getClassId(),
 							linkModel.getTo().getFieldId(),
 							linkModel.getFrom().getClassId(),
 							linkModel.getFrom().getFieldId());
+
+			fromPoint = fromFieldAnchor.point();
+			toPoint = toFieldAnchor.point();
+
+			fromSide = fromFieldAnchor.side();
+			toSide = fromFieldAnchor.side();
 		}
 		if (fromPoint == null || toPoint == null) {
 			return null;
@@ -270,7 +286,7 @@ interface LinkGeometryResolver extends DiagramCanvasExt {
 			labelPoint = middlePoint;
 		}
 
-		return new LinkGeometry(fromPoint, toPoint, labelPoint, middlePoint, labelAngle, points);
+		return new LinkGeometry(fromPoint, toPoint, fromSide, toSide, labelPoint, middlePoint, labelAngle, points);
 	}
 
 	default Point2D resolveLinkMiddleAnchor(final Graphics2D g2, final String linkId) {
@@ -308,7 +324,9 @@ interface LinkGeometryResolver extends DiagramCanvasExt {
 		final String oppositeFieldId = this.getCanvas().linkPreviewTarget == null ? null : this.getCanvas().linkPreviewTarget.fieldId();
 
 		if (oppositeClassId != null) {
-			return this.getCanvas().resolveTechnicalFieldAnchor(g2, source.classId(), source.fieldId(), oppositeClassId, oppositeFieldId);
+			return this.getCanvas()
+					.resolveTechnicalFieldAnchor(g2, source.classId(), source.fieldId(), oppositeClassId, oppositeFieldId)
+					.point();
 		}
 
 		return this.getCanvas().resolveTechnicalFieldAnchor(g2, source.classId(), source.fieldId(), reference);
@@ -341,7 +359,9 @@ interface LinkGeometryResolver extends DiagramCanvasExt {
 			return this.getCanvas().resolveConceptualPreviewAnchor(g2, target.classId(), reference);
 		}
 
-		return this.getCanvas().resolveTechnicalFieldAnchor(g2, target.classId(), target.fieldId(), source.classId(), source.fieldId());
+		return this.getCanvas()
+				.resolveTechnicalFieldAnchor(g2, target.classId(), target.fieldId(), source.classId(), source.fieldId())
+				.point();
 	}
 
 }

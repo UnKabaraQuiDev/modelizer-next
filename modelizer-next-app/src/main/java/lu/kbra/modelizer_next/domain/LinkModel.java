@@ -72,6 +72,10 @@ public class LinkModel {
 		return this.to;
 	}
 
+	public boolean hasLabel() {
+		return this.labelTo != null && !this.labelTo.isBlank() || this.labelFrom != null && !this.labelFrom.isBlank();
+	}
+
 	public boolean hasLabelFrom() {
 		return this.labelFrom != null && !this.labelFrom.isBlank();
 	}
@@ -136,10 +140,6 @@ public class LinkModel {
 
 	public void setTo(final LinkEnd to) {
 		this.to = to;
-	}
-
-	public boolean hasLabel() {
-		return (labelTo != null && !labelTo.isBlank()) || (labelFrom != null && !labelFrom.isBlank());
 	}
 
 	@Override

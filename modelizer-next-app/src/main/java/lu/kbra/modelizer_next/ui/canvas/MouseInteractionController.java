@@ -14,7 +14,7 @@ import lu.kbra.modelizer_next.ui.canvas.datastruct.HitResult;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.LinkCreationState;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.ResizingComment;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectedElement;
-import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectedType;
+import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectedElement.SelectedType;
 
 /**
  * Contains mouse interaction handling for selection, dragging, panning, and link creation.

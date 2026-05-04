@@ -23,6 +23,12 @@ public class DiagramModel {
 		this.comments = new ArrayList<>();
 	}
 
+	public Collection<LinkModel> getAllLinks() {
+		final Collection<LinkModel> all = new HashSet<>(this.conceptualLinks);
+		all.addAll(this.technicalLinks);
+		return all;
+	}
+
 	public List<ClassModel> getClasses() {
 		return this.classes;
 	}
@@ -39,6 +45,16 @@ public class DiagramModel {
 		return this.technicalLinks;
 	}
 
+	@JsonAnyGetter
+	public void postConstruct() {
+		this.validateData();
+	}
+
+	@JsonAnySetter
+	public void preDeconstruct() {
+		this.validateData();
+	}
+
 	public void setClasses(final List<ClassModel> classes) {
 		this.classes = classes;
 	}
@@ -47,33 +63,17 @@ public class DiagramModel {
 		this.comments = comments;
 	}
 
-	public Collection<LinkModel> getAllLinks() {
-		final Collection<LinkModel> all = new HashSet<>(conceptualLinks);
-		all.addAll(technicalLinks);
-		return all;
-	}
-
-	@JsonAnySetter
-	public void preDeconstruct() {
-		validateData();
-	}
-
-	@JsonAnyGetter
-	public void postConstruct() {
-		validateData();
+	@Override
+	public String toString() {
+		return "DiagramModel@" + System.identityHashCode(this) + " [classes=" + this.classes + ", conceptualLinks=" + this.conceptualLinks
+				+ ", technicalLinks=" + this.technicalLinks + ", comments=" + this.comments + "]";
 	}
 
 	public void validateData() {
-		getClasses().removeIf(Objects::isNull);
-		getComments().removeIf(Objects::isNull);
-		getConceptualLinks().removeIf(Objects::isNull);
-		getTechnicalLinks().removeIf(Objects::isNull);
-	}
-
-	@Override
-	public String toString() {
-		return "DiagramModel@" + System.identityHashCode(this) + " [classes=" + classes + ", conceptualLinks=" + conceptualLinks
-				+ ", technicalLinks=" + technicalLinks + ", comments=" + comments + "]";
+		this.getClasses().removeIf(Objects::isNull);
+		this.getComments().removeIf(Objects::isNull);
+		this.getConceptualLinks().removeIf(Objects::isNull);
+		this.getTechnicalLinks().removeIf(Objects::isNull);
 	}
 
 }

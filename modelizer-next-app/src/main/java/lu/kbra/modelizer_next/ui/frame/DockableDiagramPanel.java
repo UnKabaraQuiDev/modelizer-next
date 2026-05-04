@@ -8,10 +8,9 @@ import java.awt.event.MouseEvent;
 
 import javax.swing.JPanel;
 
-import lu.kbra.modelizer_next.ui.canvas.DiagramCanvas;
-
 import io.github.andrewauclair.moderndocking.Dockable;
 import io.github.andrewauclair.moderndocking.app.Docking;
+import lu.kbra.modelizer_next.ui.canvas.DiagramCanvas;
 
 final class DockableDiagramPanel extends JPanel implements Dockable {
 	private static final long serialVersionUID = 1L;
