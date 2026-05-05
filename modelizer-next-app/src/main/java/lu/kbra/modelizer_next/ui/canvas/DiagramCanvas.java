@@ -223,7 +223,8 @@ public class DiagramCanvas extends JPanel
 		this.drawLinkPreview(g2);
 
 		g2.setTransform(oldTransform);
-		g2.dispose();
+//		g2.dispose();
+//		super.paintChildren(g2);
 	}
 
 	public void resetUiAfterDocumentRestore() {

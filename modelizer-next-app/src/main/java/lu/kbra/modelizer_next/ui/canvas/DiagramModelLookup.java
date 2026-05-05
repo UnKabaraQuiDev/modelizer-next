@@ -46,6 +46,20 @@ interface DiagramModelLookup extends DiagramCanvasExt {
 		return null;
 	}
 
+	default FieldModel findFieldById(ClassModel classModel, final String fieldId) {
+		if (classModel == null) {
+			return null;
+		}
+
+		for (final FieldModel fieldModel : classModel.getFields()) {
+			if (fieldModel.getId().equals(fieldId)) {
+				return fieldModel;
+			}
+		}
+
+		return null;
+	}
+
 	default LinkModel findLinkByAssociationClassId(final String classId) {
 		return this.getDocument()
 				.getModel()

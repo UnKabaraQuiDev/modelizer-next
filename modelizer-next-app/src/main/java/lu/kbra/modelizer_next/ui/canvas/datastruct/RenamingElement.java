@@ -18,7 +18,11 @@ public record RenamingElement(RenamingType type, String classId, String fieldId,
 		LINK_FROM_CARDINALITY,
 		LINK_FROM_LABEL,
 		LINK_TO_CARDINALITY,
-		LINK_TO_LABEL;
+		LINK_TO_LABEL,
+		@Deprecated
+		LINK_FROM_FIELD,
+		@Deprecated
+		LINK_TO_FIELD;
 
 		public boolean isClass() {
 			return switch (this) {
@@ -51,11 +55,11 @@ public record RenamingElement(RenamingType type, String classId, String fieldId,
 
 		public RenamingType previous() {
 			return switch (this) {
-			case LINK_FROM_CARDINALITY -> LINK_FROM_LABEL;
-			case LINK_FROM_LABEL -> LINK_TO_CARDINALITY;
-			case LINK_TO_CARDINALITY -> LINK_TO_LABEL;
-			case LINK_TO_LABEL -> LINK_LABEL;
-			case LINK_LABEL -> LINK_FROM_CARDINALITY;
+			case LINK_LABEL -> LINK_TO_LABEL;
+			case LINK_TO_LABEL -> LINK_TO_CARDINALITY;
+			case LINK_TO_CARDINALITY -> LINK_FROM_LABEL;
+			case LINK_FROM_LABEL -> LINK_FROM_CARDINALITY;
+			case LINK_FROM_CARDINALITY -> LINK_LABEL;
 			default -> this;
 			};
 		}
@@ -86,6 +90,13 @@ public record RenamingElement(RenamingType type, String classId, String fieldId,
 
 	public static RenamingElement forLink(final String linkId) {
 		return new RenamingElement(RenamingType.LINK_LABEL, null, null, null, linkId);
+	}
+
+	public static RenamingElement forLink(final String linkId, RenamingType type) {
+		if (!type.isLink()) {
+			throw new IllegalArgumentException("Type isn't applicable to a link: " + type);
+		}
+		return new RenamingElement(type, null, null, null, linkId);
 	}
 
 	public String getActualId() {
