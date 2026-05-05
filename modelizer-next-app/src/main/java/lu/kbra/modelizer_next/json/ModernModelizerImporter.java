@@ -12,6 +12,10 @@ public final class ModernModelizerImporter {
 		return MNMain.OBJECT_MAPPER.readValue(file, ModelDocument.class);
 	}
 
+	public static ModelDocument importString(final String file) throws IOException {
+		return MNMain.OBJECT_MAPPER.readValue(file, ModelDocument.class);
+	}
+
 	private ModernModelizerImporter() {
 	}
 }

@@ -5,11 +5,11 @@ import lu.kbra.modelizer_next.ui.canvas.data.AnchorSide;
 public record AnchorSidePair(AnchorSide fromSide, AnchorSide toSide) {
 
 	public boolean isFromVertical() {
-		return fromSide.isTopBottom();
+		return this.fromSide.isTopBottom();
 	}
 
 	public boolean isToVertical() {
-		return toSide.isTopBottom();
+		return this.toSide.isTopBottom();
 	}
 
 }

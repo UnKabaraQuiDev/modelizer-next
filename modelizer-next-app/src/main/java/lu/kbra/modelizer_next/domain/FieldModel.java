@@ -54,16 +54,16 @@ public class FieldModel implements NamesOwner, IdOwner, StyleOwner {
 		return this.type;
 	}
 
-	public boolean isTechnicalOnly() {
-		return this.technicalOnly;
-	}
-
 	public boolean isNotNull() {
 		return this.notNull;
 	}
 
 	public boolean isPrimaryKey() {
 		return this.primaryKey;
+	}
+
+	public boolean isTechnicalOnly() {
+		return this.technicalOnly;
 	}
 
 	public boolean isUnique() {
@@ -80,10 +80,6 @@ public class FieldModel implements NamesOwner, IdOwner, StyleOwner {
 		this.names = names;
 	}
 
-	public void setTechnicalOnly(final boolean notConceptual) {
-		this.technicalOnly = notConceptual;
-	}
-
 	public void setNotNull(final boolean notNull) {
 		this.notNull = notNull;
 	}
@@ -95,6 +91,10 @@ public class FieldModel implements NamesOwner, IdOwner, StyleOwner {
 	@Override
 	public void setStyle(final ElementStyle style) {
 		this.style = style;
+	}
+
+	public void setTechnicalOnly(final boolean notConceptual) {
+		this.technicalOnly = notConceptual;
 	}
 
 	public void setType(final String type) {

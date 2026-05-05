@@ -31,8 +31,7 @@ interface DiagramModelLookup extends DiagramCanvasExt {
 		return null;
 	}
 
-	default FieldModel findFieldById(final String classId, final String fieldId) {
-		final ClassModel classModel = this.findClassById(classId);
+	default FieldModel findFieldById(final ClassModel classModel, final String fieldId) {
 		if (classModel == null) {
 			return null;
 		}
@@ -46,7 +45,8 @@ interface DiagramModelLookup extends DiagramCanvasExt {
 		return null;
 	}
 
-	default FieldModel findFieldById(ClassModel classModel, final String fieldId) {
+	default FieldModel findFieldById(final String classId, final String fieldId) {
+		final ClassModel classModel = this.findClassById(classId);
 		if (classModel == null) {
 			return null;
 		}

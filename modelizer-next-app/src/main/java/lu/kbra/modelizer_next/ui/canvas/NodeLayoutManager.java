@@ -44,11 +44,11 @@ public interface NodeLayoutManager extends DiagramCanvasExt {
 //		final FontMetrics bodyMetrics = g2.getFontMetrics();
 
 		int width = (int) Math.max(DiagramCanvas.CLASS_MIN_WIDTH,
-				getCanvas().stringWidth(DiagramCanvas.TITLE_FONT, this.getCanvas().resolveClassTitle(classModel))
+				this.getCanvas().stringWidth(DiagramCanvas.TITLE_FONT, this.getCanvas().resolveClassTitle(classModel))
 						+ DiagramCanvas.TEXT_PADDING * 2);
 		for (final FieldModel fieldModel : this.getCanvas().getVisibleFields(classModel)) {
 			width = (int) Math.max(width,
-					getCanvas().stringWidth(DiagramCanvas.BODY_FONT, this.getCanvas().resolveFieldName(fieldModel))
+					this.getCanvas().stringWidth(DiagramCanvas.BODY_FONT, this.getCanvas().resolveFieldName(fieldModel))
 							+ DiagramCanvas.TEXT_PADDING * 2);
 		}
 
@@ -101,8 +101,9 @@ public interface NodeLayoutManager extends DiagramCanvasExt {
 
 	default Rectangle2D computeCommentBounds(final String text, final NodeLayout layout) {
 		final double width = layout.getSize().getWidth() > 0.0 ? layout.getSize().getWidth() : DiagramCanvas.COMMENT_MIN_WIDTH;
-		final List<String> wrappedLines = this.getCanvas().wrapText(text, DiagramCanvas.BODY_FONT, (int) Math.max(40, width - DiagramCanvas.TEXT_PADDING * 2));
-		final int contentHeight = (int) (wrappedLines.size() * (getCanvas().getHeight(DiagramCanvas.BODY_FONT) + 2)
+		final List<String> wrappedLines = this.getCanvas()
+				.wrapText(text, DiagramCanvas.BODY_FONT, (int) Math.max(40, width - DiagramCanvas.TEXT_PADDING * 2));
+		final int contentHeight = (int) (wrappedLines.size() * (this.getCanvas().getHeight(DiagramCanvas.BODY_FONT) + 2)
 				+ DiagramCanvas.TEXT_PADDING * 2);
 
 		if (layout.getSize().getWidth() <= 0.0) {

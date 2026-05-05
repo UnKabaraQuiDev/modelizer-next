@@ -55,6 +55,10 @@ public class LinkModel {
 		return this.id;
 	}
 
+	public String getLabel() {
+		return this.label;
+	}
+
 	public String getLabelFrom() {
 		return this.labelFrom;
 	}
@@ -67,16 +71,12 @@ public class LinkModel {
 		return this.lineColor;
 	}
 
-	public String getLabel() {
-		return this.label;
-	}
-
 	public LinkEnd getTo() {
 		return this.to;
 	}
 
-	public boolean hasTargetLabel() {
-		return this.labelTo != null && !this.labelTo.isBlank() || this.labelFrom != null && !this.labelFrom.isBlank();
+	public boolean hasLabel() {
+		return this.label != null && !this.label.isBlank();
 	}
 
 	public boolean hasLabelFrom() {
@@ -87,8 +87,8 @@ public class LinkModel {
 		return this.labelTo != null && !this.labelTo.isBlank();
 	}
 
-	public boolean hasLabel() {
-		return this.label != null && !this.label.isBlank();
+	public boolean hasTargetLabel() {
+		return this.labelTo != null && !this.labelTo.isBlank() || this.labelFrom != null && !this.labelFrom.isBlank();
 	}
 
 	public boolean isSelfLinking() {
@@ -115,6 +115,14 @@ public class LinkModel {
 		this.id = id;
 	}
 
+	public void setLabel(final String name) {
+		if (name == null || name.isBlank()) {
+			this.label = null;
+			return;
+		}
+		this.label = name;
+	}
+
 	public void setLabelFrom(final String labelFrom) {
 		if (labelFrom == null || labelFrom.isBlank()) {
 			this.labelFrom = null;
@@ -133,23 +141,15 @@ public class LinkModel {
 		this.lineColor = lineColor;
 	}
 
-	public void setLabel(final String name) {
-		if (name == null || name.isBlank()) {
-			this.label = null;
-			return;
-		}
-		this.label = name;
-	}
-
 	public void setTo(final LinkEnd to) {
 		this.to = to;
 	}
 
 	@Override
 	public String toString() {
-		return "LinkModel [id=" + id + ", label=" + label + ", from=" + from + ", to=" + to + ", cardinalityFrom=" + cardinalityFrom
-				+ ", cardinalityTo=" + cardinalityTo + ", associationClassId=" + associationClassId + ", lineColor=" + lineColor
-				+ ", labelFrom=" + labelFrom + ", labelTo=" + labelTo + "]";
+		return "LinkModel [id=" + this.id + ", label=" + this.label + ", from=" + this.from + ", to=" + this.to + ", cardinalityFrom="
+				+ this.cardinalityFrom + ", cardinalityTo=" + this.cardinalityTo + ", associationClassId=" + this.associationClassId
+				+ ", lineColor=" + this.lineColor + ", labelFrom=" + this.labelFrom + ", labelTo=" + this.labelTo + "]";
 	}
 
 }

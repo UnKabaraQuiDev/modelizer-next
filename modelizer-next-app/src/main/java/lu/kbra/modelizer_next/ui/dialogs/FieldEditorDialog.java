@@ -42,7 +42,7 @@ public final class FieldEditorDialog {
 		final JDialog dialog = new JDialog(owner, "Edit field", Dialog.ModalityType.APPLICATION_MODAL);
 
 		final JTextField nameField = new JTextField(fieldModel.getConceptualName(), 24);
-		final JTextField technicalNameField = new JTextField(fieldModel.getTechnicalName(), 24);
+		final JTextField technicalNameField = new JTextField(fieldModel.hasTechnicalName() ? fieldModel.getTechnicalName() : "", 24);
 
 		final JComboBox<String> sqlTypeBox = new JComboBox<>(FieldModel.SQL_TYPES);
 		sqlTypeBox.setSelectedItem(fieldModel.getType());

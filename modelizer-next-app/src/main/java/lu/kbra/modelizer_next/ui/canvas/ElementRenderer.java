@@ -168,6 +168,7 @@ public interface ElementRenderer extends DiagramCanvasExt {
 			final List<FieldModel> visibleFields = this.getCanvas().getVisibleFields(classModel);
 
 			for (final FieldModel fieldModel : visibleFields) {
+				// TODO: In physical mode, render flags and types better
 				final Rectangle2D fieldBounds = new Rectangle2D.Double(bounds.getX(),
 						rowY,
 						bounds.getWidth(),

@@ -29,6 +29,37 @@ public class ClassModel implements VisibilityOwner, IdOwner, StyleOwner, NamesOw
 		this.fields = new ArrayList<>();
 	}
 
+	public FieldModel getField(final int i, final PanelType panelType) {
+		int j = 0;
+
+		for (final FieldModel field : this.fields) {
+			final boolean visible = !field.isTechnicalOnly() || panelType.isTechnical();
+
+			if (visible) {
+				if (j == i) {
+					return field;
+				}
+				j++;
+			}
+		}
+
+		return null;
+	}
+
+	public int getFieldCount(final PanelType panelType) {
+		int count = 0;
+
+		for (final FieldModel field : this.fields) {
+			final boolean visible = !field.isTechnicalOnly() || panelType.isTechnical();
+
+			if (visible) {
+				count++;
+			}
+		}
+
+		return count;
+	}
+
 	public int getFieldIndex(final String fieldId) {
 		for (int i = 0; i < this.fields.size(); i++) {
 			if (fieldId.equals(this.fields.get(i).getId())) {
@@ -56,21 +87,8 @@ public class ClassModel implements VisibilityOwner, IdOwner, StyleOwner, NamesOw
 		return -1;
 	}
 
-	public FieldModel getField(final int i, final PanelType panelType) {
-		int j = 0;
-
-		for (final FieldModel field : this.fields) {
-			final boolean visible = !field.isTechnicalOnly() || panelType.isTechnical();
-
-			if (visible) {
-				if (j == i) {
-					return field;
-				}
-				j++;
-			}
-		}
-
-		return null;
+	public List<FieldModel> getFields() {
+		return this.fields;
 	}
 
 	public List<FieldModel> getFields(final PanelType panelType) {
@@ -85,24 +103,6 @@ public class ClassModel implements VisibilityOwner, IdOwner, StyleOwner, NamesOw
 		}
 
 		return result;
-	}
-
-	public int getFieldCount(final PanelType panelType) {
-		int count = 0;
-
-		for (final FieldModel field : this.fields) {
-			final boolean visible = !field.isTechnicalOnly() || panelType.isTechnical();
-
-			if (visible) {
-				count++;
-			}
-		}
-
-		return count;
-	}
-
-	public List<FieldModel> getFields() {
-		return this.fields;
 	}
 
 	@Override

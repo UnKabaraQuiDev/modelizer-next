@@ -70,11 +70,8 @@ interface NameResolver extends DiagramCanvasExt {
 			flags.add("NN");
 		}
 
-		if (flags.isEmpty()) {
-			return baseName;
-		}
-
-		return baseName + " [" + String.join(", ", flags) + "] - " + (fieldModel.getType() == null ? "No type" : fieldModel.getType());
+		return baseName + (flags.isEmpty() ? "" : " [" + String.join(", ", flags) + "]") + " - "
+				+ (fieldModel.getType() == null ? "No type" : fieldModel.getType());
 	}
 
 	default void setEditableClassName(final ClassModel classModel, final String value) {

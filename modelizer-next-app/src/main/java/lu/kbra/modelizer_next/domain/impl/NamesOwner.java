@@ -27,8 +27,16 @@ public interface NamesOwner {
 		this.getNames().setConceptualName(name);
 	}
 
+	default void setName(final boolean forceTechnical, final String name) {
+		this.getNames().set(forceTechnical, name);
+	}
+
 	default void setName(final PanelType panelType, final String name) {
 		this.getNames().set(panelType, name);
+	}
+	
+	default void setName(final PanelType panelType, final boolean maybeTechnical, final String name) {
+		this.getNames().set(panelType, maybeTechnical, name);
 	}
 
 	void setNames(ElementNames e);

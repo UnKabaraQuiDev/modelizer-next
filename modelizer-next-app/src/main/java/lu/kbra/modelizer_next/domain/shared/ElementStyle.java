@@ -28,7 +28,7 @@ public class ElementStyle {
 	public ElementStyle() {
 	}
 
-	public ElementStyle(Color textColor, Color backgroundColor, Color borderColor) {
+	public ElementStyle(final Color textColor, final Color backgroundColor, final Color borderColor) {
 		this.textColor = textColor;
 		this.backgroundColor = backgroundColor;
 		this.borderColor = borderColor;

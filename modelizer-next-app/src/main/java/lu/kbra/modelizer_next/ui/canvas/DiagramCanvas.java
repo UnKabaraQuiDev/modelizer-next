@@ -194,6 +194,10 @@ public class DiagramCanvas extends JPanel
 		return this.document;
 	}
 
+	public float getHeight(final Font bodyFont) {
+		return bodyFont.getLineMetrics("Ag", this.fontRenderContext).getHeight();
+	}
+
 	@Override
 	public PanelType getPanelType() {
 		return this.panelType;
@@ -201,7 +205,7 @@ public class DiagramCanvas extends JPanel
 
 	@Override
 	public void paintComponent(final Graphics g) {
-		fontRenderContext = ((Graphics2D) g).getFontRenderContext();
+		this.fontRenderContext = ((Graphics2D) g).getFontRenderContext();
 
 		super.paintComponent(g);
 		this.invalidateConceptualAnchorCache();
@@ -251,12 +255,8 @@ public class DiagramCanvas extends JPanel
 		this.repaint();
 	}
 
-	public double stringWidth(Font titleFont, String classTitle) {
-		return titleFont.getStringBounds(classTitle, fontRenderContext).getWidth();
-	}
-
-	public float getHeight(Font bodyFont) {
-		return bodyFont.getLineMetrics("Ag", fontRenderContext).getHeight();
+	public double stringWidth(final Font titleFont, final String classTitle) {
+		return titleFont.getStringBounds(classTitle, this.fontRenderContext).getWidth();
 	}
 
 }

@@ -57,15 +57,16 @@ public record SelectedElement(SelectedType type, String classId, String fieldId,
 		return Objects.hash(this.type, this.getActualId());
 	}
 
-	public RenamingElement asRenamingElement() {
-		return new RenamingElement(this.type.asRenamingType(), classId, fieldId, commentId, linkId);
+	public RenamingElement asRenamingElement(boolean alternative) {
+		return new RenamingElement(this.type.asRenamingType(), this.classId, this.fieldId, this.commentId, this.linkId, alternative);
 	}
 
 	@Override
-	public final boolean equals(Object other) {
+	public final boolean equals(final Object other) {
 		if (other == null || other.getClass() != this.getClass()) {
 			return false;
 		}
+
 		return ((SelectedElement) other).type == this.type && Objects.equals(((SelectedElement) other).getActualId(), this.getActualId());
 	}
 

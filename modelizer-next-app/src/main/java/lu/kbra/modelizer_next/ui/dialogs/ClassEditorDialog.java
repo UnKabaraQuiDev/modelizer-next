@@ -40,7 +40,7 @@ public final class ClassEditorDialog {
 		final JDialog dialog = new JDialog(owner, "Edit table", Dialog.ModalityType.APPLICATION_MODAL);
 
 		final JTextField conceptualNameField = new JTextField(classModel.getConceptualName(), 24);
-		final JTextField technicalNameField = new JTextField(classModel.getTechnicalName(), 24);
+		final JTextField technicalNameField = new JTextField(classModel.hasTechnicalName() ? classModel.getTechnicalName() : "", 24);
 
 		final ColorButton textColorButton = new ColorButton("Text color", classModel.getTextColor());
 		final ColorButton backgroundColorButton = new ColorButton("Background color", classModel.getBackgroundColor());

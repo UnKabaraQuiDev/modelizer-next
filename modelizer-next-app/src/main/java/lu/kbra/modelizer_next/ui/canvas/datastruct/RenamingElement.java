@@ -6,7 +6,7 @@ import javax.swing.JComponent;
 
 import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectedElement.SelectedType;
 
-public record RenamingElement(RenamingType type, String classId, String fieldId, String commentId, String linkId) {
+public record RenamingElement(RenamingType type, String classId, String fieldId, String commentId, String linkId, boolean forceAlternative) {
 
 	public enum RenamingType {
 
@@ -23,6 +23,16 @@ public record RenamingElement(RenamingType type, String classId, String fieldId,
 		LINK_FROM_FIELD,
 		@Deprecated
 		LINK_TO_FIELD;
+
+		public SelectedType asSelectedType() {
+			return switch (this) {
+			case CLASS -> SelectedType.CLASS;
+			case CLASS_FIELD -> SelectedType.FIELD;
+			case COMMENT -> SelectedType.COMMENT;
+			case LINK_LABEL, LINK_FROM_CARDINALITY, LINK_FROM_LABEL, LINK_TO_CARDINALITY, LINK_TO_LABEL -> SelectedType.LINK;
+			default -> throw new IllegalArgumentException("Unsupported option: " + this);
+			};
+		}
 
 		public boolean isClass() {
 			return switch (this) {
@@ -64,16 +74,10 @@ public record RenamingElement(RenamingType type, String classId, String fieldId,
 			};
 		}
 
-		public SelectedType asSelectedType() {
-			return switch (this) {
-			case CLASS -> SelectedType.CLASS;
-			case CLASS_FIELD -> SelectedType.FIELD;
-			case COMMENT -> SelectedType.COMMENT;
-			case LINK_LABEL, LINK_FROM_CARDINALITY, LINK_FROM_LABEL, LINK_TO_CARDINALITY, LINK_TO_LABEL -> SelectedType.LINK;
-			default -> throw new IllegalArgumentException("Unsupported option: " + this);
-			};
-		}
+	}
 
+	public RenamingElement(RenamingType type, String classId, String fieldId, String commentId, String linkId) {
+		this(type, classId, fieldId, commentId, linkId, false);
 	}
 
 	public static RenamingElement forClass(final String classId) {
@@ -92,7 +96,7 @@ public record RenamingElement(RenamingType type, String classId, String fieldId,
 		return new RenamingElement(RenamingType.LINK_LABEL, null, null, null, linkId);
 	}
 
-	public static RenamingElement forLink(final String linkId, RenamingType type) {
+	public static RenamingElement forLink(final String linkId, final RenamingType type) {
 		if (!type.isLink()) {
 			throw new IllegalArgumentException("Type isn't applicable to a link: " + type);
 		}
@@ -115,24 +119,25 @@ public record RenamingElement(RenamingType type, String classId, String fieldId,
 	}
 
 	public SelectedElement asSelectedElement() {
-		return new SelectedElement(this.type.asSelectedType(), classId, fieldId, commentId, linkId);
+		return new SelectedElement(this.type.asSelectedType(), this.classId, this.fieldId, this.commentId, this.linkId);
 	}
 
 	@Override
-	public final boolean equals(Object other) {
+	public final boolean equals(final Object other) {
 		if (other == null || other.getClass() != this.getClass()) {
 			return false;
 		}
-		return ((RenamingElement) other).type == this.type && Objects.equals(((RenamingElement) other).getActualId(), this.getActualId());
+		return ((RenamingElement) other).type == this.type && Objects.equals(((RenamingElement) other).getActualId(), this.getActualId())
+				&& this.forceAlternative == ((RenamingElement) other).forceAlternative;
 	}
 
 	@Deprecated
-	public JComponent getRenamingComponent(RenamingComponents component) {
-		return switch (type) {
+	public JComponent getRenamingComponent(final RenamingComponents component) {
+		return switch (this.type) {
 		case CLASS, CLASS_FIELD, LINK_LABEL, LINK_TO_LABEL, LINK_FROM_LABEL -> component.textField();
 		case COMMENT -> component.textArea();
 		case LINK_FROM_CARDINALITY, LINK_TO_CARDINALITY -> component.comboBox();
-		default -> throw new IllegalArgumentException("Unexpected value: " + type);
+		default -> throw new IllegalArgumentException("Unexpected value: " + this.type);
 		};
 	}
 

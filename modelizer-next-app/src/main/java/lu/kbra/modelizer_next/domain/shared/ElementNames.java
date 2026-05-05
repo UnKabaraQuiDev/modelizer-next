@@ -47,6 +47,22 @@ public class ElementNames {
 			this.setConceptualName(name);
 		}
 	}
+	
+	public void set(final PanelType panelType, final boolean maybeTechnical, final String name) {
+		if (maybeTechnical || panelType.isTechnical() && this.hasTechnicalName()) {
+			this.setTechnicalName(name);
+		} else {
+			this.setConceptualName(name);
+		}
+	}
+
+	public void set(boolean forceTechnicalName, String name) {
+		if (forceTechnicalName) {
+			this.setTechnicalName(name);
+		} else {
+			this.setConceptualName(name);
+		}
+	}
 
 	public void setConceptualName(final String name) {
 		this.conceptualName = name;

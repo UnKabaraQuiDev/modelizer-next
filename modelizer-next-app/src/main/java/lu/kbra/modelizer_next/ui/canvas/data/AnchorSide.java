@@ -25,12 +25,12 @@ public enum AnchorSide {
 		};
 	}
 
-	public boolean isTopBottom() {
-		return this == TOP || this == BOTTOM;
-	}
-
 	public boolean isLeftRight() {
 		return this == LEFT || this == RIGHT;
+	}
+
+	public boolean isTopBottom() {
+		return this == TOP || this == BOTTOM;
 	}
 
 }

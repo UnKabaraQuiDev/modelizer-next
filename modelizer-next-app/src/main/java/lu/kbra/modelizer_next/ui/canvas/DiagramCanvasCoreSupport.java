@@ -25,6 +25,7 @@ import lu.kbra.modelizer_next.layout.PanelState;
 import lu.kbra.modelizer_next.layout.PanelType;
 import lu.kbra.modelizer_next.ui.canvas.data.AnchorSide;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.DiagramCanvasActions;
+import lu.kbra.modelizer_next.ui.canvas.datastruct.FieldAnchor;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.LinkGeometry;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectedElement;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectedElement.SelectedType;
@@ -234,7 +235,8 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 
 	default void installKeyBindings() {
 		this.getCanvas()
-				.installDefaultKeyBindings(new DiagramCanvasActions(this.getCanvas()::renameSelection,
+				.installDefaultKeyBindings(new DiagramCanvasActions(() -> this.getCanvas().renameSelection(false),
+						() -> this.getCanvas().renameSelection(true),
 						this.getCanvas()::moveFieldSelection,
 						this.getCanvas()::moveSelectedFieldInList,
 						this.getCanvas()::addTable,
@@ -743,7 +745,7 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 			return Collections.emptyList();
 		}
 
-		final DiagramCanvas canvas = getCanvas();
+		final DiagramCanvas canvas = this.getCanvas();
 
 		final List<String> lines = new ArrayList<>();
 		for (final String paragraph : text.split("\\R", -1)) {

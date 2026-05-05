@@ -38,7 +38,7 @@ public interface ExportManager extends DiagramCanvasExt {
 
 			if (this.getPanelType() == PanelType.CONCEPTUAL) {
 				this.getCanvas().invalidateConceptualAnchorCache();
-				this.getCanvas().ensureConceptualAnchorCache(g2);
+				this.getCanvas().ensureConceptualAnchorCache();
 			}
 
 			Rectangle2D.Double bounds = null;
@@ -51,7 +51,7 @@ public interface ExportManager extends DiagramCanvasExt {
 
 				final NodeLayout layout = this.getCanvas()
 						.resolveRenderLayout(this.getCanvas().findOrCreateNodeLayout(LayoutObjectType.CLASS, classModel.getId()));
-				final Rectangle2D classBounds = this.getCanvas().computeClassBounds( classModel, layout);
+				final Rectangle2D classBounds = this.getCanvas().computeClassBounds(classModel, layout);
 				bounds = this.getCanvas()
 						.expandBounds(bounds, classBounds.getX(), classBounds.getY(), classBounds.getWidth(), classBounds.getHeight());
 			}
@@ -64,7 +64,7 @@ public interface ExportManager extends DiagramCanvasExt {
 
 				final NodeLayout layout = this.getCanvas()
 						.resolveRenderLayout(this.getCanvas().findOrCreateNodeLayout(LayoutObjectType.COMMENT, commentModel.getId()));
-				final Rectangle2D commentBounds = this.getCanvas().computeCommentBounds( commentModel.getText(), layout);
+				final Rectangle2D commentBounds = this.getCanvas().computeCommentBounds(commentModel.getText(), layout);
 				bounds = this.getCanvas()
 						.expandBounds(bounds,
 								commentBounds.getX(),
@@ -88,7 +88,7 @@ public interface ExportManager extends DiagramCanvasExt {
 					continue;
 				}
 
-				final LinkGeometry geometry = this.getCanvas().resolveLinkGeometry( linkModel);
+				final LinkGeometry geometry = this.getCanvas().resolveLinkGeometry(linkModel);
 				if (geometry == null) {
 					continue;
 				}

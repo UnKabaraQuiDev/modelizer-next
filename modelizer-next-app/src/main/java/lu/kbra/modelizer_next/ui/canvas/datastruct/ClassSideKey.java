@@ -5,7 +5,7 @@ import lu.kbra.modelizer_next.ui.canvas.data.AnchorSide;
 public record ClassSideKey(String classId, AnchorSide side) {
 
 	public boolean isVertical() {
-		return side.isTopBottom();
+		return this.side.isTopBottom();
 	}
 
 }

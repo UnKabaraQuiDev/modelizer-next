@@ -30,7 +30,7 @@ public class CommentModel implements StyleOwner, VisibilityOwner, IdOwner {
 		this.style = new ElementStyle();
 	}
 
-	public CommentModel(String txt) {
+	public CommentModel(final String txt) {
 		this();
 		this.text = txt;
 	}

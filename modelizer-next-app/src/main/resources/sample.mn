@@ -1,0 +1,763 @@
+{
+  "schemaVersion" : 1,
+  "meta" : {
+    "id" : "e466d898-c044-4f10-8b35-6599a4e68352",
+    "name" : "Demo model",
+    "createdAt" : "2026-05-05T13:57:27.523730527Z",
+    "updatedAt" : "2026-05-05T14:12:36.556665143Z",
+    "applicationVersion" : "7-SNAPSHOT"
+  },
+  "model" : {
+    "classes" : [ {
+      "id" : "102c2154-f751-4c3e-8af9-ea5fa430a9e1",
+      "names" : {
+        "conceptualName" : "contains",
+        "technicalName" : "contains"
+      },
+      "visibility" : {
+        "conceptual" : true,
+        "logical" : true,
+        "physical" : true
+      },
+      "style" : {
+        "textColor" : "#000000",
+        "backgroundColor" : "#FFF59D",
+        "borderColor" : "#333333"
+      },
+      "fields" : [ {
+        "id" : "6d440ed4-0b02-4a28-9e34-2246ce07d021",
+        "names" : {
+          "conceptualName" : "orderId",
+          "technicalName" : "orderId"
+        },
+        "technicalOnly" : false,
+        "style" : {
+          "textColor" : "#000000",
+          "backgroundColor" : "#FFFFFF",
+          "borderColor" : null
+        },
+        "primaryKey" : true,
+        "unique" : true,
+        "notNull" : true,
+        "type" : "BIGINT"
+      }, {
+        "id" : "f3d5177c-a6cf-483a-82ed-e355c6af8b4e",
+        "names" : {
+          "conceptualName" : "itemId",
+          "technicalName" : "itemId"
+        },
+        "technicalOnly" : false,
+        "style" : {
+          "textColor" : "#000000",
+          "backgroundColor" : "#FFFFFF",
+          "borderColor" : null
+        },
+        "primaryKey" : true,
+        "unique" : true,
+        "notNull" : true,
+        "type" : "BIGINT"
+      }, {
+        "id" : "c9f95483-d005-4df5-926a-a3e3dbac9107",
+        "names" : {
+          "conceptualName" : "Added at date",
+          "technicalName" : "addDate"
+        },
+        "technicalOnly" : false,
+        "style" : {
+          "textColor" : "#000000",
+          "backgroundColor" : "#FFFFFF",
+          "borderColor" : null
+        },
+        "primaryKey" : false,
+        "unique" : false,
+        "notNull" : true,
+        "type" : "TIMESTAMP"
+      }, {
+        "id" : "58cb2a2d-87ed-4102-b991-1e5c3b6426a7",
+        "names" : {
+          "conceptualName" : "Count",
+          "technicalName" : "count"
+        },
+        "technicalOnly" : false,
+        "style" : {
+          "textColor" : "#000000",
+          "backgroundColor" : "#FFFFFF",
+          "borderColor" : null
+        },
+        "primaryKey" : false,
+        "unique" : false,
+        "notNull" : true,
+        "type" : "INT"
+      } ]
+    }, {
+      "id" : "62819aae-b308-4211-9022-a7f94a8179d9",
+      "names" : {
+        "conceptualName" : "Item",
+        "technicalName" : "item"
+      },
+      "visibility" : {
+        "conceptual" : true,
+        "logical" : true,
+        "physical" : true
+      },
+      "style" : {
+        "textColor" : "#000000",
+        "backgroundColor" : "#FFF59D",
+        "borderColor" : "#333333"
+      },
+      "fields" : [ {
+        "id" : "68018848-71ab-4c37-8dfa-165730564669",
+        "names" : {
+          "conceptualName" : "Item ID",
+          "technicalName" : "itemId"
+        },
+        "technicalOnly" : false,
+        "style" : {
+          "textColor" : "#000000",
+          "backgroundColor" : "#FFFFFF",
+          "borderColor" : null
+        },
+        "primaryKey" : true,
+        "unique" : false,
+        "notNull" : false,
+        "type" : "BIGINT"
+      }, {
+        "id" : "3da9e7d6-9561-424e-99e4-f13f6780d657",
+        "names" : {
+          "conceptualName" : "Name",
+          "technicalName" : "name"
+        },
+        "technicalOnly" : false,
+        "style" : {
+          "textColor" : "#000000",
+          "backgroundColor" : "#FFFFFF",
+          "borderColor" : null
+        },
+        "primaryKey" : false,
+        "unique" : true,
+        "notNull" : true,
+        "type" : "TEXT"
+      } ]
+    }, {
+      "id" : "33961147-999b-4bd1-ba30-498f7ae64ba1",
+      "names" : {
+        "conceptualName" : "Order",
+        "technicalName" : "order"
+      },
+      "visibility" : {
+        "conceptual" : true,
+        "logical" : true,
+        "physical" : true
+      },
+      "style" : {
+        "textColor" : "#000000",
+        "backgroundColor" : "#FFF59D",
+        "borderColor" : "#333333"
+      },
+      "fields" : [ {
+        "id" : "22b616b6-9054-490d-bd8b-e285949e7c54",
+        "names" : {
+          "conceptualName" : "Order ID",
+          "technicalName" : "orderId"
+        },
+        "technicalOnly" : false,
+        "style" : {
+          "textColor" : "#000000",
+          "backgroundColor" : "#FFFFFF",
+          "borderColor" : null
+        },
+        "primaryKey" : true,
+        "unique" : true,
+        "notNull" : true,
+        "type" : "BIGINT"
+      }, {
+        "id" : "15103396-d52f-44aa-b7e3-b9fa72ff25cf",
+        "names" : {
+          "conceptualName" : "Customer ID",
+          "technicalName" : "customerId"
+        },
+        "technicalOnly" : true,
+        "style" : {
+          "textColor" : "#000000",
+          "backgroundColor" : "#FFFFFF",
+          "borderColor" : null
+        },
+        "primaryKey" : false,
+        "unique" : false,
+        "notNull" : true,
+        "type" : "BIGINT"
+      }, {
+        "id" : "992debaa-e682-4a04-bb0e-e18160b9a8b1",
+        "names" : {
+          "conceptualName" : "Created at",
+          "technicalName" : "createdAt"
+        },
+        "technicalOnly" : true,
+        "style" : {
+          "textColor" : "#000000",
+          "backgroundColor" : "#FFFFFF",
+          "borderColor" : null
+        },
+        "primaryKey" : false,
+        "unique" : false,
+        "notNull" : true,
+        "type" : "TIMESTAMP"
+      } ]
+    }, {
+      "id" : "b337c43a-6964-45c4-a616-d487af7df16d",
+      "names" : {
+        "conceptualName" : "Customer",
+        "technicalName" : "customer"
+      },
+      "visibility" : {
+        "conceptual" : true,
+        "logical" : true,
+        "physical" : true
+      },
+      "style" : {
+        "textColor" : "#000000",
+        "backgroundColor" : "#FFF59D",
+        "borderColor" : "#333333"
+      },
+      "fields" : [ {
+        "id" : "ef70a9a0-6452-4393-a17d-acbe9923780a",
+        "names" : {
+          "conceptualName" : "Customer ID",
+          "technicalName" : "customerId"
+        },
+        "technicalOnly" : false,
+        "style" : {
+          "textColor" : "#000000",
+          "backgroundColor" : "#FFFFFF",
+          "borderColor" : null
+        },
+        "primaryKey" : true,
+        "unique" : true,
+        "notNull" : true,
+        "type" : "BIGINT"
+      }, {
+        "id" : "e3d790eb-a0e8-4fb8-bc9a-0ee3825f5385",
+        "names" : {
+          "conceptualName" : "Display name",
+          "technicalName" : "displayName"
+        },
+        "technicalOnly" : false,
+        "style" : {
+          "textColor" : "#000000",
+          "backgroundColor" : "#FFFFFF",
+          "borderColor" : null
+        },
+        "primaryKey" : false,
+        "unique" : true,
+        "notNull" : true,
+        "type" : "TEXT"
+      }, {
+        "id" : "50091446-dc0b-4ce6-9546-b893987afd98",
+        "names" : {
+          "conceptualName" : "Email",
+          "technicalName" : "email"
+        },
+        "technicalOnly" : false,
+        "style" : {
+          "textColor" : "#000000",
+          "backgroundColor" : "#FFFFFF",
+          "borderColor" : null
+        },
+        "primaryKey" : false,
+        "unique" : true,
+        "notNull" : false,
+        "type" : "TEXT"
+      } ]
+    } ],
+    "conceptualLinks" : [ {
+      "id" : "2c499239-9570-449a-ac6d-7fe13da8383f",
+      "label" : "places",
+      "from" : {
+        "classId" : "b337c43a-6964-45c4-a616-d487af7df16d",
+        "fieldId" : null
+      },
+      "to" : {
+        "classId" : "33961147-999b-4bd1-ba30-498f7ae64ba1",
+        "fieldId" : null
+      },
+      "cardinalityFrom" : "ONE",
+      "cardinalityTo" : "ZERO_OR_MANY",
+      "associationClassId" : null,
+      "lineColor" : "#555555",
+      "labelFrom" : null,
+      "labelTo" : null
+    }, {
+      "id" : "9e647a2c-53e1-4efb-9c17-add77ce574dc",
+      "label" : "contains",
+      "from" : {
+        "classId" : "62819aae-b308-4211-9022-a7f94a8179d9",
+        "fieldId" : null
+      },
+      "to" : {
+        "classId" : "33961147-999b-4bd1-ba30-498f7ae64ba1",
+        "fieldId" : null
+      },
+      "cardinalityFrom" : "ZERO_OR_MANY",
+      "cardinalityTo" : "ONE_OR_MANY",
+      "associationClassId" : "102c2154-f751-4c3e-8af9-ea5fa430a9e1",
+      "lineColor" : "#555555",
+      "labelFrom" : "",
+      "labelTo" : null
+    } ],
+    "technicalLinks" : [ {
+      "id" : "43ecf79b-8461-4cf0-9776-7a267a045b41",
+      "label" : "FK_ORDER_CUSTOMER",
+      "from" : {
+        "classId" : "33961147-999b-4bd1-ba30-498f7ae64ba1",
+        "fieldId" : "15103396-d52f-44aa-b7e3-b9fa72ff25cf"
+      },
+      "to" : {
+        "classId" : "b337c43a-6964-45c4-a616-d487af7df16d",
+        "fieldId" : "ef70a9a0-6452-4393-a17d-acbe9923780a"
+      },
+      "cardinalityFrom" : null,
+      "cardinalityTo" : null,
+      "associationClassId" : null,
+      "lineColor" : "#555555",
+      "labelFrom" : null,
+      "labelTo" : null
+    }, {
+      "id" : "4f705b6d-c390-4864-8ec2-b02768e8a5fc",
+      "label" : null,
+      "from" : {
+        "classId" : "102c2154-f751-4c3e-8af9-ea5fa430a9e1",
+        "fieldId" : "6d440ed4-0b02-4a28-9e34-2246ce07d021"
+      },
+      "to" : {
+        "classId" : "33961147-999b-4bd1-ba30-498f7ae64ba1",
+        "fieldId" : "22b616b6-9054-490d-bd8b-e285949e7c54"
+      },
+      "cardinalityFrom" : null,
+      "cardinalityTo" : null,
+      "associationClassId" : null,
+      "lineColor" : "#555555",
+      "labelFrom" : null,
+      "labelTo" : null
+    }, {
+      "id" : "bec76138-cebf-4d9c-a04b-f764202aac1c",
+      "label" : null,
+      "from" : {
+        "classId" : "102c2154-f751-4c3e-8af9-ea5fa430a9e1",
+        "fieldId" : "f3d5177c-a6cf-483a-82ed-e355c6af8b4e"
+      },
+      "to" : {
+        "classId" : "62819aae-b308-4211-9022-a7f94a8179d9",
+        "fieldId" : "68018848-71ab-4c37-8dfa-165730564669"
+      },
+      "cardinalityFrom" : null,
+      "cardinalityTo" : null,
+      "associationClassId" : null,
+      "lineColor" : "#555555",
+      "labelFrom" : null,
+      "labelTo" : null
+    } ],
+    "comments" : [ {
+      "id" : "060f6753-b669-4b35-9663-b2a049ee8ffc",
+      "kind" : "STANDALONE",
+      "text" : "Standalone notes can live anywhere on the canvas.",
+      "binding" : null,
+      "visibility" : {
+        "conceptual" : true,
+        "logical" : true,
+        "physical" : false
+      },
+      "style" : {
+        "textColor" : "#333333",
+        "backgroundColor" : "#FFF8CC",
+        "borderColor" : "#444444"
+      }
+    }, {
+      "id" : "d066dd64-3ea5-46d7-bf6e-09407a66ca48",
+      "kind" : "BOUND",
+      "text" : "Comments can be bound to a class.",
+      "binding" : {
+        "targetType" : "CLASS",
+        "targetId" : "b337c43a-6964-45c4-a616-d487af7df16d"
+      },
+      "visibility" : {
+        "conceptual" : true,
+        "logical" : true,
+        "physical" : true
+      },
+      "style" : {
+        "textColor" : "#333333",
+        "backgroundColor" : "#FFF8CC",
+        "borderColor" : "#444444"
+      }
+    }, {
+      "id" : "d8cac5b6-f15b-4ab4-bc4c-c0d5e6d07519",
+      "kind" : "BOUND",
+      "text" : "Comments can be bound to a conceptual link.",
+      "binding" : {
+        "targetType" : "LINK",
+        "targetId" : "2c499239-9570-449a-ac6d-7fe13da8383f"
+      },
+      "visibility" : {
+        "conceptual" : true,
+        "logical" : true,
+        "physical" : true
+      },
+      "style" : {
+        "textColor" : "#333333",
+        "backgroundColor" : "#FFF8CC",
+        "borderColor" : "#444444"
+      }
+    }, {
+      "id" : "0b5b5bf7-b39c-4dfa-a309-5181ce553bee",
+      "kind" : "BOUND",
+      "text" : "Comments can be bound to a technical link.",
+      "binding" : {
+        "targetType" : "LINK",
+        "targetId" : "43ecf79b-8461-4cf0-9776-7a267a045b41"
+      },
+      "visibility" : {
+        "conceptual" : true,
+        "logical" : true,
+        "physical" : false
+      },
+      "style" : {
+        "textColor" : "#333333",
+        "backgroundColor" : "#FFF8CC",
+        "borderColor" : "#444444"
+      }
+    }, {
+      "id" : "f052174b-17bb-45d0-94cc-68069387a5fb",
+      "kind" : "STANDALONE",
+      "text" : "Comments can be disabled/enabled depending on the panel type",
+      "binding" : null,
+      "visibility" : {
+        "conceptual" : false,
+        "logical" : false,
+        "physical" : true
+      },
+      "style" : {
+        "textColor" : "#333333",
+        "backgroundColor" : "#FFF8CC",
+        "borderColor" : "#444444"
+      }
+    } ]
+  },
+  "workspace" : {
+    "dockLayout" : {
+      "tabGroups" : [ {
+        "id" : "df27d888-e68f-4eaa-affc-b8be6368a0d0",
+        "x" : 0.0,
+        "y" : 0.0,
+        "width" : 1.0,
+        "height" : 1.0,
+        "tabs" : [ "CONCEPTUAL", "LOGICAL", "PHYSICAL" ],
+        "selectedTab" : "CONCEPTUAL"
+      } ]
+    },
+    "panels" : {
+      "CONCEPTUAL" : {
+        "zoom" : 0.6830134553650707,
+        "panX" : 54.215699064271575,
+        "panY" : 107.18488491223283,
+        "nodeLayouts" : [ {
+          "objectType" : "CLASS",
+          "objectId" : "b337c43a-6964-45c4-a616-d487af7df16d",
+          "position" : {
+            "x" : 122.0,
+            "y" : 142.0
+          },
+          "size" : {
+            "x" : 220.0,
+            "y" : 94.0
+          }
+        }, {
+          "objectType" : "CLASS",
+          "objectId" : "33961147-999b-4bd1-ba30-498f7ae64ba1",
+          "position" : {
+            "x" : 1023.0,
+            "y" : 386.0
+          },
+          "size" : {
+            "x" : 220.0,
+            "y" : 50.0
+          }
+        }, {
+          "objectType" : "COMMENT",
+          "objectId" : "060f6753-b669-4b35-9663-b2a049ee8ffc",
+          "position" : {
+            "x" : 44.0,
+            "y" : 443.0
+          },
+          "size" : {
+            "x" : 280.0,
+            "y" : 90.0
+          }
+        }, {
+          "objectType" : "COMMENT",
+          "objectId" : "d066dd64-3ea5-46d7-bf6e-09407a66ca48",
+          "position" : {
+            "x" : 293.0,
+            "y" : -74.0
+          },
+          "size" : {
+            "x" : 250.0,
+            "y" : 80.0
+          }
+        }, {
+          "objectType" : "COMMENT",
+          "objectId" : "d8cac5b6-f15b-4ab4-bc4c-c0d5e6d07519",
+          "position" : {
+            "x" : 546.0,
+            "y" : 533.0
+          },
+          "size" : {
+            "x" : 260.0,
+            "y" : 80.0
+          }
+        }, {
+          "objectType" : "CLASS",
+          "objectId" : "62819aae-b308-4211-9022-a7f94a8179d9",
+          "position" : {
+            "x" : 992.0,
+            "y" : -61.0
+          },
+          "size" : {
+            "x" : 180.0,
+            "y" : 72.0
+          }
+        }, {
+          "objectType" : "CLASS",
+          "objectId" : "102c2154-f751-4c3e-8af9-ea5fa430a9e1",
+          "position" : {
+            "x" : 1456.0,
+            "y" : 152.0
+          },
+          "size" : {
+            "x" : 180.0,
+            "y" : 116.0
+          }
+        } ],
+        "linkLayouts" : [ {
+          "linkId" : "2c499239-9570-449a-ac6d-7fe13da8383f",
+          "bendPoints" : [ ],
+          "nameLabelPosition" : null
+        }, {
+          "linkId" : "9e647a2c-53e1-4efb-9c17-add77ce574dc",
+          "bendPoints" : [ ],
+          "nameLabelPosition" : null
+        } ]
+      },
+      "LOGICAL" : {
+        "zoom" : 0.6830134553650705,
+        "panX" : 52.158664025681446,
+        "panY" : 124.29943309883208,
+        "nodeLayouts" : [ {
+          "objectType" : "CLASS",
+          "objectId" : "b337c43a-6964-45c4-a616-d487af7df16d",
+          "position" : {
+            "x" : 120.0,
+            "y" : 120.0
+          },
+          "size" : {
+            "x" : 220.0,
+            "y" : 94.0
+          }
+        }, {
+          "objectType" : "CLASS",
+          "objectId" : "33961147-999b-4bd1-ba30-498f7ae64ba1",
+          "position" : {
+            "x" : 730.0,
+            "y" : 157.0
+          },
+          "size" : {
+            "x" : 220.0,
+            "y" : 94.0
+          }
+        }, {
+          "objectType" : "COMMENT",
+          "objectId" : "060f6753-b669-4b35-9663-b2a049ee8ffc",
+          "position" : {
+            "x" : 103.0,
+            "y" : 468.0
+          },
+          "size" : {
+            "x" : 280.0,
+            "y" : 90.0
+          }
+        }, {
+          "objectType" : "COMMENT",
+          "objectId" : "d066dd64-3ea5-46d7-bf6e-09407a66ca48",
+          "position" : {
+            "x" : 181.0,
+            "y" : -88.0
+          },
+          "size" : {
+            "x" : 250.0,
+            "y" : 80.0
+          }
+        }, {
+          "objectType" : "CLASS",
+          "objectId" : "102c2154-f751-4c3e-8af9-ea5fa430a9e1",
+          "position" : {
+            "x" : 1175.0,
+            "y" : 172.0
+          },
+          "size" : {
+            "x" : 140.0,
+            "y" : 116.0
+          }
+        }, {
+          "objectType" : "CLASS",
+          "objectId" : "62819aae-b308-4211-9022-a7f94a8179d9",
+          "position" : {
+            "x" : 1483.0,
+            "y" : 193.0
+          },
+          "size" : {
+            "x" : 140.0,
+            "y" : 72.0
+          }
+        }, {
+          "objectType" : "COMMENT",
+          "objectId" : "0b5b5bf7-b39c-4dfa-a309-5181ce553bee",
+          "position" : {
+            "x" : 459.0,
+            "y" : 414.0
+          },
+          "size" : {
+            "x" : 120.0,
+            "y" : 71.0
+          }
+        } ],
+        "linkLayouts" : [ {
+          "linkId" : "43ecf79b-8461-4cf0-9776-7a267a045b41",
+          "bendPoints" : [ ],
+          "nameLabelPosition" : null
+        }, {
+          "linkId" : "914ae3d7-c7ca-4ad2-b1f4-30ca4483b7f5",
+          "bendPoints" : [ ],
+          "nameLabelPosition" : null
+        }, {
+          "linkId" : "7015263d-a666-4d50-b06d-14b60242c23a",
+          "bendPoints" : [ ],
+          "nameLabelPosition" : null
+        }, {
+          "linkId" : "4f705b6d-c390-4864-8ec2-b02768e8a5fc",
+          "bendPoints" : [ ],
+          "nameLabelPosition" : null
+        }, {
+          "linkId" : "bec76138-cebf-4d9c-a04b-f764202aac1c",
+          "bendPoints" : [ ],
+          "nameLabelPosition" : null
+        } ]
+      },
+      "PHYSICAL" : {
+        "zoom" : 0.683013455365071,
+        "panX" : -35.49168239874393,
+        "panY" : 11.282858547913179,
+        "nodeLayouts" : [ {
+          "objectType" : "CLASS",
+          "objectId" : "b337c43a-6964-45c4-a616-d487af7df16d",
+          "position" : {
+            "x" : 127.0,
+            "y" : 219.0
+          },
+          "size" : {
+            "x" : 220.0,
+            "y" : 94.0
+          }
+        }, {
+          "objectType" : "CLASS",
+          "objectId" : "33961147-999b-4bd1-ba30-498f7ae64ba1",
+          "position" : {
+            "x" : 674.0,
+            "y" : 218.0
+          },
+          "size" : {
+            "x" : 220.0,
+            "y" : 94.0
+          }
+        }, {
+          "objectType" : "COMMENT",
+          "objectId" : "060f6753-b669-4b35-9663-b2a049ee8ffc",
+          "position" : {
+            "x" : 206.0,
+            "y" : 508.0
+          },
+          "size" : {
+            "x" : 280.0,
+            "y" : 90.0
+          }
+        }, {
+          "objectType" : "COMMENT",
+          "objectId" : "d066dd64-3ea5-46d7-bf6e-09407a66ca48",
+          "position" : {
+            "x" : 82.0,
+            "y" : 508.0
+          },
+          "size" : {
+            "x" : 239.0,
+            "y" : 52.0
+          }
+        }, {
+          "objectType" : "CLASS",
+          "objectId" : "102c2154-f751-4c3e-8af9-ea5fa430a9e1",
+          "position" : {
+            "x" : 1263.0,
+            "y" : 258.0
+          },
+          "size" : {
+            "x" : 182.0,
+            "y" : 116.0
+          }
+        }, {
+          "objectType" : "CLASS",
+          "objectId" : "62819aae-b308-4211-9022-a7f94a8179d9",
+          "position" : {
+            "x" : 1650.0,
+            "y" : 287.0
+          },
+          "size" : {
+            "x" : 140.0,
+            "y" : 72.0
+          }
+        }, {
+          "objectType" : "COMMENT",
+          "objectId" : "0b5b5bf7-b39c-4dfa-a309-5181ce553bee",
+          "position" : {
+            "x" : 499.0,
+            "y" : 368.0
+          },
+          "size" : {
+            "x" : 120.0,
+            "y" : 71.0
+          }
+        }, {
+          "objectType" : "COMMENT",
+          "objectId" : "f052174b-17bb-45d0-94cc-68069387a5fb",
+          "position" : {
+            "x" : 415.0,
+            "y" : 559.0
+          },
+          "size" : {
+            "x" : 219.0,
+            "y" : 70.0
+          }
+        } ],
+        "linkLayouts" : [ {
+          "linkId" : "43ecf79b-8461-4cf0-9776-7a267a045b41",
+          "bendPoints" : [ ],
+          "nameLabelPosition" : null
+        }, {
+          "linkId" : "4f705b6d-c390-4864-8ec2-b02768e8a5fc",
+          "bendPoints" : [ ],
+          "nameLabelPosition" : null
+        }, {
+          "linkId" : "bec76138-cebf-4d9c-a04b-f764202aac1c",
+          "bendPoints" : [ ],
+          "nameLabelPosition" : null
+        } ]
+      }
+    }
+  }
+}
