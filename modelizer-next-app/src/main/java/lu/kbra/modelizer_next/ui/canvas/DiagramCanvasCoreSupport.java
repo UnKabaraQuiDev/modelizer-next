@@ -1,6 +1,6 @@
 package lu.kbra.modelizer_next.ui.canvas;
 
-import java.awt.FontMetrics;
+import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.RenderingHints;
@@ -147,12 +147,12 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 
 			final NodeLayout layout = this.getCanvas()
 					.resolveRenderLayout(this.getCanvas().findOrCreateNodeLayout(LayoutObjectType.CLASS, classModel.getId()));
-			final Rectangle2D bounds = this.getCanvas().computeClassBounds(g2, classModel, layout);
+			final Rectangle2D bounds = this.getCanvas().computeClassBounds(classModel, layout);
 			return new Point2D.Double(bounds.getCenterX(), bounds.getCenterY());
 		}
 
 		final LinkModel linkModel = this.getCanvas().findLinkById(commentModel.getBinding().getTargetId());
-		final LinkGeometry geometry = linkModel == null ? null : this.getCanvas().resolveLinkGeometry(g2, linkModel);
+		final LinkGeometry geometry = linkModel == null ? null : this.getCanvas().resolveLinkGeometry(linkModel);
 		return geometry == null ? null : geometry.middlePoint();
 	}
 
@@ -165,7 +165,7 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 		return this.getCanvas().linkCreationState == null ? null : this.getCanvas().linkCreationState.toSelectedElement();
 	}
 
-	default int getTechnicalSideLinkCount(final Graphics2D g2, final String classId, final AnchorSide side, final String ignoredLinkId) {
+	default int getTechnicalSideLinkCount(final String classId, final AnchorSide side, final String ignoredLinkId) {
 		if (classId == null || side != AnchorSide.LEFT && side != AnchorSide.RIGHT) {
 			return 0;
 		}
@@ -177,8 +177,7 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 			}
 			if (classId.equals(linkModel.getFrom().getClassId())) {
 				final AnchorSide endpointSide = this.getCanvas()
-						.resolveTechnicalEndpointSide(g2,
-								linkModel.getFrom().getClassId(),
+						.resolveTechnicalEndpointSide(linkModel.getFrom().getClassId(),
 								linkModel.getFrom().getFieldId(),
 								linkModel.getTo().getClassId(),
 								linkModel.getTo().getFieldId(),
@@ -189,8 +188,7 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 			}
 			if (classId.equals(linkModel.getTo().getClassId())) {
 				final AnchorSide endpointSide = this.getCanvas()
-						.resolveTechnicalEndpointSide(g2,
-								linkModel.getTo().getClassId(),
+						.resolveTechnicalEndpointSide(linkModel.getTo().getClassId(),
 								linkModel.getTo().getFieldId(),
 								linkModel.getFrom().getClassId(),
 								linkModel.getFrom().getFieldId(),
@@ -395,7 +393,7 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 		}
 	}
 
-	default Point2D resolveConceptualPreviewAnchor(final Graphics2D g2, final String classId, final Point2D reference) {
+	default Point2D resolveConceptualPreviewAnchor(final String classId, final Point2D reference) {
 		final ClassModel classModel = this.getCanvas().findClassById(classId);
 		if (classModel == null || !classModel.isVisible(this.getPanelType())) {
 			return null;
@@ -403,7 +401,7 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 
 		final NodeLayout layout = this.getCanvas()
 				.resolveRenderLayout(this.getCanvas().findOrCreateNodeLayout(LayoutObjectType.CLASS, classId));
-		final Rectangle2D bounds = this.getCanvas().computeClassBounds(g2, classModel, layout);
+		final Rectangle2D bounds = this.getCanvas().computeClassBounds(classModel, layout);
 
 		final Point2D effectiveReference = reference == null ? new Point2D.Double(bounds.getCenterX(), bounds.getCenterY()) : reference;
 
@@ -426,7 +424,7 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 		return best;
 	}
 
-	default Point2D resolveOppositeReferencePoint(final Graphics2D g2, final String classId, final String fieldId) {
+	default Point2D resolveOppositeReferencePoint(final String classId, final String fieldId) {
 		final ClassModel classModel = this.getCanvas().findClassById(classId);
 		if (classModel == null || !classModel.isVisible(this.getPanelType())) {
 			return null;
@@ -434,7 +432,7 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 
 		final NodeLayout layout = this.getCanvas()
 				.resolveRenderLayout(this.getCanvas().findOrCreateNodeLayout(LayoutObjectType.CLASS, classId));
-		final Rectangle2D classBounds = this.getCanvas().computeClassBounds(g2, classModel, layout);
+		final Rectangle2D classBounds = this.getCanvas().computeClassBounds(classModel, layout);
 
 		if (this.getCanvas().panelType == PanelType.CONCEPTUAL || fieldId == null) {
 			return new Point2D.Double(classBounds.getCenterX(), classBounds.getCenterY());
@@ -452,7 +450,7 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 		return new Point2D.Double(classBounds.getCenterX(), classBounds.getCenterY());
 	}
 
-	default Point2D resolvePreviewSourceAnchorReference(final Graphics2D g2) {
+	default Point2D resolvePreviewSourceAnchorReference() {
 		if (this.getCanvas().linkCreationState == null) {
 			return this.getCanvas().linkPreviewMousePoint;
 		}
@@ -463,7 +461,7 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 		}
 
 		if (source.type() == SelectedType.COMMENT) {
-			return this.getCanvas().resolveCommentCenterAnchor(g2, source.commentId());
+			return this.getCanvas().resolveCommentCenterAnchor(source.commentId());
 		}
 
 		if (this.getCanvas().panelType == PanelType.CONCEPTUAL) {
@@ -474,15 +472,14 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 
 			final NodeLayout layout = this.getCanvas()
 					.resolveRenderLayout(this.getCanvas().findOrCreateNodeLayout(LayoutObjectType.CLASS, classModel.getId()));
-			final Rectangle2D bounds = this.getCanvas().computeClassBounds(g2, classModel, layout);
+			final Rectangle2D bounds = this.getCanvas().computeClassBounds(classModel, layout);
 			return new Point2D.Double(bounds.getCenterX(), bounds.getCenterY());
 		}
 
-		return this.getCanvas().resolveOppositeReferencePoint(g2, source.classId(), source.fieldId());
+		return this.getCanvas().resolveOppositeReferencePoint(source.classId(), source.fieldId());
 	}
 
 	default AnchorSide resolveTechnicalEndpointSide(
-			final Graphics2D g2,
 			final String classId,
 			final String fieldId,
 			final String oppositeClassId,
@@ -499,8 +496,8 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 
 		final NodeLayout layout = this.getCanvas()
 				.resolveRenderLayout(this.getCanvas().findOrCreateNodeLayout(LayoutObjectType.CLASS, classId));
-		final Rectangle2D classBounds = this.getCanvas().computeClassBounds(g2, classModel, layout);
-		final Point2D oppositeReference = this.getCanvas().resolveOppositeReferencePoint(g2, oppositeClassId, oppositeFieldId);
+		final Rectangle2D classBounds = this.getCanvas().computeClassBounds(classModel, layout);
+		final Point2D oppositeReference = this.getCanvas().resolveOppositeReferencePoint(oppositeClassId, oppositeFieldId);
 		if (oppositeReference == null) {
 			return AnchorSide.LEFT;
 		}
@@ -523,11 +520,7 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 		return oppositeReference.getX() <= centerX ? AnchorSide.LEFT : AnchorSide.RIGHT;
 	}
 
-	default Point2D resolveTechnicalFieldAnchor(
-			final Graphics2D g2,
-			final String classId,
-			final String fieldId,
-			final Point2D oppositeReference) {
+	default Point2D resolveTechnicalFieldAnchor(final String classId, final String fieldId, final Point2D oppositeReference) {
 		final ClassModel classModel = this.getCanvas().findClassById(classId);
 		if (classModel == null || !classModel.isVisible(this.getPanelType())) {
 			return null;
@@ -535,7 +528,7 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 
 		final NodeLayout layout = this.getCanvas()
 				.resolveRenderLayout(this.getCanvas().findOrCreateNodeLayout(LayoutObjectType.CLASS, classId));
-		final Rectangle2D classBounds = this.getCanvas().computeClassBounds(g2, classModel, layout);
+		final Rectangle2D classBounds = this.getCanvas().computeClassBounds(classModel, layout);
 
 		if (fieldId == null) {
 			final double x = oppositeReference.getX() < classBounds.getCenterX() ? classBounds.getX() : classBounds.getMaxX();
@@ -559,7 +552,6 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 	}
 
 	default FieldAnchor resolveTechnicalFieldAnchor(
-			final Graphics2D g2,
 			final String classId,
 			final String fieldId,
 			final String oppositeClassId,
@@ -571,9 +563,9 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 
 		final NodeLayout layout = this.getCanvas()
 				.resolveRenderLayout(this.getCanvas().findOrCreateNodeLayout(LayoutObjectType.CLASS, classId));
-		final Rectangle2D classBounds = this.getCanvas().computeClassBounds(g2, classModel, layout);
+		final Rectangle2D classBounds = this.getCanvas().computeClassBounds(classModel, layout);
 
-		final Point2D oppositeReference = this.getCanvas().resolveOppositeReferencePoint(g2, oppositeClassId, oppositeFieldId);
+		final Point2D oppositeReference = this.getCanvas().resolveOppositeReferencePoint(oppositeClassId, oppositeFieldId);
 		if (oppositeReference == null) {
 			return null;
 		}
@@ -607,7 +599,7 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 				: new FieldAnchor(right, AnchorSide.RIGHT);
 	}
 
-	default Point2D resolveTechnicalSelfLinkAnchor(final Graphics2D g2, final String classId, final String fieldId, final AnchorSide side) {
+	default Point2D resolveTechnicalSelfLinkAnchor(final String classId, final String fieldId, final AnchorSide side) {
 		final ClassModel classModel = this.getCanvas().findClassById(classId);
 		if (classModel == null || !classModel.isVisible(this.getPanelType())) {
 			return null;
@@ -615,7 +607,7 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 
 		final NodeLayout layout = this.getCanvas()
 				.resolveRenderLayout(this.getCanvas().findOrCreateNodeLayout(LayoutObjectType.CLASS, classId));
-		final Rectangle2D classBounds = this.getCanvas().computeClassBounds(g2, classModel, layout);
+		final Rectangle2D classBounds = this.getCanvas().computeClassBounds(classModel, layout);
 		final double x = side == AnchorSide.LEFT ? classBounds.getX() : classBounds.getMaxX();
 
 		if (fieldId == null) {
@@ -746,10 +738,12 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 		return new Point2D.Double(world.getX() * state.getZoom(), world.getY() * state.getZoom());
 	}
 
-	default List<String> wrapText(final String text, final FontMetrics metrics, final int maxWidth) {
+	default List<String> wrapText(final String text, final Font font, final int maxWidth) {
 		if (text == null || text.isEmpty()) {
 			return Collections.emptyList();
 		}
+
+		final DiagramCanvas canvas = getCanvas();
 
 		final List<String> lines = new ArrayList<>();
 		for (final String paragraph : text.split("\\R", -1)) {
@@ -768,7 +762,7 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 				}
 
 				final String candidate = current + " " + word;
-				if (metrics.stringWidth(candidate) <= maxWidth) {
+				if (canvas.stringWidth(font, candidate) <= maxWidth) {
 					current.append(" ").append(word);
 				} else {
 					lines.add(current.toString());

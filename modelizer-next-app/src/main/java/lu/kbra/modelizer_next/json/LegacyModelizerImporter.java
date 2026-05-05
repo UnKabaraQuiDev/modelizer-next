@@ -89,7 +89,7 @@ public class LegacyModelizerImporter {
 		}
 
 		final LinkModel linkModel = new LinkModel();
-		linkModel.setName(LegacyModelizerImporter.readText(linkNode, "name", ""));
+		linkModel.setLabel(LegacyModelizerImporter.readText(linkNode, "name", ""));
 //		linkModel.setComment(LegacyModelizerImporter.readText(linkNode, "comment", ""));
 		linkModel.setFrom(new LinkEnd(fromClassId, null));
 		linkModel.setTo(new LinkEnd(toClassId, null));
@@ -148,7 +148,7 @@ public class LegacyModelizerImporter {
 		}
 
 		final LinkModel linkModel = new LinkModel();
-		linkModel.setName(LegacyModelizerImporter.readText(linkNode, "name", ""));
+		linkModel.setLabel(LegacyModelizerImporter.readText(linkNode, "name", ""));
 //		linkModel.setComment(LegacyModelizerImporter.readText(linkNode, "comment", ""));
 		linkModel.setFrom(new LinkEnd(fromClassId, fromFieldId));
 		linkModel.setTo(new LinkEnd(toClassId, toFieldId));

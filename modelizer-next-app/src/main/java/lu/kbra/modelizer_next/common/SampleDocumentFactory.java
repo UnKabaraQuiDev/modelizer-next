@@ -42,7 +42,7 @@ public final class SampleDocumentFactory {
 		order.getFields().add(SampleDocumentFactory.field("Created at", "CREATED_AT", true, false, false, true));
 
 		final LinkModel conceptualCustomerOrders = new LinkModel();
-		conceptualCustomerOrders.setName("places");
+		conceptualCustomerOrders.setLabel("places");
 		conceptualCustomerOrders.setFrom(new LinkEnd(customer.getId(), null));
 		conceptualCustomerOrders.setTo(new LinkEnd(order.getId(), null));
 		conceptualCustomerOrders.setCardinalityFrom(Cardinality.ONE);
@@ -50,7 +50,7 @@ public final class SampleDocumentFactory {
 //		conceptualCustomerOrders.setComment("One customer can place many orders.");
 
 		final LinkModel logicalCustomerOrders = new LinkModel();
-		logicalCustomerOrders.setName("FK_ORDER_CUSTOMER");
+		logicalCustomerOrders.setLabel("FK_ORDER_CUSTOMER");
 		logicalCustomerOrders.setFrom(new LinkEnd(order.getId(), order.getFields().get(1).getId()));
 		logicalCustomerOrders.setTo(new LinkEnd(customer.getId(), customer.getFields().get(0).getId()));
 		logicalCustomerOrders.setCardinalityFrom(null);

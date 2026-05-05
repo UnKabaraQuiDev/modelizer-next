@@ -81,7 +81,7 @@ public interface CaptureManager extends DiagramCanvasExt {
 		final LinkEnd to = linkModel.getTo();
 
 		return new CopiedLink(linkModel.getId(),
-				linkModel.getName(),
+				linkModel.getLabel(),
 				linkModel.getLineColor(),
 				linkModel.getAssociationClassId(),
 				from == null ? null : from.getClassId(),

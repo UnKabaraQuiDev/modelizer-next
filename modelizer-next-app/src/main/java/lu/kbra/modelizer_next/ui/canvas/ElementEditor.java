@@ -124,7 +124,7 @@ public interface ElementEditor extends DiagramCanvasExt {
 			return;
 		}
 
-		linkModel.setName(result.name());
+		linkModel.setLabel(result.name());
 		linkModel.setLineColor(result.lineColor());
 		linkModel.setFrom(new LinkEnd(result.fromClassId(), result.fromFieldId()));
 		linkModel.setTo(new LinkEnd(result.toClassId(), result.toFieldId()));

@@ -1,6 +1,5 @@
 package lu.kbra.modelizer_next.ui.canvas;
 
-import java.awt.Graphics2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.List;
@@ -99,10 +98,10 @@ public interface LinkLayoutManager extends DiagramCanvasExt {
 		return bestSide;
 	}
 
-	default AnchorSide chooseTechnicalSelfLinkSide(final Graphics2D g2, final LinkModel linkModel) {
+	default AnchorSide chooseTechnicalSelfLinkSide(final LinkModel linkModel) {
 		final String classId = linkModel.getFrom().getClassId();
-		final int leftCount = this.getCanvas().getTechnicalSideLinkCount(g2, classId, AnchorSide.LEFT, linkModel.getId());
-		final int rightCount = this.getCanvas().getTechnicalSideLinkCount(g2, classId, AnchorSide.RIGHT, linkModel.getId());
+		final int leftCount = this.getCanvas().getTechnicalSideLinkCount(classId, AnchorSide.LEFT, linkModel.getId());
+		final int rightCount = this.getCanvas().getTechnicalSideLinkCount(classId, AnchorSide.RIGHT, linkModel.getId());
 		return leftCount <= rightCount ? AnchorSide.LEFT : AnchorSide.RIGHT;
 	}
 
@@ -135,7 +134,7 @@ public interface LinkLayoutManager extends DiagramCanvasExt {
 			}
 
 			final AnchorSide oppositeSide = fromEndpoint ? sidePair.toSide() : sidePair.fromSide();
-			final Point2D oppositePoint = this.getCanvas().computeConceptualSideCenter(bounds, oppositeSide, linkModel.hasLabel());
+			final Point2D oppositePoint = this.getCanvas().computeConceptualSideCenter(bounds, oppositeSide, linkModel.hasTargetLabel());
 			return switch (side) {
 			case TOP, BOTTOM -> oppositePoint.getX();
 			case LEFT, RIGHT -> oppositePoint.getY();
@@ -154,8 +153,8 @@ public interface LinkLayoutManager extends DiagramCanvasExt {
 		};
 	}
 
-	default AnchorPair resolveConceptualAnchorPair(final Graphics2D g2, final LinkModel targetLink) {
-		this.getCanvas().ensureConceptualAnchorCache(g2);
+	default AnchorPair resolveConceptualAnchorPair(final LinkModel targetLink) {
+		this.getCanvas().ensureConceptualAnchorCache();
 		return this.getCanvas().conceptualAnchorCache.get(targetLink.getId());
 	}
 

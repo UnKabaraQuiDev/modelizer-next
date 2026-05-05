@@ -1,5 +1,6 @@
 package lu.kbra.modelizer_next.ui.canvas;
 
+import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
@@ -21,6 +22,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
+import javax.swing.text.JTextComponent;
 
 import lu.kbra.modelizer_next.common.Size2D;
 import lu.kbra.modelizer_next.domain.ClassModel;
@@ -36,12 +38,12 @@ import lu.kbra.modelizer_next.domain.shared.ElementStyle;
 import lu.kbra.modelizer_next.layout.LayoutObjectType;
 import lu.kbra.modelizer_next.layout.NodeLayout;
 import lu.kbra.modelizer_next.layout.PanelType;
+import lu.kbra.modelizer_next.ui.canvas.datastruct.LinkGeometry;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.RenamingComponents;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.RenamingElement;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectedElement;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectedElement.SelectedType;
 import lu.kbra.modelizer_next.ui.dialogs.LinkEditorDialog;
-import lu.kbra.modelizer_next.ui.dialogs.RenameDialog;
 
 /**
  * Contains document editing helpers for model changes made from the canvas.
@@ -128,11 +130,11 @@ interface DiagramModelEditor extends DiagramCanvasExt {
 		linkModel.setTo(new LinkEnd(null, null));
 
 		if (this.getPanelType() == PanelType.CONCEPTUAL) {
-			linkModel.setName("new relation");
+			linkModel.setLabel("new relation");
 			linkModel.setCardinalityFrom(Cardinality.ONE);
 			linkModel.setCardinalityTo(Cardinality.ZERO_OR_MANY);
 		} else {
-			linkModel.setName("NEW_LINK");
+			linkModel.setLabel("NEW_LINK");
 			linkModel.setCardinalityFrom(null);
 			linkModel.setCardinalityTo(null);
 		}
@@ -144,7 +146,7 @@ interface DiagramModelEditor extends DiagramCanvasExt {
 		}
 
 		final LinkModel createdLink = new LinkModel();
-		createdLink.setName(result.name());
+		createdLink.setLabel(result.name());
 		createdLink.setLineColor(result.lineColor());
 		createdLink.setAssociationClassId(result.associationClassId());
 		createdLink.setFrom(new LinkEnd(result.fromClassId(), result.fromFieldId()));
@@ -242,6 +244,10 @@ interface DiagramModelEditor extends DiagramCanvasExt {
 		case COMMENT -> {
 			final CommentModel commentModel = this.getCanvas().findCommentById(this.getCanvas().renamingElement.commentId());
 			commentModel.setText(this.getCanvas().renamingComponents.textArea().getText());
+		}
+		case LINK_LABEL -> {
+			final LinkModel linkModel = getCanvas().findLinkById(getCanvas().renamingElement.linkId());
+			linkModel.setLabel(getCanvas().renamingComponents.textField().getText());
 		}
 		default -> throw new UnsupportedOperationException("Unsupported type: " + this.getCanvas().renamingElement);
 		}
@@ -363,7 +369,7 @@ interface DiagramModelEditor extends DiagramCanvasExt {
 		}
 	}
 
-	record RenamingContext(Point2D pos, Point2D size, String value, Object style, Class<?> valueType, Object owner) {
+	record RenamingContext(Point2D pos, Point2D size, String value, ElementStyle style, Class<?> valueType, Object owner) {
 	}
 
 	default void invokeRenamingElement(final RenamingElement element) {
@@ -372,7 +378,7 @@ interface DiagramModelEditor extends DiagramCanvasExt {
 			this.getCanvas().renamingElement = null;
 		}
 
-		final var canvas = this.getCanvas();
+		final DiagramCanvas canvas = this.getCanvas();
 
 		canvas.renamingElement = element;
 		canvas.selectedElements.clear();
@@ -433,19 +439,34 @@ interface DiagramModelEditor extends DiagramCanvasExt {
 	}
 
 	default RenamingContext buildLinkLabelContext(final RenamingElement e) {
-		return null;
-//		final var canvas = this.getCanvas();
-//
-//		final NodeLayout nl = canvas.findOrCreateNodeLayout(LayoutObjectType.LINK_LABEL, e.linkId());
-//
-//		final LinkModel link = canvas.findLinkById(e.linkId());
-//
-//		final Point2D pos = canvas.worldToScreen(nl.getPosition());
-//		final Point2D size = canvas.worldToScreenZoom(nl.getSize());
-//
-//		final String value = e.type().isToLabel() ? link.getToLabel() : link.getFromLabel();
-//
-//		return new RenamingContext(pos, size, value, null, String.class, link);
+		final LinkModel linkModel = getCanvas().findLinkById(e.linkId());
+		final LinkGeometry geometry = getCanvas().resolveLinkGeometry(linkModel);
+
+		final LinkModel link = getCanvas().findLinkById(e.linkId());
+
+		final Point2D pos;
+		final String value;
+
+		switch (e.type()) {
+		case LINK_LABEL -> {
+			pos = getCanvas().worldToScreen(geometry.labelPoint());
+			value = linkModel.getLabel();
+		}
+		case LINK_FROM_LABEL -> {
+			pos = getCanvas().worldToScreen(geometry.fromPoint());
+			value = linkModel.getLabelFrom();
+		}
+		case LINK_TO_LABEL -> {
+			pos = getCanvas().worldToScreen(geometry.toPoint());
+			value = linkModel.getLabelTo();
+		}
+		default -> throw new IllegalArgumentException("Unexpected type: " + e);
+		}
+
+		final Point2D size = getCanvas().worldToScreenZoom(
+				new Point2D.Double(getCanvas().stringWidth(getCanvas().renamingComponents.textField().getFont(), value), 30));
+
+		return new RenamingContext(pos, size, value, new ElementStyle(Color.BLACK, Color.WHITE, Color.BLACK), String.class, link);
 	}
 
 	default RenamingContext buildLinkCardinalityContext(final RenamingElement e) {
@@ -470,8 +491,8 @@ interface DiagramModelEditor extends DiagramCanvasExt {
 		canvas.renamingComponents
 				.setBounds((int) ctx.pos().getX(), (int) ctx.pos().getY(), (int) ctx.size().getX(), (int) ctx.size().getY());
 
-		// style only when present
-		if (ctx.style() instanceof final ElementStyle style) {
+		if (ctx.style() != null) {
+			final ElementStyle style = ctx.style();
 			canvas.renamingComponents.setBackground(style.getBackgroundColor());
 			canvas.renamingComponents.setForeground(style.getTextColor());
 			canvas.renamingComponents.setBorder(new CompoundBorder(new LineBorder(style.getBorderColor()),
@@ -482,16 +503,18 @@ interface DiagramModelEditor extends DiagramCanvasExt {
 			final JComponent comp = canvas.renamingElement.getRenamingComponent(canvas.renamingComponents);
 
 			if (ctx.valueType() == String.class) {
-				canvas.renamingComponents.setText(ctx.value());
+				((JTextComponent) comp).setText(ctx.value());
 			} else if (Enum.class.isAssignableFrom(ctx.valueType())) {
 				canvas.renamingComponents.setValues((Class) ctx.valueType(), ctx.value());
 			} else {
 				throw new IllegalArgumentException("Unsupported type: " + ctx.valueType());
 			}
 
-			canvas.renamingComponents.setVisible(true);
-			comp.requestFocusInWindow();
-			canvas.renamingComponents.selectAll();
+			comp.setVisible(true);
+			comp.requestFocus();
+			if (comp instanceof JTextComponent txt) {
+				txt.selectAll();
+			}
 			canvas.repaint();
 		});
 	}
@@ -586,48 +609,48 @@ interface DiagramModelEditor extends DiagramCanvasExt {
 		final String currentValue;
 
 		switch (this.getCanvas().selectedElement.type()) {
-		case CLASS, FIELD, COMMENT -> {
+		case CLASS, FIELD, COMMENT, LINK -> {
 			this.getCanvas().invokeRenamingElement(this.getCanvas().selectedElement.asRenamingElement());
 			return;
 		}
-		case LINK -> {
-			if (this.getPanelType() != PanelType.CONCEPTUAL) {
-				return;
-			}
-			final LinkModel linkModel = this.getCanvas().findLinkById(this.getCanvas().selectedElement.linkId());
-			if (linkModel == null) {
-				return;
-			}
-			title = "Rename link";
-			currentValue = linkModel.getName();
-		}
+//		case LINK -> {
+//			if (this.getPanelType() != PanelType.CONCEPTUAL) {
+//				return;
+//			}
+//			final LinkModel linkModel = this.getCanvas().findLinkById(this.getCanvas().selectedElement.linkId());
+//			if (linkModel == null) {
+//				return;
+//			}
+//			title = "Rename link";
+//			currentValue = linkModel.getName();
+//		}
 		default -> {
 			return;
 		}
 		}
 
-		final String newValue = RenameDialog.showDialog(this.getCanvas(), title, currentValue);
-		if (newValue == null) {
-			return;
-		}
-
-		switch (this.getCanvas().selectedElement.type()) {
-		case CLASS ->
-			this.getCanvas().setEditableClassName(this.getCanvas().findClassById(this.getCanvas().selectedElement.classId()), newValue);
-		case FIELD -> this.getCanvas()
-				.setEditableFieldName(
-						this.getCanvas()
-								.findFieldById(this.getCanvas().selectedElement.classId(), this.getCanvas().selectedElement.fieldId()),
-						newValue);
-		case COMMENT -> this.getCanvas().setEditableCommentText(this.getCanvas().selectedElement.commentId(), newValue);
-		case LINK -> this.getCanvas().findLinkById(this.getCanvas().selectedElement.linkId()).setName(newValue);
-		default -> {
-		}
-		}
-
-		this.getCanvas().notifySelectionChanged();
-		this.getCanvas().notifyDocumentChanged();
-		this.getCanvas().repaint();
+//		final String newValue = RenameDialog.showDialog(this.getCanvas(), title, currentValue);
+//		if (newValue == null) {
+//			return;
+//		}
+//
+//		switch (this.getCanvas().selectedElement.type()) {
+//		case CLASS ->
+//			this.getCanvas().setEditableClassName(this.getCanvas().findClassById(this.getCanvas().selectedElement.classId()), newValue);
+//		case FIELD -> this.getCanvas()
+//				.setEditableFieldName(
+//						this.getCanvas()
+//								.findFieldById(this.getCanvas().selectedElement.classId(), this.getCanvas().selectedElement.fieldId()),
+//						newValue);
+//		case COMMENT -> this.getCanvas().setEditableCommentText(this.getCanvas().selectedElement.commentId(), newValue);
+//		case LINK -> this.getCanvas().findLinkById(this.getCanvas().selectedElement.linkId()).setName(newValue);
+//		default -> {
+//		}
+//		}
+//
+//		this.getCanvas().notifySelectionChanged();
+//		this.getCanvas().notifyDocumentChanged();
+//		this.getCanvas().repaint();
 	}
 
 }

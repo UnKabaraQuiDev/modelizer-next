@@ -106,8 +106,7 @@ public interface ElementRenderer extends DiagramCanvasExt {
 			return;
 		}
 
-		final Point2D associationAnchor = this.getCanvas()
-				.resolveConceptualPreviewAnchor(g2, associationClass.getId(), geometry.middlePoint());
+		final Point2D associationAnchor = this.getCanvas().resolveConceptualPreviewAnchor(associationClass.getId(), geometry.middlePoint());
 
 		if (associationAnchor == null) {
 			return;
@@ -151,7 +150,7 @@ public interface ElementRenderer extends DiagramCanvasExt {
 
 			final NodeLayout layout = this.getCanvas()
 					.resolveRenderLayout(this.getCanvas().findOrCreateNodeLayout(LayoutObjectType.CLASS, classModel.getId()));
-			final Rectangle2D bounds = this.getCanvas().computeClassBounds(g2, classModel, layout);
+			final Rectangle2D bounds = this.getCanvas().computeClassBounds(classModel, layout);
 			this.getCanvas().findOrCreateNodeLayout(LayoutObjectType.CLASS, classModel.getId()).getSize().setWidth(bounds.getWidth());
 			this.getCanvas().findOrCreateNodeLayout(LayoutObjectType.CLASS, classModel.getId()).getSize().setHeight(bounds.getHeight());
 
@@ -245,7 +244,7 @@ public interface ElementRenderer extends DiagramCanvasExt {
 
 			final NodeLayout layout = this.getCanvas()
 					.resolveRenderLayout(this.getCanvas().findOrCreateNodeLayout(LayoutObjectType.COMMENT, commentModel.getId()));
-			final Rectangle2D bounds = this.getCanvas().computeCommentBounds(g2, commentText, layout);
+			final Rectangle2D bounds = this.getCanvas().computeCommentBounds(commentText, layout);
 			this.getCanvas().findOrCreateNodeLayout(LayoutObjectType.COMMENT, commentModel.getId()).getSize().setWidth(bounds.getWidth());
 			this.getCanvas().findOrCreateNodeLayout(LayoutObjectType.COMMENT, commentModel.getId()).getSize().setHeight(bounds.getHeight());
 
@@ -310,7 +309,7 @@ public interface ElementRenderer extends DiagramCanvasExt {
 
 		final Point2D toAnchor;
 		if (target != null) {
-			toAnchor = this.getCanvas().resolvePreviewTargetAnchor(g2, target);
+			toAnchor = this.getCanvas().resolvePreviewTargetAnchor(target);
 		} else {
 			toAnchor = this.getCanvas().linkPreviewMousePoint;
 		}
@@ -331,7 +330,7 @@ public interface ElementRenderer extends DiagramCanvasExt {
 
 	default void drawLinks(final Graphics2D g2) {
 		if (this.getPanelType() == PanelType.CONCEPTUAL) {
-			this.getCanvas().ensureConceptualAnchorCache(g2);
+			this.getCanvas().ensureConceptualAnchorCache();
 		}
 
 		g2.setFont(DiagramCanvas.BODY_FONT);
@@ -341,7 +340,7 @@ public interface ElementRenderer extends DiagramCanvasExt {
 				continue;
 			}
 
-			final LinkGeometry geometry = this.getCanvas().resolveLinkGeometry(g2, linkModel);
+			final LinkGeometry geometry = this.getCanvas().resolveLinkGeometry(linkModel);
 			if (geometry == null) {
 				continue;
 			}
@@ -360,10 +359,10 @@ public interface ElementRenderer extends DiagramCanvasExt {
 
 			g2.setStroke(DiagramCanvas.DEFAULT_STROKE);
 
-			if (this.getPanelType() == PanelType.CONCEPTUAL && linkModel.getName() != null && !linkModel.getName().isBlank()) {
+			if (this.getPanelType() == PanelType.CONCEPTUAL && linkModel.getLabel() != null && !linkModel.getLabel().isBlank()) {
 				this.getCanvas()
 						.drawAlignedLinkLabel(g2,
-								linkModel.getName(),
+								linkModel.getLabel(),
 								geometry.labelPoint(),
 								geometry.labelAngle(),
 								false,
@@ -441,7 +440,8 @@ public interface ElementRenderer extends DiagramCanvasExt {
 
 	default void drawMultilineText(final Graphics2D g2, final String text, final Rectangle2D bounds, final int padding) {
 		final FontMetrics metrics = g2.getFontMetrics();
-		final List<String> wrappedLines = this.getCanvas().wrapText(text, metrics, (int) Math.max(40, bounds.getWidth() - padding * 2));
+		final List<String> wrappedLines = this.getCanvas()
+				.wrapText(text, g2.getFont(), (int) Math.max(40, bounds.getWidth() - padding * 2));
 
 		float y = (float) bounds.getY() + padding + metrics.getAscent();
 		for (final String line : wrappedLines) {

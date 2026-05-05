@@ -108,7 +108,7 @@ public final class LinkEditorDialog {
 		final Window owner = parent == null ? null : SwingUtilities.getWindowAncestor(parent);
 		final JDialog dialog = new JDialog(owner, "Edit relation", Dialog.ModalityType.APPLICATION_MODAL);
 
-		final JTextField nameField = new JTextField(linkModel.getName(), 24);
+		final JTextField nameField = new JTextField(linkModel.getLabel(), 24);
 		final ColorButton colorButton = new ColorButton("Line color", linkModel.getLineColor());
 
 		final JComboBox<ClassModel> fromClassBox = new JComboBox<>(document.getModel().getClasses().toArray(ClassModel[]::new));

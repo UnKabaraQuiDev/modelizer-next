@@ -25,11 +25,7 @@ import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectedElement.SelectedType;
  */
 interface LinkGeometryResolver extends DiagramCanvasExt {
 
-	default List<Point2D> buildSelfLinkPoints(
-			final Graphics2D g2,
-			final LinkModel linkModel,
-			final Point2D fromPoint,
-			final Point2D toPoint) {
+	default List<Point2D> buildSelfLinkPoints(final LinkModel linkModel, final Point2D fromPoint, final Point2D toPoint) {
 		final List<Point2D> points = new ArrayList<>();
 		points.add(fromPoint);
 
@@ -42,9 +38,9 @@ interface LinkGeometryResolver extends DiagramCanvasExt {
 		if (this.getPanelType() != PanelType.CONCEPTUAL) {
 			final NodeLayout layout = this.getCanvas()
 					.resolveRenderLayout(this.getCanvas().findOrCreateNodeLayout(LayoutObjectType.CLASS, classModel.getId()));
-			final Rectangle2D bounds = this.getCanvas().computeClassBounds(g2, classModel, layout);
-			final AnchorSide side = this.getCanvas().chooseTechnicalSelfLinkSide(g2, linkModel);
-			final int sideLoad = this.getCanvas().getTechnicalSideLinkCount(g2, classModel.getId(), side, linkModel.getId());
+			final Rectangle2D bounds = this.getCanvas().computeClassBounds(classModel, layout);
+			final AnchorSide side = this.getCanvas().chooseTechnicalSelfLinkSide(linkModel);
+			final int sideLoad = this.getCanvas().getTechnicalSideLinkCount(classModel.getId(), side, linkModel.getId());
 			final double outsideOffset = DiagramCanvas.SELF_LINK_OUTSIDE_OFFSET + sideLoad * 12.0;
 			final double outsideX = side == AnchorSide.LEFT ? bounds.getX() - outsideOffset : bounds.getMaxX() + outsideOffset;
 
@@ -62,7 +58,7 @@ interface LinkGeometryResolver extends DiagramCanvasExt {
 
 		final NodeLayout layout = this.getCanvas()
 				.resolveRenderLayout(this.getCanvas().findOrCreateNodeLayout(LayoutObjectType.CLASS, classModel.getId()));
-		final Rectangle2D bounds = this.getCanvas().computeClassBounds(g2, classModel, layout);
+		final Rectangle2D bounds = this.getCanvas().computeClassBounds(classModel, layout);
 		final double outsideOffset = DiagramCanvas.SELF_LINK_OUTSIDE_OFFSET + Math.max(placement.fromCount(), placement.toCount()) * 4.0;
 
 		switch (placement.fromSide()) {
@@ -185,7 +181,7 @@ interface LinkGeometryResolver extends DiagramCanvasExt {
 		return angle;
 	}
 
-	default Point2D resolveClassCenterAnchor(final Graphics2D g2, final String classId) {
+	default Point2D resolveClassCenterAnchor(final String classId) {
 		final ClassModel classModel = this.getCanvas().findClassById(classId);
 		if (classModel == null || !classModel.isVisible(this.getPanelType())) {
 			return null;
@@ -193,11 +189,11 @@ interface LinkGeometryResolver extends DiagramCanvasExt {
 
 		final NodeLayout layout = this.getCanvas()
 				.resolveRenderLayout(this.getCanvas().findOrCreateNodeLayout(LayoutObjectType.CLASS, classModel.getId()));
-		final Rectangle2D bounds = this.getCanvas().computeClassBounds(g2, classModel, layout);
+		final Rectangle2D bounds = this.getCanvas().computeClassBounds(classModel, layout);
 		return new Point2D.Double(bounds.getCenterX(), bounds.getCenterY());
 	}
 
-	default Point2D resolveCommentCenterAnchor(final Graphics2D g2, final String commentId) {
+	default Point2D resolveCommentCenterAnchor(final String commentId) {
 		final CommentModel commentModel = this.getCanvas().findCommentById(commentId);
 		if (commentModel == null || !this.getCanvas().isCommentVisible(commentModel)) {
 			return null;
@@ -205,18 +201,18 @@ interface LinkGeometryResolver extends DiagramCanvasExt {
 
 		final NodeLayout layout = this.getCanvas()
 				.resolveRenderLayout(this.getCanvas().findOrCreateNodeLayout(LayoutObjectType.COMMENT, commentModel.getId()));
-		final Rectangle2D bounds = this.getCanvas().computeCommentBounds(g2, commentModel.getText(), layout);
+		final Rectangle2D bounds = this.getCanvas().computeCommentBounds(commentModel.getText(), layout);
 		return new Point2D.Double(bounds.getCenterX(), bounds.getCenterY());
 	}
 
-	default LinkGeometry resolveLinkGeometry(final Graphics2D g2, final LinkModel linkModel) {
+	default LinkGeometry resolveLinkGeometry(final LinkModel linkModel) {
 		final Point2D fromPoint;
 		final Point2D toPoint;
 		final AnchorSide fromSide;
 		final AnchorSide toSide;
 
 		if (this.getPanelType() == PanelType.CONCEPTUAL) {
-			final AnchorPair anchorPair = this.getCanvas().resolveConceptualAnchorPair(g2, linkModel);
+			final AnchorPair anchorPair = this.getCanvas().resolveConceptualAnchorPair(linkModel);
 			if (anchorPair == null) {
 				return null;
 			}
@@ -227,25 +223,23 @@ interface LinkGeometryResolver extends DiagramCanvasExt {
 			fromSide = anchorPair.fromSide();
 			toSide = anchorPair.toSide();
 		} else if (linkModel.isSelfLinking()) {
-			final AnchorSide selfLinkSide = this.getCanvas().chooseTechnicalSelfLinkSide(g2, linkModel);
+			final AnchorSide selfLinkSide = this.getCanvas().chooseTechnicalSelfLinkSide(linkModel);
 
 			fromPoint = this.getCanvas()
-					.resolveTechnicalSelfLinkAnchor(g2, linkModel.getFrom().getClassId(), linkModel.getFrom().getFieldId(), selfLinkSide);
+					.resolveTechnicalSelfLinkAnchor(linkModel.getFrom().getClassId(), linkModel.getFrom().getFieldId(), selfLinkSide);
 			toPoint = this.getCanvas()
-					.resolveTechnicalSelfLinkAnchor(g2, linkModel.getTo().getClassId(), linkModel.getTo().getFieldId(), selfLinkSide);
+					.resolveTechnicalSelfLinkAnchor(linkModel.getTo().getClassId(), linkModel.getTo().getFieldId(), selfLinkSide);
 
 			fromSide = selfLinkSide;
 			toSide = selfLinkSide.clockwise();
 		} else {
 			final FieldAnchor fromFieldAnchor = this.getCanvas()
-					.resolveTechnicalFieldAnchor(g2,
-							linkModel.getFrom().getClassId(),
+					.resolveTechnicalFieldAnchor(linkModel.getFrom().getClassId(),
 							linkModel.getFrom().getFieldId(),
 							linkModel.getTo().getClassId(),
 							linkModel.getTo().getFieldId());
 			final FieldAnchor toFieldAnchor = this.getCanvas()
-					.resolveTechnicalFieldAnchor(g2,
-							linkModel.getTo().getClassId(),
+					.resolveTechnicalFieldAnchor(linkModel.getTo().getClassId(),
 							linkModel.getTo().getFieldId(),
 							linkModel.getFrom().getClassId(),
 							linkModel.getFrom().getFieldId());
@@ -262,7 +256,7 @@ interface LinkGeometryResolver extends DiagramCanvasExt {
 
 		final List<Point2D> points;
 		if (linkModel.isSelfLinking()) {
-			points = this.getCanvas().buildSelfLinkPoints(g2, linkModel, fromPoint, toPoint);
+			points = this.getCanvas().buildSelfLinkPoints(linkModel, fromPoint, toPoint);
 		} else {
 			points = new ArrayList<>();
 			points.add(fromPoint);
@@ -289,9 +283,9 @@ interface LinkGeometryResolver extends DiagramCanvasExt {
 		return new LinkGeometry(fromPoint, toPoint, fromSide, toSide, labelPoint, middlePoint, labelAngle, points);
 	}
 
-	default Point2D resolveLinkMiddleAnchor(final Graphics2D g2, final String linkId) {
+	default Point2D resolveLinkMiddleAnchor(final String linkId) {
 		final LinkModel linkModel = this.getCanvas().findLinkById(linkId);
-		final LinkGeometry geometry = linkModel == null ? null : this.getCanvas().resolveLinkGeometry(g2, linkModel);
+		final LinkGeometry geometry = linkModel == null ? null : this.getCanvas().resolveLinkGeometry(linkModel);
 		return geometry == null ? null : geometry.middlePoint();
 	}
 
@@ -306,18 +300,18 @@ interface LinkGeometryResolver extends DiagramCanvasExt {
 		}
 
 		if (source.type() == SelectedType.COMMENT) {
-			return this.getCanvas().resolveCommentCenterAnchor(g2, source.commentId());
+			return this.getCanvas().resolveCommentCenterAnchor(source.commentId());
 		}
 
 		if (this.getPanelType() == PanelType.CONCEPTUAL) {
 			final Point2D reference = this.getCanvas().linkPreviewTarget != null
-					? this.getCanvas().resolvePreviewTargetAnchor(g2, this.getCanvas().linkPreviewTarget)
+					? this.getCanvas().resolvePreviewTargetAnchor(this.getCanvas().linkPreviewTarget)
 					: this.getCanvas().linkPreviewMousePoint;
-			return this.getCanvas().resolveConceptualPreviewAnchor(g2, source.classId(), reference);
+			return this.getCanvas().resolveConceptualPreviewAnchor(source.classId(), reference);
 		}
 
 		final Point2D reference = this.getCanvas().linkPreviewTarget != null
-				? this.getCanvas().resolvePreviewTargetAnchor(g2, this.getCanvas().linkPreviewTarget)
+				? this.getCanvas().resolvePreviewTargetAnchor(this.getCanvas().linkPreviewTarget)
 				: this.getCanvas().linkPreviewMousePoint;
 
 		final String oppositeClassId = this.getCanvas().linkPreviewTarget == null ? null : this.getCanvas().linkPreviewTarget.classId();
@@ -325,14 +319,14 @@ interface LinkGeometryResolver extends DiagramCanvasExt {
 
 		if (oppositeClassId != null) {
 			return this.getCanvas()
-					.resolveTechnicalFieldAnchor(g2, source.classId(), source.fieldId(), oppositeClassId, oppositeFieldId)
+					.resolveTechnicalFieldAnchor(source.classId(), source.fieldId(), oppositeClassId, oppositeFieldId)
 					.point();
 		}
 
-		return this.getCanvas().resolveTechnicalFieldAnchor(g2, source.classId(), source.fieldId(), reference);
+		return this.getCanvas().resolveTechnicalFieldAnchor(source.classId(), source.fieldId(), reference);
 	}
 
-	default Point2D resolvePreviewTargetAnchor(final Graphics2D g2, final SelectedElement target) {
+	default Point2D resolvePreviewTargetAnchor(final SelectedElement target) {
 		if (target == null) {
 			return null;
 		}
@@ -344,24 +338,22 @@ interface LinkGeometryResolver extends DiagramCanvasExt {
 
 		if (source.type() == SelectedType.COMMENT) {
 			return switch (target.type()) {
-			case CLASS -> this.getCanvas().resolveClassCenterAnchor(g2, target.classId());
-			case LINK -> this.getCanvas().resolveLinkMiddleAnchor(g2, target.linkId());
+			case CLASS -> this.getCanvas().resolveClassCenterAnchor(target.classId());
+			case LINK -> this.getCanvas().resolveLinkMiddleAnchor(target.linkId());
 			default -> null;
 			};
 		}
 
 		if (target.type() == SelectedType.LINK) {
-			return this.getCanvas().resolveLinkMiddleAnchor(g2, target.linkId());
+			return this.getCanvas().resolveLinkMiddleAnchor(target.linkId());
 		}
 
 		if (this.getPanelType() == PanelType.CONCEPTUAL) {
-			final Point2D reference = this.getCanvas().resolvePreviewSourceAnchorReference(g2);
-			return this.getCanvas().resolveConceptualPreviewAnchor(g2, target.classId(), reference);
+			final Point2D reference = this.getCanvas().resolvePreviewSourceAnchorReference();
+			return this.getCanvas().resolveConceptualPreviewAnchor(target.classId(), reference);
 		}
 
-		return this.getCanvas()
-				.resolveTechnicalFieldAnchor(g2, target.classId(), target.fieldId(), source.classId(), source.fieldId())
-				.point();
+		return this.getCanvas().resolveTechnicalFieldAnchor(target.classId(), target.fieldId(), source.classId(), source.fieldId()).point();
 	}
 
 }

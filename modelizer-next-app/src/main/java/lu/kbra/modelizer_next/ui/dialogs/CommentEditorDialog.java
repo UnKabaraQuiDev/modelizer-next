@@ -67,7 +67,7 @@ public final class CommentEditorDialog {
 
 		private static AssociationTarget forLink(final LinkModel linkModel, final boolean conceptual) {
 			final String label = (conceptual ? "Conceptual link: " : "Technical link: ")
-					+ (linkModel.getName() == null || linkModel.getName().isBlank() ? linkModel.getId() : linkModel.getName());
+					+ (linkModel.getLabel() == null || linkModel.getLabel().isBlank() ? linkModel.getId() : linkModel.getLabel());
 			return new AssociationTarget(label, CommentKind.BOUND, new CommentBinding(BoundTargetType.LINK, linkModel.getId()));
 		}
 

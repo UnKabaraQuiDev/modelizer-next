@@ -118,10 +118,9 @@ public record RenamingElement(RenamingType type, String classId, String fieldId,
 	@Deprecated
 	public JComponent getRenamingComponent(RenamingComponents component) {
 		return switch (type) {
-		case CLASS -> component.textField();
-		case CLASS_FIELD -> component.textField();
+		case CLASS, CLASS_FIELD, LINK_LABEL, LINK_TO_LABEL, LINK_FROM_LABEL -> component.textField();
 		case COMMENT -> component.textArea();
-		case LINK_LABEL, LINK_FROM_CARDINALITY, LINK_FROM_LABEL, LINK_TO_CARDINALITY, LINK_TO_LABEL -> component.comboBox();
+		case LINK_FROM_CARDINALITY, LINK_TO_CARDINALITY -> component.comboBox();
 		default -> throw new IllegalArgumentException("Unexpected value: " + type);
 		};
 	}

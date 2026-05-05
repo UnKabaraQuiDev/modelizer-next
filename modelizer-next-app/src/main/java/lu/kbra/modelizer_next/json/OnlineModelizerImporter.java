@@ -128,7 +128,7 @@ public final class OnlineModelizerImporter {
 
 		final JsonNode dataNode = edgeNode.path("data");
 		final LinkModel linkModel = new LinkModel();
-		linkModel.setName(OnlineModelizerImporter.readEdgeText(edgeNode, dataNode, "label", "name", ""));
+		linkModel.setLabel(OnlineModelizerImporter.readEdgeText(edgeNode, dataNode, "label", "name", ""));
 //		linkModel.setComment(OnlineModelizerImporter.readEdgeText(dataNode, dataNode, "comment", "description", ""));
 		linkModel.setFrom(new LinkEnd(sourceClassId, sourceFieldId));
 		linkModel.setTo(new LinkEnd(targetClassId, targetFieldId));

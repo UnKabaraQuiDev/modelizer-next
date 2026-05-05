@@ -22,12 +22,16 @@ public class ElementStyle {
 	}
 
 	private Color textColor;
-
 	private Color backgroundColor;
-
 	private Color borderColor;
 
 	public ElementStyle() {
+	}
+
+	public ElementStyle(Color textColor, Color backgroundColor, Color borderColor) {
+		this.textColor = textColor;
+		this.backgroundColor = backgroundColor;
+		this.borderColor = borderColor;
 	}
 
 	public Color getBackgroundColor() {

@@ -77,7 +77,7 @@ public interface ElementCreator extends DiagramCanvasExt {
 
 		final LinkModel linkCopy = new LinkModel();
 
-		linkCopy.setName(copiedLink.name());
+		linkCopy.setLabel(copiedLink.name());
 		linkCopy.setLineColor(copiedLink.lineColor());
 		linkCopy.setAssociationClassId(associationClassId);
 		linkCopy.setFrom(new LinkEnd(fromClassId, fromFieldId));

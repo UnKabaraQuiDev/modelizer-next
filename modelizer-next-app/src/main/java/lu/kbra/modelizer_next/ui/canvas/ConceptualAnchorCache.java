@@ -1,6 +1,5 @@
 package lu.kbra.modelizer_next.ui.canvas;
 
-import java.awt.Graphics2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
@@ -44,12 +43,12 @@ interface ConceptualAnchorCache extends DiagramCanvasExt {
 		return this.getCanvas().computeConceptualAnchorPoint(bounds, side, 0, big, 1);
 	}
 
-	default void ensureConceptualAnchorCache(final Graphics2D g2) {
+	default void ensureConceptualAnchorCache() {
 		if (this.getPanelType() != PanelType.CONCEPTUAL || this.getCanvas().conceptualAnchorCacheValid) {
 			return;
 		}
 
-		this.getCanvas().rebuildConceptualAnchorCache(g2);
+		this.getCanvas().rebuildConceptualAnchorCache();
 	}
 
 	default int getConceptualSideLinkCount(final String classId, final AnchorSide side) {
@@ -64,7 +63,7 @@ interface ConceptualAnchorCache extends DiagramCanvasExt {
 		this.getCanvas().conceptualAnchorCacheValid = false;
 	}
 
-	default void rebuildConceptualAnchorCache(final Graphics2D g2) {
+	default void rebuildConceptualAnchorCache() {
 		this.getCanvas().invalidateConceptualAnchorCache();
 
 		final Map<String, Rectangle2D> boundsByClassId = new HashMap<>();
@@ -82,12 +81,12 @@ interface ConceptualAnchorCache extends DiagramCanvasExt {
 			final Rectangle2D fromBounds = boundsByClassId.computeIfAbsent(fromClass.getId(), classId -> {
 				final NodeLayout layout = this.getCanvas()
 						.resolveRenderLayout(this.getCanvas().findOrCreateNodeLayout(LayoutObjectType.CLASS, classId));
-				return this.getCanvas().computeClassBounds(g2, fromClass, layout);
+				return this.getCanvas().computeClassBounds(fromClass, layout);
 			});
 			final Rectangle2D toBounds = boundsByClassId.computeIfAbsent(toClass.getId(), classId -> {
 				final NodeLayout layout = this.getCanvas()
 						.resolveRenderLayout(this.getCanvas().findOrCreateNodeLayout(LayoutObjectType.CLASS, classId));
-				return this.getCanvas().computeClassBounds(g2, toClass, layout);
+				return this.getCanvas().computeClassBounds(toClass, layout);
 			});
 
 			final AnchorSidePair sidePair;
@@ -96,7 +95,7 @@ interface ConceptualAnchorCache extends DiagramCanvasExt {
 				sidePair = new AnchorSidePair(fromSide, this.getCanvas().clockwise(fromSide));
 			} else {
 				sidePair = this.getCanvas()
-						.chooseBestConceptualSidePair(fromClass.getId(), fromBounds, toClass.getId(), toBounds, linkModel.hasLabel());
+						.chooseBestConceptualSidePair(fromClass.getId(), fromBounds, toClass.getId(), toBounds, linkModel.hasTargetLabel());
 			}
 
 			sidePairs.put(linkModel.getId(), sidePair);
@@ -148,9 +147,9 @@ interface ConceptualAnchorCache extends DiagramCanvasExt {
 			final int fromIndex = indexByKey.get(fromKey).get(linkModel.getId());
 			final int toIndex = indexByKey.get(toKey).get(linkModel.getId());
 			final Point2D fromPoint = this.getCanvas()
-					.computeConceptualAnchorPoint(fromBounds, sidePair.fromSide(), fromIndex, linkModel.hasLabel(), fromLinks.size());
+					.computeConceptualAnchorPoint(fromBounds, sidePair.fromSide(), fromIndex, linkModel.hasTargetLabel(), fromLinks.size());
 			final Point2D toPoint = this.getCanvas()
-					.computeConceptualAnchorPoint(toBounds, sidePair.toSide(), toIndex, linkModel.hasLabel(), toLinks.size());
+					.computeConceptualAnchorPoint(toBounds, sidePair.toSide(), toIndex, linkModel.hasTargetLabel(), toLinks.size());
 
 			this.getCanvas().conceptualAnchorCache.put(linkModel.getId(), new AnchorPair(fromPoint, toPoint, fromKey.side(), toKey.side()));
 			this.getCanvas().conceptualAnchorPlacements.put(linkModel.getId(),

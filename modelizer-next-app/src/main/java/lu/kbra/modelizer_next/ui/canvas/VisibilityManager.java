@@ -59,7 +59,7 @@ public interface VisibilityManager extends DiagramCanvasExt {
 
 //		final Graphics2D g2 = this.getCanvas().createGraphicsContext();
 //		try {
-//			return this.getCanvas().resolveLinkGeometry(g2, linkModel) != null;
+//			return this.getCanvas().resolveLinkGeometry( linkModel) != null;
 //		} finally {
 //			g2.dispose();
 //		}

@@ -328,7 +328,7 @@ interface ClipboardController extends DiagramCanvasExt {
 					: duplicatedFieldIds.getOrDefault(source.getTo().getFieldId(), source.getTo().getFieldId());
 
 			final LinkModel copy = new LinkModel();
-			copy.setName(source.getName());
+			copy.setLabel(source.getLabel());
 			copy.setLineColor(source.getLineColor());
 			copy.setAssociationClassId(source.getAssociationClassId() == null ? null
 					: duplicatedClassIds.getOrDefault(source.getAssociationClassId(), source.getAssociationClassId()));

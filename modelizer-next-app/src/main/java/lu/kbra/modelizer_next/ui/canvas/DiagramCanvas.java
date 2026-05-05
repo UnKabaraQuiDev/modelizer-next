@@ -8,6 +8,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.event.MouseAdapter;
+import java.awt.font.FontRenderContext;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.util.Comparator;
@@ -108,6 +109,8 @@ public class DiagramCanvas extends JPanel
 
 	final ModelDocument document;
 
+	FontRenderContext fontRenderContext;
+
 	final PanelType panelType;
 	final DocumentChangeListener documentEventListener;
 	DraggedSelection draggedSelection;
@@ -198,6 +201,8 @@ public class DiagramCanvas extends JPanel
 
 	@Override
 	public void paintComponent(final Graphics g) {
+		fontRenderContext = ((Graphics2D) g).getFontRenderContext();
+
 		super.paintComponent(g);
 		this.invalidateConceptualAnchorCache();
 		this.ensureLayouts();
@@ -243,6 +248,14 @@ public class DiagramCanvas extends JPanel
 		this.notifySelectionChanged();
 		this.revalidate();
 		this.repaint();
+	}
+
+	public double stringWidth(Font titleFont, String classTitle) {
+		return titleFont.getStringBounds(classTitle, fontRenderContext).getWidth();
+	}
+
+	public float getHeight(Font bodyFont) {
+		return bodyFont.getLineMetrics("Ag", fontRenderContext).getHeight();
 	}
 
 }
