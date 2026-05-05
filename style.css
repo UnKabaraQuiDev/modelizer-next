@@ -622,10 +622,20 @@ footer {
 
 }
 
-@media (min-width: 1200px) {
+@media (min-width:1200px) {
 
     .shortcut-sections {
+        display: grid;
         grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 16px;
+    }
+
+    .shortcut-group-wide {
+        grid-column: span 2;
+    }
+
+    .shortcut-group-full {
+        grid-column: 1 / -1;
     }
 
 }
@@ -835,11 +845,11 @@ footer {
     .download-layout {
         grid-template-columns: 1fr
     }
+
 }
 
 @media(max-width:760px) {
-    .build-list,
-    .compact-steps {
+    .build-list, .compact-steps {
         grid-template-columns: 1fr
     }
 
@@ -860,6 +870,7 @@ footer {
     .summary-row strong {
         text-align: left
     }
+
 }
 
 .source-callout {
@@ -904,6 +915,7 @@ footer {
     line-height: 1;
     box-shadow: 0 12px 28px color-mix(in srgb, var(--a) 24%, transparent);
 }
+
 .channel-row.release {
     background: linear-gradient(135deg, color-mix(in srgb, var(--ok) 10%, var(--card2)), var(--card2))
 }
@@ -916,21 +928,18 @@ footer {
     background: linear-gradient(135deg, color-mix(in srgb, var(--b) 10%, var(--card2)), var(--card2))
 }
 
-.channel-main,
-.channel-detail {
+.channel-main, .channel-detail {
     display: grid;
     gap: 3px
 }
 
-.channel-label,
-.channel-detail span {
+.channel-label, .channel-detail span {
     color: var(--muted);
     font-size: .86rem;
     font-weight: 700
 }
 
-.channel-main strong,
-.channel-detail strong {
+.channel-main strong, .channel-detail strong {
     color: var(--text);
     overflow-wrap: anywhere
 }
@@ -957,6 +966,7 @@ footer {
     .channel-row .btn {
         width: 100%
     }
+
 }
 
 @media(max-width:760px) {
@@ -968,10 +978,10 @@ footer {
         grid-template-columns: 46px 1fr;
     }
 
-    .channel-detail,
-    .channel-row .btn {
+    .channel-detail, .channel-row .btn {
         grid-column: 1 / -1;
     }
+
 }
 
 div.title-button-container {
@@ -988,4 +998,5 @@ div.title-button-container {
     .btn {
         flex-shrink: 0;
     }
+
 }
