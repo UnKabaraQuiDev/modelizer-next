@@ -1,10 +1,10 @@
 {
   "channel": "snapshot",
-  "version": "6-SNAPSHOT-193",
-  "tag": "6-SNAPSHOT-193",
-  "releaseUrl": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/tag/6-SNAPSHOT-193",
-  "assetUrl": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/6-SNAPSHOT-193/modelizer-next-app-6-SNAPSHOT-193.jar",
-  "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/6-SNAPSHOT-193/modelizer-next-app-6-SNAPSHOT-193.jar",
+  "version": "7-SNAPSHOT-205",
+  "tag": "7-SNAPSHOT-205",
+  "releaseUrl": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/tag/7-SNAPSHOT-205",
+  "assetUrl": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/7-SNAPSHOT-205/modelizer-next-app-7-SNAPSHOT-205.jar",
+  "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/7-SNAPSHOT-205/modelizer-next-app-7-SNAPSHOT-205.jar",
   "platforms": [
     "unknown",
     "linux",
@@ -12,8 +12,85 @@
     "windows"
   ],
   "notes": "Latest snapshot build.",
-  "updatedAt": "2026-05-03T12:14:18Z",
+  "updatedAt": "2026-05-05T15:04:51Z",
   "entries": [
+    {
+      "version": "7-SNAPSHOT-205",
+      "tag": "7-SNAPSHOT-205",
+      "releaseUrl": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/tag/7-SNAPSHOT-205",
+      "assetUrl": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/7-SNAPSHOT-205/modelizer-next-app-7-SNAPSHOT-205.jar",
+      "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/7-SNAPSHOT-205/modelizer-next-app-7-SNAPSHOT-205.jar",
+      "platforms": [
+        "unknown",
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "notes": "Latest snapshot build.",
+      "publishedAt": "2026-05-05T15:04:51Z",
+      "assets": [
+        {
+          "name": "modelizer-next-app-7-SNAPSHOT-205.jar",
+          "platform": "unknown",
+          "kind": "app-standalone-jar",
+          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/7-SNAPSHOT-205/modelizer-next-app-7-SNAPSHOT-205.jar"
+        },
+        {
+          "name": "modelizer-next-app-portable-linux-7-SNAPSHOT-205.zip",
+          "platform": "linux",
+          "kind": "app-portable-native",
+          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/7-SNAPSHOT-205/modelizer-next-app-portable-linux-7-SNAPSHOT-205.zip"
+        },
+        {
+          "name": "modelizer-next-app-portable-macos-7-SNAPSHOT-205.zip",
+          "platform": "macos",
+          "kind": "app-portable-native",
+          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/7-SNAPSHOT-205/modelizer-next-app-portable-macos-7-SNAPSHOT-205.zip"
+        },
+        {
+          "name": "modelizer-next-app-portable-windows-7-SNAPSHOT-205.zip",
+          "platform": "windows",
+          "kind": "app-portable-native",
+          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/7-SNAPSHOT-205/modelizer-next-app-portable-windows-7-SNAPSHOT-205.zip"
+        },
+        {
+          "name": "modelizer-next-app-standalone-linux-7-SNAPSHOT-205.deb",
+          "platform": "linux",
+          "kind": "app-standalone-native",
+          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/7-SNAPSHOT-205/modelizer-next-app-standalone-linux-7-SNAPSHOT-205.deb"
+        },
+        {
+          "name": "modelizer-next-app-standalone-macos-7-SNAPSHOT-205.dmg",
+          "platform": "macos",
+          "kind": "app-standalone-native",
+          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/7-SNAPSHOT-205/modelizer-next-app-standalone-macos-7-SNAPSHOT-205.dmg"
+        },
+        {
+          "name": "modelizer-next-app-standalone-windows-7-SNAPSHOT-205.exe",
+          "platform": "windows",
+          "kind": "app-standalone-native",
+          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/7-SNAPSHOT-205/modelizer-next-app-standalone-windows-7-SNAPSHOT-205.exe"
+        },
+        {
+          "name": "modelizer-next-bootstrap-linux-7-SNAPSHOT-205.deb",
+          "platform": "linux",
+          "kind": "bootstrap-native",
+          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/7-SNAPSHOT-205/modelizer-next-bootstrap-linux-7-SNAPSHOT-205.deb"
+        },
+        {
+          "name": "modelizer-next-bootstrap-macos-7-SNAPSHOT-205.dmg",
+          "platform": "macos",
+          "kind": "bootstrap-native",
+          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/7-SNAPSHOT-205/modelizer-next-bootstrap-macos-7-SNAPSHOT-205.dmg"
+        },
+        {
+          "name": "modelizer-next-bootstrap-windows-7-SNAPSHOT-205.exe",
+          "platform": "windows",
+          "kind": "bootstrap-native",
+          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/7-SNAPSHOT-205/modelizer-next-bootstrap-windows-7-SNAPSHOT-205.exe"
+        }
+      ]
+    },
     {
       "version": "6-SNAPSHOT-193",
       "tag": "6-SNAPSHOT-193",
