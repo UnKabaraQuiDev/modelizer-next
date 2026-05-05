@@ -202,6 +202,7 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 		return count;
 	}
 
+	@Deprecated
 	default List<FieldModel> getVisibleFields(final ClassModel classModel) {
 		final List<FieldModel> visibleFields = new ArrayList<>();
 

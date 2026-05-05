@@ -1,8 +1,5 @@
 package lu.kbra.modelizer_next.ui.canvas;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import lu.kbra.modelizer_next.domain.ClassModel;
 import lu.kbra.modelizer_next.domain.CommentModel;
 import lu.kbra.modelizer_next.domain.FieldModel;
@@ -54,24 +51,26 @@ interface NameResolver extends DiagramCanvasExt {
 		} else {
 			baseName = this.blankToFallback(fieldModel.getTechnicalName(), fieldModel.getConceptualName(), "Unnamed field");
 		}
-
-		if (this.getPanelType() != PanelType.PHYSICAL) {
-			return baseName;
-		}
-
-		final List<String> flags = new ArrayList<>();
-		if (fieldModel.isPrimaryKey()) {
-			flags.add("PK");
-		}
-		if (fieldModel.isUnique()) {
-			flags.add("UQ");
-		}
-		if (fieldModel.isNotNull()) {
-			flags.add("NN");
-		}
-
-		return baseName + (flags.isEmpty() ? "" : " [" + String.join(", ", flags) + "]") + " - "
-				+ (fieldModel.getType() == null ? "No type" : fieldModel.getType());
+		
+		return baseName;
+//
+//		if (this.getPanelType() != PanelType.PHYSICAL) {
+//			return baseName;
+//		}
+//
+//		final List<String> flags = new ArrayList<>();
+//		if (fieldModel.isPrimaryKey()) {
+//			flags.add("PK");
+//		}
+//		if (fieldModel.isUnique()) {
+//			flags.add("UQ");
+//		}
+//		if (fieldModel.isNotNull()) {
+//			flags.add("NN");
+//		}
+//
+//		return baseName + (flags.isEmpty() ? "" : " [" + String.join(", ", flags) + "]") + " - "
+//				+ (fieldModel.getType() == null ? "No type" : fieldModel.getType());
 	}
 
 	default void setEditableClassName(final ClassModel classModel, final String value) {

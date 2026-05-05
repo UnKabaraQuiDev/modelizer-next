@@ -1,5 +1,7 @@
 package lu.kbra.modelizer_next.domain;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
@@ -13,6 +15,10 @@ import lu.kbra.modelizer_next.domain.shared.ElementStyle;
 public class FieldModel implements NamesOwner, IdOwner, StyleOwner {
 
 	public static final String[] SQL_TYPES = { null, "INT", "BIGINT", "TEXT", "BOOLEAN", "TINYINT", "DATE", "TIMESTAMP" };
+
+	public static final String NOT_NULL_FLAG = "NN";
+	public static final String PRIMARY_KEY_FLAG = "PK";
+	public static final String UNIQUE_FLAG = "UQ";
 
 	private String id;
 	private ElementNames names;
@@ -103,6 +109,24 @@ public class FieldModel implements NamesOwner, IdOwner, StyleOwner {
 
 	public void setUnique(final boolean unique) {
 		this.unique = unique;
+	}
+
+	public List<String> getFlags() {
+		final List<String> ll = new ArrayList<>();
+		if (primaryKey) {
+			ll.add(PRIMARY_KEY_FLAG);
+		}
+		if (notNull) {
+			ll.add(NOT_NULL_FLAG);
+		}
+		if (unique) {
+			ll.add(UNIQUE_FLAG);
+		}
+		return ll;
+	}
+
+	public boolean hasFlags() {
+		return primaryKey || notNull || unique;
 	}
 
 	@Override

@@ -99,7 +99,7 @@
 			<dependency>
 				<groupId>lu.kbra</groupId>
 				<artifactId>pclib</artifactId>
-				<version>1.0.2</version>
+				<version>1.0.3-SNAPSHOT</version>
 				<scope>import</scope>
 				<type>pom</type>
 			</dependency>

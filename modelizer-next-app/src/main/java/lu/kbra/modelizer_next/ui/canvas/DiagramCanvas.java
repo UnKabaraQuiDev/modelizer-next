@@ -256,6 +256,9 @@ public class DiagramCanvas extends JPanel
 	}
 
 	public double stringWidth(final Font titleFont, final String classTitle) {
+		if (classTitle == null || classTitle.isBlank()) {
+			return 0;
+		}
 		return titleFont.getStringBounds(classTitle, this.fontRenderContext).getWidth();
 	}
 

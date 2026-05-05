@@ -23,6 +23,10 @@ import lu.kbra.modelizer_next.ui.canvas.data.AnchorSide;
 import lu.kbra.modelizer_next.ui.canvas.data.Direction2D;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.LinkGeometry;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectedElement;
+import lu.kbra.pclib.datastructure.pair.Pair;
+import lu.kbra.pclib.datastructure.pair.Pairs;
+import lu.kbra.pclib.datastructure.triplet.Triplet;
+import lu.kbra.pclib.datastructure.triplet.Triplets;
 
 /**
  * Contains drawing helpers for classes, comments, fields, links, and overlays.
@@ -167,34 +171,13 @@ public interface ElementRenderer extends DiagramCanvasExt {
 			double rowY = bounds.getY() + DiagramCanvas.CLASS_HEADER_HEIGHT;
 			final List<FieldModel> visibleFields = this.getCanvas().getVisibleFields(classModel);
 
+			final Pair<Triplet<Double, Double, Double>, Pair<Boolean, Boolean>> columnProps = this.resolveClassFieldProps(visibleFields);
+
 			for (final FieldModel fieldModel : visibleFields) {
-				// TODO: In physical mode, render flags and types better
-				final Rectangle2D fieldBounds = new Rectangle2D.Double(bounds.getX(),
-						rowY,
-						bounds.getWidth(),
-						DiagramCanvas.CLASS_ROW_HEIGHT);
-
-				g2.setColor(fieldModel.getBackgroundColor());
-				g2.fill(fieldBounds);
-
-				if (this.getCanvas().isFieldSelected(classModel.getId(), fieldModel.getId())) {
-					g2.setColor(DiagramCanvas.SELECTION_FILL_COLOR);
-					g2.fill(fieldBounds);
-				}
-
-				g2.setColor(classModel.getBorderColor());
-				g2.draw(new Line2D.Double(bounds.getX(), rowY, bounds.getMaxX(), rowY));
-
-				g2.setColor(fieldModel.getTextColor());
-				g2.drawString(this.getCanvas().resolveFieldName(fieldModel),
-						(float) bounds.getX() + DiagramCanvas.TEXT_PADDING,
-						(float) rowY + 15);
-
-				if (this.getCanvas().isFieldSelected(classModel.getId(), fieldModel.getId())) {
-					g2.setColor(DiagramCanvas.SELECTION_COLOR);
-					g2.setStroke(DiagramCanvas.FIELD_SELECTION_STROKE);
-					g2.draw(fieldBounds);
-					g2.setStroke(DiagramCanvas.DEFAULT_STROKE);
+				if (this.getPanelType() == PanelType.CONCEPTUAL || this.getPanelType() == PanelType.LOGICAL) {
+					this.drawConceptualLogicalClassField(g2, bounds, rowY, classModel, fieldModel);
+				} else {
+					this.drawPhysicalClassField(g2, bounds, rowY, columnProps.getKey(), classModel, fieldModel, columnProps.getValue());
 				}
 
 				rowY += DiagramCanvas.CLASS_ROW_HEIGHT;
@@ -214,6 +197,156 @@ public interface ElementRenderer extends DiagramCanvasExt {
 						bounds.getMaxX(),
 						bounds.getY() + DiagramCanvas.CLASS_HEADER_HEIGHT));
 			}
+		}
+	}
+
+	default Triplet<Double, Double, Double> resolveClassColumWidths(final List<FieldModel> visibleFields) {
+		double maxStringWidth = 0;
+		final double maxFlagWidth = DiagramCanvas.TEXT_PADDING * 2
+				+ getCanvas().stringWidth(DiagramCanvas.BODY_FONT, FieldModel.PRIMARY_KEY_FLAG)
+				+ getCanvas().stringWidth(DiagramCanvas.BODY_FONT, FieldModel.NOT_NULL_FLAG)
+				+ getCanvas().stringWidth(DiagramCanvas.BODY_FONT, FieldModel.UNIQUE_FLAG);
+		boolean hasFlags = false;
+		double maxTypeWidth = 0;
+
+		for (final FieldModel fm : visibleFields) {
+			maxStringWidth = Math.max(maxStringWidth,
+					this.getCanvas().stringWidth(DiagramCanvas.BODY_FONT, fm.getName(this.getPanelType())));
+			maxTypeWidth = Math.max(maxTypeWidth,
+					fm.getType() == null || fm.getType().isBlank() ? 0
+							: this.getCanvas().stringWidth(DiagramCanvas.BODY_FONT, fm.getType()));
+			hasFlags |= fm.hasFlags();
+		}
+
+		return Triplets.readOnly(maxStringWidth, hasFlags ? maxFlagWidth + DiagramCanvas.TEXT_PADDING : 0, maxTypeWidth);
+	}
+
+	/**
+	 * @return [ [ name column width, flags column width, type column width ], [ any flags, any type ] ]
+	 */
+	default Pair<Triplet<Double, Double, Double>, Pair<Boolean, Boolean>> resolveClassFieldProps(final List<FieldModel> visibleFields) {
+		double maxStringWidth = 0;
+		final double maxFlagWidth = DiagramCanvas.TEXT_PADDING * 2
+				+ getCanvas().stringWidth(DiagramCanvas.BODY_FONT, FieldModel.PRIMARY_KEY_FLAG)
+				+ getCanvas().stringWidth(DiagramCanvas.BODY_FONT, FieldModel.NOT_NULL_FLAG)
+				+ getCanvas().stringWidth(DiagramCanvas.BODY_FONT, FieldModel.UNIQUE_FLAG);
+		boolean hasFlags = false;
+		boolean hasType = false;
+		double maxTypeWidth = 0;
+
+		for (final FieldModel fm : visibleFields) {
+			maxStringWidth = Math.max(maxStringWidth,
+					this.getCanvas().stringWidth(DiagramCanvas.BODY_FONT, fm.getName(this.getPanelType())));
+			maxTypeWidth = Math.max(maxTypeWidth,
+					fm.getType() == null || fm.getType().isBlank() ? 0
+							: this.getCanvas().stringWidth(DiagramCanvas.BODY_FONT, fm.getType()));
+			hasFlags |= fm.hasFlags();
+			hasType |= fm.getType() != null && !fm.getType().isBlank();
+		}
+
+		return Pairs.readOnly(Triplets.readOnly(maxStringWidth, hasFlags ? maxFlagWidth : 0, maxTypeWidth),
+				Pairs.readOnly(hasFlags, hasType));
+	}
+
+	default void drawPhysicalClassField(
+			final Graphics2D g2,
+			final Rectangle2D bounds,
+			final double rowY,
+			final Triplet<Double, Double, Double> columnWidths,
+			final ClassModel classModel,
+			final FieldModel fieldModel,
+			final Pair<Boolean, Boolean> anyFlagsTypes) {
+		final Rectangle2D fieldBounds = new Rectangle2D.Double(bounds.getX(), rowY, bounds.getWidth(), DiagramCanvas.CLASS_ROW_HEIGHT);
+
+		g2.setColor(fieldModel.getBackgroundColor());
+		g2.fill(fieldBounds);
+
+		if (this.getCanvas().isFieldSelected(classModel.getId(), fieldModel.getId())) {
+			g2.setColor(DiagramCanvas.SELECTION_FILL_COLOR);
+			g2.fill(fieldBounds);
+		}
+
+		g2.setColor(classModel.getBorderColor());
+		g2.draw(new Line2D.Double(bounds.getX(), rowY, bounds.getMaxX(), rowY));
+
+		g2.setColor(fieldModel.getTextColor());
+
+		float x = (float) bounds.getX() + DiagramCanvas.TEXT_PADDING;
+		final float y = (float) rowY + 15;
+		g2.drawString(this.getCanvas().resolveFieldName(fieldModel), x, y);
+
+		if (anyFlagsTypes.getKey()) {
+			x = (float) (bounds.getX() + columnWidths.getFirst() + DiagramCanvas.TEXT_PADDING * 2);
+			g2.drawLine((int) x - DiagramCanvas.TEXT_PADDING / 2,
+					(int) rowY,
+					(int) x - DiagramCanvas.TEXT_PADDING / 2,
+					(int) (rowY + DiagramCanvas.CLASS_ROW_HEIGHT));
+
+			if (fieldModel.hasFlags()) {
+				if (fieldModel.isPrimaryKey()) {
+					g2.drawString(FieldModel.PRIMARY_KEY_FLAG, x, y);
+				}
+				x += getCanvas().stringWidth(DiagramCanvas.BODY_FONT, FieldModel.PRIMARY_KEY_FLAG) + DiagramCanvas.TEXT_PADDING;
+				if (fieldModel.isNotNull()) {
+					g2.drawString(FieldModel.NOT_NULL_FLAG, x, y);
+				}
+				x += getCanvas().stringWidth(DiagramCanvas.BODY_FONT, FieldModel.NOT_NULL_FLAG) + DiagramCanvas.TEXT_PADDING;
+				if (fieldModel.isUnique()) {
+					g2.drawString(FieldModel.UNIQUE_FLAG, x, y);
+				}
+			}
+		}
+
+		if (anyFlagsTypes.getValue()) {
+			x = (float) (bounds.getX() + columnWidths.getFirst() + DiagramCanvas.TEXT_PADDING * 3 + columnWidths.getSecond());
+			g2.drawLine((int) x - DiagramCanvas.TEXT_PADDING / 2,
+					(int) rowY,
+					(int) x - DiagramCanvas.TEXT_PADDING / 2,
+					(int) (rowY + DiagramCanvas.CLASS_ROW_HEIGHT));
+
+			if (fieldModel.getType() != null && !fieldModel.getType().isBlank()) {
+				x = (float) (bounds.getMaxX() - DiagramCanvas.TEXT_PADDING);
+				g2.drawString(fieldModel.getType(),
+						(float) (x - getCanvas().stringWidth(DiagramCanvas.BODY_FONT, fieldModel.getType())),
+						y);
+			}
+		}
+
+		if (this.getCanvas().isFieldSelected(classModel.getId(), fieldModel.getId())) {
+			g2.setColor(DiagramCanvas.SELECTION_COLOR);
+			g2.setStroke(DiagramCanvas.FIELD_SELECTION_STROKE);
+			g2.draw(fieldBounds);
+			g2.setStroke(DiagramCanvas.DEFAULT_STROKE);
+		}
+	}
+
+	default void drawConceptualLogicalClassField(
+			final Graphics2D g2,
+			final Rectangle2D bounds,
+			final double rowY,
+			final ClassModel classModel,
+			final FieldModel fieldModel) {
+		final Rectangle2D fieldBounds = new Rectangle2D.Double(bounds.getX(), rowY, bounds.getWidth(), DiagramCanvas.CLASS_ROW_HEIGHT);
+
+		g2.setColor(fieldModel.getBackgroundColor());
+		g2.fill(fieldBounds);
+
+		if (this.getCanvas().isFieldSelected(classModel.getId(), fieldModel.getId())) {
+			g2.setColor(DiagramCanvas.SELECTION_FILL_COLOR);
+			g2.fill(fieldBounds);
+		}
+
+		g2.setColor(classModel.getBorderColor());
+		g2.draw(new Line2D.Double(bounds.getX(), rowY, bounds.getMaxX(), rowY));
+
+		g2.setColor(fieldModel.getTextColor());
+		g2.drawString(this.getCanvas().resolveFieldName(fieldModel), (float) bounds.getX() + DiagramCanvas.TEXT_PADDING, (float) rowY + 15);
+
+		if (this.getCanvas().isFieldSelected(classModel.getId(), fieldModel.getId())) {
+			g2.setColor(DiagramCanvas.SELECTION_COLOR);
+			g2.setStroke(DiagramCanvas.FIELD_SELECTION_STROKE);
+			g2.draw(fieldBounds);
+			g2.setStroke(DiagramCanvas.DEFAULT_STROKE);
 		}
 	}
 

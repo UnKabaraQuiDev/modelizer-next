@@ -9,6 +9,7 @@ import lu.kbra.modelizer_next.domain.ClassModel;
 import lu.kbra.modelizer_next.domain.FieldModel;
 import lu.kbra.modelizer_next.layout.LayoutObjectType;
 import lu.kbra.modelizer_next.layout.NodeLayout;
+import lu.kbra.modelizer_next.layout.PanelType;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.ClipboardSnapshot;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.CopiedClass;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.CopiedComment;
@@ -32,32 +33,30 @@ public interface NodeLayoutManager extends DiagramCanvasExt {
 		final NodeLayout layout = this.getCanvas().findOrCreateNodeLayout(type, objectId);
 
 		layout.setPosition(new Point2D.Double(copiedLayout.x() + deltaX, copiedLayout.y() + deltaY));
-
 		layout.setSize(new Size2D(copiedLayout.width(), copiedLayout.height()));
 	}
 
 	default Rectangle2D computeClassBounds(final ClassModel classModel, final NodeLayout layout) {
-//		g2.setFont(DiagramCanvas.TITLE_FONT);
-//		final FontMetrics titleMetrics = g2.getFontMetrics();
-//
-//		g2.setFont(DiagramCanvas.BODY_FONT);
-//		final FontMetrics bodyMetrics = g2.getFontMetrics();
-
 		int width = (int) Math.max(DiagramCanvas.CLASS_MIN_WIDTH,
 				this.getCanvas().stringWidth(DiagramCanvas.TITLE_FONT, this.getCanvas().resolveClassTitle(classModel))
 						+ DiagramCanvas.TEXT_PADDING * 2);
-		for (final FieldModel fieldModel : this.getCanvas().getVisibleFields(classModel)) {
+
+		if (getPanelType() == PanelType.CONCEPTUAL || getPanelType() == PanelType.LOGICAL) {
+			for (final FieldModel fieldModel : classModel.getFields(getPanelType())) {
+				width = (int) Math.max(width,
+						this.getCanvas().stringWidth(DiagramCanvas.BODY_FONT, this.getCanvas().resolveFieldName(fieldModel))
+								+ DiagramCanvas.TEXT_PADDING * 2);
+			}
+		} else {
 			width = (int) Math.max(width,
-					this.getCanvas().stringWidth(DiagramCanvas.BODY_FONT, this.getCanvas().resolveFieldName(fieldModel))
-							+ DiagramCanvas.TEXT_PADDING * 2);
+					(double) getCanvas().resolveClassColumWidths(classModel.getFields(getPanelType())).map((a, b, c) -> a + b + c)
+							+ 3 * DiagramCanvas.TEXT_PADDING);
 		}
 
-		final int visibleFieldCount = this.getCanvas().getVisibleFields(classModel).size();
+		final int visibleFieldCount = classModel.getFieldCount(getPanelType());
 		final int height = DiagramCanvas.CLASS_HEADER_HEIGHT + visibleFieldCount * DiagramCanvas.CLASS_ROW_HEIGHT;
 
-		if (layout.getSize().getX() <= 0.0) {
-			layout.getSize().setWidth(width);
-		}
+		layout.getSize().setWidth(width);
 		layout.getSize().setHeight(height);
 
 		return new Rectangle2D.Double(layout.getPosition().getX(),

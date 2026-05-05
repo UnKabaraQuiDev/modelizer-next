@@ -45,8 +45,8 @@ public final class FieldEditorDialog {
 		final JTextField technicalNameField = new JTextField(fieldModel.hasTechnicalName() ? fieldModel.getTechnicalName() : "", 24);
 
 		final JComboBox<String> sqlTypeBox = new JComboBox<>(FieldModel.SQL_TYPES);
-		sqlTypeBox.setSelectedItem(fieldModel.getType());
 		sqlTypeBox.setEditable(true);
+		sqlTypeBox.setSelectedItem(fieldModel.getType());
 
 		final JCheckBox technicalOnlyBox = new JCheckBox("Logical/Physical only", fieldModel.isTechnicalOnly());
 
