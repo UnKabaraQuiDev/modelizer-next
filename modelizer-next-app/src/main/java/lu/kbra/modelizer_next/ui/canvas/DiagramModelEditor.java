@@ -50,6 +50,7 @@ import lu.kbra.modelizer_next.ui.canvas.datastruct.RenamingElement.RenamingType;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectedElement;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectedElement.SelectedType;
 import lu.kbra.modelizer_next.ui.dialogs.LinkEditorDialog;
+import lu.kbra.modelizer_next.ui.frame.MainFrame;
 import lu.kbra.pclib.PCUtils;
 
 /**
@@ -90,7 +91,6 @@ interface DiagramModelEditor extends DiagramCanvasExt {
 		layout.setPosition(new Point2D.Double(center.getX() - 100, center.getY() - 30));
 		layout.setSize(new Size2D(220, 80));
 
-//		confirmRenamingElement(0);
 		this.getCanvas().select(SelectedElement.forComment(commentModel.getId()));
 		this.getCanvas().notifySelectionChanged();
 		this.getCanvas().notifyDocumentChanged();
@@ -115,10 +115,11 @@ interface DiagramModelEditor extends DiagramCanvasExt {
 		fieldModel.setConceptualName("New field");
 		this.getCanvas().applyDefaultPaletteToField(fieldModel);
 		targetClass.getFields().add(fieldModel);
+		fieldModel.setTechnicalOnly(this.getPanelType().isTechnical());
 
 		if (this.isRenamingElement() && this.getCanvas().renamingElement.type().isClass()
 				&& this.getCanvas().renamingElement.classId().equals(targetClass.getId())) {
-			this.confirmRenamingElement(0);
+			this.confirmRenamingElement(0, false);
 		}
 		this.getCanvas().select(SelectedElement.forField(targetClass.getId(), fieldModel.getId()));
 		this.getCanvas().notifySelectionChanged();
@@ -346,7 +347,7 @@ interface DiagramModelEditor extends DiagramCanvasExt {
 		this.getCanvas().repaint();
 	}
 
-	default void confirmRenamingElement(final int nextDir) {
+	default void confirmRenamingElement(final int nextDir, final boolean alternative) {
 		if (!this.isRenamingElement()) {
 			this.getCanvas().renamingComponents.setVisible(false);
 			this.getCanvas().repaint();
@@ -362,13 +363,14 @@ interface DiagramModelEditor extends DiagramCanvasExt {
 			final ClassModel classModel = this.getCanvas().findClassById(renamingElement.classId());
 			switch (renamingElement.type()) {
 			case CLASS -> {
-				classModel.setName(getPanelType(), renamingElement.forceAlternative(), renamingComponents.textField().getText());
+				classModel.setName(this.getPanelType(), renamingElement.forceAlternative(), renamingComponents.textField().getText());
 
 				if (next) {
 					if (classModel.getFields().size() > 0) {
 						this.getCanvas()
 								.invokeRenamingElement(RenamingElement.forField(classModel.getId(),
-										(nextDir < 0 ? classModel.getFields().getLast() : classModel.getFields().getFirst()).getId()));
+										(nextDir < 0 ? classModel.getFields().getLast() : classModel.getFields().getFirst()).getId(),
+										alternative));
 					} else {
 						next = false;
 					}
@@ -376,16 +378,17 @@ interface DiagramModelEditor extends DiagramCanvasExt {
 			}
 			case CLASS_FIELD -> {
 				final FieldModel fieldModel = this.getCanvas().findFieldById(renamingElement.classId(), renamingElement.fieldId());
-				fieldModel.setName(getPanelType(), renamingElement.forceAlternative(), renamingComponents.textField().getText());
+				fieldModel.setName(this.getPanelType(), renamingElement.forceAlternative(), renamingComponents.textField().getText());
 
 				if (next) {
 					final int idx = classModel.getFieldIndex(fieldModel.getId(), this.getPanelType());
 					if (idx + nextDir < 0 || idx + nextDir > classModel.getFieldCount(this.getPanelType()) - 1) {
-						this.getCanvas().invokeRenamingElement(RenamingElement.forClass(classModel.getId()));
+						this.getCanvas().invokeRenamingElement(RenamingElement.forClass(classModel.getId(), alternative));
 					} else {
 						this.getCanvas()
 								.invokeRenamingElement(RenamingElement.forField(classModel.getId(),
-										classModel.getField(idx + nextDir, this.getPanelType()).getId()));
+										classModel.getField(idx + nextDir, this.getPanelType()).getId(),
+										alternative));
 					}
 				}
 			}
@@ -436,6 +439,7 @@ interface DiagramModelEditor extends DiagramCanvasExt {
 			final CommentModel commentModel = this.getCanvas().findCommentById(renamingElement.commentId());
 			commentModel.setText(renamingComponents.textArea().getText());
 
+			next = false;
 		} else if (renamingElement.type() == RenamingType.NONE) {
 			return;
 		} else {
@@ -504,6 +508,11 @@ interface DiagramModelEditor extends DiagramCanvasExt {
 			renamingField.getInputMap(JComponent.WHEN_FOCUSED).put(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, 0), "submitNext");
 			renamingField.getInputMap(JComponent.WHEN_FOCUSED)
 					.put(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, InputEvent.SHIFT_DOWN_MASK), "submitPrevious");
+			renamingField.getInputMap(JComponent.WHEN_FOCUSED)
+					.put(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, MainFrame.CTRL_MODIFIER), "submitNextAlt");
+			renamingField.getInputMap(JComponent.WHEN_FOCUSED)
+					.put(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, InputEvent.SHIFT_DOWN_MASK | MainFrame.CTRL_MODIFIER),
+							"submitPreviousAlt");
 			renamingField.getActionMap().put("cancel", new AbstractAction() {
 
 				@Override
@@ -516,7 +525,7 @@ interface DiagramModelEditor extends DiagramCanvasExt {
 
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					DiagramModelEditor.this.confirmRenamingElement(0);
+					DiagramModelEditor.this.confirmRenamingElement(0, false);
 				}
 
 			});
@@ -524,7 +533,7 @@ interface DiagramModelEditor extends DiagramCanvasExt {
 
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					DiagramModelEditor.this.confirmRenamingElement(1);
+					DiagramModelEditor.this.confirmRenamingElement(1, false);
 				}
 
 			});
@@ -532,7 +541,23 @@ interface DiagramModelEditor extends DiagramCanvasExt {
 
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					DiagramModelEditor.this.confirmRenamingElement(-1);
+					DiagramModelEditor.this.confirmRenamingElement(-1, false);
+				}
+
+			});
+			renamingField.getActionMap().put("submitNextAlt", new AbstractAction() {
+
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					DiagramModelEditor.this.confirmRenamingElement(1, true);
+				}
+
+			});
+			renamingField.getActionMap().put("submitPreviousAlt", new AbstractAction() {
+
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					DiagramModelEditor.this.confirmRenamingElement(-1, true);
 				}
 
 			});
@@ -686,12 +711,10 @@ interface DiagramModelEditor extends DiagramCanvasExt {
 		this.getCanvas().repaint();
 	}
 
-	default void renameSelection(boolean alternative) {
+	default void renameSelection(final boolean alternative) {
 		if (this.getCanvas().selectedElement == null || this.getCanvas().selectedElement.type() == SelectedType.NONE) {
 			return;
 		}
-
-		System.err.println(alternative);
 
 		switch (this.getCanvas().selectedElement.type()) {
 		case CLASS, FIELD, COMMENT, LINK -> {

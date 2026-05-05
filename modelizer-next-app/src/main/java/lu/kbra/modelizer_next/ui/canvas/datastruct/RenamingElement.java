@@ -6,7 +6,8 @@ import javax.swing.JComponent;
 
 import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectedElement.SelectedType;
 
-public record RenamingElement(RenamingType type, String classId, String fieldId, String commentId, String linkId, boolean forceAlternative) {
+public record RenamingElement(RenamingType type, String classId, String fieldId, String commentId, String linkId,
+		boolean forceAlternative) {
 
 	public enum RenamingType {
 
@@ -86,6 +87,14 @@ public record RenamingElement(RenamingType type, String classId, String fieldId,
 
 	public static RenamingElement forField(final String classId, final String fieldId) {
 		return new RenamingElement(RenamingType.CLASS_FIELD, classId, fieldId, null, null);
+	}
+
+	public static RenamingElement forClass(final String classId, final boolean alternative) {
+		return new RenamingElement(RenamingType.CLASS, classId, null, null, null, alternative);
+	}
+
+	public static RenamingElement forField(final String classId, final String fieldId, final boolean alternative) {
+		return new RenamingElement(RenamingType.CLASS_FIELD, classId, fieldId, null, null, alternative);
 	}
 
 	public static RenamingElement forComment(final String commentId) {

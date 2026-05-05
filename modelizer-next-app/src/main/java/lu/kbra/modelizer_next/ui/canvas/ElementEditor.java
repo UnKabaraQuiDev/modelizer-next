@@ -106,6 +106,7 @@ public interface ElementEditor extends DiagramCanvasExt {
 		fieldModel.setTextColor(result.textColor());
 		fieldModel.setBackgroundColor(result.backgroundColor());
 		fieldModel.setType(result.type());
+		fieldModel.setTechnicalOnly(result.technicalOnly());
 
 		this.getCanvas().notifySelectionChanged();
 		this.getCanvas().notifyDocumentChanged();

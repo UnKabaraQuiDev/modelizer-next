@@ -30,7 +30,7 @@ import lu.kbra.modelizer_next.ui.component.ColorButton;
 public final class FieldEditorDialog {
 
 	public record Result(String name, String technicalName, boolean primaryKey, boolean unique, boolean notNull, Color textColor,
-			Color backgroundColor, int moveDelta, String type) {
+			Color backgroundColor, int moveDelta, String type, boolean technicalOnly) {
 	}
 
 	private static final class Holder {
@@ -48,6 +48,8 @@ public final class FieldEditorDialog {
 		sqlTypeBox.setSelectedItem(fieldModel.getType());
 		sqlTypeBox.setEditable(true);
 
+		final JCheckBox technicalOnlyBox = new JCheckBox("Logical/Physical only", fieldModel.isTechnicalOnly());
+
 		final JCheckBox primaryKeyBox = new JCheckBox("PK", fieldModel.isPrimaryKey());
 		final JCheckBox uniqueBox = new JCheckBox("UQ", fieldModel.isUnique());
 		final JCheckBox notNullBox = new JCheckBox("NN", fieldModel.isNotNull());
@@ -63,6 +65,7 @@ public final class FieldEditorDialog {
 		form.add(FieldEditorDialog.row("Name", nameField));
 		form.add(FieldEditorDialog.row("Technical name", technicalNameField));
 		form.add(FieldEditorDialog.row("Type", sqlTypeBox));
+		form.add(FieldEditorDialog.row("Visibility", technicalOnlyBox));
 
 		final JPanel flagsRow = new JPanel(new GridLayout(1, 3, 8, 0));
 		flagsRow.add(primaryKeyBox);
@@ -90,7 +93,8 @@ public final class FieldEditorDialog {
 					textColorButton.getSelectedColor(),
 					backgroundColorButton.getSelectedColor(),
 					0,
-					sqlTypeBox.getSelectedItem() == null ? null : sqlTypeBox.getSelectedItem().toString());
+					sqlTypeBox.getSelectedItem() == null ? null : sqlTypeBox.getSelectedItem().toString(),
+					technicalOnlyBox.isSelected());
 			dialog.dispose();
 		});
 		upButton.addActionListener(event -> {
@@ -102,7 +106,8 @@ public final class FieldEditorDialog {
 					notNullBox,
 					textColorButton,
 					backgroundColorButton,
-					sqlTypeBox);
+					sqlTypeBox,
+					technicalOnlyBox);
 			if (moveCallback != null) {
 				moveCallback.accept(-1);
 			}
@@ -116,7 +121,8 @@ public final class FieldEditorDialog {
 					notNullBox,
 					textColorButton,
 					backgroundColorButton,
-					sqlTypeBox);
+					sqlTypeBox,
+					technicalOnlyBox);
 			if (moveCallback != null) {
 				moveCallback.accept(1);
 			}
@@ -156,7 +162,8 @@ public final class FieldEditorDialog {
 			final JCheckBox notNullBox,
 			final ColorButton textColorButton,
 			final ColorButton backgroundColorButton,
-			final JComboBox<String> typeField) {
+			final JComboBox<String> typeField,
+			final JCheckBox technicalOnly) {
 		fieldModel.setConceptualName(nameField.getText());
 		fieldModel.setTechnicalName(technicalNameField.getText());
 		fieldModel.setPrimaryKey(primaryKeyBox.isSelected());
@@ -165,6 +172,7 @@ public final class FieldEditorDialog {
 		fieldModel.setTextColor(textColorButton.getSelectedColor());
 		fieldModel.setBackgroundColor(backgroundColorButton.getSelectedColor());
 		fieldModel.setType(typeField.getSelectedItem() == null ? null : typeField.getSelectedItem().toString().trim());
+		fieldModel.setTechnicalOnly(technicalOnly.isSelected());
 	}
 
 	private static JPanel row(final String labelText, final Component component) {
