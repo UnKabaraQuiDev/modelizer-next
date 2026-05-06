@@ -286,7 +286,7 @@ run_shared_build() {
 
   mvn -B -DskipTests -Drevision="${VERSION}" -DappVersion="${APP_VERSION}" \
     -Ddistributor="Automated ${channel} build ${BUILD_TIMESTAMP} (shared)" \
-    -pl modelizer-next-app -am \
+    -pl modelizer-next-app -am -U\
     clean package
 
   stage_shared_artifacts "${channel}"
@@ -330,12 +330,12 @@ run_platform_build() {
   echo "mvn args: ${mvn_args[*]:-}"
   if (( ${#mvn_args[@]} > 0 )); then
     mvn -B -DskipTests -Drevision="${VERSION}" -DappVersion="${APP_VERSION}" \
-      -Ddistributor="Automated ${channel} build ${BUILD_TIMESTAMP} (${platform}-${build_kind})" \
-      "${mvn_args[@]}" \
+      -Ddistributor="Automated ${channel} build ${BUILD_TIMESTAMP} (${platform}-${build_kind})" -U\
+      "${mvn_args[@]}"\
       -Pnative,${extra_profiles} clean package
   else
     mvn -B -DskipTests -Drevision="${VERSION}" -DappVersion="${APP_VERSION}" \
-      -Ddistributor="Automated ${channel} build ${BUILD_TIMESTAMP} (${platform}-${build_kind})" \
+      -Ddistributor="Automated ${channel} build ${BUILD_TIMESTAMP} (${platform}-${build_kind})" -U\
       -Pnative,${extra_profiles} clean package
   fi
 
