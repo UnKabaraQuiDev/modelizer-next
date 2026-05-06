@@ -34,7 +34,7 @@ public interface NamesOwner {
 	default void setName(final PanelType panelType, final String name) {
 		this.getNames().set(panelType, name);
 	}
-	
+
 	default void setName(final PanelType panelType, final boolean maybeTechnical, final String name) {
 		this.getNames().set(panelType, maybeTechnical, name);
 	}

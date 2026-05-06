@@ -51,7 +51,7 @@ interface NameResolver extends DiagramCanvasExt {
 		} else {
 			baseName = this.blankToFallback(fieldModel.getTechnicalName(), fieldModel.getConceptualName(), "Unnamed field");
 		}
-		
+
 		return baseName;
 //
 //		if (this.getPanelType() != PanelType.PHYSICAL) {
