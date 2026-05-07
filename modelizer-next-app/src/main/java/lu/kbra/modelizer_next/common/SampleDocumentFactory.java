@@ -13,7 +13,9 @@ public final class SampleDocumentFactory {
 
 	public static ModelDocument create() {
 		try {
-			return ModernModelizerImporter.importString(PCUtils.readPackagedStringFile(MNMain.class, "/sample.mn"));
+			final ModelDocument md = ModernModelizerImporter.importString(PCUtils.readPackagedStringFile(MNMain.class, "/sample.mn"));
+			md.getMeta().setName(META_NAME);
+			return md;
 		} catch (final IOException e) {
 			return null;
 		}
