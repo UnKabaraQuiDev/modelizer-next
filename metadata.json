@@ -1,66 +1,66 @@
 {
   "version": 1,
   "repository": "UnKabaraQuiDev/modelizer-next",
-  "releaseTag": "7-RELEASE-210",
+  "releaseTag": "7-RELEASE-211",
   "assets": {
     "windows": {
       "portable": {
         "label": "Windows portable ZIP",
-        "tag": "7-RELEASE-210",
-        "file": "modelizer-next-app-portable-windows-7-RELEASE-210.zip",
-        "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/7-RELEASE-210/modelizer-next-app-portable-windows-7-RELEASE-210.zip"
+        "tag": "7-RELEASE-211",
+        "file": "modelizer-next-app-portable-windows-7-RELEASE-211.zip",
+        "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/7-RELEASE-211/modelizer-next-app-portable-windows-7-RELEASE-211.zip"
       },
       "standalone": {
         "label": "Windows standalone installer",
-        "tag": "7-RELEASE-210",
-        "file": "modelizer-next-app-standalone-windows-7-RELEASE-210.exe",
-        "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/7-RELEASE-210/modelizer-next-app-standalone-windows-7-RELEASE-210.exe"
+        "tag": "7-RELEASE-211",
+        "file": "modelizer-next-app-standalone-windows-7-RELEASE-211.exe",
+        "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/7-RELEASE-211/modelizer-next-app-standalone-windows-7-RELEASE-211.exe"
       },
       "updater": {
         "label": "Windows updater installer",
-        "tag": "7-RELEASE-210",
-        "file": "modelizer-next-bootstrap-windows-7-RELEASE-210.exe",
-        "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/7-RELEASE-210/modelizer-next-bootstrap-windows-7-RELEASE-210.exe"
+        "tag": "7-RELEASE-211",
+        "file": "modelizer-next-bootstrap-windows-7-RELEASE-211.exe",
+        "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/7-RELEASE-211/modelizer-next-bootstrap-windows-7-RELEASE-211.exe"
       }
     },
     "linux": {
       "portable": {
         "label": "Linux portable ZIP",
-        "tag": "7-RELEASE-210",
-        "file": "modelizer-next-app-portable-linux-7-RELEASE-210.zip",
-        "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/7-RELEASE-210/modelizer-next-app-portable-linux-7-RELEASE-210.zip"
+        "tag": "7-RELEASE-211",
+        "file": "modelizer-next-app-portable-linux-7-RELEASE-211.zip",
+        "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/7-RELEASE-211/modelizer-next-app-portable-linux-7-RELEASE-211.zip"
       },
       "standalone": {
         "label": "Linux standalone .deb",
-        "tag": "7-RELEASE-210",
-        "file": "modelizer-next-app-standalone-linux-7-RELEASE-210.deb",
-        "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/7-RELEASE-210/modelizer-next-app-standalone-linux-7-RELEASE-210.deb"
+        "tag": "7-RELEASE-211",
+        "file": "modelizer-next-app-standalone-linux-7-RELEASE-211.deb",
+        "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/7-RELEASE-211/modelizer-next-app-standalone-linux-7-RELEASE-211.deb"
       },
       "updater": {
         "label": "Linux updater .deb",
-        "tag": "7-RELEASE-210",
-        "file": "modelizer-next-bootstrap-linux-7-RELEASE-210.deb",
-        "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/7-RELEASE-210/modelizer-next-bootstrap-linux-7-RELEASE-210.deb"
+        "tag": "7-RELEASE-211",
+        "file": "modelizer-next-bootstrap-linux-7-RELEASE-211.deb",
+        "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/7-RELEASE-211/modelizer-next-bootstrap-linux-7-RELEASE-211.deb"
       }
     },
     "macos": {
       "portable": {
         "label": "MacOS portable ZIP",
-        "tag": "7-RELEASE-210",
-        "file": "modelizer-next-app-portable-macos-7-RELEASE-210.zip",
-        "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/7-RELEASE-210/modelizer-next-app-portable-macos-7-RELEASE-210.zip"
+        "tag": "7-RELEASE-211",
+        "file": "modelizer-next-app-portable-macos-7-RELEASE-211.zip",
+        "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/7-RELEASE-211/modelizer-next-app-portable-macos-7-RELEASE-211.zip"
       },
       "standalone": {
         "label": "MacOS standalone .dmg",
-        "tag": "7-RELEASE-210",
-        "file": "modelizer-next-app-standalone-macos-7-RELEASE-210.dmg",
-        "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/7-RELEASE-210/modelizer-next-app-standalone-macos-7-RELEASE-210.dmg"
+        "tag": "7-RELEASE-211",
+        "file": "modelizer-next-app-standalone-macos-7-RELEASE-211.dmg",
+        "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/7-RELEASE-211/modelizer-next-app-standalone-macos-7-RELEASE-211.dmg"
       },
       "updater": {
         "label": "MacOS updater .dmg",
-        "tag": "7-RELEASE-210",
-        "file": "modelizer-next-bootstrap-macos-7-RELEASE-210.dmg",
-        "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/7-RELEASE-210/modelizer-next-bootstrap-macos-7-RELEASE-210.dmg"
+        "tag": "7-RELEASE-211",
+        "file": "modelizer-next-bootstrap-macos-7-RELEASE-211.dmg",
+        "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/7-RELEASE-211/modelizer-next-bootstrap-macos-7-RELEASE-211.dmg"
       }
     }
   }
