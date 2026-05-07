@@ -12,7 +12,7 @@
     "windows"
   ],
   "notes": "Latest nightly build.",
-  "updatedAt": "2026-05-06T06:22:52Z",
+  "updatedAt": "2026-05-07T06:22:28Z",
   "entries": [
     {
       "version": "7-NIGHTLY-208",
@@ -27,7 +27,7 @@
         "windows"
       ],
       "notes": "Latest nightly build.",
-      "publishedAt": "2026-05-06T06:22:52Z",
+      "publishedAt": "2026-05-07T06:22:28Z",
       "assets": [
         {
           "name": "modelizer-next-app-7-NIGHTLY-208.jar",
