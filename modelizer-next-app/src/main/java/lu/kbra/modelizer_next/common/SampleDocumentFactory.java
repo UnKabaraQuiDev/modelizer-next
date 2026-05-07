@@ -12,7 +12,7 @@ public final class SampleDocumentFactory {
 
 	public static ModelDocument create() {
 		try {
-			return ModernModelizerImporter.importString(PCUtils.readPackagedStringFile("/sample.mn"));
+			return ModernModelizerImporter.importString(PCUtils.readPackagedStringFile(SampleDocumentFactory.class, "/sample.mn"));
 		} catch (final IOException e) {
 			return null;
 		}
