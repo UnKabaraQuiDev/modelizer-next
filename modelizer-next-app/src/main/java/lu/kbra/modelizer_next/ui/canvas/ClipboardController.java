@@ -374,7 +374,6 @@ interface ClipboardController extends DiagramCanvasExt {
 		final Point2D.Double pasteTarget = this.getCanvas().getMouseWorldPos();
 
 		final double deltaX = clipboardBounds == null ? DiagramCanvas.PASTE_OFFSET : pasteTarget.getX() - clipboardBounds.getCenterX();
-
 		final double deltaY = clipboardBounds == null ? DiagramCanvas.PASTE_OFFSET : pasteTarget.getY() - clipboardBounds.getCenterY();
 
 		final Map<String, String> pastedClassIds = new HashMap<>();
@@ -412,8 +411,14 @@ interface ClipboardController extends DiagramCanvasExt {
 		}
 
 		for (final CopiedField copiedField : clipboard.fields()) {
-			final String ownerClassId = this.getCanvas().mapId(pastedClassIds, copiedField.ownerClassId());
-			final ClassModel owner = this.getCanvas().findClassById(ownerClassId);
+			final ClassModel owner;
+			if (this.getCanvas().selectedElement != null && (this.getCanvas().selectedElement.type() == SelectedType.CLASS
+					|| this.getCanvas().selectedElement.type() == SelectedType.FIELD)) {
+				owner = this.getCanvas().findClassById(this.getCanvas().selectedElement.classId());
+			} else {
+				final String ownerClassId = this.getCanvas().mapId(pastedClassIds, copiedField.ownerClassId());
+				owner = this.getCanvas().findClassById(ownerClassId);
+			}
 
 			if (owner == null) {
 				continue;
@@ -421,19 +426,19 @@ interface ClipboardController extends DiagramCanvasExt {
 
 			final FieldModel fieldCopy = this.getCanvas().createFieldFromClipboard(copiedField, true);
 
-			int insertIndex = -1;
-			for (int i = 0; i < owner.getFields().size(); i++) {
-				if (Objects.equals(owner.getFields().get(i).getId(), copiedField.sourceId())) {
-					insertIndex = i;
-					break;
-				}
-			}
+//			int insertIndex = -1;
+//			for (int i = 0; i < owner.getFields().size(); i++) {
+//				if (Objects.equals(owner.getFields().get(i).getId(), copiedField.sourceId())) {
+//					insertIndex = i;
+//					break;
+//				}
+//			}
 
-			if (insertIndex < 0) {
-				owner.getFields().add(fieldCopy);
-			} else {
-				owner.getFields().add(insertIndex + 1, fieldCopy);
-			}
+//			if (insertIndex < 0) {
+			owner.getFields().add(fieldCopy);
+//			} else {
+//				owner.getFields().add(insertIndex + 1, fieldCopy);
+//			}
 
 			pastedFieldIds.put(copiedField.sourceId(), fieldCopy.getId());
 			newSelection.add(SelectedElement.forField(owner.getId(), fieldCopy.getId()));
