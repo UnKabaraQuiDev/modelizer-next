@@ -9,10 +9,13 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.ListCellRenderer;
 import javax.swing.SwingUtilities;
+import javax.swing.border.Border;
 
 import lu.kbra.modelizer_next.style.StylePalette;
 
 public class StylePaletteRenderer extends JPanel implements ListCellRenderer<StylePalette> {
+
+	private static final Border EMPTY_BORDER = BorderFactory.createEmptyBorder(4, 8, 4, 8);
 
 	private final JLabel label = new JLabel();
 
@@ -24,7 +27,7 @@ public class StylePaletteRenderer extends JPanel implements ListCellRenderer<Sty
 
 		label.setOpaque(false);
 
-		setBorder(BorderFactory.createEmptyBorder(4, 8, 4, 8));
+		setBorder(EMPTY_BORDER);
 		setOpaque(true);
 	}
 
@@ -39,6 +42,9 @@ public class StylePaletteRenderer extends JPanel implements ListCellRenderer<Sty
 			final int index,
 			final boolean isSelected,
 			final boolean cellHasFocus) {
+
+		label.setFont(list.getFont());
+		setFont(list.getFont());
 
 		if (value == null) {
 			label.setText("");
@@ -68,11 +74,13 @@ public class StylePaletteRenderer extends JPanel implements ListCellRenderer<Sty
 		}
 
 		case LINK -> {
-			SwingUtilities.updateComponentTreeUI(label);
+			SwingUtilities.updateComponentTreeUI(this);
 			label.setForeground(value.getLinkColor());
 			setBorder(BorderFactory.createLineBorder(value.getLinkColor()));
 		}
 		}
+		
+		setBorder(BorderFactory.createCompoundBorder(getBorder(), EMPTY_BORDER));
 
 		if (isSelected) {
 			setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(list.getSelectionBackground(), 2), getBorder()));
@@ -80,4 +88,5 @@ public class StylePaletteRenderer extends JPanel implements ListCellRenderer<Sty
 
 		return this;
 	}
+
 }

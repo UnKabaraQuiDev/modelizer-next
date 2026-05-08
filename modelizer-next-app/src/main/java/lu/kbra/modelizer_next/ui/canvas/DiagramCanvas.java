@@ -3,6 +3,7 @@ package lu.kbra.modelizer_next.ui.canvas;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Cursor;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -213,8 +214,6 @@ public class DiagramCanvas extends JPanel implements DiagramModelLookup, NodeLay
 		this.drawLinkPreview(g2);
 
 		g2.setTransform(oldTransform);
-//		g2.dispose();
-//		super.paintChildren(g2);
 	}
 
 	public void resetUiAfterDocumentRestore() {

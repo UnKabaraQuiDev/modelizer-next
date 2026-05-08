@@ -69,7 +69,6 @@ interface PaletteController extends DiagramCanvasExt {
 		classModel.setBorderColor(palette.getClassBorderColor());
 	}
 
-	@Deprecated
 	default void applyPaletteToClass(
 			final StylePalette palette,
 			final ClassModel classModel,

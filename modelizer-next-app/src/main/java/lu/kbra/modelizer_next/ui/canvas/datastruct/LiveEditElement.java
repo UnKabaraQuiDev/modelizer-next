@@ -6,8 +6,8 @@ import javax.swing.JComponent;
 
 import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectedElement.SelectedType;
 
-public record LiveEditElement(LiveEditType type, String classId, String fieldId, String commentId, String linkId,
-		boolean forceAlternative) {
+public record LiveEditElement(LiveEditType type, String classId, String fieldId, String commentId, String linkId, boolean forceAlternative,
+		Object snapshotValue) {
 
 	public enum LiveEditType {
 
@@ -27,14 +27,12 @@ public record LiveEditElement(LiveEditType type, String classId, String fieldId,
 
 		CLASS_STYLE,
 		CLASS_FIELD_STYLE,
-		@Deprecated
-		CLASS_ALL_STYLE,
 		COMMENT_STYLE,
 		LINK_STYLE;
 
 		public SelectedType asSelectedType() {
 			return switch (this) {
-			case CLASS, CLASS_STYLE, CLASS_ALL_STYLE -> SelectedType.CLASS;
+			case CLASS, CLASS_STYLE -> SelectedType.CLASS;
 			case CLASS_FIELD, CLASS_FIELD_STYLE -> SelectedType.FIELD;
 			case COMMENT, COMMENT_STYLE -> SelectedType.COMMENT;
 			case LINK_LABEL, LINK_FROM_CARDINALITY, LINK_FROM_LABEL, LINK_TO_CARDINALITY, LINK_TO_LABEL, LINK_FROM_FIELD, LINK_TO_FIELD,
@@ -44,9 +42,9 @@ public record LiveEditElement(LiveEditType type, String classId, String fieldId,
 			};
 		}
 
-		public LiveEditType asStyle(boolean alternative) {
+		public LiveEditType asStyle() {
 			return switch (this) {
-			case CLASS -> alternative ? CLASS_ALL_STYLE : CLASS_STYLE;
+			case CLASS -> CLASS_STYLE;
 			case CLASS_FIELD -> CLASS_FIELD_STYLE;
 			case COMMENT -> COMMENT_STYLE;
 			case LINK_LABEL, LINK_FROM_CARDINALITY, LINK_FROM_LABEL, LINK_TO_CARDINALITY, LINK_TO_LABEL, LINK_FROM_FIELD, LINK_TO_FIELD ->
@@ -57,7 +55,7 @@ public record LiveEditElement(LiveEditType type, String classId, String fieldId,
 
 		public boolean isClass() {
 			return switch (this) {
-			case CLASS, CLASS_FIELD, CLASS_FIELD_STYLE, CLASS_STYLE, CLASS_ALL_STYLE -> true;
+			case CLASS, CLASS_FIELD, CLASS_FIELD_STYLE, CLASS_STYLE -> true;
 			default -> false;
 			};
 		}
@@ -68,14 +66,16 @@ public record LiveEditElement(LiveEditType type, String classId, String fieldId,
 
 		public boolean isLink() {
 			return switch (this) {
-			case LINK_LABEL, LINK_FROM_CARDINALITY, LINK_FROM_LABEL, LINK_TO_CARDINALITY, LINK_TO_LABEL, LINK_STYLE, LINK_FROM_FIELD, LINK_TO_FIELD -> true;
+			case LINK_LABEL, LINK_FROM_CARDINALITY, LINK_FROM_LABEL, LINK_TO_CARDINALITY, LINK_TO_LABEL, LINK_STYLE, LINK_FROM_FIELD,
+					LINK_TO_FIELD ->
+				true;
 			default -> false;
 			};
 		}
 
 		public boolean isStyle() {
 			return switch (this) {
-			case CLASS_STYLE, CLASS_ALL_STYLE, CLASS_FIELD_STYLE, COMMENT_STYLE, LINK_STYLE -> true;
+			case CLASS_STYLE, CLASS_FIELD_STYLE, COMMENT_STYLE, LINK_STYLE -> true;
 			default -> false;
 			};
 		}
@@ -105,7 +105,11 @@ public record LiveEditElement(LiveEditType type, String classId, String fieldId,
 	}
 
 	public LiveEditElement(LiveEditType type, String classId, String fieldId, String commentId, String linkId) {
-		this(type, classId, fieldId, commentId, linkId, false);
+		this(type, classId, fieldId, commentId, linkId, false, null);
+	}
+
+	public LiveEditElement(LiveEditType type, String classId, String fieldId, String commentId, String linkId, boolean forceAlternative) {
+		this(type, classId, fieldId, commentId, linkId, forceAlternative, null);
 	}
 
 	public static LiveEditElement forClass(final String classId) {
@@ -141,7 +145,7 @@ public record LiveEditElement(LiveEditType type, String classId, String fieldId,
 
 	public String getActualId() {
 		return switch (this.type) {
-		case CLASS, CLASS_STYLE, CLASS_ALL_STYLE -> this.classId;
+		case CLASS, CLASS_STYLE -> this.classId;
 		case CLASS_FIELD, CLASS_FIELD_STYLE -> this.fieldId;
 		case COMMENT, COMMENT_STYLE -> this.commentId;
 		case LINK_LABEL, LINK_FROM_CARDINALITY, LINK_FROM_LABEL, LINK_TO_CARDINALITY, LINK_TO_LABEL, LINK_STYLE -> this.linkId;
@@ -172,7 +176,7 @@ public record LiveEditElement(LiveEditType type, String classId, String fieldId,
 		case CLASS, CLASS_FIELD, LINK_LABEL, LINK_TO_LABEL, LINK_FROM_LABEL -> component.textField();
 		case COMMENT -> component.textArea();
 		case LINK_FROM_CARDINALITY, LINK_TO_CARDINALITY -> component.enumComboBox();
-		case CLASS_STYLE, CLASS_ALL_STYLE, CLASS_FIELD_STYLE, LINK_STYLE, COMMENT_STYLE -> component.paletteList();
+		case CLASS_STYLE, CLASS_FIELD_STYLE, LINK_STYLE, COMMENT_STYLE -> component.paletteList();
 		default -> throw new IllegalArgumentException("Unexpected value: " + this.type);
 		};
 	}

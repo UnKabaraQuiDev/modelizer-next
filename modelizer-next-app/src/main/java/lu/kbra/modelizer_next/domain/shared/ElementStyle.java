@@ -4,7 +4,7 @@ import java.awt.Color;
 
 import lu.kbra.modelizer_next.common.ColorUtils;
 
-public class ElementStyle {
+public class ElementStyle implements ModelElement {
 
 	public static ElementStyle forClass() {
 		final ElementStyle style = new ElementStyle();
@@ -56,6 +56,15 @@ public class ElementStyle {
 
 	public void setTextColor(final Color textColor) {
 		this.textColor = textColor;
+	}
+
+	@Override
+	public ElementStyle clone() {
+		try {
+			return (ElementStyle) super.clone();
+		} catch (CloneNotSupportedException e) {
+			return new ElementStyle(textColor, backgroundColor, borderColor);
+		}
 	}
 
 	@Override

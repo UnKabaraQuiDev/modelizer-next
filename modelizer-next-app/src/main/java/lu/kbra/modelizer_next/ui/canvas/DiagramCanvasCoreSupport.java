@@ -1,5 +1,6 @@
 package lu.kbra.modelizer_next.ui.canvas;
 
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Point;
@@ -313,14 +314,24 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 		return idMap.getOrDefault(oldId, oldId);
 	}
 
-	default Point2D.Double mouseWorldOrViewportCenter() {
+	default Point2D.Double getMouseWorldPos() {
 		final Point mousePoint = this.getCanvas().getMousePosition();
 
 		if (mousePoint == null) {
-			return this.getCanvas().viewportCenterWorld();
+			return this.getCanvas().getViewportCenterWorld();
 		}
 
 		return this.getCanvas().screenToWorld(mousePoint);
+	}
+
+	default Point2D.Double getMouseViewportPos() {
+		final Point mousePoint = this.getCanvas().getMousePosition();
+
+		if (mousePoint != null) {
+			return new Point2D.Double(mousePoint.x, mousePoint.y);
+		}
+
+		return this.getCanvas().getViewportCenter();
 	}
 
 	default SelectedElement normalizeConnectionSourceSelection(final SelectedElement selection) {
@@ -725,22 +736,27 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 				|| linkModel != null && this.getCanvas().exportSelectionFilter.contains(SelectedElement.forLink(linkModel.getId()));
 	}
 
-	default Point2D.Double viewportCenterWorld() {
-		final PanelState state = this.getCanvas().getPanelState();
-		return new Point2D.Double((this.getCanvas().getWidth() / 2.0 - state.getPanX()) / state.getZoom(),
-				(this.getCanvas().getHeight() / 2.0 - state.getPanY()) / state.getZoom());
+	default Point2D.Double getViewportCenterWorld() {
+		return worldToViewport(getViewportCenter());
 	}
 
-	default Point2D.Double worldToScreen(final Point2D world) {
-		final PanelState state = this.getCanvas().getPanelState();
+	default Point2D.Double getViewportCenter() {
+		return new Point2D.Double(this.getCanvas().getWidth() / 2.0, this.getCanvas().getHeight() / 2.0);
+	}
 
+	default Point2D.Double worldToViewport(final Point2D world) {
+		final PanelState state = this.getCanvas().getPanelState();
 		return new Point2D.Double(world.getX() * state.getZoom() + state.getPanX(), world.getY() * state.getZoom() + state.getPanY());
 	}
 
-	default Point2D.Double worldToScreenZoom(final Point2D world) {
+	default Point2D.Double worldToviewportZoom(final Point2D world) {
 		final PanelState state = this.getCanvas().getPanelState();
-
 		return new Point2D.Double(world.getX() * state.getZoom(), world.getY() * state.getZoom());
+	}
+
+	default Point2D.Double worldToViewportZoom(Dimension world) {
+		final PanelState state = this.getCanvas().getPanelState();
+		return new Point2D.Double(world.getWidth() * state.getZoom(), world.getHeight() * state.getZoom());
 	}
 
 	default List<String> wrapText(final String text, final Font font, final int maxWidth) {

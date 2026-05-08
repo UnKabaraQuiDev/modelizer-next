@@ -2,6 +2,7 @@ package lu.kbra.modelizer_next.ui.canvas.datastruct;
 
 import java.util.Objects;
 
+import lu.kbra.modelizer_next.ui.canvas.StyleScope;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.LiveEditElement.LiveEditType;
 
 public record SelectedElement(SelectedType type, String classId, String fieldId, String commentId, String linkId) {
@@ -21,6 +22,16 @@ public record SelectedElement(SelectedType type, String classId, String fieldId,
 			case COMMENT -> LiveEditType.COMMENT;
 			case LINK -> LiveEditType.LINK_LABEL;
 			default -> throw new IllegalArgumentException("Unsupported option: " + this);
+			};
+		}
+
+		public StyleScope asStyleScope() {
+			return switch(this) {
+			case CLASS -> StyleScope.CLASS;
+			case FIELD -> StyleScope.FIELD;
+			case COMMENT -> StyleScope.COMMENT;
+			case LINK -> StyleScope.LINK;
+			default -> throw new IllegalArgumentException("Unexpected value: " + this);
 			};
 		}
 
@@ -62,13 +73,13 @@ public record SelectedElement(SelectedType type, String classId, String fieldId,
 	}
 
 	public LiveEditElement asLiveEditElement(boolean alternative, boolean style) {
-		return new LiveEditElement(this.type.asLiveEditType()
-				.asStyle(style), this.classId, this.fieldId, this.commentId, this.linkId, alternative);
+		return new LiveEditElement(style ? this.type.asLiveEditType().asStyle()
+				: this.type.asLiveEditType(), this.classId, this.fieldId, this.commentId, this.linkId, alternative);
 	}
 
-	public LiveEditElement asStyleEditElement(boolean alternative) {
+	public LiveEditElement asStyleEditElement(boolean alternative, Object currentStyle) {
 		return new LiveEditElement(this.type.asLiveEditType()
-				.asStyle(alternative), this.classId, this.fieldId, this.commentId, this.linkId, false);
+				.asStyle(), this.classId, this.fieldId, this.commentId, this.linkId, alternative, currentStyle);
 	}
 
 	@Override

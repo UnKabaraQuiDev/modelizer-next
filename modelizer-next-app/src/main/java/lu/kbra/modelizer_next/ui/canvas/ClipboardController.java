@@ -156,7 +156,7 @@ interface ClipboardController extends DiagramCanvasExt {
 		final List<SelectedElement> snapshot = new ArrayList<>(this.getCanvas().selectedElements);
 
 		final Rectangle2D.Double selectionBounds = this.getCanvas().computeSelectionBounds(snapshot);
-		final Point2D.Double duplicateTarget = this.getCanvas().mouseWorldOrViewportCenter();
+		final Point2D.Double duplicateTarget = this.getCanvas().getMouseWorldPos();
 
 		final double deltaX = selectionBounds == null ? DiagramCanvas.PASTE_OFFSET : duplicateTarget.getX() - selectionBounds.getCenterX();
 		final double deltaY = selectionBounds == null ? DiagramCanvas.PASTE_OFFSET : duplicateTarget.getY() - selectionBounds.getCenterY();
@@ -371,7 +371,7 @@ interface ClipboardController extends DiagramCanvasExt {
 		}
 
 		final Rectangle2D.Double clipboardBounds = this.getCanvas().computeClipboardBounds(clipboard);
-		final Point2D.Double pasteTarget = this.getCanvas().mouseWorldOrViewportCenter();
+		final Point2D.Double pasteTarget = this.getCanvas().getMouseWorldPos();
 
 		final double deltaX = clipboardBounds == null ? DiagramCanvas.PASTE_OFFSET : pasteTarget.getX() - clipboardBounds.getCenterX();
 

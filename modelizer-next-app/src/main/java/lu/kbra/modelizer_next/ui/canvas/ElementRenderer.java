@@ -169,7 +169,7 @@ public interface ElementRenderer extends DiagramCanvasExt {
 
 			g2.setFont(DiagramCanvas.BODY_FONT);
 			double rowY = bounds.getY() + DiagramCanvas.CLASS_HEADER_HEIGHT;
-			final List<FieldModel> visibleFields = this.getCanvas().getVisibleFields(classModel);
+			final List<FieldModel> visibleFields = classModel.getFields(getPanelType());
 
 			final Pair<Triplet<Double, Double, Double>, Pair<Boolean, Boolean>> columnProps = this.resolveClassFieldProps(visibleFields);
 
@@ -200,6 +200,9 @@ public interface ElementRenderer extends DiagramCanvasExt {
 		}
 	}
 
+	/**
+	 * @return [ name column width, flags column width, type column width ]
+	 */
 	default Triplet<Double, Double, Double> resolveClassColumWidths(final List<FieldModel> visibleFields) {
 		double maxStringWidth = 0;
 		final double maxFlagWidth = DiagramCanvas.TEXT_PADDING * 2
