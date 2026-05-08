@@ -6,7 +6,7 @@ import java.util.Objects;
 import lu.kbra.modelizer_next.domain.ClassModel;
 import lu.kbra.modelizer_next.domain.CommentModel;
 import lu.kbra.modelizer_next.domain.LinkModel;
-import lu.kbra.modelizer_next.ui.canvas.data.StylePreviewType;
+import lu.kbra.modelizer_next.ui.canvas.data.StyleScope;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectedElement;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectionInfo;
 
@@ -38,17 +38,17 @@ interface SelectionController extends DiagramCanvasExt {
 		return new SelectionInfo(this.getPanelType(), this.getCanvas().buildSelectionPath());
 	}
 
-	default StylePreviewType getStylePreviewType() {
+	default StyleScope getStyleScope() {
 		if (this.getCanvas().selectedElement == null) {
-			return StylePreviewType.NONE;
+			return StyleScope.NONE;
 		}
 
 		return switch (this.getCanvas().selectedElement.type()) {
-		case CLASS -> StylePreviewType.CLASS;
-		case FIELD -> StylePreviewType.FIELD;
-		case COMMENT -> StylePreviewType.COMMENT;
-		case LINK -> StylePreviewType.LINK;
-		default -> StylePreviewType.NONE;
+		case CLASS -> StyleScope.CLASS;
+		case FIELD -> StyleScope.FIELD;
+		case COMMENT -> StyleScope.COMMENT;
+		case LINK -> StyleScope.LINK;
+		default -> StyleScope.NONE;
 		};
 	}
 

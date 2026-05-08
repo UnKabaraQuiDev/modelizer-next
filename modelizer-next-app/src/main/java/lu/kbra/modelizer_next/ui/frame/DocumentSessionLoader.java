@@ -7,13 +7,13 @@ import java.util.Optional;
 
 import javax.swing.JOptionPane;
 
-import lu.kbra.modelizer_next.App;
+import lu.kbra.modelizer_next.common.App;
 import lu.kbra.modelizer_next.common.VersionComparator;
 import lu.kbra.modelizer_next.document.ModelDocument;
+import lu.kbra.modelizer_next.document.SwingDocumentLoadHandler;
 import lu.kbra.modelizer_next.json.LegacyModelizerImporter;
 import lu.kbra.modelizer_next.json.ModernModelizerImporter;
 import lu.kbra.modelizer_next.json.OnlineModelizerImporter;
-import lu.kbra.modelizer_next.ui.SwingDocumentLoadHandler;
 import lu.kbra.modelizer_next.ui.impl.DocumentLoadHandler;
 import lu.kbra.pclib.PCUtils;
 

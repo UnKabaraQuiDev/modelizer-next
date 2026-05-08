@@ -1,5 +1,6 @@
 package lu.kbra.modelizer_next.domain;
 
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -39,6 +40,18 @@ public class FieldModel implements NamesOwner, IdOwner, StyleOwner {
 		this.unique = false;
 		this.notNull = false;
 		this.type = null;
+	}
+
+	@Deprecated
+	@Override
+	public Color getBorderColor() {
+		return StyleOwner.super.getBorderColor();
+	}
+
+	@Deprecated
+	@Override
+	public void setBorderColor(Color c) {
+		StyleOwner.super.setBorderColor(c);
 	}
 
 	@Override

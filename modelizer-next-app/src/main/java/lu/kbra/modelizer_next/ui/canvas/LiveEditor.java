@@ -8,6 +8,7 @@ import java.awt.event.FocusEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.geom.Point2D;
+import java.util.List;
 import java.util.Objects;
 
 import javax.swing.AbstractAction;
@@ -36,6 +37,7 @@ import lu.kbra.modelizer_next.domain.shared.ElementStyle;
 import lu.kbra.modelizer_next.layout.LayoutObjectType;
 import lu.kbra.modelizer_next.layout.NodeLayout;
 import lu.kbra.modelizer_next.layout.PanelType;
+import lu.kbra.modelizer_next.style.StylePalette;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.LinkGeometry;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.LiveEditComponents;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.LiveEditElement;
@@ -47,25 +49,56 @@ import lu.kbra.pclib.PCUtils;
 
 public interface LiveEditor extends DiagramCanvasExt {
 
-	default void editStyle() {
+	default void editSelectionStyle(boolean alternative) {
 		if (this.getCanvas().selectedElement == null || this.getCanvas().selectedElement.type() == SelectedType.NONE) {
 			return;
 		}
 
+		System.err.println(getCanvas().selectedElement);
+		invokeStyleEditingElement(getCanvas().selectedElement.asStyleEditElement(alternative));
 	}
 
-	@SuppressWarnings("incomplete-switch")
-	default void editSelected() {
+	default void renameSelection(final boolean alternative) {
 		if (this.getCanvas().selectedElement == null || this.getCanvas().selectedElement.type() == SelectedType.NONE) {
 			return;
 		}
 
 		switch (this.getCanvas().selectedElement.type()) {
-		case CLASS -> this.getCanvas().editClass(this.getCanvas().selectedElement.classId());
-		case FIELD -> this.getCanvas().editField(this.getCanvas().selectedElement.classId(), this.getCanvas().selectedElement.fieldId());
-		case COMMENT -> this.getCanvas().editComment(this.getCanvas().selectedElement.commentId());
-		case LINK -> this.getCanvas().editLink(this.getCanvas().selectedElement.linkId());
+		case CLASS, FIELD, COMMENT, LINK -> {
+			this.getCanvas().invokeRenamingElement(this.getCanvas().selectedElement.asLiveEditElement(alternative));
 		}
+		default -> throw new IllegalArgumentException("Unexpected type: " + this.getCanvas().selectedElement);
+		}
+	}
+
+	default void invokeStyleEditingElement(final LiveEditElement element) {
+		if (isLiveEditingElement()) {
+			cancelLiveEditElement();
+		}
+
+		final DiagramCanvas canvas = this.getCanvas();
+
+		canvas.liveEditElement = element;
+		canvas.select(canvas.selectedElement);
+
+		final JList<StylePalette> list = canvas.liveEditComponents.paletteList();
+		final List<StylePalette> palettes = getFrame().getPalettes();
+
+		SwingUtilities.invokeLater(() -> {
+			list.setListData(palettes.toArray(StylePalette[]::new));
+			list.setSelectedValue(canvas.defaultPalette, true);
+//			list.setSelectedIndex(IntStream.range(0, palettes.size())
+//					.filter(i -> palettes.get(i).getName().equals(App.CONFIG.getSelectedPaletteName()))
+//					.findFirst()
+//					.orElse(0));
+			list.setFont(
+					DiagramCanvas.BODY_FONT.deriveFont(DiagramCanvas.BODY_FONT.getSize() * (float) getCanvas().getPanelState().getZoom()));
+			list.setBounds(0, 0, 100, 100);
+
+			list.setVisible(true);
+			list.requestFocus();
+			canvas.repaint();
+		});
 	}
 
 	default void invokeRenamingElement(final LiveEditElement element) {
@@ -285,16 +318,48 @@ public interface LiveEditor extends DiagramCanvasExt {
 			return;
 		}
 
-		final LiveEditElement renamingElement = this.getCanvas().liveEditElement;
-		final LiveEditComponents renamingComponents = this.getCanvas().liveEditComponents;
+		final LiveEditElement liveEditElement = this.getCanvas().liveEditElement;
+		final LiveEditComponents liveEditComponents = this.getCanvas().liveEditComponents;
 		boolean next = nextDir != 0;
 
-		if (renamingElement.type().isClass()) {
+		System.err.println(liveEditElement);
 
-			final ClassModel classModel = this.getCanvas().findClassById(renamingElement.classId());
-			switch (renamingElement.type()) {
+		if (liveEditElement.type().isStyle()) {
+
+			final StylePalette palette = liveEditComponents.paletteList().getSelectedValue();
+
+			switch (liveEditElement.type()) {
+			case CLASS_ALL_STYLE -> {
+				final ClassModel classModel = this.getCanvas().findClassById(liveEditElement.classId());
+				getCanvas().applyPaletteToClass(palette, classModel, true, false);
+			}
+			case CLASS_STYLE -> {
+				final ClassModel classModel = this.getCanvas().findClassById(liveEditElement.classId());
+				getCanvas().applyPaletteToClass(palette, classModel);
+			}
+			case CLASS_FIELD_STYLE -> {
+				final FieldModel fieldModel = this.getCanvas().findFieldById(liveEditElement.classId(), liveEditElement.fieldId());
+				getCanvas().applyPaletteToField(palette, fieldModel);
+			}
+			case COMMENT_STYLE -> {
+				final CommentModel commentModel = this.getCanvas().findCommentById(liveEditElement.commentId());
+				getCanvas().applyPaletteToComment(palette, commentModel);
+			}
+			case LINK_STYLE -> {
+				final LinkModel linkModel = this.getCanvas().findLinkById(liveEditElement.linkId());
+				getCanvas().applyPaletteToLink(palette, linkModel);
+			}
+			default -> new IllegalArgumentException("Unexpected type: " + liveEditElement);
+			}
+
+			next = false;
+
+		} else if (liveEditElement.type().isClass()) {
+
+			final ClassModel classModel = this.getCanvas().findClassById(liveEditElement.classId());
+			switch (liveEditElement.type()) {
 			case CLASS -> {
-				classModel.setName(this.getPanelType(), renamingElement.forceAlternative(), renamingComponents.textField().getText());
+				classModel.setName(this.getPanelType(), liveEditElement.forceAlternative(), liveEditComponents.textField().getText());
 
 				if (next) {
 					if (classModel.getFields().size() > 0) {
@@ -308,8 +373,8 @@ public interface LiveEditor extends DiagramCanvasExt {
 				}
 			}
 			case CLASS_FIELD -> {
-				final FieldModel fieldModel = this.getCanvas().findFieldById(renamingElement.classId(), renamingElement.fieldId());
-				fieldModel.setName(this.getPanelType(), renamingElement.forceAlternative(), renamingComponents.textField().getText());
+				final FieldModel fieldModel = this.getCanvas().findFieldById(liveEditElement.classId(), liveEditElement.fieldId());
+				fieldModel.setName(this.getPanelType(), liveEditElement.forceAlternative(), liveEditComponents.textField().getText());
 
 				if (next) {
 					final int idx = classModel.getFieldIndex(fieldModel.getId(), this.getPanelType());
@@ -323,65 +388,65 @@ public interface LiveEditor extends DiagramCanvasExt {
 					}
 				}
 			}
-			default -> new IllegalArgumentException("Unexpected type: " + renamingElement);
+			default -> new IllegalArgumentException("Unexpected type: " + liveEditElement);
 			}
 
-		} else if (renamingElement.type().isLink() && this.getPanelType() == PanelType.CONCEPTUAL) {
+		} else if (liveEditElement.type().isLink() && this.getPanelType() == PanelType.CONCEPTUAL) {
 
-			final LinkModel linkModel = this.getCanvas().findLinkById(renamingElement.linkId());
-			switch (renamingElement.type()) {
+			final LinkModel linkModel = this.getCanvas().findLinkById(liveEditElement.linkId());
+			switch (liveEditElement.type()) {
 			case LINK_LABEL -> {
-				linkModel.setLabel(renamingComponents.textField().getText());
+				linkModel.setLabel(liveEditComponents.textField().getText());
 			}
 			case LINK_TO_LABEL -> {
-				linkModel.setLabelTo(renamingComponents.textField().getText());
+				linkModel.setLabelTo(liveEditComponents.textField().getText());
 			}
 			case LINK_FROM_LABEL -> {
-				linkModel.setLabelFrom(renamingComponents.textField().getText());
+				linkModel.setLabelFrom(liveEditComponents.textField().getText());
 			}
 			case LINK_TO_CARDINALITY -> {
-				linkModel.setCardinalityTo((Cardinality) renamingComponents.comboBox().getSelectedItem());
+				linkModel.setCardinalityTo((Cardinality) liveEditComponents.enumComboBox().getSelectedItem());
 			}
 			case LINK_FROM_CARDINALITY -> {
-				linkModel.setCardinalityFrom((Cardinality) renamingComponents.comboBox().getSelectedItem());
+				linkModel.setCardinalityFrom((Cardinality) liveEditComponents.enumComboBox().getSelectedItem());
 			}
-			default -> new IllegalArgumentException("Unexpected type: " + renamingElement);
+			default -> new IllegalArgumentException("Unexpected type: " + liveEditElement);
 			}
 
 			if (next) {
 				this.getCanvas()
 						.invokeRenamingElement(LiveEditElement.forLink(linkModel.getId(),
-								nextDir > 0 ? renamingElement.type().next() : renamingElement.type().previous()));
+								nextDir > 0 ? liveEditElement.type().next() : liveEditElement.type().previous()));
 			}
 
-		} else if (renamingElement.type().isLink() && this.getPanelType().isTechnical()) {
+		} else if (liveEditElement.type().isLink() && this.getPanelType().isTechnical()) {
 
-			final LinkModel linkModel = this.getCanvas().findLinkById(renamingElement.linkId());
-			switch (renamingElement.type()) {
+			final LinkModel linkModel = this.getCanvas().findLinkById(liveEditElement.linkId());
+			switch (liveEditElement.type()) {
 			case LINK_LABEL -> {
-				linkModel.setLabel(renamingComponents.textField().getText());
+				linkModel.setLabel(liveEditComponents.textField().getText());
 			}
-			default -> new IllegalArgumentException("Unexpected type: " + renamingElement);
+			default -> new IllegalArgumentException("Unexpected type: " + liveEditElement);
 			}
 
 			next = false;
-		} else if (renamingElement.type().isComment()) {
+		} else if (liveEditElement.type().isComment()) {
 
-			final CommentModel commentModel = this.getCanvas().findCommentById(renamingElement.commentId());
-			commentModel.setText(renamingComponents.textArea().getText());
+			final CommentModel commentModel = this.getCanvas().findCommentById(liveEditElement.commentId());
+			commentModel.setText(liveEditComponents.textArea().getText());
 
 			next = false;
-		} else if (renamingElement.type() == LiveEditType.NONE) {
+		} else if (liveEditElement.type() == LiveEditType.NONE) {
 			return;
 		} else {
-			throw new IllegalArgumentException("Unknown type: " + renamingElement);
+			throw new IllegalArgumentException("Unknown type: " + liveEditElement);
 		}
 
 		this.getCanvas().notifyDocumentChanged();
 		this.getCanvas().notifySelectionChanged();
 
 		if (!next) {
-			renamingComponents.setVisible(false);
+			liveEditComponents.setVisible(false);
 			this.getCanvas().liveEditElement = null;
 			SwingUtilities.invokeLater(this.getCanvas()::requestFocusInWindow);
 			this.getCanvas().repaint();
@@ -395,8 +460,8 @@ public interface LiveEditor extends DiagramCanvasExt {
 		textArea.setLineWrap(true);
 		textArea.setWrapStyleWord(true);
 
-		final JComboBox<Enum<?>> comboBox = new JComboBox<>(new DefaultComboBoxModel<>());
-		comboBox.setRenderer(new DefaultListCellRenderer() {
+		final JComboBox<Enum<?>> enumComboBox = new JComboBox<>(new DefaultComboBoxModel<>());
+		enumComboBox.setRenderer(new DefaultListCellRenderer() {
 
 			@Override
 			public Component getListCellRendererComponent(
@@ -421,33 +486,10 @@ public interface LiveEditor extends DiagramCanvasExt {
 
 		});
 
-		final JList<Object> list = new JList<>(new DefaultListModel<>());
-		list.setCellRenderer(new DefaultListCellRenderer() {
+		final JList<StylePalette> stylePaletteList = new JList<>(new DefaultListModel<>());
+		stylePaletteList.setCellRenderer(new StylePaletteRenderer());
 
-			@Override
-			public Component getListCellRendererComponent(
-					final JList<?> list,
-					final Object value,
-					final int index,
-					final boolean isSelected,
-					final boolean cellHasFocus) {
-
-				super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-
-				if (value instanceof final DisplayValueOwner dvo) {
-					this.setText(dvo.getDisplayValue());
-				} else if (value instanceof final Enum<?> e) {
-					this.setText(PCUtils.capitalize(e.name().toLowerCase().replace('_', ' ')));
-				} else {
-					this.setText(value != null ? value.toString() : "");
-				}
-
-				return this;
-			}
-
-		});
-
-		for (final JComponent renamingField : new JComponent[] { textField, textArea, comboBox, list }) {
+		for (final JComponent renamingField : new JComponent[] { textField, textArea, enumComboBox, stylePaletteList }) {
 			renamingField.setVisible(false);
 			renamingField.setFocusTraversalKeysEnabled(false);
 			renamingField.addFocusListener(new FocusAdapter() {
@@ -524,7 +566,7 @@ public interface LiveEditor extends DiagramCanvasExt {
 			});
 		}
 
-		return new LiveEditComponents(textField, textArea, comboBox, list);
+		return new LiveEditComponents(textField, textArea, enumComboBox, stylePaletteList);
 	}
 
 }

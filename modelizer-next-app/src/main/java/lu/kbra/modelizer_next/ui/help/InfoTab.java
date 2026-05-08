@@ -17,7 +17,7 @@ import javax.swing.JScrollPane;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
-import lu.kbra.modelizer_next.App;
+import lu.kbra.modelizer_next.common.App;
 
 public class InfoTab extends JPanel {
 

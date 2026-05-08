@@ -21,6 +21,21 @@ interface PaletteController extends DiagramCanvasExt {
 		classModel.setBorderColor(this.getCanvas().defaultPalette.getClassBorderColor());
 	}
 
+	@Deprecated
+	default void applyDefaultPaletteToClass(final ClassModel classModel, final boolean deep, final boolean visibleOnly) {
+		if (this.getCanvas().defaultPalette == null || classModel == null) {
+			return;
+		}
+		classModel.setTextColor(this.getCanvas().defaultPalette.getClassTextColor());
+		classModel.setBackgroundColor(this.getCanvas().defaultPalette.getClassBackgroundColor());
+		classModel.setBorderColor(this.getCanvas().defaultPalette.getClassBorderColor());
+		if (deep) {
+			for (final FieldModel fm : visibleOnly ? classModel.getFields(this.getPanelType()) : classModel.getFields()) {
+				this.applyDefaultPaletteToField(fm);
+			}
+		}
+	}
+
 	default void applyDefaultPaletteToComment(final CommentModel commentModel) {
 		if (this.getCanvas().defaultPalette == null || commentModel == null) {
 			return;
@@ -45,7 +60,63 @@ interface PaletteController extends DiagramCanvasExt {
 		linkModel.setLineColor(this.getCanvas().defaultPalette.getLinkColor());
 	}
 
-	default void applyPalette(final StylePalette palette) {
+	default void applyPaletteToClass(final StylePalette palette, final ClassModel classModel) {
+		if (palette == null || classModel == null) {
+			return;
+		}
+		classModel.setTextColor(palette.getClassTextColor());
+		classModel.setBackgroundColor(palette.getClassBackgroundColor());
+		classModel.setBorderColor(palette.getClassBorderColor());
+	}
+
+	@Deprecated
+	default void applyPaletteToClass(
+			final StylePalette palette,
+			final ClassModel classModel,
+			final boolean deep,
+			final boolean visibleOnly) {
+		if (palette == null || classModel == null) {
+			return;
+		}
+		classModel.setTextColor(palette.getClassTextColor());
+		classModel.setBackgroundColor(palette.getClassBackgroundColor());
+		classModel.setBorderColor(palette.getClassBorderColor());
+		if (deep) {
+			for (final FieldModel fm : visibleOnly ? classModel.getFields(this.getPanelType()) : classModel.getFields()) {
+				this.applyPaletteToField(palette, fm);
+			}
+		}
+	}
+
+	default void applyPaletteToComment(final StylePalette palette, final CommentModel commentModel) {
+		if (palette == null || commentModel == null) {
+			return;
+		}
+		commentModel.setTextColor(palette.getCommentTextColor());
+		commentModel.setBackgroundColor(palette.getCommentBackgroundColor());
+		commentModel.setBorderColor(palette.getCommentBorderColor());
+	}
+
+	default void applyPaletteToField(final StylePalette palette, final FieldModel fieldModel) {
+		if (palette == null || fieldModel == null) {
+			return;
+		}
+		fieldModel.setTextColor(palette.getFieldTextColor());
+		fieldModel.setBackgroundColor(palette.getFieldBackgroundColor());
+	}
+
+	default void applyPaletteToLink(final StylePalette palette, final LinkModel linkModel) {
+		if (palette == null || linkModel == null) {
+			return;
+		}
+		linkModel.setLineColor(palette.getLinkColor());
+	}
+
+	default void applyDefaultPaletteToSelection(final StylePalette palette) {
+		this.applyPaletteToSelection(this.getCanvas().defaultPalette);
+	}
+
+	default void applyPaletteToSelection(final StylePalette palette) {
 		if (palette == null || this.getCanvas().selectedElements.isEmpty()) {
 			return;
 		}
@@ -54,32 +125,19 @@ interface PaletteController extends DiagramCanvasExt {
 			switch (element.type()) {
 			case CLASS -> {
 				final ClassModel classModel = this.getCanvas().findClassById(element.classId());
-				if (classModel != null) {
-					classModel.setTextColor(palette.getClassTextColor());
-					classModel.setBackgroundColor(palette.getClassBackgroundColor());
-					classModel.setBorderColor(palette.getClassBorderColor());
-				}
+				this.applyPaletteToClass(palette, classModel);
 			}
 			case FIELD -> {
 				final FieldModel fieldModel = this.getCanvas().findFieldById(element.classId(), element.fieldId());
-				if (fieldModel != null) {
-					fieldModel.setTextColor(palette.getFieldTextColor());
-					fieldModel.setBackgroundColor(palette.getFieldBackgroundColor());
-				}
+				this.applyPaletteToField(palette, fieldModel);
 			}
 			case COMMENT -> {
 				final CommentModel commentModel = this.getCanvas().findCommentById(element.commentId());
-				if (commentModel != null) {
-					commentModel.setTextColor(palette.getCommentTextColor());
-					commentModel.setBackgroundColor(palette.getCommentBackgroundColor());
-					commentModel.setBorderColor(palette.getCommentBorderColor());
-				}
+				this.applyPaletteToComment(palette, commentModel);
 			}
 			case LINK -> {
 				final LinkModel linkModel = this.getCanvas().findLinkById(element.linkId());
-				if (linkModel != null) {
-					linkModel.setLineColor(palette.getLinkColor());
-				}
+				this.applyPaletteToLink(palette, linkModel);
 			}
 			default -> {
 			}

@@ -8,6 +8,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.KeyStroke;
 
+import lu.kbra.modelizer_next.common.App;
 import lu.kbra.modelizer_next.ui.ThemeMode;
 
 final class MainFrameMenuBar extends JMenuBar {
@@ -50,7 +51,7 @@ final class MainFrameMenuBar extends JMenuBar {
 
 	private JRadioButtonMenuItem createThemeItem(final MainFrame frame, final String text, final ThemeMode mode, final ButtonGroup group) {
 		final JRadioButtonMenuItem item = new JRadioButtonMenuItem(text);
-		item.setSelected(frame.appConfig.getThemeMode() == mode);
+		item.setSelected(App.CONFIG.getThemeMode() == mode);
 		item.addActionListener(event -> frame.applyThemeAndReopen(mode));
 		group.add(item);
 		return item;

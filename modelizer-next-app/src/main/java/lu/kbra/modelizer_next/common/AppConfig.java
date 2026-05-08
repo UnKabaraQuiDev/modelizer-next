@@ -1,4 +1,4 @@
-package lu.kbra.modelizer_next;
+package lu.kbra.modelizer_next.common;
 
 import java.util.ArrayList;
 import java.util.List;

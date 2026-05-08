@@ -14,11 +14,11 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JRadioButtonMenuItem;
 
-import lu.kbra.modelizer_next.App;
+import lu.kbra.modelizer_next.common.App;
 import lu.kbra.modelizer_next.style.StylePalette;
 import lu.kbra.modelizer_next.style.StylePaletteService;
 import lu.kbra.modelizer_next.ui.canvas.DiagramCanvas;
-import lu.kbra.modelizer_next.ui.canvas.data.StylePreviewType;
+import lu.kbra.modelizer_next.ui.canvas.StyleScope;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.StatusStyleAppearance;
 import lu.kbra.modelizer_next.ui.dialogs.StylePaletteEditorDialog;
 
@@ -31,10 +31,10 @@ public interface MainFrameStyleController {
 
 		for (final StylePalette palette : frame.palettes) {
 			final JRadioButtonMenuItem item = new JRadioButtonMenuItem(palette.getName());
-			item.setSelected(palette.getName().equals(frame.appConfig.getDefaultPaletteName()));
+			item.setSelected(palette.getName().equals(App.CONFIG.getDefaultPaletteName()));
 			item.addActionListener(event -> {
-				frame.appConfig.setDefaultPaletteName(palette.getName());
-				App.saveConfig(frame.appConfig);
+				App.CONFIG.setDefaultPaletteName(palette.getName());
+				App.saveConfig();
 				this.setDefaultPaletteToCanvases();
 			});
 			defaultGroup.add(item);
@@ -48,14 +48,14 @@ public interface MainFrameStyleController {
 		final JMenu pinMenu = new JMenu("Pin to status bar");
 		for (final StylePalette palette : frame.palettes) {
 			final JCheckBoxMenuItem item = new JCheckBoxMenuItem(palette.getName(),
-					frame.appConfig.getPinnedPaletteNames().contains(palette.getName()));
+					App.CONFIG.getPinnedPaletteNames().contains(palette.getName()));
 			item.addActionListener(event -> this.setPalettePinned(palette.getName(), item.isSelected()));
 			pinMenu.add(item);
 		}
 		return pinMenu;
 	}
 
-	default JButton createPinnedStyleButton(final StylePalette palette, final StylePreviewType previewType) {
+	default JButton createPinnedStyleButton(final StylePalette palette, final StyleScope previewType) {
 		final MainFrame frame = (MainFrame) this;
 		final JButton button = new JButton(palette.getName());
 		button.setFocusable(false);
@@ -76,10 +76,10 @@ public interface MainFrameStyleController {
 				return;
 			}
 
-			canvas.applyPalette(palette);
+			canvas.applyPaletteToSelection(palette);
 			canvas.requestFocusInWindow();
-			frame.appConfig.setSelectedPaletteName(palette.getName());
-			App.saveConfig(frame.appConfig);
+			App.CONFIG.setSelectedPaletteName(palette.getName());
+			App.saveConfig();
 		});
 		final DragListener dragListener = (DragListener) frame.pinnedStylesPanel.getClientProperty("dragListener");
 		button.addMouseListener(dragListener);
@@ -165,7 +165,7 @@ public interface MainFrameStyleController {
 		final LinkedHashSet<String> seen = new LinkedHashSet<>();
 		boolean changed = false;
 
-		for (final String paletteName : frame.appConfig.getPinnedPaletteNames()) {
+		for (final String paletteName : App.CONFIG.getPinnedPaletteNames()) {
 			final String resolvedName = oldName.equals(paletteName) ? newName : paletteName;
 			changed |= !resolvedName.equals(paletteName);
 			if (seen.add(resolvedName)) {
@@ -177,11 +177,11 @@ public interface MainFrameStyleController {
 			return;
 		}
 
-		frame.appConfig.setPinnedPaletteNames(updatedNames);
-		App.saveConfig(frame.appConfig);
+		App.CONFIG.setPinnedPaletteNames(updatedNames);
+		App.saveConfig();
 	}
 
-	default StatusStyleAppearance resolvePinnedStyleAppearance(final StylePalette palette, final StylePreviewType previewType) {
+	default StatusStyleAppearance resolvePinnedStyleAppearance(final StylePalette palette, final StyleScope previewType) {
 		if (palette == null) {
 			return new StatusStyleAppearance(Color.BLACK, Color.WHITE, Color.GRAY);
 		}
@@ -199,8 +199,7 @@ public interface MainFrameStyleController {
 	}
 
 	default void sanitizePinnedPaletteNames() {
-		final MainFrame frame = (MainFrame) this;
-		final List<String> currentNames = new ArrayList<>(frame.appConfig.getPinnedPaletteNames());
+		final List<String> currentNames = new ArrayList<>(App.CONFIG.getPinnedPaletteNames());
 		final List<String> sanitizedNames = new ArrayList<>();
 		final LinkedHashSet<String> seen = new LinkedHashSet<>();
 
@@ -214,13 +213,13 @@ public interface MainFrameStyleController {
 			return;
 		}
 
-		frame.appConfig.setPinnedPaletteNames(sanitizedNames);
-		App.saveConfig(frame.appConfig);
+		App.CONFIG.setPinnedPaletteNames(sanitizedNames);
+		App.saveConfig();
 	}
 
 	default void setDefaultPaletteToCanvases() {
 		final MainFrame frame = (MainFrame) this;
-		final StylePalette palette = this.findPaletteByName(frame.appConfig.getDefaultPaletteName());
+		final StylePalette palette = this.findPaletteByName(App.CONFIG.getDefaultPaletteName());
 		frame.conceptualCanvas.setDefaultPalette(palette);
 		frame.logicalCanvas.setDefaultPalette(palette);
 		frame.physicalCanvas.setDefaultPalette(palette);
@@ -228,15 +227,15 @@ public interface MainFrameStyleController {
 
 	default void setPalettePinned(final String paletteName, final boolean pinned) {
 		final MainFrame frame = (MainFrame) this;
-		final LinkedHashSet<String> names = new LinkedHashSet<>(frame.appConfig.getPinnedPaletteNames());
+		final LinkedHashSet<String> names = new LinkedHashSet<>(App.CONFIG.getPinnedPaletteNames());
 		if (pinned) {
 			names.add(paletteName);
 		} else {
 			names.remove(paletteName);
 		}
 
-		frame.appConfig.setPinnedPaletteNames(new ArrayList<>(names));
-		App.saveConfig(frame.appConfig);
+		App.CONFIG.setPinnedPaletteNames(new ArrayList<>(names));
+		App.saveConfig();
 		frame.refreshPinnedStylesPanel();
 	}
 

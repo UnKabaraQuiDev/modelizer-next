@@ -3,7 +3,7 @@ package lu.kbra.modelizer_next.document;
 import java.time.Instant;
 import java.util.UUID;
 
-import lu.kbra.modelizer_next.App;
+import lu.kbra.modelizer_next.common.App;
 
 public class DocumentMeta {
 

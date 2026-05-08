@@ -20,7 +20,8 @@
 		<jpackage.macos.name>Modelizer Next (Standalone)</jpackage.macos.name>
 		<common.scope>provided</common.scope>
 		<portable>false</portable>
-		  <update.path>${user.home}/.modelizer-next/updates/${project.build.finalName}.jar</update.path>
+		<update.path>
+			${user.home}/.modelizer-next/updates/${project.build.finalName}.jar</update.path>
 	</properties>
 
 	<dependencies>
@@ -52,6 +53,12 @@
 		<dependency>
 			<groupId>org.apache.xmlgraphics</groupId>
 			<artifactId>batik-dom</artifactId>
+			<exclusions>
+				<exclusion>
+					<groupId>xml-apis</groupId>
+					<artifactId>xml-apis</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>lu.kbra</groupId>

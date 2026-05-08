@@ -1,31 +1,9 @@
 package lu.kbra.modelizer_next.ui.canvas;
 
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.event.ActionEvent;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
-import java.awt.event.InputEvent;
-import java.awt.event.KeyEvent;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-
-import javax.swing.AbstractAction;
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.DefaultListCellRenderer;
-import javax.swing.JComboBox;
-import javax.swing.JComponent;
-import javax.swing.JList;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
-import javax.swing.KeyStroke;
-import javax.swing.SwingUtilities;
-import javax.swing.border.CompoundBorder;
-import javax.swing.border.EmptyBorder;
-import javax.swing.border.LineBorder;
-import javax.swing.text.JTextComponent;
 
 import lu.kbra.modelizer_next.common.Size2D;
 import lu.kbra.modelizer_next.domain.ClassModel;
@@ -37,26 +15,32 @@ import lu.kbra.modelizer_next.domain.LinkModel;
 import lu.kbra.modelizer_next.domain.data.BoundTargetType;
 import lu.kbra.modelizer_next.domain.data.Cardinality;
 import lu.kbra.modelizer_next.domain.data.CommentKind;
-import lu.kbra.modelizer_next.domain.data.DisplayValueOwner;
-import lu.kbra.modelizer_next.domain.shared.ElementStyle;
 import lu.kbra.modelizer_next.layout.LayoutObjectType;
 import lu.kbra.modelizer_next.layout.NodeLayout;
 import lu.kbra.modelizer_next.layout.PanelType;
-import lu.kbra.modelizer_next.ui.canvas.datastruct.LinkGeometry;
-import lu.kbra.modelizer_next.ui.canvas.datastruct.LiveEditComponents;
-import lu.kbra.modelizer_next.ui.canvas.datastruct.RenamingContext;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.LiveEditElement;
-import lu.kbra.modelizer_next.ui.canvas.datastruct.LiveEditElement.LiveEditType;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectedElement;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectedElement.SelectedType;
 import lu.kbra.modelizer_next.ui.dialogs.LinkEditorDialog;
-import lu.kbra.modelizer_next.ui.frame.MainFrame;
-import lu.kbra.pclib.PCUtils;
 
 /**
  * Contains document editing helpers for model changes made from the canvas.
  */
 interface DiagramModelEditor extends DiagramCanvasExt {
+
+	@SuppressWarnings("incomplete-switch")
+	default void editSelected() {
+		if (this.getCanvas().selectedElement == null || this.getCanvas().selectedElement.type() == SelectedType.NONE) {
+			return;
+		}
+
+		switch (this.getCanvas().selectedElement.type()) {
+		case CLASS -> this.getCanvas().editClass(this.getCanvas().selectedElement.classId());
+		case FIELD -> this.getCanvas().editField(this.getCanvas().selectedElement.classId(), this.getCanvas().selectedElement.fieldId());
+		case COMMENT -> this.getCanvas().editComment(this.getCanvas().selectedElement.commentId());
+		case LINK -> this.getCanvas().editLink(this.getCanvas().selectedElement.linkId());
+		}
+	}
 
 	default void addComment() {
 		final CommentModel commentModel = new CommentModel();
@@ -302,19 +286,6 @@ interface DiagramModelEditor extends DiagramCanvasExt {
 		this.getCanvas().select(SelectedElement.forField(classModel.getId(), moved.getId()));
 		this.getCanvas().notifyDocumentChanged();
 		this.getCanvas().repaint();
-	}
-
-	default void renameSelection(final boolean alternative) {
-		if (this.getCanvas().selectedElement == null || this.getCanvas().selectedElement.type() == SelectedType.NONE) {
-			return;
-		}
-
-		switch (this.getCanvas().selectedElement.type()) {
-		case CLASS, FIELD, COMMENT, LINK -> {
-			this.getCanvas().invokeRenamingElement(this.getCanvas().selectedElement.asRenamingElement(alternative));
-		}
-		default -> throw new IllegalArgumentException("Unexpected type: " + this.getCanvas().selectedElement);
-		}
 	}
 
 }

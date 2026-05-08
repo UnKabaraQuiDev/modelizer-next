@@ -57,8 +57,18 @@ public record SelectedElement(SelectedType type, String classId, String fieldId,
 		return Objects.hash(this.type, this.getActualId());
 	}
 
-	public LiveEditElement asRenamingElement(boolean alternative) {
+	public LiveEditElement asLiveEditElement(boolean alternative) {
 		return new LiveEditElement(this.type.asLiveEditType(), this.classId, this.fieldId, this.commentId, this.linkId, alternative);
+	}
+
+	public LiveEditElement asLiveEditElement(boolean alternative, boolean style) {
+		return new LiveEditElement(this.type.asLiveEditType()
+				.asStyle(style), this.classId, this.fieldId, this.commentId, this.linkId, alternative);
+	}
+
+	public LiveEditElement asStyleEditElement(boolean alternative) {
+		return new LiveEditElement(this.type.asLiveEditType()
+				.asStyle(alternative), this.classId, this.fieldId, this.commentId, this.linkId, false);
 	}
 
 	@Override

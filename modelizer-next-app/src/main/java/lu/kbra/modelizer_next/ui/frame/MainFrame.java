@@ -31,19 +31,21 @@ import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
-import lu.kbra.modelizer_next.App;
-import lu.kbra.modelizer_next.AppConfig;
+import io.github.andrewauclair.moderndocking.DockingRegion;
+import io.github.andrewauclair.moderndocking.app.Docking;
+import io.github.andrewauclair.moderndocking.app.RootDockingPanel;
 import lu.kbra.modelizer_next.MNMain;
 import lu.kbra.modelizer_next.bootstrap.AvailableUpdate;
 import lu.kbra.modelizer_next.bootstrap.UpdateRuntime;
 import lu.kbra.modelizer_next.bootstrap.UpdateRuntimes;
+import lu.kbra.modelizer_next.common.App;
 import lu.kbra.modelizer_next.document.ModelDocument;
 import lu.kbra.modelizer_next.layout.PanelType;
 import lu.kbra.modelizer_next.style.StylePalette;
 import lu.kbra.modelizer_next.style.StylePaletteService;
 import lu.kbra.modelizer_next.ui.ThemeMode;
 import lu.kbra.modelizer_next.ui.canvas.DiagramCanvas;
-import lu.kbra.modelizer_next.ui.canvas.data.StylePreviewType;
+import lu.kbra.modelizer_next.ui.canvas.StyleScope;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectionInfo;
 import lu.kbra.modelizer_next.ui.dialogs.ViewExportDialog;
 import lu.kbra.modelizer_next.ui.export.ViewExportRequest;
@@ -52,10 +54,6 @@ import lu.kbra.modelizer_next.ui.impl.DocumentChangeListener;
 import lu.kbra.modelizer_next.ui.impl.DocumentLoadHandler;
 import lu.kbra.pclib.PCUtils;
 import lu.kbra.pclib.datastructure.pair.Pair;
-
-import io.github.andrewauclair.moderndocking.DockingRegion;
-import io.github.andrewauclair.moderndocking.app.Docking;
-import io.github.andrewauclair.moderndocking.app.RootDockingPanel;
 
 public class MainFrame extends JFrame implements MainFrameDocumentController, MainFrameStyleController, MainFrameWindowController {
 
@@ -110,8 +108,6 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 	MainFrameToolBar toolBar;
 	JPanel pinnedStylesPanel;
 
-	AppConfig appConfig;
-
 	List<StylePalette> palettes;
 
 	JMenuItem undoMenuItem;
@@ -131,10 +127,10 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 	}
 
 	public void applyDefaultPaletteToCanvases() {
-		final StylePalette palette = this.findPaletteByName(this.appConfig.getDefaultPaletteName());
+		final StylePalette palette = this.findPaletteByName(App.CONFIG.getDefaultPaletteName());
 		this.getCanvases().forEach(c -> {
 			c.selectAll();
-			c.applyPalette(palette);
+			c.applyPaletteToSelection(palette);
 			c.clearSelection();
 		});
 	}
@@ -214,7 +210,6 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 		this.setLayout(new BorderLayout());
 		this.installCloseHandling();
 
-		this.appConfig = App.loadConfig();
 		this.palettes = StylePaletteService.loadAll();
 		this.sanitizePinnedPaletteNames();
 
@@ -248,9 +243,9 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 
 		};
 
-		this.conceptualCanvas = new DiagramCanvas(this.document, PanelType.CONCEPTUAL, canvasListener);
-		this.logicalCanvas = new DiagramCanvas(this.document, PanelType.LOGICAL, canvasListener);
-		this.physicalCanvas = new DiagramCanvas(this.document, PanelType.PHYSICAL, canvasListener);
+		this.conceptualCanvas = new DiagramCanvas(this, PanelType.CONCEPTUAL, canvasListener);
+		this.logicalCanvas = new DiagramCanvas(this, PanelType.LOGICAL, canvasListener);
+		this.physicalCanvas = new DiagramCanvas(this, PanelType.PHYSICAL, canvasListener);
 		this.setDefaultPaletteToCanvases();
 
 		this.rootDockingPanel = new RootDockingPanel(this);
@@ -288,8 +283,8 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 	}
 
 	void applyThemeAndReopen(final ThemeMode mode) {
-		this.appConfig.setThemeMode(mode);
-		App.saveConfig(this.appConfig);
+		App.CONFIG.setThemeMode(mode);
+		App.saveConfig();
 		this.reopenWithCurrentDocument();
 	}
 
@@ -517,9 +512,9 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 		this.pinnedStylesPanel.removeAll();
 
 		final DiagramCanvas canvas = this.getActiveCanvas();
-		final StylePreviewType previewType = canvas == null ? StylePreviewType.NONE : canvas.getStylePreviewType();
+		final StyleScope previewType = canvas == null ? StyleScope.NONE : canvas.getStyleScope();
 
-		for (final String paletteName : this.appConfig.getPinnedPaletteNames()) {
+		for (final String paletteName : App.CONFIG.getPinnedPaletteNames()) {
 			final StylePalette palette = this.findPaletteByName(paletteName);
 			if (palette != null) {
 				this.pinnedStylesPanel.add(this.createPinnedStyleButton(palette, previewType));
@@ -573,6 +568,10 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 				: selectionInfo.path();
 		this.selectionPathLabel.setText(path);
 		this.refreshPinnedStylesPanel();
+	}
+
+	public List<StylePalette> getPalettes() {
+		return palettes;
 	}
 
 }

@@ -13,7 +13,7 @@ import com.formdev.flatlaf.FlatClientProperties;
 import com.formdev.flatlaf.FlatDarkLaf;
 import com.formdev.flatlaf.FlatLightLaf;
 
-import lu.kbra.modelizer_next.App;
+import lu.kbra.modelizer_next.common.App;
 import lu.kbra.modelizer_next.common.SystemThemeDetector;
 import lu.kbra.modelizer_next.ui.frame.MainFrame;
 

@@ -3,7 +3,7 @@ package lu.kbra.modelizer_next.ui.frame;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 
-import lu.kbra.modelizer_next.App;
+import lu.kbra.modelizer_next.common.App;
 import lu.kbra.modelizer_next.style.StylePalette;
 import lu.kbra.modelizer_next.style.StylePaletteService;
 import lu.kbra.modelizer_next.ui.dialogs.StylePaletteEditorDialog;
@@ -30,14 +30,14 @@ final class StyleEditMenu extends JMenu {
 
 		if (!oldName.equals(edited.getName())) {
 			StylePaletteService.deleteByName(oldName);
-			if (oldName.equals(frame.appConfig.getDefaultPaletteName())) {
-				frame.appConfig.setDefaultPaletteName(edited.getName());
+			if (oldName.equals(App.CONFIG.getDefaultPaletteName())) {
+				App.CONFIG.setDefaultPaletteName(edited.getName());
 			}
-			if (oldName.equals(frame.appConfig.getSelectedPaletteName())) {
-				frame.appConfig.setSelectedPaletteName(edited.getName());
+			if (oldName.equals(App.CONFIG.getSelectedPaletteName())) {
+				App.CONFIG.setSelectedPaletteName(edited.getName());
 			}
 			frame.replacePinnedPaletteName(oldName, edited.getName());
-			App.saveConfig(frame.appConfig);
+			App.saveConfig();
 		}
 
 		StylePaletteService.save(edited);

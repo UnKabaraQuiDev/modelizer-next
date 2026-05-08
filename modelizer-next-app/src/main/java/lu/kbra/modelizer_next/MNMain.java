@@ -17,6 +17,8 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.formdev.flatlaf.FlatDarkLaf;
 import com.formdev.flatlaf.FlatLightLaf;
 
+import lu.kbra.modelizer_next.common.App;
+import lu.kbra.modelizer_next.common.AppConfig;
 import lu.kbra.modelizer_next.common.FileOpenBridge;
 import lu.kbra.modelizer_next.common.SystemThemeDetector;
 import lu.kbra.modelizer_next.json.ColorModule;
@@ -28,7 +30,8 @@ public class MNMain {
 
 	public static void applyConfiguredLookAndFeel() {
 		try {
-			final AppConfig config = App.loadConfig();
+			App.loadConfig();
+			final AppConfig config = App.CONFIG;
 			final ThemeMode themeMode = config == null || config.getThemeMode() == null ? ThemeMode.SYSTEM : config.getThemeMode();
 
 			switch (themeMode) {

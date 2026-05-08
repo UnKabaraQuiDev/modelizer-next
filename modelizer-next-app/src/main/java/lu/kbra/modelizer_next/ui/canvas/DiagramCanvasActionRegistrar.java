@@ -29,12 +29,17 @@ interface DiagramCanvasActionRegistrar extends DiagramCanvasExt {
 		this.installKeyBind(inputMap,
 				actionMap,
 				KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.SHIFT_DOWN_MASK),
-				"editStyle",
+				"editSelectionStyle",
 				actions.editStyle());
+		this.installKeyBind(inputMap,
+				actionMap,
+				KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.SHIFT_DOWN_MASK | InputEvent.ALT_DOWN_MASK),
+				"editSelectionStyleAlt",
+				actions.editStyleAlt());
 		this.installKeyBind(inputMap, actionMap, KeyStroke.getKeyStroke(KeyEvent.VK_F2, 0), "renameSelection", actions.renameSelection());
 		this.installKeyBind(inputMap,
 				actionMap,
-				KeyStroke.getKeyStroke(KeyEvent.VK_F2, MainFrame.CTRL_MODIFIER),
+				KeyStroke.getKeyStroke(KeyEvent.VK_F2, InputEvent.ALT_DOWN_MASK),
 				"renameSelectionAlt",
 				actions.renameSelectionAlt());
 		this.installKeyBind(inputMap,

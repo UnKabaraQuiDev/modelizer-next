@@ -11,23 +11,22 @@ import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 
-import lu.kbra.modelizer_next.App;
+import lu.kbra.modelizer_next.common.App;
 
 public interface MainFrameWindowController {
 
 	default JPanel createPinnedStylesPanel() {
-		final MainFrame frame = (MainFrame) this;
 		final JPanel panel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 3, 3));
 		panel.putClientProperty("dragListener", new DragListener(panel));
 		panel.putClientProperty("savePalettes", (Runnable) () -> {
-			final List<String> pinnedPalettes = frame.appConfig.getPinnedPaletteNames();
+			final List<String> pinnedPalettes = App.CONFIG.getPinnedPaletteNames();
 			pinnedPalettes.clear();
 			pinnedPalettes.addAll(Arrays.stream(panel.getComponents())
 					.filter(JButton.class::isInstance)
 					.map(JButton.class::cast)
 					.map(JButton::getText)
 					.toList());
-			App.saveConfig(frame.appConfig);
+			App.saveConfig();
 		});
 		panel.setOpaque(false);
 		return panel;

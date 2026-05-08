@@ -2,7 +2,9 @@ package lu.kbra.modelizer_next.style;
 
 import java.awt.Color;
 
-public class StylePalette {
+import lu.kbra.modelizer_next.domain.data.DisplayValueOwner;
+
+public class StylePalette implements DisplayValueOwner {
 
 	private String name;
 
@@ -18,6 +20,11 @@ public class StylePalette {
 	private Color commentBorderColor = new Color(0x444444);
 
 	private Color linkColor = new Color(0x555555);
+
+	@Override
+	public String getDisplayValue() {
+		return name;
+	}
 
 	public Color getClassBackgroundColor() {
 		return this.classBackgroundColor;

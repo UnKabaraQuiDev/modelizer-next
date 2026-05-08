@@ -254,7 +254,8 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 						this.getCanvas()::pasteSelection,
 						this.getCanvas().documentEventListener::undo,
 						this.getCanvas().documentEventListener::redo,
-						this.getCanvas()::editStyle));
+						() -> this.getCanvas().editSelectionStyle(false),
+						() -> this.getCanvas().editSelectionStyle(true)));
 	}
 
 	default boolean isLinkConnectedTo(final LinkModel linkModel, final String classId) {

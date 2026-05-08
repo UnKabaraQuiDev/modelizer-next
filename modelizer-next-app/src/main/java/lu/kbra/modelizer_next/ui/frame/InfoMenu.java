@@ -15,10 +15,10 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JRadioButtonMenuItem;
 
-import lu.kbra.modelizer_next.App;
 import lu.kbra.modelizer_next.bootstrap.BootstrapConfig;
 import lu.kbra.modelizer_next.bootstrap.UpdateChannel;
 import lu.kbra.modelizer_next.bootstrap.UpdateRuntime;
+import lu.kbra.modelizer_next.common.App;
 import lu.kbra.modelizer_next.ui.help.HelpDialog;
 import lu.kbra.pclib.PCUtils;
 

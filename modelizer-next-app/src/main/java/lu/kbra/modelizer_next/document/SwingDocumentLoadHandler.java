@@ -1,4 +1,4 @@
-package lu.kbra.modelizer_next.ui;
+package lu.kbra.modelizer_next.document;
 
 import java.awt.Component;
 import java.io.File;

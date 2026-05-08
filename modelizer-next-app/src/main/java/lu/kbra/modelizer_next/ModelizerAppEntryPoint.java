@@ -14,6 +14,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import lu.kbra.modelizer_next.bootstrap.AppMain;
 import lu.kbra.modelizer_next.cmdline.CommandLineExportParser;
 import lu.kbra.modelizer_next.cmdline.CommandLineExporter;
+import lu.kbra.modelizer_next.common.App;
 import lu.kbra.modelizer_next.common.FileOpenBridge;
 import lu.kbra.modelizer_next.common.SampleDocumentFactory;
 import lu.kbra.modelizer_next.common.UnsupportedBootstrapVersionException;

@@ -8,13 +8,15 @@ import javax.swing.JList;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
-public record LiveEditComponents(JTextField textField, JTextArea textArea, JComboBox<Enum<?>> comboBox, JList list) {
+import lu.kbra.modelizer_next.style.StylePalette;
+
+public record LiveEditComponents(JTextField textField, JTextArea textArea, JComboBox<Enum<?>> enumComboBox, JList<StylePalette> paletteList) {
 
 	public void forEach(final Consumer<JComponent> consumer) {
 		consumer.accept(this.textField);
 		consumer.accept(this.textArea);
-		consumer.accept(this.comboBox);
-		consumer.accept(this.list);
+		consumer.accept(this.enumComboBox);
+		consumer.accept(this.paletteList);
 	}
 
 	public void setVisible(final boolean b) {

@@ -7,8 +7,8 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 
-import lu.kbra.modelizer_next.App;
 import lu.kbra.modelizer_next.MNMain;
+import lu.kbra.modelizer_next.common.App;
 
 public final class StylePaletteService {
 

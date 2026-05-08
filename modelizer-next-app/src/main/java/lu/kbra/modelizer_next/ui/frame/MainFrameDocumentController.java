@@ -15,8 +15,8 @@ import javax.swing.TransferHandler;
 import javax.swing.WindowConstants;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import lu.kbra.modelizer_next.App;
 import lu.kbra.modelizer_next.MNMain;
+import lu.kbra.modelizer_next.common.App;
 import lu.kbra.modelizer_next.document.ModelDocument;
 
 public interface MainFrameDocumentController {

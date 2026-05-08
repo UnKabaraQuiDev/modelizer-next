@@ -1,4 +1,4 @@
-package lu.kbra.modelizer_next;
+package lu.kbra.modelizer_next.common;
 
 import java.io.File;
 import java.io.IOException;
@@ -6,6 +6,7 @@ import java.io.IOException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 
+import lu.kbra.modelizer_next.MNMain;
 import lu.kbra.pclib.PCUtils;
 
 public class App {
@@ -25,6 +26,8 @@ public class App {
 	public static String WEBSITE_URL;
 	public static String ENTRY_POINT;
 	public static String AUTHOR_WEBSITE_URL;
+
+	public static AppConfig CONFIG;
 
 	public static void ensureDirsExists() {
 		App.getAppDirectory().mkdirs();
@@ -86,29 +89,30 @@ public class App {
 		App.ensureDirsExists();
 	}
 
-	public static AppConfig loadConfig() {
+	public static synchronized void loadConfig() {
 		App.ensureDirsExists();
 
 		final File file = App.getConfigFile();
 		if (!file.isFile()) {
 			final AppConfig config = new AppConfig();
-			App.saveConfig(config);
-			return config;
+			CONFIG = config;
+			App.saveConfig();
+			return;
 		}
 
 		try {
-			return MNMain.OBJECT_MAPPER.readValue(file, AppConfig.class);
+			CONFIG = MNMain.OBJECT_MAPPER.readValue(file, AppConfig.class);
 		} catch (final IOException e) {
 			e.printStackTrace();
-			return new AppConfig();
+			CONFIG = new AppConfig();
 		}
 	}
 
-	public static void saveConfig(final AppConfig config) {
+	public static synchronized void saveConfig() {
 		App.ensureDirsExists();
 
 		try {
-			MNMain.OBJECT_MAPPER.writeValue(App.getConfigFile(), config);
+			MNMain.OBJECT_MAPPER.writeValue(App.getConfigFile(), CONFIG);
 		} catch (final IOException e) {
 			e.printStackTrace();
 		}

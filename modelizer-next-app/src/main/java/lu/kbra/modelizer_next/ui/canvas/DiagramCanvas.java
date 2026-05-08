@@ -36,7 +36,9 @@ import lu.kbra.modelizer_next.ui.canvas.datastruct.LiveEditElement;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.ResizingComment;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectedElement;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectedElement.SelectedType;
+import lu.kbra.modelizer_next.ui.frame.MainFrame;
 import lu.kbra.modelizer_next.ui.impl.DocumentChangeListener;
+import lu.kbra.pclib.PCUtils;
 
 public class DiagramCanvas extends JPanel implements DiagramModelLookup, NodeLayoutCache, SelectionController, NameResolver,
 		PaletteController, ClipboardController, LinkGeometryResolver, ConceptualAnchorCache, CanvasHitTester, CanvasExportRenderer,
@@ -70,10 +72,7 @@ public class DiagramCanvas extends JPanel implements DiagramModelLookup, NodeLay
 	public static final Color CANVAS_BACKGROUND_COLOR = new Color(0xF2F2F2);
 	public static final Color GRID_COLOR = new Color(0xE4E4E4);
 	public static final Color SELECTION_COLOR = new Color(0x2F7DFF);
-	public static final Color SELECTION_FILL_COLOR = new Color(DiagramCanvas.SELECTION_COLOR.getRed(),
-			DiagramCanvas.SELECTION_COLOR.getGreen(),
-			DiagramCanvas.SELECTION_COLOR.getBlue(),
-			60);
+	public static final Color SELECTION_FILL_COLOR = PCUtils.setAlpha(DiagramCanvas.SELECTION_COLOR, 60);
 	public static final Color COMMENT_CONNECTOR_COLOR = new Color(0x777777);
 	public static final BasicStroke DEFAULT_STROKE = new BasicStroke(1.0f);
 
@@ -107,6 +106,7 @@ public class DiagramCanvas extends JPanel implements DiagramModelLookup, NodeLay
 	public static final int DEFAULT_EXPORT_WIDTH = 1200;
 	public static final int DEFAULT_EXPORT_HEIGHT = 800;
 
+	final MainFrame mainFrame;
 	final ModelDocument document;
 
 	FontRenderContext fontRenderContext;
@@ -159,8 +159,9 @@ public class DiagramCanvas extends JPanel implements DiagramModelLookup, NodeLay
 		return aSelected ? -1 : 1;
 	};
 
-	public DiagramCanvas(final ModelDocument document, final PanelType panelType, final DocumentChangeListener documentEventListener) {
-		this.document = document;
+	public DiagramCanvas(final MainFrame mainFrame, final PanelType panelType, final DocumentChangeListener documentEventListener) {
+		this.mainFrame = mainFrame;
+		this.document = mainFrame.getDocument();
 		this.panelType = panelType;
 		this.documentEventListener = documentEventListener;
 
@@ -180,27 +181,12 @@ public class DiagramCanvas extends JPanel implements DiagramModelLookup, NodeLay
 		super.setLayout(null);
 	}
 
-	@Override
-	public DiagramCanvas getCanvas() {
-		return this;
-	}
-
 	public Action getCanvasAction(final String actionKey) {
 		return this.getActionMap().get(actionKey);
 	}
 
-	@Override
-	public ModelDocument getDocument() {
-		return this.document;
-	}
-
 	public float getHeight(final Font bodyFont) {
 		return bodyFont.getLineMetrics("Ag", this.fontRenderContext).getHeight();
-	}
-
-	@Override
-	public PanelType getPanelType() {
-		return this.panelType;
 	}
 
 	@Override

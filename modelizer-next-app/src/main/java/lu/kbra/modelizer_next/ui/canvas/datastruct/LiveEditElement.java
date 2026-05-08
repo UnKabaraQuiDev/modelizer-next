@@ -28,23 +28,36 @@ public record LiveEditElement(LiveEditType type, String classId, String fieldId,
 		CLASS_STYLE,
 		CLASS_FIELD_STYLE,
 		@Deprecated
-		CLASS_TOP_STYLE,
+		CLASS_ALL_STYLE,
 		COMMENT_STYLE,
 		LINK_STYLE;
 
 		public SelectedType asSelectedType() {
 			return switch (this) {
-			case CLASS -> SelectedType.CLASS;
-			case CLASS_FIELD -> SelectedType.FIELD;
-			case COMMENT -> SelectedType.COMMENT;
-			case LINK_LABEL, LINK_FROM_CARDINALITY, LINK_FROM_LABEL, LINK_TO_CARDINALITY, LINK_TO_LABEL -> SelectedType.LINK;
+			case CLASS, CLASS_STYLE, CLASS_ALL_STYLE -> SelectedType.CLASS;
+			case CLASS_FIELD, CLASS_FIELD_STYLE -> SelectedType.FIELD;
+			case COMMENT, COMMENT_STYLE -> SelectedType.COMMENT;
+			case LINK_LABEL, LINK_FROM_CARDINALITY, LINK_FROM_LABEL, LINK_TO_CARDINALITY, LINK_TO_LABEL, LINK_FROM_FIELD, LINK_TO_FIELD,
+					LINK_STYLE ->
+				SelectedType.LINK;
 			default -> throw new IllegalArgumentException("Unsupported option: " + this);
+			};
+		}
+
+		public LiveEditType asStyle(boolean alternative) {
+			return switch (this) {
+			case CLASS -> alternative ? CLASS_ALL_STYLE : CLASS_STYLE;
+			case CLASS_FIELD -> CLASS_FIELD_STYLE;
+			case COMMENT -> COMMENT_STYLE;
+			case LINK_LABEL, LINK_FROM_CARDINALITY, LINK_FROM_LABEL, LINK_TO_CARDINALITY, LINK_TO_LABEL, LINK_FROM_FIELD, LINK_TO_FIELD ->
+				LINK_STYLE;
+			default -> throw new IllegalArgumentException("Unexpected value: " + this);
 			};
 		}
 
 		public boolean isClass() {
 			return switch (this) {
-			case CLASS, CLASS_FIELD, CLASS_FIELD_STYLE, CLASS_STYLE, CLASS_TOP_STYLE -> true;
+			case CLASS, CLASS_FIELD, CLASS_FIELD_STYLE, CLASS_STYLE, CLASS_ALL_STYLE -> true;
 			default -> false;
 			};
 		}
@@ -55,14 +68,14 @@ public record LiveEditElement(LiveEditType type, String classId, String fieldId,
 
 		public boolean isLink() {
 			return switch (this) {
-			case LINK_LABEL, LINK_FROM_CARDINALITY, LINK_FROM_LABEL, LINK_TO_CARDINALITY, LINK_TO_LABEL, LINK_STYLE -> true;
+			case LINK_LABEL, LINK_FROM_CARDINALITY, LINK_FROM_LABEL, LINK_TO_CARDINALITY, LINK_TO_LABEL, LINK_STYLE, LINK_FROM_FIELD, LINK_TO_FIELD -> true;
 			default -> false;
 			};
 		}
 
 		public boolean isStyle() {
 			return switch (this) {
-			case CLASS_STYLE, CLASS_TOP_STYLE, CLASS_FIELD_STYLE, COMMENT_STYLE, LINK_STYLE -> true;
+			case CLASS_STYLE, CLASS_ALL_STYLE, CLASS_FIELD_STYLE, COMMENT_STYLE, LINK_STYLE -> true;
 			default -> false;
 			};
 		}
@@ -128,7 +141,7 @@ public record LiveEditElement(LiveEditType type, String classId, String fieldId,
 
 	public String getActualId() {
 		return switch (this.type) {
-		case CLASS, CLASS_STYLE, CLASS_TOP_STYLE -> this.classId;
+		case CLASS, CLASS_STYLE, CLASS_ALL_STYLE -> this.classId;
 		case CLASS_FIELD, CLASS_FIELD_STYLE -> this.fieldId;
 		case COMMENT, COMMENT_STYLE -> this.commentId;
 		case LINK_LABEL, LINK_FROM_CARDINALITY, LINK_FROM_LABEL, LINK_TO_CARDINALITY, LINK_TO_LABEL, LINK_STYLE -> this.linkId;
@@ -158,8 +171,8 @@ public record LiveEditElement(LiveEditType type, String classId, String fieldId,
 		return switch (this.type) {
 		case CLASS, CLASS_FIELD, LINK_LABEL, LINK_TO_LABEL, LINK_FROM_LABEL -> component.textField();
 		case COMMENT -> component.textArea();
-		case LINK_FROM_CARDINALITY, LINK_TO_CARDINALITY -> component.comboBox();
-		case CLASS_STYLE, CLASS_TOP_STYLE, CLASS_FIELD_STYLE, LINK_STYLE, COMMENT_STYLE -> component.list();
+		case LINK_FROM_CARDINALITY, LINK_TO_CARDINALITY -> component.enumComboBox();
+		case CLASS_STYLE, CLASS_ALL_STYLE, CLASS_FIELD_STYLE, LINK_STYLE, COMMENT_STYLE -> component.paletteList();
 		default -> throw new IllegalArgumentException("Unexpected value: " + this.type);
 		};
 	}
