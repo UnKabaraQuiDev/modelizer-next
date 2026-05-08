@@ -3,7 +3,6 @@ package lu.kbra.modelizer_next.ui.canvas;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Cursor;
-import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -160,9 +159,9 @@ public class DiagramCanvas extends JPanel implements DiagramModelLookup, NodeLay
 		return aSelected ? -1 : 1;
 	};
 
-	public DiagramCanvas(final MainFrame mainFrame, final PanelType panelType, final DocumentChangeListener documentEventListener) {
+	public DiagramCanvas(final MainFrame mainFrame, final ModelDocument modelDocument, final PanelType panelType, final DocumentChangeListener documentEventListener) {
 		this.mainFrame = mainFrame;
-		this.document = mainFrame.getDocument();
+		this.document = modelDocument;
 		this.panelType = panelType;
 		this.documentEventListener = documentEventListener;
 

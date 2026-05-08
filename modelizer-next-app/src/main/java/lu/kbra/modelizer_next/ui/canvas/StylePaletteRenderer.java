@@ -12,6 +12,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.border.Border;
 
 import lu.kbra.modelizer_next.style.StylePalette;
+import lu.kbra.modelizer_next.ui.canvas.data.StyleScope;
 
 public class StylePaletteRenderer extends JPanel implements ListCellRenderer<StylePalette> {
 

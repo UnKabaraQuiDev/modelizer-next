@@ -67,7 +67,7 @@ public final class CommandLineExporter {
 				: requestedPanelTypes;
 
 		for (final PanelType panelType : panelTypes) {
-			final DiagramCanvas canvas = new DiagramCanvas(document, panelType, DocumentChangeListener.NOOP);
+			final DiagramCanvas canvas = new DiagramCanvas(null, document, panelType, DocumentChangeListener.NOOP);
 
 			if (canvas != null) {
 				canvas.revalidate();

@@ -45,7 +45,7 @@ import lu.kbra.modelizer_next.style.StylePalette;
 import lu.kbra.modelizer_next.style.StylePaletteService;
 import lu.kbra.modelizer_next.ui.ThemeMode;
 import lu.kbra.modelizer_next.ui.canvas.DiagramCanvas;
-import lu.kbra.modelizer_next.ui.canvas.StyleScope;
+import lu.kbra.modelizer_next.ui.canvas.data.StyleScope;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectionInfo;
 import lu.kbra.modelizer_next.ui.dialogs.ViewExportDialog;
 import lu.kbra.modelizer_next.ui.export.ViewExportRequest;
@@ -243,9 +243,9 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 
 		};
 
-		this.conceptualCanvas = new DiagramCanvas(this, PanelType.CONCEPTUAL, canvasListener);
-		this.logicalCanvas = new DiagramCanvas(this, PanelType.LOGICAL, canvasListener);
-		this.physicalCanvas = new DiagramCanvas(this, PanelType.PHYSICAL, canvasListener);
+		this.conceptualCanvas = new DiagramCanvas(this, document, PanelType.CONCEPTUAL, canvasListener);
+		this.logicalCanvas = new DiagramCanvas(this, document, PanelType.LOGICAL, canvasListener);
+		this.physicalCanvas = new DiagramCanvas(this, document, PanelType.PHYSICAL, canvasListener);
 		this.setDefaultPaletteToCanvases();
 
 		this.rootDockingPanel = new RootDockingPanel(this);

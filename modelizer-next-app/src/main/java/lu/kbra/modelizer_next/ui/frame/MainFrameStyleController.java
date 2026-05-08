@@ -18,7 +18,7 @@ import lu.kbra.modelizer_next.common.App;
 import lu.kbra.modelizer_next.style.StylePalette;
 import lu.kbra.modelizer_next.style.StylePaletteService;
 import lu.kbra.modelizer_next.ui.canvas.DiagramCanvas;
-import lu.kbra.modelizer_next.ui.canvas.StyleScope;
+import lu.kbra.modelizer_next.ui.canvas.data.StyleScope;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.StatusStyleAppearance;
 import lu.kbra.modelizer_next.ui.dialogs.StylePaletteEditorDialog;
 

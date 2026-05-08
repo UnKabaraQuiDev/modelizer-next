@@ -2,7 +2,7 @@ package lu.kbra.modelizer_next.ui.canvas.datastruct;
 
 import java.util.Objects;
 
-import lu.kbra.modelizer_next.ui.canvas.StyleScope;
+import lu.kbra.modelizer_next.ui.canvas.data.StyleScope;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.LiveEditElement.LiveEditType;
 
 public record SelectedElement(SelectedType type, String classId, String fieldId, String commentId, String linkId) {
