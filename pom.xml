@@ -64,6 +64,8 @@
 		<jpackage.macos.name>filled in by modules</jpackage.macos.name>
 
 		<app.mainClass>filled in by modules</app.mainClass>
+		
+		<minimizeJar>true</minimizeJar>
 
 		<skipLinuxInstaller>true</skipLinuxInstaller>
 		<skipWindowsInstaller>true</skipWindowsInstaller>
@@ -251,8 +253,6 @@
 								<transformer
 									implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
 								<transformer
-									implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
-								<transformer
 									implementation="org.apache.maven.plugins.shade.resource.ApacheLicenseResourceTransformer" />
 								<transformer
 									implementation="org.apache.maven.plugins.shade.resource.ApacheNoticeResourceTransformer">
@@ -260,7 +260,12 @@
 								</transformer>
 							</transformers>
 
-							<minimizeJar>true</minimizeJar>
+							<minimizeJar>${minimizeJar}</minimizeJar>
+							<entryPoints>
+								<entryPoint>lu.kbra.modelizer_next.MNMain</entryPoint>
+								<entryPoint>lu.kbra.modelizer_next.ModelizerAppEntryPoint</entryPoint>
+								<entryPoint>lu.kbra.modelizer_next.bootstrap.BootstrapMain</entryPoint>
+							</entryPoints>
 
 							<filters>
 								<!-- Keep FlatLaf fully -->
