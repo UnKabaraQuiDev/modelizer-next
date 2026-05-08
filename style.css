@@ -365,14 +365,18 @@ section {
     background: linear-gradient(135deg, color-mix(in srgb, var(--a) 16%, transparent), color-mix(in srgb, var(--b) 12%, transparent))
 }
 
-.grid3 {
+.card {
+    padding: 24px;
+    margin: 24px 0 24px 0;
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 16px
+    grid-template-columns: minmax(0, 1fr) minmax(0, 624px);
 }
 
-.card {
-    padding: 24px
+.card img {
+    width: 100%;
+    height: auto;
+    margin-top: auto;
+    margin-bottom: auto;
 }
 
 .icon {
@@ -1011,7 +1015,7 @@ div.title-button-container {
     background: linear-gradient(135deg, color-mix(in srgb, var(--a) 14%, var(--card)), color-mix(in srgb, var(--b) 12%, var(--card)));
 }
 
-.sponsor-callout::after {
+/*.sponsor-callout::after {
     content: "";
     position: absolute;
     right: -80px;
@@ -1021,7 +1025,7 @@ div.title-button-container {
     border-radius: 50%;
     background: color-mix(in srgb, var(--b) 18%, transparent);
     pointer-events: none;
-}
+}*/
 
 .sponsor-copy, .sponsor-actions {
     position: relative;
