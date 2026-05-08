@@ -293,12 +293,12 @@ public class ShortcutsTab extends JPanel {
 						List.of(List.of("Ctrl", "E"))),
 						new Shortcut(List.of(List.of("F2")),
 								"<html><b>Rename selected item</b>: edits the conceptual name if it has no technical name or is in conceptual view</html>"),
-						new Shortcut(List.of(List.of("Ctrl", "F2")),
+						new Shortcut(List.of(List.of("Alt", "F2")),
 								"<html><b>Alternative rename selected item</b>: edits the technical name of the item</html>"),
 						new Shortcut(List.of(List.of("Tab")), "Confirm edit and edit next item"),
 						new Shortcut(List.of(List.of("Shift", "Tab")), "Confirm edit and edit previous item"),
-						new Shortcut(List.of(List.of("Ctrl", "Tab")), "Confirm editand alternative rename next item"),
-						new Shortcut(List.of(List.of("Ctrl", "Shift", "Tab")), "Confirm edit and alternative rename previous item"),
+						new Shortcut(List.of(List.of("Alt", "Tab")), "Confirm editand alternative rename next item"),
+						new Shortcut(List.of(List.of("Alt", "Shift", "Tab")), "Confirm edit and alternative rename previous item"),
 						new Shortcut(List.of(List.of("Delete"), List.of("Shift", "X")), "Delete selected item(s)"),
 						new Shortcut(List.of(List.of("Ctrl", "D")), "Duplicate selected element(s)")));
 	}

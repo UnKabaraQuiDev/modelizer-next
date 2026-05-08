@@ -51,7 +51,6 @@ import lu.kbra.modelizer_next.ui.canvas.datastruct.LiveEditElement.LiveEditType;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.RenamingContext;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectedElement;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectedElement.SelectedType;
-import lu.kbra.modelizer_next.ui.frame.MainFrame;
 import lu.kbra.pclib.PCUtils;
 import lu.kbra.pclib.datastructure.pair.Pair;
 import lu.kbra.pclib.datastructure.pair.Pairs;
@@ -124,7 +123,10 @@ public interface LiveEditor extends DiagramCanvasExt {
 //			final Point2D.Double size = getCanvas().worldToViewportZoom(preferredSize);
 			final Point2D.Double point = getCanvas().getMouseViewportPos();
 
-			list.setBounds((int) point.getX() + 5, (int) point.getY(), (int) preferredSize.getWidth() + DiagramCanvas.TEXT_PADDING, (int) preferredSize.getHeight());
+			list.setBounds((int) point.getX() + 5,
+					(int) point.getY(),
+					(int) preferredSize.getWidth() + DiagramCanvas.TEXT_PADDING,
+					(int) preferredSize.getHeight());
 
 			list.setVisible(true);
 			list.requestFocus();
@@ -657,9 +659,9 @@ public interface LiveEditor extends DiagramCanvasExt {
 			renamingField.getInputMap(JComponent.WHEN_FOCUSED)
 					.put(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, InputEvent.SHIFT_DOWN_MASK), "submitPrevious");
 			renamingField.getInputMap(JComponent.WHEN_FOCUSED)
-					.put(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, MainFrame.CTRL_MODIFIER), "submitNextAlt");
+					.put(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, InputEvent.ALT_DOWN_MASK), "submitNextAlt");
 			renamingField.getInputMap(JComponent.WHEN_FOCUSED)
-					.put(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, InputEvent.SHIFT_DOWN_MASK | MainFrame.CTRL_MODIFIER),
+					.put(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, InputEvent.SHIFT_DOWN_MASK | InputEvent.ALT_DOWN_MASK),
 							"submitPreviousAlt");
 			renamingField.getActionMap().put("cancel", new AbstractAction() {
 
