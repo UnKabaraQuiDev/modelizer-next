@@ -200,8 +200,6 @@ interface DiagramModelEditor extends DiagramCanvasExt {
 		this.getCanvas().invokeRenamingElement(RenamingElement.forClass(classModel.getId()));
 	}
 
-	
-
 	default void deleteSelection() {
 		if (this.getCanvas().selectedElements.isEmpty()) {
 			return;
@@ -224,21 +222,6 @@ interface DiagramModelEditor extends DiagramCanvasExt {
 		this.getCanvas().notifyDocumentChanged();
 		this.getCanvas().repaint();
 	}
-
-	@SuppressWarnings("incomplete-switch")
-	default void editSelected() {
-		if (this.getCanvas().selectedElement == null || this.getCanvas().selectedElement.type() == SelectedType.NONE) {
-			return;
-		}
-		switch (this.getCanvas().selectedElement.type()) {
-		case CLASS -> this.getCanvas().editClass(this.getCanvas().selectedElement.classId());
-		case FIELD -> this.getCanvas().editField(this.getCanvas().selectedElement.classId(), this.getCanvas().selectedElement.fieldId());
-		case COMMENT -> this.getCanvas().editComment(this.getCanvas().selectedElement.commentId());
-		case LINK -> this.getCanvas().editLink(this.getCanvas().selectedElement.linkId());
-		}
-	}
-
-	
 
 	default void moveFieldSelection(final int delta) {
 		if (this.getCanvas().selectedElement != null && this.getCanvas().selectedElement.type() == SelectedType.CLASS) {

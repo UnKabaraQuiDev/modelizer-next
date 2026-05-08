@@ -40,10 +40,24 @@ import lu.kbra.modelizer_next.ui.canvas.datastruct.RenamingComponents;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.RenamingContext;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.RenamingElement;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.RenamingElement.RenamingType;
+import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectedElement.SelectedType;
 import lu.kbra.modelizer_next.ui.frame.MainFrame;
 import lu.kbra.pclib.PCUtils;
 
 public interface LiveEditor extends DiagramCanvasExt {
+
+	@SuppressWarnings("incomplete-switch")
+	default void editSelected() {
+		if (this.getCanvas().selectedElement == null || this.getCanvas().selectedElement.type() == SelectedType.NONE) {
+			return;
+		}
+		switch (this.getCanvas().selectedElement.type()) {
+		case CLASS -> this.getCanvas().editClass(this.getCanvas().selectedElement.classId());
+		case FIELD -> this.getCanvas().editField(this.getCanvas().selectedElement.classId(), this.getCanvas().selectedElement.fieldId());
+		case COMMENT -> this.getCanvas().editComment(this.getCanvas().selectedElement.commentId());
+		case LINK -> this.getCanvas().editLink(this.getCanvas().selectedElement.linkId());
+		}
+	}
 
 	default void invokeRenamingElement(final RenamingElement element) {
 		if (this.isRenamingElement()) {

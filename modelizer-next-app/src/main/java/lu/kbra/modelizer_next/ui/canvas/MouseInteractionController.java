@@ -5,6 +5,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 
 import javax.swing.SwingUtilities;
 
@@ -167,7 +168,7 @@ interface MouseInteractionController extends DiagramCanvasExt {
 				this.getCanvas().notifySelectionChanged();
 				this.getCanvas().repaint();
 			} else {
-				this.getCanvas().select(clickedElement);
+				this.getCanvas().addToSelection(clickedElement);
 			}
 		}
 
@@ -189,8 +190,20 @@ interface MouseInteractionController extends DiagramCanvasExt {
 				return;
 			}
 
-			this.getCanvas().draggedSelection = this.getCanvas()
-					.createDraggedSelection(clickedElement, hitResult.layout(), worldPoint, hitResult.bounds());
+			if (hitResult.selection().type() == SelectedType.FIELD) {
+				this.getCanvas().draggedSelection = this.getCanvas()
+						.createDraggedSelection(clickedElement,
+								hitResult.layout(),
+								worldPoint,
+								new Rectangle2D.Double(hitResult.layout().getPosition().getX(),
+										hitResult.layout().getPosition().getY(),
+										hitResult.layout().getSize().getX(),
+										hitResult.layout().getSize().getY()));
+			} else {
+				this.getCanvas().draggedSelection = this.getCanvas()
+						.createDraggedSelection(clickedElement, hitResult.layout(), worldPoint, hitResult.bounds());
+			}
+
 			this.getCanvas().setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		}
 	}
