@@ -6,10 +6,10 @@ import javax.swing.JComponent;
 
 import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectedElement.SelectedType;
 
-public record RenamingElement(RenamingType type, String classId, String fieldId, String commentId, String linkId,
+public record LiveEditElement(LiveEditType type, String classId, String fieldId, String commentId, String linkId,
 		boolean forceAlternative) {
 
-	public enum RenamingType {
+	public enum LiveEditType {
 
 		NONE,
 		CLASS,
@@ -23,7 +23,14 @@ public record RenamingElement(RenamingType type, String classId, String fieldId,
 		@Deprecated
 		LINK_FROM_FIELD,
 		@Deprecated
-		LINK_TO_FIELD;
+		LINK_TO_FIELD,
+
+		CLASS_STYLE,
+		CLASS_FIELD_STYLE,
+		@Deprecated
+		CLASS_TOP_STYLE,
+		COMMENT_STYLE,
+		LINK_STYLE;
 
 		public SelectedType asSelectedType() {
 			return switch (this) {
@@ -37,7 +44,7 @@ public record RenamingElement(RenamingType type, String classId, String fieldId,
 
 		public boolean isClass() {
 			return switch (this) {
-			case CLASS, CLASS_FIELD -> true;
+			case CLASS, CLASS_FIELD, CLASS_FIELD_STYLE, CLASS_STYLE, CLASS_TOP_STYLE -> true;
 			default -> false;
 			};
 		}
@@ -48,12 +55,19 @@ public record RenamingElement(RenamingType type, String classId, String fieldId,
 
 		public boolean isLink() {
 			return switch (this) {
-			case LINK_LABEL, LINK_FROM_CARDINALITY, LINK_FROM_LABEL, LINK_TO_CARDINALITY, LINK_TO_LABEL -> true;
+			case LINK_LABEL, LINK_FROM_CARDINALITY, LINK_FROM_LABEL, LINK_TO_CARDINALITY, LINK_TO_LABEL, LINK_STYLE -> true;
 			default -> false;
 			};
 		}
 
-		public RenamingType next() {
+		public boolean isStyle() {
+			return switch (this) {
+			case CLASS_STYLE, CLASS_TOP_STYLE, CLASS_FIELD_STYLE, COMMENT_STYLE, LINK_STYLE -> true;
+			default -> false;
+			};
+		}
+
+		public LiveEditType next() {
 			return switch (this) {
 			case LINK_LABEL -> LINK_FROM_CARDINALITY;
 			case LINK_FROM_CARDINALITY -> LINK_FROM_LABEL;
@@ -64,7 +78,7 @@ public record RenamingElement(RenamingType type, String classId, String fieldId,
 			};
 		}
 
-		public RenamingType previous() {
+		public LiveEditType previous() {
 			return switch (this) {
 			case LINK_LABEL -> LINK_TO_LABEL;
 			case LINK_TO_LABEL -> LINK_TO_CARDINALITY;
@@ -77,47 +91,47 @@ public record RenamingElement(RenamingType type, String classId, String fieldId,
 
 	}
 
-	public RenamingElement(RenamingType type, String classId, String fieldId, String commentId, String linkId) {
+	public LiveEditElement(LiveEditType type, String classId, String fieldId, String commentId, String linkId) {
 		this(type, classId, fieldId, commentId, linkId, false);
 	}
 
-	public static RenamingElement forClass(final String classId) {
-		return new RenamingElement(RenamingType.CLASS, classId, null, null, null);
+	public static LiveEditElement forClass(final String classId) {
+		return new LiveEditElement(LiveEditType.CLASS, classId, null, null, null);
 	}
 
-	public static RenamingElement forField(final String classId, final String fieldId) {
-		return new RenamingElement(RenamingType.CLASS_FIELD, classId, fieldId, null, null);
+	public static LiveEditElement forField(final String classId, final String fieldId) {
+		return new LiveEditElement(LiveEditType.CLASS_FIELD, classId, fieldId, null, null);
 	}
 
-	public static RenamingElement forClass(final String classId, final boolean alternative) {
-		return new RenamingElement(RenamingType.CLASS, classId, null, null, null, alternative);
+	public static LiveEditElement forClass(final String classId, final boolean alternative) {
+		return new LiveEditElement(LiveEditType.CLASS, classId, null, null, null, alternative);
 	}
 
-	public static RenamingElement forField(final String classId, final String fieldId, final boolean alternative) {
-		return new RenamingElement(RenamingType.CLASS_FIELD, classId, fieldId, null, null, alternative);
+	public static LiveEditElement forField(final String classId, final String fieldId, final boolean alternative) {
+		return new LiveEditElement(LiveEditType.CLASS_FIELD, classId, fieldId, null, null, alternative);
 	}
 
-	public static RenamingElement forComment(final String commentId) {
-		return new RenamingElement(RenamingType.COMMENT, null, null, commentId, null);
+	public static LiveEditElement forComment(final String commentId) {
+		return new LiveEditElement(LiveEditType.COMMENT, null, null, commentId, null);
 	}
 
-	public static RenamingElement forLink(final String linkId) {
-		return new RenamingElement(RenamingType.LINK_LABEL, null, null, null, linkId);
+	public static LiveEditElement forLink(final String linkId) {
+		return new LiveEditElement(LiveEditType.LINK_LABEL, null, null, null, linkId);
 	}
 
-	public static RenamingElement forLink(final String linkId, final RenamingType type) {
+	public static LiveEditElement forLink(final String linkId, final LiveEditType type) {
 		if (!type.isLink()) {
 			throw new IllegalArgumentException("Type isn't applicable to a link: " + type);
 		}
-		return new RenamingElement(type, null, null, null, linkId);
+		return new LiveEditElement(type, null, null, null, linkId);
 	}
 
 	public String getActualId() {
 		return switch (this.type) {
-		case CLASS -> this.classId;
-		case CLASS_FIELD -> this.fieldId;
-		case COMMENT -> this.commentId;
-		case LINK_LABEL, LINK_FROM_CARDINALITY, LINK_FROM_LABEL, LINK_TO_CARDINALITY, LINK_TO_LABEL -> this.linkId;
+		case CLASS, CLASS_STYLE, CLASS_TOP_STYLE -> this.classId;
+		case CLASS_FIELD, CLASS_FIELD_STYLE -> this.fieldId;
+		case COMMENT, COMMENT_STYLE -> this.commentId;
+		case LINK_LABEL, LINK_FROM_CARDINALITY, LINK_FROM_LABEL, LINK_TO_CARDINALITY, LINK_TO_LABEL, LINK_STYLE -> this.linkId;
 		default -> throw new IllegalArgumentException("Unexpected value: " + this.type);
 		};
 	}
@@ -136,15 +150,16 @@ public record RenamingElement(RenamingType type, String classId, String fieldId,
 		if (other == null || other.getClass() != this.getClass()) {
 			return false;
 		}
-		return ((RenamingElement) other).type == this.type && Objects.equals(((RenamingElement) other).getActualId(), this.getActualId())
-				&& this.forceAlternative == ((RenamingElement) other).forceAlternative;
+		return ((LiveEditElement) other).type == this.type && Objects.equals(((LiveEditElement) other).getActualId(), this.getActualId())
+				&& this.forceAlternative == ((LiveEditElement) other).forceAlternative;
 	}
 
-	public JComponent getRenamingComponent(final RenamingComponents component) {
+	public JComponent getRenamingComponent(final LiveEditComponents component) {
 		return switch (this.type) {
 		case CLASS, CLASS_FIELD, LINK_LABEL, LINK_TO_LABEL, LINK_FROM_LABEL -> component.textField();
 		case COMMENT -> component.textArea();
 		case LINK_FROM_CARDINALITY, LINK_TO_CARDINALITY -> component.comboBox();
+		case CLASS_STYLE, CLASS_TOP_STYLE, CLASS_FIELD_STYLE, LINK_STYLE, COMMENT_STYLE -> component.list();
 		default -> throw new IllegalArgumentException("Unexpected value: " + this.type);
 		};
 	}

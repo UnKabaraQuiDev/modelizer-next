@@ -26,6 +26,11 @@ interface DiagramCanvasActionRegistrar extends DiagramCanvasExt {
 				"redo",
 				actions.redo());
 
+		this.installKeyBind(inputMap,
+				actionMap,
+				KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.SHIFT_DOWN_MASK),
+				"editStyle",
+				actions.editStyle());
 		this.installKeyBind(inputMap, actionMap, KeyStroke.getKeyStroke(KeyEvent.VK_F2, 0), "renameSelection", actions.renameSelection());
 		this.installKeyBind(inputMap,
 				actionMap,

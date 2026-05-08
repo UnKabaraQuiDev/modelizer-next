@@ -2,7 +2,7 @@ package lu.kbra.modelizer_next.ui.canvas.datastruct;
 
 import java.util.Objects;
 
-import lu.kbra.modelizer_next.ui.canvas.datastruct.RenamingElement.RenamingType;
+import lu.kbra.modelizer_next.ui.canvas.datastruct.LiveEditElement.LiveEditType;
 
 public record SelectedElement(SelectedType type, String classId, String fieldId, String commentId, String linkId) {
 
@@ -14,12 +14,12 @@ public record SelectedElement(SelectedType type, String classId, String fieldId,
 		COMMENT,
 		LINK;
 
-		public RenamingType asRenamingType() {
+		public LiveEditType asLiveEditType() {
 			return switch (this) {
-			case CLASS -> RenamingType.CLASS;
-			case FIELD -> RenamingType.CLASS_FIELD;
-			case COMMENT -> RenamingType.COMMENT;
-			case LINK -> RenamingType.LINK_LABEL;
+			case CLASS -> LiveEditType.CLASS;
+			case FIELD -> LiveEditType.CLASS_FIELD;
+			case COMMENT -> LiveEditType.COMMENT;
+			case LINK -> LiveEditType.LINK_LABEL;
 			default -> throw new IllegalArgumentException("Unsupported option: " + this);
 			};
 		}
@@ -57,8 +57,8 @@ public record SelectedElement(SelectedType type, String classId, String fieldId,
 		return Objects.hash(this.type, this.getActualId());
 	}
 
-	public RenamingElement asRenamingElement(boolean alternative) {
-		return new RenamingElement(this.type.asRenamingType(), this.classId, this.fieldId, this.commentId, this.linkId, alternative);
+	public LiveEditElement asRenamingElement(boolean alternative) {
+		return new LiveEditElement(this.type.asLiveEditType(), this.classId, this.fieldId, this.commentId, this.linkId, alternative);
 	}
 
 	@Override

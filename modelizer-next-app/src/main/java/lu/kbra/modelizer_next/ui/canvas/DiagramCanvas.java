@@ -31,8 +31,8 @@ import lu.kbra.modelizer_next.ui.canvas.datastruct.ClipboardSnapshot;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.DraggedSelection;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.LinkAnchorPlacement;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.LinkCreationState;
-import lu.kbra.modelizer_next.ui.canvas.datastruct.RenamingComponents;
-import lu.kbra.modelizer_next.ui.canvas.datastruct.RenamingElement;
+import lu.kbra.modelizer_next.ui.canvas.datastruct.LiveEditComponents;
+import lu.kbra.modelizer_next.ui.canvas.datastruct.LiveEditElement;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.ResizingComment;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectedElement;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectedElement.SelectedType;
@@ -120,8 +120,8 @@ public class DiagramCanvas extends JPanel implements DiagramModelLookup, NodeLay
 	LinkCreationState linkCreationState;
 	SelectedElement linkPreviewTarget;
 
-	RenamingComponents renamingComponents;
-	RenamingElement renamingElement;
+	LiveEditComponents liveEditComponents;
+	LiveEditElement liveEditElement;
 
 	Point2D.Double linkPreviewMousePoint;
 	SelectedElement selectedElement;
@@ -175,8 +175,8 @@ public class DiagramCanvas extends JPanel implements DiagramModelLookup, NodeLay
 		super.addMouseMotionListener(mouseAdapter);
 		super.addMouseWheelListener(mouseAdapter);
 
-		this.renamingComponents = this.createRenamingField();
-		this.renamingComponents.forEach(super::add);
+		this.liveEditComponents = this.createRenamingField();
+		this.liveEditComponents.forEach(super::add);
 		super.setLayout(null);
 	}
 
@@ -247,7 +247,7 @@ public class DiagramCanvas extends JPanel implements DiagramModelLookup, NodeLay
 		this.dragOccurred = false;
 
 		this.currentDragOffset = new Point2D.Double();
-		this.renamingComponents.forEach(c -> c.setVisible(false));
+		this.liveEditComponents.forEach(c -> c.setVisible(false));
 
 		this.setCursor(Cursor.getDefaultCursor());
 		this.notifySelectionChanged();

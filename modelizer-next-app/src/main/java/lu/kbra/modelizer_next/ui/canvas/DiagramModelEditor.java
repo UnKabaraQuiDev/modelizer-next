@@ -43,10 +43,10 @@ import lu.kbra.modelizer_next.layout.LayoutObjectType;
 import lu.kbra.modelizer_next.layout.NodeLayout;
 import lu.kbra.modelizer_next.layout.PanelType;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.LinkGeometry;
-import lu.kbra.modelizer_next.ui.canvas.datastruct.RenamingComponents;
+import lu.kbra.modelizer_next.ui.canvas.datastruct.LiveEditComponents;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.RenamingContext;
-import lu.kbra.modelizer_next.ui.canvas.datastruct.RenamingElement;
-import lu.kbra.modelizer_next.ui.canvas.datastruct.RenamingElement.RenamingType;
+import lu.kbra.modelizer_next.ui.canvas.datastruct.LiveEditElement;
+import lu.kbra.modelizer_next.ui.canvas.datastruct.LiveEditElement.LiveEditType;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectedElement;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectedElement.SelectedType;
 import lu.kbra.modelizer_next.ui.dialogs.LinkEditorDialog;
@@ -117,15 +117,15 @@ interface DiagramModelEditor extends DiagramCanvasExt {
 		targetClass.getFields().add(fieldModel);
 		fieldModel.setTechnicalOnly(this.getPanelType().isTechnical());
 
-		if (this.getCanvas().isRenamingElement() && this.getCanvas().renamingElement.type().isClass()
-				&& this.getCanvas().renamingElement.classId().equals(targetClass.getId())) {
+		if (this.getCanvas().isLiveEditingElement() && this.getCanvas().liveEditElement.type().isClass()
+				&& this.getCanvas().liveEditElement.classId().equals(targetClass.getId())) {
 			this.getCanvas().confirmRenamingElement(0, false);
 		}
 		this.getCanvas().select(SelectedElement.forField(targetClass.getId(), fieldModel.getId()));
 		this.getCanvas().notifySelectionChanged();
 		this.getCanvas().notifyDocumentChanged();
 		this.getCanvas().repaint();
-		this.getCanvas().invokeRenamingElement(RenamingElement.forField(targetClass.getId(), fieldModel.getId()));
+		this.getCanvas().invokeRenamingElement(LiveEditElement.forField(targetClass.getId(), fieldModel.getId()));
 	}
 
 	default void addLink() {
@@ -197,7 +197,7 @@ interface DiagramModelEditor extends DiagramCanvasExt {
 		this.getCanvas().notifySelectionChanged();
 		this.getCanvas().notifyDocumentChanged();
 		this.getCanvas().repaint();
-		this.getCanvas().invokeRenamingElement(RenamingElement.forClass(classModel.getId()));
+		this.getCanvas().invokeRenamingElement(LiveEditElement.forClass(classModel.getId()));
 	}
 
 	default void deleteSelection() {

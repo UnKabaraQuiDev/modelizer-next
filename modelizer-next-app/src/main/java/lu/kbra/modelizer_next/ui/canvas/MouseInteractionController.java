@@ -105,6 +105,26 @@ interface MouseInteractionController extends DiagramCanvasExt {
 		this.getCanvas().repaint();
 	}
 
+	default SelectedElement getSelectedDragAnchor(final SelectedElement element) {
+		if (element == null) {
+			return null;
+		}
+
+		if (this.getCanvas().isElementSelected(element)) {
+			return element;
+		}
+
+		if (element.type() == SelectedElement.SelectedType.FIELD) {
+			final SelectedElement parentClass = SelectedElement.forClass(element.classId());
+
+			if (this.getCanvas().isElementSelected(parentClass)) {
+				return parentClass;
+			}
+		}
+
+		return null;
+	}
+
 	default void handleMousePressed(final MouseEvent event) {
 		this.getCanvas().requestFocusInWindow();
 		this.getCanvas().lastScreenPoint = event.getPoint();
@@ -159,16 +179,17 @@ interface MouseInteractionController extends DiagramCanvasExt {
 		}
 
 		final SelectedElement clickedElement = hitResult.selection();
-		final boolean clickedAlreadySelected = this.getCanvas().isElementSelected(clickedElement);
+		final SelectedElement selectedDragAnchor = this.getCanvas().getSelectedDragAnchor(clickedElement);
+		final boolean clickedAlreadySelected = selectedDragAnchor != null;
 
 		if (!this.getCanvas().pendingModifierSelection) {
 			if (clickedAlreadySelected) {
-				this.getCanvas().selectedElement = clickedElement;
+				this.getCanvas().selectedElement = selectedDragAnchor;
 				this.getCanvas().document.getModel().getClasses().sort(this.getCanvas().comparator);
 				this.getCanvas().notifySelectionChanged();
 				this.getCanvas().repaint();
 			} else {
-				this.getCanvas().addToSelection(clickedElement);
+				this.getCanvas().select(clickedElement);
 			}
 		}
 
@@ -186,13 +207,17 @@ interface MouseInteractionController extends DiagramCanvasExt {
 		}
 
 		if (hitResult.layout() != null) {
-			if (this.getCanvas().pendingModifierSelection && !this.getCanvas().isElementSelected(clickedElement)) {
+			final SelectedElement dragAnchor = this.getCanvas().getSelectedDragAnchor(clickedElement);
+
+			if (this.getCanvas().pendingModifierSelection && dragAnchor == null) {
 				return;
 			}
 
+			final SelectedElement draggedElement = dragAnchor == null ? clickedElement : dragAnchor;
+
 			if (hitResult.selection().type() == SelectedType.FIELD) {
 				this.getCanvas().draggedSelection = this.getCanvas()
-						.createDraggedSelection(clickedElement,
+						.createDraggedSelection(draggedElement,
 								hitResult.layout(),
 								worldPoint,
 								new Rectangle2D.Double(hitResult.layout().getPosition().getX(),
@@ -201,7 +226,7 @@ interface MouseInteractionController extends DiagramCanvasExt {
 										hitResult.layout().getSize().getY()));
 			} else {
 				this.getCanvas().draggedSelection = this.getCanvas()
-						.createDraggedSelection(clickedElement, hitResult.layout(), worldPoint, hitResult.bounds());
+						.createDraggedSelection(draggedElement, hitResult.layout(), worldPoint, hitResult.bounds());
 			}
 
 			this.getCanvas().setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
@@ -242,6 +267,17 @@ interface MouseInteractionController extends DiagramCanvasExt {
 			this.getCanvas().updateSelectionFromMouse(this.getCanvas().pendingClickSelection, event);
 		}
 
+		if (SwingUtilities.isLeftMouseButton(event) && !this.getCanvas().pendingModifierSelection && !this.getCanvas().dragOccurred
+				&& this.getCanvas().pendingClickSelection != null) {
+
+			final SelectedElement pendingSelection = this.getCanvas().pendingClickSelection;
+			final SelectedElement selectedDragAnchor = this.getCanvas().getSelectedDragAnchor(pendingSelection);
+
+			if (selectedDragAnchor != null && !selectedDragAnchor.equals(pendingSelection)) {
+				this.getCanvas().select(pendingSelection);
+			}
+		}
+
 		this.getCanvas().draggedSelection = null;
 		this.getCanvas().resizingComment = null;
 		this.getCanvas().panning = false;
@@ -275,8 +311,8 @@ interface MouseInteractionController extends DiagramCanvasExt {
 		state.setPanX(event.getX() - worldBefore.getX() * newZoom);
 		state.setPanY(event.getY() - worldBefore.getY() * newZoom);
 
-		if (getCanvas().isRenamingElement()) {
-			getCanvas().updateRenamingLayout();
+		if (getCanvas().isLiveEditingElement()) {
+			getCanvas().updateLiveEditLayout();
 		}
 
 		this.getCanvas().repaint();

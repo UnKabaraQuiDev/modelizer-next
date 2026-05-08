@@ -13,6 +13,7 @@ import java.util.Objects;
 import javax.swing.AbstractAction;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListCellRenderer;
+import javax.swing.DefaultListModel;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JList;
@@ -36,15 +37,19 @@ import lu.kbra.modelizer_next.layout.LayoutObjectType;
 import lu.kbra.modelizer_next.layout.NodeLayout;
 import lu.kbra.modelizer_next.layout.PanelType;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.LinkGeometry;
-import lu.kbra.modelizer_next.ui.canvas.datastruct.RenamingComponents;
+import lu.kbra.modelizer_next.ui.canvas.datastruct.LiveEditComponents;
+import lu.kbra.modelizer_next.ui.canvas.datastruct.LiveEditElement;
+import lu.kbra.modelizer_next.ui.canvas.datastruct.LiveEditElement.LiveEditType;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.RenamingContext;
-import lu.kbra.modelizer_next.ui.canvas.datastruct.RenamingElement;
-import lu.kbra.modelizer_next.ui.canvas.datastruct.RenamingElement.RenamingType;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectedElement.SelectedType;
 import lu.kbra.modelizer_next.ui.frame.MainFrame;
 import lu.kbra.pclib.PCUtils;
 
 public interface LiveEditor extends DiagramCanvasExt {
+
+	default void editStyle() {
+
+	}
 
 	@SuppressWarnings("incomplete-switch")
 	default void editSelected() {
@@ -59,16 +64,17 @@ public interface LiveEditor extends DiagramCanvasExt {
 		}
 	}
 
-	default void invokeRenamingElement(final RenamingElement element) {
-		if (this.isRenamingElement()) {
-			this.getCanvas().renamingComponents.setVisible(false);
-			this.getCanvas().renamingElement = null;
+	default void invokeRenamingElement(final LiveEditElement element) {
+		if (this.isLiveEditingElement()) {
+			cancelLiveEditElement();
+//			this.getCanvas().liveEditComponents.setVisible(false);
+//			this.getCanvas().liveEditElement = null;
 		}
 
 		final DiagramCanvas canvas = this.getCanvas();
 
-		canvas.renamingElement = element;
-		canvas.selectedElements.clear();
+		canvas.liveEditElement = element;
+//		canvas.selectedElements.clear();
 		canvas.select(element.asSelectedElement());
 
 		final RenamingContext ctx = switch (element.type()) {
@@ -80,18 +86,18 @@ public interface LiveEditor extends DiagramCanvasExt {
 		default -> throw new IllegalArgumentException("Unexpected value: " + element.type());
 		};
 
-		this.applyRenamingContext(ctx);
+		this.applyLiveEditContext(ctx);
 	}
 
-	default void updateRenamingLayout() {
-		if (!isRenamingElement()) {
+	default void updateLiveEditLayout() {
+		if (!isLiveEditingElement()) {
 			return;
 		}
 
 		final DiagramCanvas canvas = getCanvas();
 
-		final RenamingElement renamingElement = canvas.renamingElement;
-		final RenamingComponents renamingComponents = canvas.renamingComponents;
+		final LiveEditElement renamingElement = canvas.liveEditElement;
+		final LiveEditComponents renamingComponents = canvas.liveEditComponents;
 
 		final RenamingContext ctx = switch (renamingElement.type()) {
 		case CLASS -> this.buildClassContext(renamingElement);
@@ -111,11 +117,11 @@ public interface LiveEditor extends DiagramCanvasExt {
 	}
 
 	@SuppressWarnings("unchecked")
-	default void applyRenamingContext(final RenamingContext ctx) {
+	default void applyLiveEditContext(final RenamingContext ctx) {
 		final DiagramCanvas canvas = this.getCanvas();
 
-		final RenamingElement renamingElement = canvas.renamingElement;
-		final RenamingComponents renamingComponents = canvas.renamingComponents;
+		final LiveEditElement renamingElement = canvas.liveEditElement;
+		final LiveEditComponents renamingComponents = canvas.liveEditComponents;
 
 		final JComponent comp = renamingElement.getRenamingComponent(renamingComponents);
 
@@ -154,7 +160,7 @@ public interface LiveEditor extends DiagramCanvasExt {
 		});
 	}
 
-	default RenamingContext buildClassContext(final RenamingElement e) {
+	default RenamingContext buildClassContext(final LiveEditElement e) {
 		final var canvas = this.getCanvas();
 
 		final NodeLayout nl = canvas.findOrCreateNodeLayout(LayoutObjectType.CLASS, e.classId());
@@ -168,7 +174,7 @@ public interface LiveEditor extends DiagramCanvasExt {
 		return new RenamingContext(pos, size, model.getNames().get(canvas.panelType), model.getStyle(), String.class, model);
 	}
 
-	default RenamingContext buildClassFieldContext(final RenamingElement e) {
+	default RenamingContext buildClassFieldContext(final LiveEditElement e) {
 		final var canvas = this.getCanvas();
 
 		final NodeLayout nl = canvas.findOrCreateNodeLayout(LayoutObjectType.CLASS, e.classId());
@@ -188,7 +194,7 @@ public interface LiveEditor extends DiagramCanvasExt {
 				.worldToScreen(fieldPos), size, field.getNames().get(canvas.panelType), field.getStyle(), String.class, field);
 	}
 
-	default RenamingContext buildCommentContext(final RenamingElement e) {
+	default RenamingContext buildCommentContext(final LiveEditElement e) {
 		final var canvas = this.getCanvas();
 
 		final NodeLayout nl = canvas.findOrCreateNodeLayout(LayoutObjectType.COMMENT, e.commentId());
@@ -200,7 +206,7 @@ public interface LiveEditor extends DiagramCanvasExt {
 		return new RenamingContext(pos, size, comment.getText(), comment.getStyle(), String.class, comment);
 	}
 
-	default RenamingContext buildLinkCardinalityContext(final RenamingElement e) {
+	default RenamingContext buildLinkCardinalityContext(final LiveEditElement e) {
 		final LinkModel linkModel = this.getCanvas().findLinkById(e.linkId());
 		final LinkGeometry geometry = this.getCanvas().resolveLinkGeometry(linkModel);
 
@@ -220,14 +226,14 @@ public interface LiveEditor extends DiagramCanvasExt {
 		}
 
 		final Point2D size = new Point2D.Double(
-				value == null ? 50 : this.getCanvas().renamingComponents.textField().getPreferredSize().getWidth() + 10,
-				this.getCanvas().renamingComponents.textField().getPreferredSize().getHeight());
+				value == null ? 50 : this.getCanvas().liveEditComponents.textField().getPreferredSize().getWidth() + 10,
+				this.getCanvas().liveEditComponents.textField().getPreferredSize().getHeight());
 		pos.setLocation(pos.getX() - size.getX() / 2, pos.getY() - size.getY() / 2);
 
 		return new RenamingContext(pos, size, value, new ElementStyle(Color.BLACK, Color.WHITE, Color.BLACK), Cardinality.class, linkModel);
 	}
 
-	default RenamingContext buildLinkLabelContext(final RenamingElement e) {
+	default RenamingContext buildLinkLabelContext(final LiveEditElement e) {
 		final LinkModel linkModel = this.getCanvas().findLinkById(e.linkId());
 		final LinkGeometry geometry = this.getCanvas().resolveLinkGeometry(linkModel);
 
@@ -251,35 +257,35 @@ public interface LiveEditor extends DiagramCanvasExt {
 		}
 
 		final Point2D size = new Point2D.Double(
-				value == null || value.isBlank() ? 50 : this.getCanvas().renamingComponents.textField().getPreferredSize().getWidth() + 10,
-				this.getCanvas().renamingComponents.textField().getPreferredSize().getHeight());
+				value == null || value.isBlank() ? 50 : this.getCanvas().liveEditComponents.textField().getPreferredSize().getWidth() + 10,
+				this.getCanvas().liveEditComponents.textField().getPreferredSize().getHeight());
 		pos.setLocation(pos.getX() - size.getX() / 2, pos.getY() - size.getY() / 2);
 
 		return new RenamingContext(pos, size, value, new ElementStyle(Color.BLACK, Color.WHITE, Color.BLACK), String.class, linkModel);
 	}
 
-	default boolean isRenamingElement() {
-		return this.getCanvas().renamingElement != null;
+	default boolean isLiveEditingElement() {
+		return this.getCanvas().liveEditElement != null;
 	}
 
-	default void cancelRenamingElement() {
-		if (!this.isRenamingElement()) {
+	default void cancelLiveEditElement() {
+		if (!this.isLiveEditingElement()) {
 			return;
 		}
-		this.getCanvas().renamingComponents.setVisible(false);
-		this.getCanvas().renamingElement = null;
+		this.getCanvas().liveEditComponents.setVisible(false);
+		this.getCanvas().liveEditElement = null;
 		this.getCanvas().repaint();
 	}
 
 	default void confirmRenamingElement(final int nextDir, final boolean alternative) {
-		if (!this.isRenamingElement()) {
-			this.getCanvas().renamingComponents.setVisible(false);
+		if (!this.isLiveEditingElement()) {
+			this.getCanvas().liveEditComponents.setVisible(false);
 			this.getCanvas().repaint();
 			return;
 		}
 
-		final RenamingElement renamingElement = this.getCanvas().renamingElement;
-		final RenamingComponents renamingComponents = this.getCanvas().renamingComponents;
+		final LiveEditElement renamingElement = this.getCanvas().liveEditElement;
+		final LiveEditComponents renamingComponents = this.getCanvas().liveEditComponents;
 		boolean next = nextDir != 0;
 
 		if (renamingElement.type().isClass()) {
@@ -292,7 +298,7 @@ public interface LiveEditor extends DiagramCanvasExt {
 				if (next) {
 					if (classModel.getFields().size() > 0) {
 						this.getCanvas()
-								.invokeRenamingElement(RenamingElement.forField(classModel.getId(),
+								.invokeRenamingElement(LiveEditElement.forField(classModel.getId(),
 										(nextDir < 0 ? classModel.getFields().getLast() : classModel.getFields().getFirst()).getId(),
 										alternative));
 					} else {
@@ -307,10 +313,10 @@ public interface LiveEditor extends DiagramCanvasExt {
 				if (next) {
 					final int idx = classModel.getFieldIndex(fieldModel.getId(), this.getPanelType());
 					if (idx + nextDir < 0 || idx + nextDir > classModel.getFieldCount(this.getPanelType()) - 1) {
-						this.getCanvas().invokeRenamingElement(RenamingElement.forClass(classModel.getId(), alternative));
+						this.getCanvas().invokeRenamingElement(LiveEditElement.forClass(classModel.getId(), alternative));
 					} else {
 						this.getCanvas()
-								.invokeRenamingElement(RenamingElement.forField(classModel.getId(),
+								.invokeRenamingElement(LiveEditElement.forField(classModel.getId(),
 										classModel.getField(idx + nextDir, this.getPanelType()).getId(),
 										alternative));
 					}
@@ -343,7 +349,7 @@ public interface LiveEditor extends DiagramCanvasExt {
 
 			if (next) {
 				this.getCanvas()
-						.invokeRenamingElement(RenamingElement.forLink(linkModel.getId(),
+						.invokeRenamingElement(LiveEditElement.forLink(linkModel.getId(),
 								nextDir > 0 ? renamingElement.type().next() : renamingElement.type().previous()));
 			}
 
@@ -364,7 +370,7 @@ public interface LiveEditor extends DiagramCanvasExt {
 			commentModel.setText(renamingComponents.textArea().getText());
 
 			next = false;
-		} else if (renamingElement.type() == RenamingType.NONE) {
+		} else if (renamingElement.type() == LiveEditType.NONE) {
 			return;
 		} else {
 			throw new IllegalArgumentException("Unknown type: " + renamingElement);
@@ -375,19 +381,22 @@ public interface LiveEditor extends DiagramCanvasExt {
 
 		if (!next) {
 			renamingComponents.setVisible(false);
-			this.getCanvas().renamingElement = null;
+			this.getCanvas().liveEditElement = null;
 			SwingUtilities.invokeLater(this.getCanvas()::requestFocusInWindow);
 			this.getCanvas().repaint();
 		}
 	}
 
-	default RenamingComponents createRenamingField() {
+	default LiveEditComponents createRenamingField() {
 		final JTextField textField = new JTextField("editing");
+
 		final JTextArea textArea = new JTextArea("editing");
 		textArea.setLineWrap(true);
 		textArea.setWrapStyleWord(true);
+
 		final JComboBox<Enum<?>> comboBox = new JComboBox<>(new DefaultComboBoxModel<>());
 		comboBox.setRenderer(new DefaultListCellRenderer() {
+
 			@Override
 			public Component getListCellRendererComponent(
 					final JList<?> list,
@@ -408,9 +417,36 @@ public interface LiveEditor extends DiagramCanvasExt {
 
 				return this;
 			}
+
 		});
 
-		for (final JComponent renamingField : new JComponent[] { textField, textArea, comboBox }) {
+		final JList<Object> list = new JList<>(new DefaultListModel<>());
+		list.setCellRenderer(new DefaultListCellRenderer() {
+
+			@Override
+			public Component getListCellRendererComponent(
+					final JList<?> list,
+					final Object value,
+					final int index,
+					final boolean isSelected,
+					final boolean cellHasFocus) {
+
+				super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+
+				if (value instanceof final DisplayValueOwner dvo) {
+					this.setText(dvo.getDisplayValue());
+				} else if (value instanceof final Enum<?> e) {
+					this.setText(PCUtils.capitalize(e.name().toLowerCase().replace('_', ' ')));
+				} else {
+					this.setText(value != null ? value.toString() : "");
+				}
+
+				return this;
+			}
+
+		});
+
+		for (final JComponent renamingField : new JComponent[] { textField, textArea, comboBox, list }) {
 			renamingField.setVisible(false);
 			renamingField.setFocusTraversalKeysEnabled(false);
 			renamingField.addFocusListener(new FocusAdapter() {
@@ -420,7 +456,7 @@ public interface LiveEditor extends DiagramCanvasExt {
 					if (!e.isTemporary() && renamingField.isVisible() && e.getOppositeComponent() != renamingField) {
 						SwingUtilities.invokeLater(() -> {
 							if (!renamingField.hasFocus()) {
-								getCanvas().cancelRenamingElement();
+								getCanvas().cancelLiveEditElement();
 							}
 						});
 					}
@@ -441,7 +477,7 @@ public interface LiveEditor extends DiagramCanvasExt {
 
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					getCanvas().cancelRenamingElement();
+					getCanvas().cancelLiveEditElement();
 				}
 
 			});
@@ -487,7 +523,7 @@ public interface LiveEditor extends DiagramCanvasExt {
 			});
 		}
 
-		return new RenamingComponents(textField, textArea, comboBox);
+		return new LiveEditComponents(textField, textArea, comboBox, list);
 	}
 
 }
