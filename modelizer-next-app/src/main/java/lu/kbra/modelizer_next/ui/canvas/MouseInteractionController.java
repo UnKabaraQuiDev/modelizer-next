@@ -262,6 +262,10 @@ interface MouseInteractionController extends DiagramCanvasExt {
 		state.setPanX(event.getX() - worldBefore.getX() * newZoom);
 		state.setPanY(event.getY() - worldBefore.getY() * newZoom);
 
+		if (getCanvas().isRenamingElement()) {
+			getCanvas().updateRenamingLayout();
+		}
+
 		this.getCanvas().repaint();
 	}
 

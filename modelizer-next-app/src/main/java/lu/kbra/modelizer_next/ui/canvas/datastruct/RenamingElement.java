@@ -140,7 +140,6 @@ public record RenamingElement(RenamingType type, String classId, String fieldId,
 				&& this.forceAlternative == ((RenamingElement) other).forceAlternative;
 	}
 
-	@Deprecated
 	public JComponent getRenamingComponent(final RenamingComponents component) {
 		return switch (this.type) {
 		case CLASS, CLASS_FIELD, LINK_LABEL, LINK_TO_LABEL, LINK_FROM_LABEL -> component.textField();
