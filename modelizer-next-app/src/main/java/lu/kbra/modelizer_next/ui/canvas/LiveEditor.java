@@ -48,6 +48,9 @@ import lu.kbra.pclib.PCUtils;
 public interface LiveEditor extends DiagramCanvasExt {
 
 	default void editStyle() {
+		if (this.getCanvas().selectedElement == null || this.getCanvas().selectedElement.type() == SelectedType.NONE) {
+			return;
+		}
 
 	}
 
@@ -56,6 +59,7 @@ public interface LiveEditor extends DiagramCanvasExt {
 		if (this.getCanvas().selectedElement == null || this.getCanvas().selectedElement.type() == SelectedType.NONE) {
 			return;
 		}
+
 		switch (this.getCanvas().selectedElement.type()) {
 		case CLASS -> this.getCanvas().editClass(this.getCanvas().selectedElement.classId());
 		case FIELD -> this.getCanvas().editField(this.getCanvas().selectedElement.classId(), this.getCanvas().selectedElement.fieldId());
@@ -67,14 +71,11 @@ public interface LiveEditor extends DiagramCanvasExt {
 	default void invokeRenamingElement(final LiveEditElement element) {
 		if (this.isLiveEditingElement()) {
 			cancelLiveEditElement();
-//			this.getCanvas().liveEditComponents.setVisible(false);
-//			this.getCanvas().liveEditElement = null;
 		}
 
 		final DiagramCanvas canvas = this.getCanvas();
 
 		canvas.liveEditElement = element;
-//		canvas.selectedElements.clear();
 		canvas.select(element.asSelectedElement());
 
 		final RenamingContext ctx = switch (element.type()) {
