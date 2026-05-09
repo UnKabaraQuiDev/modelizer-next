@@ -3,15 +3,15 @@ package lu.kbra.modelizer_next.bootstrap.subapp;
 import java.io.File;
 import java.lang.reflect.Method;
 import java.net.URL;
-import java.net.URLClassLoader;
 import java.util.Queue;
 
 import lu.kbra.modelizer_next.bootstrap.AppMain;
 import lu.kbra.modelizer_next.common.UnsupportedBootstrapVersionException;
+import java.util.Collections;
 
 public final class JarApplicationLauncher {
 
-	private URLClassLoader activeLoader;
+	private ChildFirstURLClassLoader activeLoader;
 
 	public void launch(final String[] args, final Queue<File> toBeOpened, final InstalledApplication application)
 			throws AppLaunchException {
@@ -19,8 +19,9 @@ public final class JarApplicationLauncher {
 			throw new AppLaunchException("No installed application is available.");
 		}
 		try {
-			this.activeLoader = new URLClassLoader(new URL[] { application.jarFile().toUri().toURL() },
-					JarApplicationLauncher.class.getClassLoader());
+			this.activeLoader = new ChildFirstURLClassLoader(new URL[] { application.jarFile().toUri().toURL() },
+					JarApplicationLauncher.class.getClassLoader(),
+					Collections.singletonList("lu.kbra.modelizer_next.bootstrap"));
 			Thread.currentThread().setContextClassLoader(this.activeLoader);
 			final Class<?> entryPointClass = Class.forName(application.entryPoint(), true, this.activeLoader);
 			if (!AppMain.class.isAssignableFrom(entryPointClass)) {
