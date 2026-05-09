@@ -159,7 +159,11 @@ public class DiagramCanvas extends JPanel implements DiagramModelLookup, NodeLay
 		return aSelected ? -1 : 1;
 	};
 
-	public DiagramCanvas(final MainFrame mainFrame, final ModelDocument modelDocument, final PanelType panelType, final DocumentChangeListener documentEventListener) {
+	public DiagramCanvas(
+			final MainFrame mainFrame,
+			final ModelDocument modelDocument,
+			final PanelType panelType,
+			final DocumentChangeListener documentEventListener) {
 		this.mainFrame = mainFrame;
 		this.document = modelDocument;
 		this.panelType = panelType;

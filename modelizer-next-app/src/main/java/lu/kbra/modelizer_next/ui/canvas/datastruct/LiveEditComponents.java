@@ -10,7 +10,8 @@ import javax.swing.JTextField;
 
 import lu.kbra.modelizer_next.style.StylePalette;
 
-public record LiveEditComponents(JTextField textField, JTextArea textArea, JComboBox<Enum<?>> enumComboBox, JList<StylePalette> paletteList) {
+public record LiveEditComponents(JTextField textField, JTextArea textArea, JComboBox<Enum<?>> enumComboBox,
+		JList<StylePalette> paletteList) {
 
 	public void forEach(final Consumer<JComponent> consumer) {
 		consumer.accept(this.textField);

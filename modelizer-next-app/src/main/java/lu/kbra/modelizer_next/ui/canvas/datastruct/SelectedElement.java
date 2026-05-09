@@ -26,7 +26,7 @@ public record SelectedElement(SelectedType type, String classId, String fieldId,
 		}
 
 		public StyleScope asStyleScope() {
-			return switch(this) {
+			return switch (this) {
 			case CLASS -> StyleScope.CLASS;
 			case FIELD -> StyleScope.FIELD;
 			case COMMENT -> StyleScope.COMMENT;

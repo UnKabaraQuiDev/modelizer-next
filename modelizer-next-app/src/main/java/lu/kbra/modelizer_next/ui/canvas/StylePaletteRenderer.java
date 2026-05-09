@@ -80,7 +80,7 @@ public class StylePaletteRenderer extends JPanel implements ListCellRenderer<Sty
 			setBorder(BorderFactory.createLineBorder(value.getLinkColor()));
 		}
 		}
-		
+
 		setBorder(BorderFactory.createCompoundBorder(getBorder(), EMPTY_BORDER));
 
 		if (isSelected) {
