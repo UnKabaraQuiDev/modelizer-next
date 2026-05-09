@@ -3,11 +3,11 @@ package lu.kbra.modelizer_next.bootstrap.subapp;
 import java.io.File;
 import java.lang.reflect.Method;
 import java.net.URL;
+import java.util.Collections;
 import java.util.Queue;
 
 import lu.kbra.modelizer_next.bootstrap.AppMain;
 import lu.kbra.modelizer_next.common.UnsupportedBootstrapVersionException;
-import java.util.Collections;
 
 public final class JarApplicationLauncher {
 
