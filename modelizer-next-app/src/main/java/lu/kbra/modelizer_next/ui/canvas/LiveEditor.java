@@ -1,7 +1,6 @@
 package lu.kbra.modelizer_next.ui.canvas;
 
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.FocusAdapter;
@@ -18,7 +17,6 @@ import java.util.Objects;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.DefaultComboBoxModel;
-import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
@@ -38,7 +36,6 @@ import lu.kbra.modelizer_next.domain.CommentModel;
 import lu.kbra.modelizer_next.domain.FieldModel;
 import lu.kbra.modelizer_next.domain.LinkModel;
 import lu.kbra.modelizer_next.domain.data.Cardinality;
-import lu.kbra.modelizer_next.domain.data.DisplayValueOwner;
 import lu.kbra.modelizer_next.domain.shared.ElementStyle;
 import lu.kbra.modelizer_next.layout.LayoutObjectType;
 import lu.kbra.modelizer_next.layout.NodeLayout;
@@ -51,7 +48,6 @@ import lu.kbra.modelizer_next.ui.canvas.datastruct.LiveEditElement.LiveEditType;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.RenamingContext;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectedElement;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectedElement.SelectedType;
-import lu.kbra.pclib.PCUtils;
 import lu.kbra.pclib.datastructure.pair.Pair;
 import lu.kbra.pclib.datastructure.pair.Pairs;
 
@@ -111,7 +107,7 @@ public interface LiveEditor extends DiagramCanvasExt {
 		final List<StylePalette> palettes = this.getFrame().getPalettes();
 
 		SwingUtilities.invokeLater(() -> {
-			((StylePaletteRenderer) list.getCellRenderer()).setScope(element.type().asSelectedType().asStyleScope());
+			((StylePaletteCellRenderer) list.getCellRenderer()).setScope(element.type().asSelectedType().asStyleScope());
 
 			list.setListData(palettes.toArray(StylePalette[]::new));
 			list.setSelectedValue(canvas.defaultPalette, true);
@@ -120,8 +116,7 @@ public interface LiveEditor extends DiagramCanvasExt {
 
 			list.setFixedCellHeight(-1);
 			final Dimension preferredSize = list.getPreferredSize();
-//			final Point2D.Double size = getCanvas().worldToViewportZoom(preferredSize);
-			final Point2D.Double point = getCanvas().getMouseViewportPos();
+			final Point2D.Double point = this.getCanvas().getMouseViewportPos();
 
 			list.setBounds((int) point.getX() + 5,
 					(int) point.getY(),
@@ -171,11 +166,11 @@ public interface LiveEditor extends DiagramCanvasExt {
 		comp.setFont(
 				DiagramCanvas.BODY_FONT.deriveFont(DiagramCanvas.BODY_FONT.getSize() * (float) this.getCanvas().getPanelState().getZoom()));
 
-		if (liveEditElement.type().isStyle()) {
-			final Dimension preferredSize = comp.getPreferredSize();
-//			final Point2D.Double size = getCanvas().worldToViewportZoom(preferredSize);
+		final Dimension preferredSize = comp.getPreferredSize();
+		comp.setSize((int) (preferredSize.getWidth() + DiagramCanvas.TEXT_PADDING * getCanvas().getPanelState().getZoom()),
+				(int) preferredSize.getHeight());
 
-			comp.setSize((int) preferredSize.getWidth() + DiagramCanvas.TEXT_PADDING, (int) preferredSize.getHeight());
+		if (liveEditElement.type().isStyle()) {
 			this.getCanvas().repaint();
 			return;
 		}
@@ -189,7 +184,7 @@ public interface LiveEditor extends DiagramCanvasExt {
 		default -> throw new IllegalArgumentException("Unexpected value: " + liveEditElement.type());
 		};
 
-		comp.setBounds((int) ctx.pos().getX(), (int) ctx.pos().getY(), (int) ctx.size().getX(), (int) ctx.size().getY());
+		comp.setLocation((int) ctx.pos().getX(), (int) ctx.pos().getY());
 
 		this.getCanvas().repaint();
 	}
@@ -243,14 +238,17 @@ public interface LiveEditor extends DiagramCanvasExt {
 				((JTextComponent) comp).setText(ctx.value() == null ? "" : Objects.toString(ctx.value()));
 			} else if (ctx.valueType().isEnum()) {
 				final Class<? extends Enum<?>> enumClass = (Class<? extends Enum<?>>) ctx.valueType().asSubclass(Enum.class);
-				((JComboBox<Enum<?>>) comp).setModel(new DefaultComboBoxModel<>(enumClass.getEnumConstants()));
-				((JComboBox<Enum<?>>) comp).setSelectedItem(ctx.value());
+				((JList<Enum<?>>) comp).setListData(enumClass.getEnumConstants());
+				((JList<Enum<?>>) comp).setSelectedValue(ctx.value(), true);
 			} else {
 				throw new IllegalArgumentException("Unsupported type: " + ctx.valueType());
 			}
 
 			comp.setFont(DiagramCanvas.BODY_FONT
 					.deriveFont(DiagramCanvas.BODY_FONT.getSize() * (float) this.getCanvas().getPanelState().getZoom()));
+			final Dimension preferredSize = comp.getPreferredSize();
+			comp.setSize((int) (preferredSize.getWidth() + DiagramCanvas.TEXT_PADDING * getCanvas().getPanelState().getZoom()),
+					(int) preferredSize.getHeight());
 
 			comp.setVisible(true);
 			comp.requestFocus();
@@ -485,10 +483,10 @@ public interface LiveEditor extends DiagramCanvasExt {
 				linkModel.setLabelFrom(liveEditComponents.textField().getText());
 			}
 			case LINK_TO_CARDINALITY -> {
-				linkModel.setCardinalityTo((Cardinality) liveEditComponents.enumComboBox().getSelectedItem());
+				linkModel.setCardinalityTo((Cardinality) liveEditComponents.enumList().getSelectedValue());
 			}
 			case LINK_FROM_CARDINALITY -> {
-				linkModel.setCardinalityFrom((Cardinality) liveEditComponents.enumComboBox().getSelectedItem());
+				linkModel.setCardinalityFrom((Cardinality) liveEditComponents.enumList().getSelectedValue());
 			}
 			default -> new IllegalArgumentException("Unexpected type: " + liveEditElement);
 			}
@@ -563,47 +561,11 @@ public interface LiveEditor extends DiagramCanvasExt {
 		textArea.setWrapStyleWord(true);
 
 		final JComboBox<Enum<?>> enumComboBox = new JComboBox<>(new DefaultComboBoxModel<>());
-		enumComboBox.setRenderer(new DefaultListCellRenderer() {
-
-			@Override
-			public Component getListCellRendererComponent(
-					final JList<?> list,
-					final Object value,
-					final int index,
-					final boolean isSelected,
-					final boolean cellHasFocus) {
-
-				super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-
-				if (value instanceof final DisplayValueOwner dvo) {
-					this.setText(dvo.getDisplayValue());
-				} else if (value instanceof final Enum<?> e) {
-					this.setText(PCUtils.capitalize(e.name().toLowerCase().replace('_', ' ')));
-				} else {
-					this.setText(value != null ? value.toString() : "");
-				}
-
-				return this;
-			}
-
-		});
+		enumComboBox.setRenderer(new EnumCellRenderer());
 
 		final JList<StylePalette> stylePaletteList = new JList<>(new DefaultListModel<>());
-		stylePaletteList.setCellRenderer(new StylePaletteRenderer());
+		stylePaletteList.setCellRenderer(new StylePaletteCellRenderer());
 		stylePaletteList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		stylePaletteList.addMouseMotionListener(new MouseMotionAdapter() {
-
-			@Override
-			public void mouseMoved(final MouseEvent e) {
-
-				final int index = stylePaletteList.locationToIndex(e.getPoint());
-
-				if (index >= 0 && index != stylePaletteList.getSelectedIndex()) {
-					stylePaletteList.setSelectedIndex(index);
-				}
-			}
-
-		});
 		stylePaletteList.addListSelectionListener(e -> {
 
 			if (!e.getValueIsAdjusting() && this.isLiveEditingElement() && this.getCanvas().liveEditElement.type().isStyle()) {
@@ -613,39 +575,57 @@ public interface LiveEditor extends DiagramCanvasExt {
 			}
 
 		});
-		stylePaletteList.addMouseListener(new MouseAdapter() {
 
-			@Override
-			public void mouseClicked(final MouseEvent e) {
+		final JList<Enum<?>> enumList = new JList<>(new DefaultListModel<>());
+		enumList.setCellRenderer(new EnumCellRenderer());
 
-				if (!(e.getClickCount() >= 1 && SwingUtilities.isLeftMouseButton(e))) {
-					return;
+		for (final JList<?> list : new JList[] { stylePaletteList, enumList }) {
+			list.addMouseMotionListener(new MouseMotionAdapter() {
+
+				@Override
+				public void mouseMoved(final MouseEvent e) {
+					final int index = ((JList) e.getComponent()).locationToIndex(e.getPoint());
+
+					if (index >= 0 && index != stylePaletteList.getSelectedIndex()) {
+						((JList) e.getComponent()).setSelectedIndex(index);
+					}
 				}
 
-				final int index = stylePaletteList.locationToIndex(e.getPoint());
-				if (index < 0) {
-					return;
+			});
+			list.addMouseListener(new MouseAdapter() {
+
+				@Override
+				public void mouseClicked(final MouseEvent e) {
+
+					if (!(e.getClickCount() >= 1 && SwingUtilities.isLeftMouseButton(e))) {
+						return;
+					}
+
+					final int index = ((JList) e.getComponent()).locationToIndex(e.getPoint());
+					if (index < 0) {
+						return;
+					}
+
+					((JList) e.getComponent()).setSelectedIndex(index);
+					final Action action = ((JList) e.getComponent()).getActionMap().get("submit");
+					if (action != null) {
+						action.actionPerformed(new ActionEvent(((JList) e.getComponent()), ActionEvent.ACTION_PERFORMED, "submit"));
+					}
 				}
 
-				stylePaletteList.setSelectedIndex(index);
-				final Action action = stylePaletteList.getActionMap().get("submit");
-				if (action != null) {
-					action.actionPerformed(new ActionEvent(stylePaletteList, ActionEvent.ACTION_PERFORMED, "submit"));
-				}
-			}
+			});
+		}
 
-		});
-
-		for (final JComponent renamingField : new JComponent[] { textField, textArea, enumComboBox, stylePaletteList }) {
-			renamingField.setVisible(false);
-			renamingField.setFocusTraversalKeysEnabled(false);
-			renamingField.addFocusListener(new FocusAdapter() {
+		for (final JComponent component : new JComponent[] { textField, textArea, enumComboBox, stylePaletteList, enumList }) {
+			component.setVisible(false);
+			component.setFocusTraversalKeysEnabled(false);
+			component.addFocusListener(new FocusAdapter() {
 
 				@Override
 				public void focusLost(final FocusEvent e) {
-					if (!e.isTemporary() && renamingField.isVisible() && e.getOppositeComponent() != renamingField) {
+					if (!e.isTemporary() && component.isVisible() && e.getOppositeComponent() != component) {
 						SwingUtilities.invokeLater(() -> {
-							if (!renamingField.hasFocus()) {
+							if (!component.hasFocus()) {
 								LiveEditor.this.getCanvas().cancelLiveEditElement();
 							}
 						});
@@ -653,17 +633,17 @@ public interface LiveEditor extends DiagramCanvasExt {
 				}
 
 			});
-			renamingField.getInputMap(JComponent.WHEN_FOCUSED).put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "cancel");
-			renamingField.getInputMap(JComponent.WHEN_FOCUSED).put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "submit");
-			renamingField.getInputMap(JComponent.WHEN_FOCUSED).put(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, 0), "submitNext");
-			renamingField.getInputMap(JComponent.WHEN_FOCUSED)
+			component.getInputMap(JComponent.WHEN_FOCUSED).put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "cancel");
+			component.getInputMap(JComponent.WHEN_FOCUSED).put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "submit");
+			component.getInputMap(JComponent.WHEN_FOCUSED).put(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, 0), "submitNext");
+			component.getInputMap(JComponent.WHEN_FOCUSED)
 					.put(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, InputEvent.SHIFT_DOWN_MASK), "submitPrevious");
-			renamingField.getInputMap(JComponent.WHEN_FOCUSED)
+			component.getInputMap(JComponent.WHEN_FOCUSED)
 					.put(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, InputEvent.ALT_DOWN_MASK), "submitNextAlt");
-			renamingField.getInputMap(JComponent.WHEN_FOCUSED)
+			component.getInputMap(JComponent.WHEN_FOCUSED)
 					.put(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, InputEvent.SHIFT_DOWN_MASK | InputEvent.ALT_DOWN_MASK),
 							"submitPreviousAlt");
-			renamingField.getActionMap().put("cancel", new AbstractAction() {
+			component.getActionMap().put("cancel", new AbstractAction() {
 
 				@Override
 				public void actionPerformed(final ActionEvent e) {
@@ -671,7 +651,7 @@ public interface LiveEditor extends DiagramCanvasExt {
 				}
 
 			});
-			renamingField.getActionMap().put("submit", new AbstractAction() {
+			component.getActionMap().put("submit", new AbstractAction() {
 
 				@Override
 				public void actionPerformed(final ActionEvent e) {
@@ -679,7 +659,7 @@ public interface LiveEditor extends DiagramCanvasExt {
 				}
 
 			});
-			renamingField.getActionMap().put("submitNext", new AbstractAction() {
+			component.getActionMap().put("submitNext", new AbstractAction() {
 
 				@Override
 				public void actionPerformed(final ActionEvent e) {
@@ -687,7 +667,7 @@ public interface LiveEditor extends DiagramCanvasExt {
 				}
 
 			});
-			renamingField.getActionMap().put("submitPrevious", new AbstractAction() {
+			component.getActionMap().put("submitPrevious", new AbstractAction() {
 
 				@Override
 				public void actionPerformed(final ActionEvent e) {
@@ -695,7 +675,7 @@ public interface LiveEditor extends DiagramCanvasExt {
 				}
 
 			});
-			renamingField.getActionMap().put("submitNextAlt", new AbstractAction() {
+			component.getActionMap().put("submitNextAlt", new AbstractAction() {
 
 				@Override
 				public void actionPerformed(final ActionEvent e) {
@@ -703,7 +683,7 @@ public interface LiveEditor extends DiagramCanvasExt {
 				}
 
 			});
-			renamingField.getActionMap().put("submitPreviousAlt", new AbstractAction() {
+			component.getActionMap().put("submitPreviousAlt", new AbstractAction() {
 
 				@Override
 				public void actionPerformed(final ActionEvent e) {
@@ -713,7 +693,7 @@ public interface LiveEditor extends DiagramCanvasExt {
 			});
 		}
 
-		return new LiveEditComponents(textField, textArea, enumComboBox, stylePaletteList);
+		return new LiveEditComponents(textField, textArea, enumComboBox, stylePaletteList, enumList);
 	}
 
 }

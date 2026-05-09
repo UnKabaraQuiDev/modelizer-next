@@ -175,7 +175,7 @@ public record LiveEditElement(LiveEditType type, String classId, String fieldId,
 		return switch (this.type) {
 		case CLASS, CLASS_FIELD, LINK_LABEL, LINK_TO_LABEL, LINK_FROM_LABEL -> component.textField();
 		case COMMENT -> component.textArea();
-		case LINK_FROM_CARDINALITY, LINK_TO_CARDINALITY -> component.enumComboBox();
+		case LINK_FROM_CARDINALITY, LINK_TO_CARDINALITY -> component.enumList();
 		case CLASS_STYLE, CLASS_FIELD_STYLE, LINK_STYLE, COMMENT_STYLE -> component.paletteList();
 		default -> throw new IllegalArgumentException("Unexpected value: " + this.type);
 		};
