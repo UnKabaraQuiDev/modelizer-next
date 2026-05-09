@@ -16,6 +16,7 @@ import lu.kbra.modelizer_next.cmdline.CommandLineExportParser;
 import lu.kbra.modelizer_next.cmdline.CommandLineExporter;
 import lu.kbra.modelizer_next.common.App;
 import lu.kbra.modelizer_next.common.FileOpenBridge;
+import lu.kbra.modelizer_next.common.LicensePrinter;
 import lu.kbra.modelizer_next.common.SampleDocumentFactory;
 import lu.kbra.modelizer_next.common.UnsupportedBootstrapVersionException;
 import lu.kbra.modelizer_next.ui.frame.DocumentSession;
@@ -26,6 +27,8 @@ public class ModelizerAppEntryPoint implements AppMain {
 
 	@Override
 	public void start(final String[] args) {
+		LicensePrinter.print();
+
 		try {
 			PCUtils.readPackagedBytesFile("/app.json");
 			throw new UnsupportedBootstrapVersionException("Bootstrap loader is too old.");
