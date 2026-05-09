@@ -9,6 +9,7 @@ public final class LicensePrinter {
 
 	public static final void print() {
 		System.out.println(PCUtils.readPackagedStringFile("/LICENSE_PART"));
+		System.out.println();
 	}
 
 }
