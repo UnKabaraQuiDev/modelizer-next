@@ -14,10 +14,10 @@
     "tag": "7-SNAPSHOT-205"
   },
   "nightly": {
-    "version": "8-NIGHTLY-212",
-    "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/8-NIGHTLY-212/modelizer-next-app-8-NIGHTLY-212.jar",
-    "releaseUrl": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/tag/8-NIGHTLY-212",
+    "version": "8-NIGHTLY-225",
+    "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/8-NIGHTLY-225/modelizer-next-app-8-NIGHTLY-225.jar",
+    "releaseUrl": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/tag/8-NIGHTLY-225",
     "notes": "Latest nightly build.",
-    "tag": "8-NIGHTLY-212"
+    "tag": "8-NIGHTLY-225"
   }
 }
