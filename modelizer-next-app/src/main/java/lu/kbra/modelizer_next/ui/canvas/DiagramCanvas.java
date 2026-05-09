@@ -109,7 +109,7 @@ public class DiagramCanvas extends JPanel implements DiagramModelLookup, NodeLay
 	final MainFrame mainFrame;
 	final ModelDocument document;
 
-	FontRenderContext fontRenderContext;
+	FontRenderContext fontRenderContext = new FontRenderContext(null, true, true);
 
 	final PanelType panelType;
 	final DocumentChangeListener documentEventListener;

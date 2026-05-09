@@ -51,7 +51,7 @@ import lu.kbra.modelizer_next.ui.impl.DocumentChangeListener;
 import lu.kbra.modelizer_next.ui.impl.DocumentLoadHandler;
 import lu.kbra.pclib.PCUtils;
 import lu.kbra.pclib.datastructure.pair.Pair;
-
+import lu.kbra.pclib.datastructure.triplet.Triplet;
 import io.github.andrewauclair.moderndocking.DockingRegion;
 import io.github.andrewauclair.moderndocking.app.Docking;
 import io.github.andrewauclair.moderndocking.app.RootDockingPanel;
@@ -390,15 +390,15 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 		}
 
 		try {
-			final List<File> exportedFiles = ViewExporter
-					.exportViews(this.getCanvasesByPanelType(), request, this.getExportSourceFileName());
+			final List<Triplet<File, PanelType, File>> exportedFiles = ViewExporter
+					.exportViews(this.getCanvasesByPanelType(), request, this.getExportSourceFileName(), null);
 			if (exportedFiles.isEmpty()) {
 				JOptionPane.showMessageDialog(this, "No view was exported.", "Export", JOptionPane.WARNING_MESSAGE);
 				return;
 			}
 
 			final String message = "Exported " + exportedFiles.size() + " file" + (exportedFiles.size() > 1 ? "s" : "") + ":\n"
-					+ exportedFiles.stream().map(File::getAbsolutePath).collect(Collectors.joining("\n"));
+					+ exportedFiles.stream().map(t -> t.getThird().getAbsolutePath()).collect(Collectors.joining("\n"));
 
 			final Object[] options = { "Show file(s)", "Close" };
 
@@ -419,7 +419,7 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 							JOptionPane.ERROR_MESSAGE);
 					return;
 				}
-				Desktop.getDesktop().open(exportedFiles.size() > 1 ? request.outputDirectory() : exportedFiles.get(0));
+				Desktop.getDesktop().open(exportedFiles.size() > 1 ? request.outputDirectory() : exportedFiles.get(0).getThird());
 			}
 		} catch (final IOException ex) {
 			JOptionPane.showMessageDialog(this, "Failed to export view:\n" + ex.getMessage(), "Export error", JOptionPane.ERROR_MESSAGE);

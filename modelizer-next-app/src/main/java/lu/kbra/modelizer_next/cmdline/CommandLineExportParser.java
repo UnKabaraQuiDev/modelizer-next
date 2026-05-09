@@ -2,6 +2,8 @@ package lu.kbra.modelizer_next.cmdline;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -65,20 +67,22 @@ public final class CommandLineExportParser {
 		boolean force = false;
 		boolean multiple = false;
 		boolean wildcard = false;
+		int jobCount = 1;
 
 		for (int i = 0; i < args.length; i++) {
 			final String arg = args[i];
 
 			switch (arg) {
-			case "-e", "--export" -> inputFile = new File(CommandLineExportParser.requireValue(args, ++i, arg));
+			case "-e", "--export" -> inputFile = resolveHome(CommandLineExportParser.requireValue(args, ++i, arg)).toFile();
 			case "-t", "--type" -> format = CommandLineExportParser.parseFormat(CommandLineExportParser.requireValue(args, ++i, arg));
 			case "-s", "--scope" -> scope = CommandLineExportParser.parseScope(CommandLineExportParser.requireValue(args, ++i, arg));
 			case "-p", "--panels" -> panelTypes = CommandLineExportParser.parsePanels(CommandLineExportParser.requireValue(args, ++i, arg));
-			case "-o", "--out" -> outputDirectory = new File(CommandLineExportParser.requireValue(args, ++i, arg));
+			case "-o", "--out" -> outputDirectory = resolveHome(CommandLineExportParser.requireValue(args, ++i, arg)).toFile();
 			case "-n", "--pattern" -> fileNamePattern = CommandLineExportParser.requireValue(args, ++i, arg);
 			case "-f", "--force" -> force = true;
 			case "-m", "--multiple" -> multiple = true;
 			case "-w", "--wildcard" -> wildcard = true;
+			case "-j", "--jobs" -> jobCount = Integer.parseInt(CommandLineExportParser.requireValue(args, ++i, arg));
 			case "-h", "--help" -> {
 				CommandLineExportParser.printHelp();
 				throw new HelpRequestedException();
@@ -95,7 +99,7 @@ public final class CommandLineExportParser {
 			throw new MissingArgumentException("Missing required argument: --type <svg|png>");
 		}
 
-		if (!inputFile.exists()) {
+		if (!multiple && !wildcard && !inputFile.exists()) {
 			throw new MissingArgumentException("Input file does not exist: " + inputFile);
 		}
 
@@ -107,7 +111,27 @@ public final class CommandLineExportParser {
 			throw new MissingArgumentException("Missing required argument: --panels <conceptual,logical,physical>");
 		}
 
-		return new CommandLineExportOptions(inputFile, format, scope, panelTypes, outputDirectory, fileNamePattern, force, multiple, wildcard);
+		if (jobCount <= 0) {
+			throw new IllegalArgumentException("Job count cannot be zero or negative.");
+		}
+
+		return new CommandLineExportOptions(inputFile,
+				format,
+				scope,
+				panelTypes,
+				outputDirectory,
+				fileNamePattern,
+				force,
+				multiple,
+				wildcard,
+				jobCount);
+	}
+
+	public static Path resolveHome(String path) {
+		if (path.startsWith("~")) {
+			path = System.getProperty("user.home") + path.substring(1);
+		}
+		return Paths.get(path).normalize();
 	}
 
 	public static void printHelp() {
@@ -126,6 +150,7 @@ public final class CommandLineExportParser {
 				  -h, --help                 Print this help
 				  -m, --multiple             Multiple input files, separated by commas "path1,path2,path3..."
 				  -w, --wildcard             Enable wildcard support for input files, supports: *, **, ?
+				  -j, --jobs <count>         Dispatch multiple threads to speed up the export process
 				""".replace("%DEFAULT_FILE_PATTER%", ViewExporter.DEFAULT_FILE_PATTERN)
 				.replace("%FILE_PATTERN_TOKENS%", ViewExporter.FILE_PATTERN_TOKENS.stream().collect(Collectors.joining(", "))));
 	}

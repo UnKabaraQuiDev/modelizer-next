@@ -97,7 +97,9 @@ public final class ViewExporter {
 				}
 
 				final Triplet<File, PanelType, File> data = Triplets.readOnly(sourceFile, panelType, outputFile);
-				callback.accept(data);
+				if (callback != null) {
+					callback.accept(data);
+				}
 				exportedFiles.add(data);
 			}
 		}

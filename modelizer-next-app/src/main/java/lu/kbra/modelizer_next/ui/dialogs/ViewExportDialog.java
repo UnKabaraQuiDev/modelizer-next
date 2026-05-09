@@ -375,7 +375,9 @@ public class ViewExportDialog extends JDialog {
 				(ViewExportScope) this.scopeSelector.getSelectedItem(),
 				this.getSelectedPanelTypes(),
 				new File(this.outputDirectoryField.getText()),
-				this.filePatternField.getText());
+				this.filePatternField.getText(),
+				false,
+				false);
 		this.dispose();
 	}
 
