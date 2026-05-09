@@ -1,0 +1,12 @@
+#!/bin/sh
+set -e
+
+APP_BIN_DIR="/opt/modelizer-next/bin"
+TARGET="$APP_BIN_DIR/Modelizer Next"
+LINK="/usr/bin/modelizer-next"
+
+if [ -x "$TARGET" ]; then
+    ln -sfn "$TARGET" "$LINK"
+fi
+
+exit 0

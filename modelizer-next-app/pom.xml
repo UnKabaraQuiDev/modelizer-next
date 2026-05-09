@@ -121,6 +121,7 @@
 			<properties>
 				<portable>true</portable>
 				<common.scope>compile</common.scope>
+				<jpackage.resourceDir>${jpackage.add}/app</jpackage.resourceDir>
 			</properties>
 		</profile>
 	</profiles>

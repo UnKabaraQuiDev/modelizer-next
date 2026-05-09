@@ -1,0 +1,10 @@
+#!/bin/sh
+set -e
+
+LINK="/usr/bin/modelizer-next-app"
+
+if [ -L "$LINK" ]; then
+    rm -f "$LINK"
+fi
+
+exit 0
