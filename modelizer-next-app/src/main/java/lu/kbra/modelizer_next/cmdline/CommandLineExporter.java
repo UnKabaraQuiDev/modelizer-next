@@ -1,10 +1,13 @@
 package lu.kbra.modelizer_next.cmdline;
 
 import java.io.File;
+import java.nio.file.PathMatcher;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
+import org.apache.commons.io.filefilter.PathMatcherFileFilter;
 
 import lu.kbra.modelizer_next.document.ModelDocument;
 import lu.kbra.modelizer_next.layout.PanelType;
@@ -14,6 +17,7 @@ import lu.kbra.modelizer_next.ui.export.ViewExporter;
 import lu.kbra.modelizer_next.ui.frame.DocumentSession;
 import lu.kbra.modelizer_next.ui.frame.MainFrame;
 import lu.kbra.modelizer_next.ui.impl.DocumentChangeListener;
+import lu.kbra.pclib.datastructure.triplet.Triplet;
 
 public final class CommandLineExporter {
 
@@ -40,15 +44,21 @@ public final class CommandLineExporter {
 				return 3;
 			}
 
-			final ViewExportRequest request = new ViewExportRequest(options
-					.format(), options.scope(), options.panelTypes(), options.outputDirectory(), options.fileNamePattern());
+			final ViewExportRequest request = new ViewExportRequest(options.format(),
+					options.scope(),
+					options.panelTypes(),
+					options.outputDirectory(),
+					options.fileNamePattern(),
+					options.multiple(),
+					options.wildcard());
 
-			final List<File> exportedFiles = ViewExporter
-					.exportViews(canvases, request, CommandLineExporter.stripExtension(options.inputFile().getName()));
+			final List<Triplet<File, PanelType, File>> exportedFiles = ViewExporter.exportViews(canvases,
+					request,
+					CommandLineExporter.stripExtension(options.inputFile().getName()),
+					(triplet) -> System.out.println("Exported: " + triplet.getFirst().getPath() + ":" + triplet.getSecond().name() + " to "
+							+ triplet.getThird().getPath()));
 
-			for (final File exportedFile : exportedFiles) {
-				System.out.println("Exported: " + exportedFile.getAbsolutePath());
-			}
+			System.out.println("Exported " + exportedFiles.size() + " images.");
 
 			return 0;
 		} catch (final CommandLineExportParser.HelpRequestedException ex) {

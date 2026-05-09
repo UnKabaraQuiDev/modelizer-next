@@ -63,6 +63,8 @@ public final class CommandLineExportParser {
 		File outputDirectory = new File(".");
 		String fileNamePattern = ViewExporter.DEFAULT_FILE_PATTERN;
 		boolean force = false;
+		boolean multiple = false;
+		boolean wildcard = false;
 
 		for (int i = 0; i < args.length; i++) {
 			final String arg = args[i];
@@ -75,6 +77,8 @@ public final class CommandLineExportParser {
 			case "-o", "--out" -> outputDirectory = new File(CommandLineExportParser.requireValue(args, ++i, arg));
 			case "-n", "--pattern" -> fileNamePattern = CommandLineExportParser.requireValue(args, ++i, arg);
 			case "-f", "--force" -> force = true;
+			case "-m", "--multiple" -> multiple = true;
+			case "-w", "--wildcard" -> wildcard = true;
 			case "-h", "--help" -> {
 				CommandLineExportParser.printHelp();
 				throw new HelpRequestedException();
@@ -103,7 +107,7 @@ public final class CommandLineExportParser {
 			throw new MissingArgumentException("Missing required argument: --panels <conceptual,logical,physical>");
 		}
 
-		return new CommandLineExportOptions(inputFile, format, scope, panelTypes, outputDirectory, fileNamePattern, force);
+		return new CommandLineExportOptions(inputFile, format, scope, panelTypes, outputDirectory, fileNamePattern, force, multiple, wildcard);
 	}
 
 	public static void printHelp() {
@@ -120,6 +124,8 @@ public final class CommandLineExportParser {
 				  -n, --pattern <pattern>    File name pattern, default: '%DEFAULT_FILE_PATTER%', available: %FILE_PATTERN_TOKENS%
 				  -f, --force                Continue on legacy/newer-version warnings
 				  -h, --help                 Print this help
+				  -m, --multiple             Multiple input files, separated by commas "path1,path2,path3..."
+				  -w, --wildcard             Enable wildcard support for input files, supports: *, **, ?
 				""".replace("%DEFAULT_FILE_PATTER%", ViewExporter.DEFAULT_FILE_PATTERN)
 				.replace("%FILE_PATTERN_TOKENS%", ViewExporter.FILE_PATTERN_TOKENS.stream().collect(Collectors.joining(", "))));
 	}
