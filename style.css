@@ -372,6 +372,10 @@ section {
     grid-template-columns: minmax(0, 1fr) minmax(0, 624px);
 }
 
+.card div {
+    padding-left: 10px;
+}
+
 .card img {
     width: 100%;
     height: auto;
