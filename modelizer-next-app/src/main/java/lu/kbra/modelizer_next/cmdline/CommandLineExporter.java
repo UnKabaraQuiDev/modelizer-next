@@ -114,11 +114,11 @@ public final class CommandLineExporter {
 							return;
 						}
 
-						final List<Triplet<File, PanelType, File>> exportedFiles = ViewExporter.exportViews(canvases,
+						final List<Triplet<Optional<File>, PanelType, File>> exportedFiles = ViewExporter.exportViews(canvases,
 								request,
-								doc.sourceFile().getPath(),
-								(triplet) -> System.out.println("Exported: " + triplet.getFirst().getPath() + ":"
-										+ triplet.getSecond().name() + " to " + triplet.getThird().getPath()));
+								Optional.of(doc.sourceFile()),
+								(triplet) -> System.out.println("" + triplet.getFirst().map(File::getPath).orElse("?") + "\t"
+										+ triplet.getSecond().name() + "\t" + triplet.getThird().getPath()));
 
 						exportedFileCount.add(exportedFiles.size());
 					} catch (Exception e) {
@@ -157,9 +157,9 @@ public final class CommandLineExporter {
 		}
 	}
 
-	private static List<File> resolveInputFiles(final File rawInputFile, final boolean multiple, final boolean wildcard)
+	private static List<File> resolveInputFiles(final String rawInputFile, final boolean multiple, final boolean wildcard)
 			throws IOException {
-		final String rawInput = rawInputFile == null ? "" : rawInputFile.getPath();
+		final String rawInput = rawInputFile == null ? "" : rawInputFile.trim();
 
 		if (rawInput.isBlank()) {
 			throw new CommandLineExportParser.MissingArgumentException("Missing required argument: --export <file>");
@@ -188,7 +188,7 @@ public final class CommandLineExporter {
 					CommandLineExporter.addInputFile(inputFiles, usedPaths, matchedPath.toFile());
 				}
 			} else {
-				CommandLineExporter.addInputFile(inputFiles, usedPaths, new File(entry));
+				CommandLineExporter.addInputFile(inputFiles, usedPaths, CommandLineExportParser.resolveHome(entry).toFile());
 			}
 		}
 
@@ -216,14 +216,14 @@ public final class CommandLineExporter {
 	}
 
 	private static List<Path> resolveWildcardInputFiles(final String rawPattern) throws IOException {
-		final String pattern = CommandLineExporter.normalizeWildcardSeparators(rawPattern);
+		final String pattern = CommandLineExporter.normalizeWildcardSeparators(CommandLineExportParser.resolveHome(rawPattern).toString());
 		final Path searchRoot = CommandLineExporter.findWildcardSearchRoot(pattern);
 
 		if (!Files.exists(searchRoot) || !Files.isDirectory(searchRoot)) {
 			return List.of();
 		}
 
-		final boolean absolutePattern = new File(pattern).isAbsolute();
+		final boolean absolutePattern = Paths.get(pattern).isAbsolute();
 		final Path baseDirectory = Paths.get("").toAbsolutePath().normalize();
 		final List<PathMatcher> matchers = CommandLineExporter.createWildcardMatchers(pattern);
 

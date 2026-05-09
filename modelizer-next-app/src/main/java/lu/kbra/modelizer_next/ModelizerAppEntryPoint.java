@@ -40,6 +40,7 @@ public class ModelizerAppEntryPoint implements AppMain {
 			App.init();
 			System.out.println(App.NAME + " / " + App.VERSION + " [" + App.DISTRIBUTOR + "]");
 			System.out.println("App dir: " + App.getAppDirectory());
+			System.out.println();
 		} catch (final JsonProcessingException e) {
 			e.printStackTrace();
 			JOptionPane.showMessageDialog(null,

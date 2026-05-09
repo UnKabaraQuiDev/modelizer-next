@@ -6,24 +6,17 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.nio.file.FileSystems;
 import java.nio.file.Files;
-import java.nio.file.InvalidPathException;
-import java.nio.file.Path;
-import java.nio.file.PathMatcher;
-import java.nio.file.Paths;
 import java.text.Normalizer;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
-import java.util.stream.Stream;
 
 import javax.imageio.ImageIO;
 
@@ -48,11 +41,11 @@ public final class ViewExporter {
 	private static final DateTimeFormatter TIME_FORMAT = DateTimeFormatter.ofPattern("HH-mm-ss");
 	private static final String SVG_NAMESPACE_URI = "http://www.w3.org/2000/svg";
 
-	public static List<Triplet<File, PanelType, File>> exportViews(
+	public static List<Triplet<Optional<File>, PanelType, File>> exportViews(
 			final Map<PanelType, DiagramCanvas> canvases,
 			final ViewExportRequest request,
-			final String sourceFileName,
-			final Consumer<Triplet<File, PanelType, File>> callback) throws IOException {
+			final Optional<File> sourceFileName,
+			final Consumer<Triplet<Optional<File>, PanelType, File>> callback) throws IOException {
 
 		if (request == null || request.panelTypes() == null || request.panelTypes().isEmpty()) {
 			throw new InvalidArgumentException("No panel type selected.");
@@ -67,221 +60,47 @@ public final class ViewExporter {
 			throw new InvalidArgumentException("The selected output path is not a directory.");
 		}
 
-		final List<File> sourceFiles = ViewExporter.resolveSourceFiles(sourceFileName, request.multiple(), request.wildcard());
-
-		final List<Triplet<File, PanelType, File>> exportedFiles = new ArrayList<>();
+		final List<Triplet<Optional<File>, PanelType, File>> exportedFiles = new ArrayList<>();
 		final Set<String> usedPaths = new HashSet<>();
 
-		for (final File sourceFile : sourceFiles) {
-			final String sourceName = sourceFile.getName() == null || sourceFile.getName().isBlank() ? sourceFile.getPath()
-					: sourceFile.getName();
+		final String baseFileName = ViewExporter
+				.sanitizeFileName(PCUtils.removeFileExtension(sourceFileName.map(File::getName).orElse("Untitled")));
 
-			final String baseFileName = ViewExporter
-					.sanitizeFileName(ViewExporter.stripExtension(sourceName == null || sourceName.isBlank() ? "Untitled" : sourceName));
-
-			for (final PanelType panelType : request.panelTypes()) {
-				final DiagramCanvas canvas = canvases.get(panelType);
-				if (canvas == null) {
-					continue;
-				}
-
-				final String fileName = ViewExporter.buildFileName(request.fileNamePattern(), baseFileName, panelType, request.format());
-
-				File outputFile = new File(request.outputDirectory(), fileName);
-				outputFile = ViewExporter.ensureExtension(outputFile, request.format().getExtension());
-				outputFile = ViewExporter.avoidDuplicatePath(outputFile, usedPaths);
-
-				switch (request.format()) {
-				case PNG -> ViewExporter.writePng(canvas, request.scope(), outputFile);
-				case SVG -> ViewExporter.writeSvg(canvas, request.scope(), outputFile);
-				}
-
-				final Triplet<File, PanelType, File> data = Triplets.readOnly(sourceFile, panelType, outputFile);
-				if (callback != null) {
-					callback.accept(data);
-				}
-				exportedFiles.add(data);
+		for (final PanelType panelType : request.panelTypes()) {
+			final DiagramCanvas canvas = canvases.get(panelType);
+			if (canvas == null) {
+				continue;
 			}
+
+			final String fileName = ViewExporter.buildFileName(request.fileNamePattern(), baseFileName, panelType, request.format());
+
+			File outputFile = new File(request.outputDirectory(), fileName);
+			outputFile = ViewExporter.ensureExtension(outputFile, request.format().getExtension());
+			outputFile = ViewExporter.avoidDuplicatePath(outputFile, usedPaths);
+
+			switch (request.format()) {
+			case PNG -> ViewExporter.writePng(canvas, request.scope(), outputFile);
+			case SVG -> ViewExporter.writeSvg(canvas, request.scope(), outputFile);
+			}
+
+			final Triplet<Optional<File>, PanelType, File> data = Triplets.readOnly(sourceFileName, panelType, outputFile);
+			if (callback != null) {
+				callback.accept(data);
+			}
+			exportedFiles.add(data);
 		}
 
 		return exportedFiles;
-	}
 
-	private static List<File> resolveSourceFiles(final String rawInput, final boolean multipleFiles, final boolean wildcard)
-			throws IOException {
-
-		final String input = rawInput == null || rawInput.isBlank() ? "Untitled" : rawInput.trim();
-
-		final List<String> entries = multipleFiles
-				? Arrays.stream(input.split(",")).map(String::trim).filter(value -> !value.isBlank()).toList()
-				: List.of(input);
-
-		if (entries.isEmpty()) {
-			throw new InvalidArgumentException("No source file selected.");
-		}
-
-		final List<File> sourceFiles = new ArrayList<>();
-		final Set<Path> usedSourcePaths = new LinkedHashSet<>();
-
-		for (final String entry : entries) {
-			if (wildcard && ViewExporter.containsWildcard(entry)) {
-				final List<Path> matchedPaths = ViewExporter.resolveWildcardPaths(entry);
-
-				if (matchedPaths.isEmpty()) {
-					throw new InvalidArgumentException("No source files matched wildcard pattern: " + entry);
-				}
-
-				for (final Path matchedPath : matchedPaths) {
-					final Path normalizedPath = matchedPath.toAbsolutePath().normalize();
-					if (usedSourcePaths.add(normalizedPath)) {
-						sourceFiles.add(normalizedPath.toFile());
-					}
-				}
-			} else {
-				final Path path = ViewExporter.pathOf(entry);
-				final Path normalizedPath = path.toAbsolutePath().normalize();
-
-				if (usedSourcePaths.add(normalizedPath)) {
-					sourceFiles.add(path.toFile());
-				}
-			}
-		}
-
-		if (sourceFiles.isEmpty()) {
-			throw new InvalidArgumentException("No source file selected.");
-		}
-
-		return sourceFiles;
-	}
-
-	private static List<Path> resolveWildcardPaths(final String rawPattern) throws IOException {
-		final Path patternPath = ViewExporter.pathOf(rawPattern);
-		final boolean absolutePattern = patternPath.isAbsolute();
-
-		final Path searchRoot = ViewExporter.findWildcardSearchRoot(patternPath).toAbsolutePath().normalize();
-
-		if (!Files.exists(searchRoot) || !Files.isDirectory(searchRoot)) {
-			return List.of();
-		}
-
-		final Path baseDirectory = Paths.get("").toAbsolutePath().normalize();
-
-		final List<PathMatcher> matchers = ViewExporter.createWildcardMatchers(rawPattern, absolutePattern);
-
-		try (Stream<Path> stream = Files.walk(searchRoot)) {
-			return stream.filter(Files::isRegularFile)
-					.filter(path -> ViewExporter.matchesWildcard(path, absolutePattern, baseDirectory, matchers))
-					.sorted()
-					.toList();
-		}
-	}
-
-	private static boolean matchesWildcard(
-			final Path path,
-			final boolean absolutePattern,
-			final Path baseDirectory,
-			final List<PathMatcher> matchers) {
-
-		final Path normalizedPath = path.toAbsolutePath().normalize();
-
-		final Path pathToMatch = absolutePattern ? normalizedPath : baseDirectory.relativize(normalizedPath);
-
-		for (final PathMatcher matcher : matchers) {
-			if (matcher.matches(pathToMatch)) {
-				return true;
-			}
-		}
-
-		return false;
-	}
-
-	private static List<PathMatcher> createWildcardMatchers(final String rawPattern, final boolean absolutePattern) {
-
-		final Path patternPath = ViewExporter.pathOf(rawPattern);
-
-		final String globPattern = absolutePattern ? patternPath.toAbsolutePath().normalize().toString() : rawPattern;
-
-		return ViewExporter.expandDoubleStarZeroDirectoryVariants(ViewExporter.normalizeGlobSeparators(globPattern))
-				.stream()
-				.map(pattern -> FileSystems.getDefault().getPathMatcher("glob:" + pattern))
-				.toList();
-	}
-
-	private static List<String> expandDoubleStarZeroDirectoryVariants(final String globPattern) {
-		final Set<String> variants = new LinkedHashSet<>();
-		ViewExporter.expandDoubleStarZeroDirectoryVariants(globPattern, variants);
-		return new ArrayList<>(variants);
-	}
-
-	private static void expandDoubleStarZeroDirectoryVariants(final String globPattern, final Set<String> variants) {
-
-		if (!variants.add(globPattern)) {
-			return;
-		}
-
-		final String separator = File.separator;
-		final String leadingDoubleStar = "**" + separator;
-
-		if (globPattern.startsWith(leadingDoubleStar)) {
-			ViewExporter.expandDoubleStarZeroDirectoryVariants(globPattern.substring(leadingDoubleStar.length()), variants);
-		}
-
-		final String middleDoubleStar = separator + "**" + separator;
-
-		int index = globPattern.indexOf(middleDoubleStar);
-		while (index >= 0) {
-			final String withoutDoubleStar = globPattern.substring(0, index + separator.length())
-					+ globPattern.substring(index + middleDoubleStar.length());
-
-			ViewExporter.expandDoubleStarZeroDirectoryVariants(withoutDoubleStar, variants);
-
-			index = globPattern.indexOf(middleDoubleStar, index + 1);
-		}
-	}
-
-	private static Path findWildcardSearchRoot(final Path patternPath) {
-		Path searchRoot = patternPath.getRoot();
-
-		if (searchRoot == null) {
-			searchRoot = Paths.get("");
-		}
-
-		for (final Path part : patternPath) {
-			final String value = part.toString();
-
-			if (ViewExporter.containsWildcard(value)) {
-				break;
-			}
-
-			searchRoot = searchRoot.resolve(value);
-		}
-
-		return searchRoot;
-	}
-
-	private static boolean containsWildcard(final String value) {
-		return value != null && (value.indexOf('*') >= 0 || value.indexOf('?') >= 0);
-	}
-
-	private static Path pathOf(final String value) {
-		try {
-			return Paths.get(value);
-		} catch (final InvalidPathException exception) {
-			throw new InvalidArgumentException("Invalid source path: " + value);
-		}
-	}
-
-	private static String normalizeGlobSeparators(final String value) {
-		return value.replace('\\', File.separatorChar).replace('/', File.separatorChar);
 	}
 
 	private static File avoidDuplicatePath(final File originalFile, final Set<String> usedPaths) {
 		File candidate = originalFile;
 		int counter = 2;
 		while (!usedPaths.add(candidate.getAbsolutePath())) {
-			final String extension = ViewExporter.stripExtension(candidate.getName()).equals(candidate.getName()) ? ""
+			final String extension = PCUtils.removeFileExtension(candidate.getName()).equals(candidate.getName()) ? ""
 					: "." + ViewExporter.getExtension(candidate.getName());
-			final String nameWithoutExtension = ViewExporter.stripExtension(originalFile.getName());
+			final String nameWithoutExtension = PCUtils.removeFileExtension(originalFile.getName());
 			candidate = new File(originalFile.getParentFile(), nameWithoutExtension + "-" + counter + extension);
 			counter++;
 		}
@@ -325,14 +144,6 @@ public final class ViewExporter {
 
 		final String normalized = Normalizer.normalize(value, Normalizer.Form.NFKC);
 		return normalized.replaceAll("[\\\\/:*?\"<>|]", "-").trim();
-	}
-
-	private static String stripExtension(final String fileName) {
-		if (fileName == null) {
-			return "";
-		}
-
-		return PCUtils.removeFileExtension(fileName);
 	}
 
 	private static String typeToken(final PanelType panelType) {

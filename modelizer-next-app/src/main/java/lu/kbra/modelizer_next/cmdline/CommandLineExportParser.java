@@ -58,7 +58,7 @@ public final class CommandLineExportParser {
 	}
 
 	public static CommandLineExportOptions parse(final String[] args) throws IOException {
-		File inputFile = null;
+		String inputFile = null;
 		ViewExportFormat format = null;
 		ViewExportScope scope = ViewExportScope.EVERYTHING;
 		List<PanelType> panelTypes = List.of();
@@ -73,7 +73,7 @@ public final class CommandLineExportParser {
 			final String arg = args[i];
 
 			switch (arg) {
-			case "-e", "--export" -> inputFile = resolveHome(CommandLineExportParser.requireValue(args, ++i, arg)).toFile();
+			case "-e", "--export" -> inputFile = CommandLineExportParser.requireValue(args, ++i, arg);
 			case "-t", "--type" -> format = CommandLineExportParser.parseFormat(CommandLineExportParser.requireValue(args, ++i, arg));
 			case "-s", "--scope" -> scope = CommandLineExportParser.parseScope(CommandLineExportParser.requireValue(args, ++i, arg));
 			case "-p", "--panels" -> panelTypes = CommandLineExportParser.parsePanels(CommandLineExportParser.requireValue(args, ++i, arg));
@@ -99,7 +99,7 @@ public final class CommandLineExportParser {
 			throw new MissingArgumentException("Missing required argument: --type <svg|png>");
 		}
 
-		if (!multiple && !wildcard && !inputFile.exists()) {
+		if (!multiple && !wildcard && !CommandLineExportParser.resolveHome(inputFile).toFile().exists()) {
 			throw new MissingArgumentException("Input file does not exist: " + inputFile);
 		}
 
@@ -143,7 +143,7 @@ public final class CommandLineExportParser {
 				  -e, --export <file>        File to load and export
 				  -t, --type <svg|png>       Export format
 				  -o, --out <directory>      Output directory, default: current directory
-				  -s, --scope <scope>        selection|view|everything, default: everything
+				  -s, --scope <scope>        selection (s), view (v), everything/all (a), default: everything
 				  -p, --panels <list>        Comma-separated PanelType names: conceptual (c), logical (l), physical (p)
 				  -n, --pattern <pattern>    File name pattern, default: '%DEFAULT_FILE_PATTER%', available: %FILE_PATTERN_TOKENS%
 				  -f, --force                Continue on legacy/newer-version warnings
@@ -196,9 +196,9 @@ public final class CommandLineExportParser {
 
 	private static ViewExportScope parseScope(final String value) {
 		return switch (value.toLowerCase()) {
-		case "selection" -> ViewExportScope.SELECTION;
-		case "view" -> ViewExportScope.VIEW;
-		case "everything", "all" -> ViewExportScope.EVERYTHING;
+		case "selection", "e" -> ViewExportScope.SELECTION;
+		case "view", "v" -> ViewExportScope.VIEW;
+		case "everything", "all", "a" -> ViewExportScope.EVERYTHING;
 		default -> throw new MissingArgumentException("Unsupported export scope: " + value);
 		};
 	}

@@ -31,6 +31,9 @@ import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
+import io.github.andrewauclair.moderndocking.DockingRegion;
+import io.github.andrewauclair.moderndocking.app.Docking;
+import io.github.andrewauclair.moderndocking.app.RootDockingPanel;
 import lu.kbra.modelizer_next.MNMain;
 import lu.kbra.modelizer_next.bootstrap.AvailableUpdate;
 import lu.kbra.modelizer_next.bootstrap.UpdateRuntime;
@@ -53,10 +56,6 @@ import lu.kbra.pclib.PCUtils;
 import lu.kbra.pclib.datastructure.pair.Pair;
 import lu.kbra.pclib.datastructure.triplet.Triplet;
 
-import io.github.andrewauclair.moderndocking.DockingRegion;
-import io.github.andrewauclair.moderndocking.app.Docking;
-import io.github.andrewauclair.moderndocking.app.RootDockingPanel;
-
 public class MainFrame extends JFrame implements MainFrameDocumentController, MainFrameStyleController, MainFrameWindowController {
 
 	private static final long serialVersionUID = 6643164008640695591L;
@@ -74,7 +73,7 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 				.map(i -> new ImageIcon(PCUtils.readPackagedBytesFile(MainFrame.class, "/icons/icon-" + i + ".png")).getImage())
 				.toList());
 		ICON_IMAGES = p.getKey();
-		System.out.println("Scaling icons took: " + (double) p.getValue() / 1_000 + "s");
+//		System.out.println("Scaling icons took: " + (double) p.getValue() / 1_000 + "s");
 
 		ICON = MainFrame.ICON_IMAGES.get(MainFrame.ICON_IMAGES.size() - 1);
 		IMAGE_ICON = new ImageIcon(MainFrame.ICON);
@@ -391,8 +390,8 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 		}
 
 		try {
-			final List<Triplet<File, PanelType, File>> exportedFiles = ViewExporter
-					.exportViews(this.getCanvasesByPanelType(), request, this.getExportSourceFileName(), null);
+			final List<Triplet<Optional<File>, PanelType, File>> exportedFiles = ViewExporter
+					.exportViews(this.getCanvasesByPanelType(), request, this.getExportSourceFile(), null);
 			if (exportedFiles.isEmpty()) {
 				JOptionPane.showMessageDialog(this, "No view was exported.", "Export", JOptionPane.WARNING_MESSAGE);
 				return;
@@ -466,17 +465,17 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 		return new File(System.getProperty("user.home"));
 	}
 
-	String getExportSourceFileName() {
+	Optional<File> getExportSourceFile() {
 		if (this.session.getCurrentFile() != null) {
-			return this.session.getCurrentFile().getName();
+			return Optional.of(this.session.getCurrentFile());
 		}
 
 		final String source = this.document.getSource();
 		if (source == null || source.isBlank()) {
-			return "Untitled";
+			return Optional.empty();
 		}
 
-		return new File(source).getName();
+		return Optional.of(new File(source));
 	}
 
 	void onDocumentChanged() {
