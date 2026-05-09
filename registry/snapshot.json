@@ -1,10 +1,10 @@
 {
   "channel": "snapshot",
-  "version": "7-SNAPSHOT-205",
-  "tag": "7-SNAPSHOT-205",
-  "releaseUrl": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/tag/7-SNAPSHOT-205",
-  "assetUrl": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/7-SNAPSHOT-205/modelizer-next-app-7-SNAPSHOT-205.jar",
-  "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/7-SNAPSHOT-205/modelizer-next-app-7-SNAPSHOT-205.jar",
+  "version": "8-SNAPSHOT-227",
+  "tag": "8-SNAPSHOT-227",
+  "releaseUrl": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/tag/8-SNAPSHOT-227",
+  "assetUrl": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/8-SNAPSHOT-227/modelizer-next-app-8-SNAPSHOT-227.jar",
+  "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/8-SNAPSHOT-227/modelizer-next-app-8-SNAPSHOT-227.jar",
   "platforms": [
     "unknown",
     "linux",
@@ -12,8 +12,85 @@
     "windows"
   ],
   "notes": "Latest snapshot build.",
-  "updatedAt": "2026-05-05T15:04:51Z",
+  "updatedAt": "2026-05-09T11:19:14Z",
   "entries": [
+    {
+      "version": "8-SNAPSHOT-227",
+      "tag": "8-SNAPSHOT-227",
+      "releaseUrl": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/tag/8-SNAPSHOT-227",
+      "assetUrl": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/8-SNAPSHOT-227/modelizer-next-app-8-SNAPSHOT-227.jar",
+      "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/8-SNAPSHOT-227/modelizer-next-app-8-SNAPSHOT-227.jar",
+      "platforms": [
+        "unknown",
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "notes": "Latest snapshot build.",
+      "publishedAt": "2026-05-09T11:19:14Z",
+      "assets": [
+        {
+          "name": "modelizer-next-app-8-SNAPSHOT-227.jar",
+          "platform": "unknown",
+          "kind": "app-standalone-jar",
+          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/8-SNAPSHOT-227/modelizer-next-app-8-SNAPSHOT-227.jar"
+        },
+        {
+          "name": "modelizer-next-app-portable-linux-8-SNAPSHOT-227.zip",
+          "platform": "linux",
+          "kind": "app-portable-native",
+          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/8-SNAPSHOT-227/modelizer-next-app-portable-linux-8-SNAPSHOT-227.zip"
+        },
+        {
+          "name": "modelizer-next-app-portable-macos-8-SNAPSHOT-227.zip",
+          "platform": "macos",
+          "kind": "app-portable-native",
+          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/8-SNAPSHOT-227/modelizer-next-app-portable-macos-8-SNAPSHOT-227.zip"
+        },
+        {
+          "name": "modelizer-next-app-portable-windows-8-SNAPSHOT-227.zip",
+          "platform": "windows",
+          "kind": "app-portable-native",
+          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/8-SNAPSHOT-227/modelizer-next-app-portable-windows-8-SNAPSHOT-227.zip"
+        },
+        {
+          "name": "modelizer-next-app-standalone-linux-8-SNAPSHOT-227.deb",
+          "platform": "linux",
+          "kind": "app-standalone-native",
+          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/8-SNAPSHOT-227/modelizer-next-app-standalone-linux-8-SNAPSHOT-227.deb"
+        },
+        {
+          "name": "modelizer-next-app-standalone-macos-8-SNAPSHOT-227.dmg",
+          "platform": "macos",
+          "kind": "app-standalone-native",
+          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/8-SNAPSHOT-227/modelizer-next-app-standalone-macos-8-SNAPSHOT-227.dmg"
+        },
+        {
+          "name": "modelizer-next-app-standalone-windows-8-SNAPSHOT-227.exe",
+          "platform": "windows",
+          "kind": "app-standalone-native",
+          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/8-SNAPSHOT-227/modelizer-next-app-standalone-windows-8-SNAPSHOT-227.exe"
+        },
+        {
+          "name": "modelizer-next-bootstrap-linux-8-SNAPSHOT-227.deb",
+          "platform": "linux",
+          "kind": "bootstrap-native",
+          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/8-SNAPSHOT-227/modelizer-next-bootstrap-linux-8-SNAPSHOT-227.deb"
+        },
+        {
+          "name": "modelizer-next-bootstrap-macos-8-SNAPSHOT-227.dmg",
+          "platform": "macos",
+          "kind": "bootstrap-native",
+          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/8-SNAPSHOT-227/modelizer-next-bootstrap-macos-8-SNAPSHOT-227.dmg"
+        },
+        {
+          "name": "modelizer-next-bootstrap-windows-8-SNAPSHOT-227.exe",
+          "platform": "windows",
+          "kind": "bootstrap-native",
+          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/8-SNAPSHOT-227/modelizer-next-bootstrap-windows-8-SNAPSHOT-227.exe"
+        }
+      ]
+    },
     {
       "version": "7-SNAPSHOT-205",
       "tag": "7-SNAPSHOT-205",
