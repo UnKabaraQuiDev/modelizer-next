@@ -36,7 +36,7 @@ public class ModelizerAppEntryPoint implements AppMain {
 	 */
 	@Override
 	public void start(final String[] args) {
-		LicensePrinter.print();
+		LicensePrinter.print(this.getClass().getClassLoader());
 
 		try {
 			PCUtils.readPackagedBytesFile("/app.json");

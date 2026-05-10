@@ -54,6 +54,9 @@ public class BootstrapRuntime implements UpdateRuntime {
 	public static synchronized BootstrapRuntime bootstrap() throws IOException {
 		BootstrapApp.init();
 
+		System.out.println(BootstrapApp.NAME + " / " + BootstrapApp.VERSION + " [" + BootstrapApp.DISTRIBUTOR + "]");
+		System.out.println("Boostrap dir: " + BootstrapApp.getHomeDirectory());
+
 		final boolean firstLaunch = BootstrapApp.isFirstLaunch();
 		final BootstrapConfiguration configuration = BootstrapApp.loadConfiguration();
 

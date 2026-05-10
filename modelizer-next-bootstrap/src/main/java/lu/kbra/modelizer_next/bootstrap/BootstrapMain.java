@@ -11,6 +11,7 @@ import javax.swing.SwingUtilities;
 import com.formdev.flatlaf.FlatDarkLaf;
 import com.formdev.flatlaf.FlatLightLaf;
 
+import lu.kbra.modelizer_next.bootstrap.config.BootstrapApp;
 import lu.kbra.modelizer_next.common.FileOpenBridge;
 import lu.kbra.modelizer_next.common.SystemThemeDetector;
 
