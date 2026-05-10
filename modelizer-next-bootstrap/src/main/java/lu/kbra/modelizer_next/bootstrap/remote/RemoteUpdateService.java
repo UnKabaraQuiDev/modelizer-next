@@ -51,6 +51,13 @@ public final class RemoteUpdateService {
 			case NIGHTLY -> this.nightly;
 			};
 		}
+
+		@Override
+		public String toString() {
+			return "UpdateManifest@" + System.identityHashCode(this) + " [release=" + release + ", snapshot=" + snapshot + ", nightly="
+					+ nightly + ", bootstrapVersion=" + bootstrapVersion + "]";
+		}
+
 	}
 
 	/**
@@ -71,6 +78,13 @@ public final class RemoteUpdateService {
 		public String releaseUrlOrDefault() {
 			return this.releaseUrl == null || this.releaseUrl.isBlank() ? BootstrapApp.RELEASES_URL : this.releaseUrl;
 		}
+
+		@Override
+		public String toString() {
+			return "UpdateRelease@" + System.identityHashCode(this) + " [version=" + version + ", url=" + url + ", releaseUrl=" + releaseUrl
+					+ ", notes=" + notes + ", tag=" + tag + "]";
+		}
+
 	}
 
 	private final HttpClient httpClient = HttpClient.newBuilder()
@@ -246,6 +260,8 @@ public final class RemoteUpdateService {
 	public AvailableUpdate findLatest(final UpdateChannel channel, final ParsedVersion currentVersion)
 			throws IOException, InterruptedException {
 		final UpdateManifest manifest = this.fetchManifest();
+		System.out.println("Versions found: " + manifest);
+		System.out.println();
 		final UpdateRelease release = manifest.channel(channel);
 		if (release == null || release.version == null || release.url == null || release.url.isBlank()) {
 			throw new IOException("No release configured for channel '" + channel.manifestKey() + "'.");
