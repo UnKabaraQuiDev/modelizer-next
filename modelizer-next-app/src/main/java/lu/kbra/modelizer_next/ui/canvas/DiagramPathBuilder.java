@@ -13,6 +13,12 @@ import lu.kbra.modelizer_next.layout.PanelType;
  */
 interface DiagramPathBuilder extends DiagramCanvasExt {
 
+	/**
+	 * Builds a foreign key field name.
+	 * @param targetClass target class value used by the operation
+	 * @param targetField target field value used by the operation
+	 * @return the built foreign key field name
+	 */
 	default String buildForeignKeyFieldName(final ClassModel targetClass, final FieldModel targetField) {
 		final String className = this.getCanvas()
 				.blankToFallback(targetClass.getTechnicalName(), targetClass.getConceptualName(), "target");
@@ -20,11 +26,22 @@ interface DiagramPathBuilder extends DiagramCanvasExt {
 		return className + "_" + fieldName;
 	}
 
+	/**
+	 * Builds a foreign key field technical name.
+	 * @param targetClass target class value used by the operation
+	 * @param targetField target field value used by the operation
+	 * @return the built foreign key field technical name
+	 */
 	default String buildForeignKeyFieldTechnicalName(final ClassModel targetClass, final FieldModel targetField) {
 		final String rawName = this.getCanvas().buildForeignKeyFieldName(targetClass, targetField);
 		return rawName.trim().replaceAll("[^A-Za-z0-9_]+", "_").replaceAll("_+", "_").replaceAll("^_|_$", "").toLowerCase();
 	}
 
+	/**
+	 * Builds a link path.
+	 * @param linkModel link model affected by the operation
+	 * @return the built link path
+	 */
 	default String buildLinkPath(final LinkModel linkModel) {
 		final ClassModel fromClass = this.getCanvas().findClassById(linkModel.getFrom().getClassId());
 		final ClassModel toClass = this.getCanvas().findClassById(linkModel.getTo().getClassId());
@@ -53,6 +70,10 @@ interface DiagramPathBuilder extends DiagramCanvasExt {
 		return fromName + " > " + fromFieldName + " -> " + toFieldName + " < " + toName;
 	}
 
+	/**
+	 * Builds a selection path.
+	 * @return the built selection path
+	 */
 	default String buildSelectionPath() {
 		if (this.getCanvas().selectedElement == null) {
 			return "";

@@ -33,6 +33,15 @@ import lu.kbra.pclib.datastructure.triplet.Triplets;
  */
 public interface ElementRenderer extends DiagramCanvasExt {
 
+	/**
+	 * Draws the aligned link label.
+	 * @param g2 graphics context used for drawing
+	 * @param text text to display or edit
+	 * @param point point in canvas coordinates
+	 * @param angle angle in radians
+	 * @param bottom whether the label is drawn below the link path
+	 * @param dir preferred label direction
+	 */
 	default void drawAlignedLinkLabel(
 			final Graphics2D g2,
 			final String text,
@@ -86,6 +95,12 @@ public interface ElementRenderer extends DiagramCanvasExt {
 		}
 	}
 
+	/**
+	 * Draws the arrow head.
+	 * @param g2 graphics context used for drawing
+	 * @param from start point or source value
+	 * @param to target point or destination value
+	 */
 	default void drawArrowHead(final Graphics2D g2, final Point2D from, final Point2D to) {
 		final double angle = Math.atan2(to.getY() - from.getY(), to.getX() - from.getX());
 		final double arrowLength = 12.0;
@@ -100,6 +115,12 @@ public interface ElementRenderer extends DiagramCanvasExt {
 		g2.draw(new Line2D.Double(to, right));
 	}
 
+	/**
+	 * Draws the association class connector.
+	 * @param g2 graphics context used for drawing
+	 * @param linkModel link model affected by the operation
+	 * @param geometry resolved link geometry to draw or inspect
+	 */
 	default void drawAssociationClassConnector(final Graphics2D g2, final LinkModel linkModel, final LinkGeometry geometry) {
 		if (this.getPanelType() != PanelType.CONCEPTUAL || !this.getCanvas().hasAssociationClass(linkModel) || geometry == null) {
 			return;
@@ -129,6 +150,16 @@ public interface ElementRenderer extends DiagramCanvasExt {
 		}
 	}
 
+	/**
+	 * Draws the cardinality label.
+	 * @param g2 graphics context used for drawing
+	 * @param text text to display or edit
+	 * @param anchor anchor point used by the link or label
+	 * @param adjacentPoint neighboring point used to orient the label
+	 * @param angle angle in radians
+	 * @param bottom whether the label is drawn below the link path
+	 * @param forcedDirection optional direction that overrides automatic label direction
+	 */
 	@Deprecated
 	default void drawCardinalityLabel(
 			final Graphics2D g2,
@@ -146,6 +177,10 @@ public interface ElementRenderer extends DiagramCanvasExt {
 		}));
 	}
 
+	/**
+	 * Draws the classes.
+	 * @param g2 graphics context used for drawing
+	 */
 	default void drawClasses(final Graphics2D g2) {
 		for (final ClassModel classModel : this.getCanvas().document.getModel().getClasses()) {
 			if (!classModel.isVisible(this.getPanelType()) || !this.getCanvas().shouldExportClass(classModel)) {
@@ -251,6 +286,16 @@ public interface ElementRenderer extends DiagramCanvasExt {
 				Pairs.readOnly(hasFlags, hasType));
 	}
 
+	/**
+	 * Draws the physical class field.
+	 * @param g2 graphics context used for drawing
+	 * @param bounds bounds used for layout or hit testing
+	 * @param rowY numeric row y value
+	 * @param columnWidths column widths value used by the operation
+	 * @param classModel class model affected by the operation
+	 * @param fieldModel field model affected by the operation
+	 * @param anyFlagsTypes whether any flags types is enabled
+	 */
 	default void drawPhysicalClassField(
 			final Graphics2D g2,
 			final Rectangle2D bounds,
@@ -323,6 +368,14 @@ public interface ElementRenderer extends DiagramCanvasExt {
 		}
 	}
 
+	/**
+	 * Draws the conceptual logical class field.
+	 * @param g2 graphics context used for drawing
+	 * @param bounds bounds used for layout or hit testing
+	 * @param rowY numeric row y value
+	 * @param classModel class model affected by the operation
+	 * @param fieldModel field model affected by the operation
+	 */
 	default void drawConceptualLogicalClassField(
 			final Graphics2D g2,
 			final Rectangle2D bounds,
@@ -353,6 +406,12 @@ public interface ElementRenderer extends DiagramCanvasExt {
 		}
 	}
 
+	/**
+	 * Draws the comment connector.
+	 * @param g2 graphics context used for drawing
+	 * @param commentModel comment model affected by the operation
+	 * @param bounds bounds used for layout or hit testing
+	 */
 	default void drawCommentConnector(final Graphics2D g2, final CommentModel commentModel, final Rectangle2D bounds) {
 		if (commentModel.getKind() != CommentKind.BOUND || commentModel.getBinding() == null) {
 			return;
@@ -371,6 +430,10 @@ public interface ElementRenderer extends DiagramCanvasExt {
 		g2.setStroke(DiagramCanvas.DEFAULT_STROKE);
 	}
 
+	/**
+	 * Draws the comments.
+	 * @param g2 graphics context used for drawing
+	 */
 	default void drawComments(final Graphics2D g2) {
 		for (final CommentModel commentModel : this.getCanvas().document.getModel().getComments()) {
 			if (commentModel == null || !this.getCanvas().isCommentVisible(commentModel)
@@ -411,6 +474,11 @@ public interface ElementRenderer extends DiagramCanvasExt {
 		}
 	}
 
+	/**
+	 * Draws the export grid.
+	 * @param g2 graphics context used for drawing
+	 * @param size size value used by the operation
+	 */
 	default void drawExportGrid(final Graphics2D g2, final Dimension size) {
 		g2.setColor(DiagramCanvas.GRID_COLOR);
 		for (int x = 0; x < size.width; x += 40) {
@@ -421,6 +489,10 @@ public interface ElementRenderer extends DiagramCanvasExt {
 		}
 	}
 
+	/**
+	 * Draws the grid.
+	 * @param g2 graphics context used for drawing
+	 */
 	default void drawGrid(final Graphics2D g2) {
 		g2.setColor(DiagramCanvas.GRID_COLOR);
 		for (int x = 0; x < this.getCanvas().getWidth(); x += 40) {
@@ -431,6 +503,10 @@ public interface ElementRenderer extends DiagramCanvasExt {
 		}
 	}
 
+	/**
+	 * Draws the link preview.
+	 * @param g2 graphics context used for drawing
+	 */
 	default void drawLinkPreview(final Graphics2D g2) {
 		if (this.getCanvas().suppressInteractiveOverlays || this.getCanvas().linkCreationState == null) {
 			return;
@@ -465,6 +541,10 @@ public interface ElementRenderer extends DiagramCanvasExt {
 		}
 	}
 
+	/**
+	 * Draws the links.
+	 * @param g2 graphics context used for drawing
+	 */
 	default void drawLinks(final Graphics2D g2) {
 		if (this.getPanelType() == PanelType.CONCEPTUAL) {
 			this.getCanvas().ensureConceptualAnchorCache();
@@ -575,6 +655,13 @@ public interface ElementRenderer extends DiagramCanvasExt {
 		}
 	}
 
+	/**
+	 * Draws the multiline text.
+	 * @param g2 graphics context used for drawing
+	 * @param text text to display or edit
+	 * @param bounds bounds used for layout or hit testing
+	 * @param padding numeric padding value
+	 */
 	default void drawMultilineText(final Graphics2D g2, final String text, final Rectangle2D bounds, final int padding) {
 		final FontMetrics metrics = g2.getFontMetrics();
 		final List<String> wrappedLines = this.getCanvas()

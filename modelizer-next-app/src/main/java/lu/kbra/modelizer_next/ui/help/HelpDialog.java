@@ -17,6 +17,9 @@ import lu.kbra.modelizer_next.common.App;
 import lu.kbra.modelizer_next.common.SystemThemeDetector;
 import lu.kbra.modelizer_next.ui.frame.MainFrame;
 
+/**
+ * Dialog window that displays help and information tabs.
+ */
 public class HelpDialog extends JFrame {
 
 	private static final long serialVersionUID = -2242189520928100036L;
@@ -24,6 +27,10 @@ public class HelpDialog extends JFrame {
 	private static final Dimension MINIMUM_WINDOW_SIZE = new Dimension(560, 420);
 	private static final Dimension DEFAULT_WINDOW_SIZE = new Dimension(980, 720);
 
+	/**
+	 * Starts the application entry point.
+	 * @param args command-line arguments supplied by the launcher
+	 */
 	public static void main(final String[] args) {
 		if (SystemThemeDetector.isDark()) {
 			FlatDarkLaf.setup();
@@ -38,6 +45,9 @@ public class HelpDialog extends JFrame {
 
 	private final ShortcutsTab shortcutsTab = new ShortcutsTab();
 
+	/**
+	 * Creates a help dialog instance.
+	 */
 	public HelpDialog() {
 		super(App.title("Help"));
 		super.setIconImage(MainFrame.ICON);
@@ -64,12 +74,19 @@ public class HelpDialog extends JFrame {
 		super.setResizable(true);
 	}
 
+	/**
+	 * Releases the dialog and its temporary resources.
+	 */
 	@Override
 	public void dispose() {
 		this.shortcutsTab.unregisterKeyDispatcher();
 		super.dispose();
 	}
 
+	/**
+	 * Creates a tabs.
+	 * @return the created tabs
+	 */
 	private JTabbedPane createTabs() {
 		final JTabbedPane tabs = new JTabbedPane();
 		tabs.putClientProperty(FlatClientProperties.STYLE, "tabType: card");

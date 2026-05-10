@@ -33,12 +33,21 @@ import javax.swing.WindowConstants;
 import lu.kbra.modelizer_next.style.StylePalette;
 import lu.kbra.modelizer_next.ui.component.ColorButton;
 
+/**
+ * Dialog for creating and editing reusable style palettes.
+ */
 public final class StylePaletteEditorDialog {
 
+	/**
+	 * Represents a holder in the dialog part of the application.
+	 */
 	private static final class Holder {
 		private StylePalette palette;
 	}
 
+	/**
+	 * Represents a style palette preview panel in the dialog part of the application.
+	 */
 	private static final class StylePalettePreviewPanel extends JPanel {
 		private static final long serialVersionUID = 1L;
 
@@ -47,17 +56,28 @@ public final class StylePaletteEditorDialog {
 
 		private StylePalette palette;
 
+		/**
+		 * Creates a style palette preview panel instance.
+		 */
 		private StylePalettePreviewPanel() {
 			this.setPreferredSize(new Dimension(720, 280));
 			this.setBackground(new Color(0xF2F2F2));
 			this.setBorder(BorderFactory.createTitledBorder("Preview"));
 		}
 
+		/**
+		 * Sets the palette.
+		 * @param palette palette value used by the operation
+		 */
 		private void setPalette(final StylePalette palette) {
 			this.palette = palette;
 			this.repaint();
 		}
 
+		/**
+		 * Paints the component.
+		 * @param graphics graphics context used for drawing
+		 */
 		@Override
 		protected void paintComponent(final Graphics graphics) {
 			super.paintComponent(graphics);
@@ -125,10 +145,21 @@ public final class StylePaletteEditorDialog {
 		}
 	}
 
+	/**
+	 * Shows the dialog.
+	 * @param parent parent component used for dialog ownership
+	 * @return the show dialog result
+	 */
 	public static StylePalette showDialog(final Component parent) {
 		return StylePaletteEditorDialog.showDialog(parent, null);
 	}
 
+	/**
+	 * Shows the dialog.
+	 * @param parent parent component used for dialog ownership
+	 * @param initialPalette initial palette value used by the operation
+	 * @return the show dialog result
+	 */
 	public static StylePalette showDialog(final Component parent, final StylePalette initialPalette) {
 		final Window owner = parent == null ? null : SwingUtilities.getWindowAncestor(parent);
 		final boolean editing = initialPalette != null;
@@ -286,6 +317,20 @@ public final class StylePaletteEditorDialog {
 		return holder.palette;
 	}
 
+	/**
+	 * Builds a palette.
+	 * @param name name value to read, write, or display
+	 * @param classTextColorButton button to configure
+	 * @param classBackgroundColorButton button to configure
+	 * @param classBorderColorButton button to configure
+	 * @param fieldTextColorButton button to configure
+	 * @param fieldBackgroundColorButton button to configure
+	 * @param commentTextColorButton button to configure
+	 * @param commentBackgroundColorButton button to configure
+	 * @param commentBorderColorButton button to configure
+	 * @param linkColorButton button to configure
+	 * @return the built palette
+	 */
 	private static StylePalette buildPalette(
 			final String name,
 			final ColorButton classTextColorButton,
@@ -311,6 +356,11 @@ public final class StylePaletteEditorDialog {
 		return palette;
 	}
 
+	/**
+	 * Creates a flow layout with consistent spacing.
+	 * @param components values for components
+	 * @return the flow result
+	 */
 	private static JPanel flow(final Component... components) {
 		final JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
 		for (final Component component : components) {
@@ -319,6 +369,12 @@ public final class StylePaletteEditorDialog {
 		return panel;
 	}
 
+	/**
+	 * Creates one labeled row for a dialog form.
+	 * @param label text value for label
+	 * @param component Swing component to configure
+	 * @return the row result
+	 */
 	private static JPanel row(final String label, final Component component) {
 		final JPanel panel = new JPanel(new BorderLayout(6, 6));
 		panel.setBorder(BorderFactory.createEmptyBorder(4, 0, 4, 0));
@@ -327,6 +383,9 @@ public final class StylePaletteEditorDialog {
 		return panel;
 	}
 
+	/**
+	 * Creates a style palette editor dialog instance.
+	 */
 	private StylePaletteEditorDialog() {
 	}
 

@@ -22,6 +22,10 @@ import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectedElement.SelectedType;
  */
 interface MouseInteractionController extends DiagramCanvasExt {
 
+	/**
+	 * Creates a mouse adapter on the active canvas.
+	 * @return the created mouse adapter
+	 */
 	default MouseAdapter createMouseAdapter() {
 		return new MouseAdapter() {
 
@@ -48,6 +52,10 @@ interface MouseInteractionController extends DiagramCanvasExt {
 		};
 	}
 
+	/**
+	 * Handles the mouse dragged on the active canvas.
+	 * @param event event object supplied by Swing
+	 */
 	default void handleMouseDragged(final MouseEvent event) {
 		if (this.getCanvas().panning && this.getCanvas().lastScreenPoint != null) {
 			final PanelState state = this.getCanvas().getPanelState();
@@ -105,6 +113,11 @@ interface MouseInteractionController extends DiagramCanvasExt {
 		this.getCanvas().repaint();
 	}
 
+	/**
+	 * Returns the selected drag anchor on the active canvas.
+	 * @param element element value used by the operation
+	 * @return the selected drag anchor
+	 */
 	default SelectedElement getSelectedDragAnchor(final SelectedElement element) {
 		if (element == null) {
 			return null;
@@ -125,6 +138,10 @@ interface MouseInteractionController extends DiagramCanvasExt {
 		return null;
 	}
 
+	/**
+	 * Handles the mouse pressed on the active canvas.
+	 * @param event event object supplied by Swing
+	 */
 	default void handleMousePressed(final MouseEvent event) {
 		this.getCanvas().requestFocusInWindow();
 		this.getCanvas().lastScreenPoint = event.getPoint();
@@ -233,6 +250,10 @@ interface MouseInteractionController extends DiagramCanvasExt {
 		}
 	}
 
+	/**
+	 * Handles the mouse released on the active canvas.
+	 * @param event event object supplied by Swing
+	 */
 	default void handleMouseReleased(final MouseEvent event) {
 		boolean documentChanged = false;
 
@@ -300,6 +321,10 @@ interface MouseInteractionController extends DiagramCanvasExt {
 		this.getCanvas().repaint();
 	}
 
+	/**
+	 * Handles the mouse wheel moved on the active canvas.
+	 * @param event event object supplied by Swing
+	 */
 	default void handleMouseWheelMoved(final MouseWheelEvent event) {
 		final PanelState state = this.getCanvas().getPanelState();
 		final Point2D.Double worldBefore = this.getCanvas().screenToWorld(event.getPoint());

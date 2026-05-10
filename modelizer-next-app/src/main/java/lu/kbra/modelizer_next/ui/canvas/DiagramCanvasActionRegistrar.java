@@ -13,8 +13,15 @@ import javax.swing.KeyStroke;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.DiagramCanvasActions;
 import lu.kbra.modelizer_next.ui.frame.MainFrame;
 
+/**
+ * Registers keyboard actions used by the diagram canvas.
+ */
 interface DiagramCanvasActionRegistrar extends DiagramCanvasExt {
 
+	/**
+	 * Installs the default key bindings on the active canvas.
+	 * @param actions actions value used by the operation
+	 */
 	default void installDefaultKeyBindings(final DiagramCanvasActions actions) {
 		final InputMap inputMap = this.getCanvas().getInputMap(JComponent.WHEN_FOCUSED);
 		final ActionMap actionMap = this.getCanvas().getActionMap();
@@ -121,6 +128,14 @@ interface DiagramCanvasActionRegistrar extends DiagramCanvasExt {
 				actions.pasteSelection());
 	}
 
+	/**
+	 * Installs the key bind on the active canvas.
+	 * @param inputMap Swing input map to update
+	 * @param actionMap Swing action map to update
+	 * @param keyStroke keyboard shortcut to register
+	 * @param actionKey key under which the action is registered
+	 * @param action action to register or execute
+	 */
 	default void installKeyBind(
 			final InputMap inputMap,
 			final ActionMap actionMap,

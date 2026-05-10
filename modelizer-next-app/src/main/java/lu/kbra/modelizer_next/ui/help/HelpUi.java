@@ -41,12 +41,21 @@ import javax.swing.border.LineBorder;
 
 import com.formdev.flatlaf.FlatClientProperties;
 
+/**
+ * Shared Swing helper components for the help dialog.
+ */
 final class HelpUi {
 
+	/**
+	 * Represents a scrollable page in the help part of the application.
+	 */
 	private static final class ScrollablePage extends JPanel implements Scrollable {
 
 		private static final long serialVersionUID = -764577319228338929L;
 
+		/**
+		 * Creates a scrollable page instance.
+		 */
 		ScrollablePage() {
 			super(new java.awt.BorderLayout());
 			this.setOpaque(true);
@@ -63,40 +72,77 @@ final class HelpUi {
 			});
 		}
 
+		/**
+		 * Returns the preferred scrollable viewport size.
+		 * @return the preferred scrollable viewport size
+		 */
 		@Override
 		public Dimension getPreferredScrollableViewportSize() {
 			return this.getPreferredSize();
 		}
 
+		/**
+		 * Returns the scrollable block increment.
+		 * @param visibleRect visible rect value used by the operation
+		 * @param orientation numeric orientation value
+		 * @param direction numeric direction value
+		 * @return the scrollable block increment
+		 */
 		@Override
 		public int getScrollableBlockIncrement(final Rectangle visibleRect, final int orientation, final int direction) {
 			return Math.max(HelpUi.SCROLL_UNIT_INCREMENT, visibleRect.height - HelpUi.SCROLL_UNIT_INCREMENT);
 		}
 
+		/**
+		 * Returns the scrollable tracks viewport height.
+		 * @return {@code true} when the condition is met; otherwise {@code false}
+		 */
 		@Override
 		public boolean getScrollableTracksViewportHeight() {
 			return false;
 		}
 
+		/**
+		 * Returns the scrollable tracks viewport width.
+		 * @return {@code true} when the condition is met; otherwise {@code false}
+		 */
 		@Override
 		public boolean getScrollableTracksViewportWidth() {
 			return true;
 		}
 
+		/**
+		 * Returns the scrollable unit increment.
+		 * @param visibleRect visible rect value used by the operation
+		 * @param orientation numeric orientation value
+		 * @param direction numeric direction value
+		 * @return the scrollable unit increment
+		 */
 		@Override
 		public int getScrollableUnitIncrement(final Rectangle visibleRect, final int orientation, final int direction) {
 			return HelpUi.SCROLL_UNIT_INCREMENT;
 		}
 	}
 
+	/**
+	 * Represents a wrapping text area in the help part of the application.
+	 */
 	private static final class WrappingTextArea extends JTextArea {
 
 		private static final long serialVersionUID = -282941749559587952L;
 
+		/**
+		 * Creates a wrapping text area instance.
+		 * @param text text to display or edit
+		 */
 		WrappingTextArea(final String text) {
 			super(text);
 		}
 
+		/**
+		 * Returns the preferred size.
+		 * @return the preferred size
+		 */
 		@Override
 		public Dimension getPreferredSize() {
 			final Container parent = this.getParent();
@@ -109,10 +155,17 @@ final class HelpUi {
 		}
 	}
 
+	/**
+	 * Represents a card panel in the help part of the application.
+	 */
 	static final class CardPanel extends JPanel {
 
 		private static final long serialVersionUID = 5726550619135877533L;
 
+		/**
+		 * Creates a card panel instance.
+		 * @param layout layout object to read or update
+		 */
 		CardPanel(final java.awt.LayoutManager layout) {
 			super(layout);
 			this.setOpaque(false);
@@ -120,11 +173,19 @@ final class HelpUi {
 			this.setAlignmentX(Component.LEFT_ALIGNMENT);
 		}
 
+		/**
+		 * Returns the maximum size.
+		 * @return the maximum size
+		 */
 		@Override
 		public Dimension getMaximumSize() {
 			return new Dimension(Integer.MAX_VALUE, this.getPreferredSize().height);
 		}
 
+		/**
+		 * Paints the component.
+		 * @param graphics graphics context used for drawing
+		 */
 		@Override
 		protected void paintComponent(final Graphics graphics) {
 			final Graphics2D g2 = (Graphics2D) graphics.create();
@@ -222,10 +283,22 @@ final class HelpUi {
 	static final Border PRESSED_CHIP_BORDER = new CompoundBorder(new LineBorder(HelpUi.ACCENT_COLOR, 1, true),
 			new EmptyBorder(HelpUi.PRESSED_CHIP_INSETS));
 
+	/**
+	 * Removes simple HTML tags from text used in the help UI.
+	 * @param text text to display or edit
+	 * @return the strip simple HTML result
+	 */
 	private static String stripSimpleHtml(final String text) {
 		return text.replace("<html>", "").replace("</html>", "").replace("<b>", "").replace("</b>", "");
 	}
 
+	/**
+	 * Blends two colors using the supplied ratio.
+	 * @param foreground foreground color to use
+	 * @param background background color to use
+	 * @param amount numeric amount value
+	 * @return the blend result
+	 */
 	static Color blend(final Color foreground, final Color background, final float amount) {
 		final float inverse = 1.0f - amount;
 		final int red = Math.round(foreground.getRed() * amount + background.getRed() * inverse);
@@ -234,6 +307,11 @@ final class HelpUi {
 		return new Color(red, green, blue);
 	}
 
+	/**
+	 * Creates a formatted title component for a help card.
+	 * @param text text to display or edit
+	 * @return the card title result
+	 */
 	static JLabel cardTitle(final String text) {
 		final JLabel label = new JLabel(text);
 		label.setForeground(HelpUi.TEXT_COLOR);
@@ -241,6 +319,11 @@ final class HelpUi {
 		return label;
 	}
 
+	/**
+	 * Creates a small rounded label component.
+	 * @param text text to display or edit
+	 * @return the chip result
+	 */
 	static JLabel chip(final String text) {
 		final JLabel label = new JLabel(text);
 		label.setForeground(HelpUi.TEXT_COLOR);
@@ -251,6 +334,11 @@ final class HelpUi {
 		return label;
 	}
 
+	/**
+	 * Creates a heading.
+	 * @param title title text to display
+	 * @return the created heading
+	 */
 	static JComponent createHeading(final String title) {
 		final JPanel heading = new JPanel();
 		heading.setOpaque(false);
@@ -269,6 +357,10 @@ final class HelpUi {
 		return heading;
 	}
 
+	/**
+	 * Creates a page content.
+	 * @return the created page content
+	 */
 	static JPanel createPageContent() {
 		final JPanel content = new JPanel();
 		content.setOpaque(false);
@@ -279,6 +371,11 @@ final class HelpUi {
 		return content;
 	}
 
+	/**
+	 * Creates a scroll pane.
+	 * @param content content value used by the operation
+	 * @return the created scroll pane
+	 */
 	static JScrollPane createScrollPane(final JComponent content) {
 		final ScrollablePage page = new ScrollablePage();
 		page.add(content, java.awt.BorderLayout.NORTH);
@@ -292,6 +389,11 @@ final class HelpUi {
 		return scroll;
 	}
 
+	/**
+	 * Creates a label used for secondary help text.
+	 * @param description text value for description
+	 * @return the description label result
+	 */
 	static JTextArea descriptionLabel(final String description) {
 		final JTextArea area = HelpUi.paragraph(HelpUi.stripSimpleHtml(description));
 		area.setForeground(HelpUi.TEXT_COLOR);
@@ -300,16 +402,32 @@ final class HelpUi {
 		return area;
 	}
 
+	/**
+	 * Returns a fallback value when the preferred value is missing.
+	 * @param value value to process
+	 * @param fallback text value for fallback
+	 * @return the fallback result
+	 */
 	static String fallback(final String value, final String fallback) {
 		return HelpUi.hasText(value) ? value : fallback;
 	}
 
+	/**
+	 * Creates a chip that describes a mouse gesture.
+	 * @param text text to display or edit
+	 * @return the gesture chip result
+	 */
 	static JLabel gestureChip(final String text) {
 		final JLabel label = HelpUi.chip(text);
 		label.setFont(HelpUi.GESTURE_CHIP_FONT);
 		return label;
 	}
 
+	/**
+	 * Creates a title label for a shortcut group.
+	 * @param text text to display or edit
+	 * @return the group title result
+	 */
 	static JLabel groupTitle(final String text) {
 		final JLabel label = new JLabel(text);
 		label.setForeground(HelpUi.TEXT_COLOR);
@@ -317,10 +435,21 @@ final class HelpUi {
 		return label;
 	}
 
+	/**
+	 * Checks whether this object has a text.
+	 * @param value value to process
+	 * @return {@code true} if text exists; otherwise {@code false}
+	 */
 	static boolean hasText(final String value) {
 		return value != null && !value.isBlank();
 	}
 
+	/**
+	 * Creates one information row for the help page.
+	 * @param label text value for label
+	 * @param value value to process
+	 * @return the info row result
+	 */
 	static JPanel infoRow(final String label, final String value) {
 		final JPanel row = new JPanel(new GridBagLayout());
 		row.setOpaque(false);
@@ -354,6 +483,12 @@ final class HelpUi {
 		return row;
 	}
 
+	/**
+	 * Creates a button that opens a help or external link.
+	 * @param text text to display or edit
+	 * @param url URL to use
+	 * @return the link button result
+	 */
 	static JButton linkButton(final String text, final String url) {
 		final JButton button = new JButton(text);
 		button.setFocusPainted(false);
@@ -370,6 +505,10 @@ final class HelpUi {
 		return button;
 	}
 
+	/**
+	 * Opens the link.
+	 * @param url URL to use
+	 */
 	static void openLink(final String url) {
 		if (!HelpUi.hasText(url)) {
 			return;
@@ -389,6 +528,11 @@ final class HelpUi {
 		}
 	}
 
+	/**
+	 * Creates a wrapped paragraph component.
+	 * @param text text to display or edit
+	 * @return the paragraph result
+	 */
 	static JTextArea paragraph(final String text) {
 		final WrappingTextArea area = new WrappingTextArea(text);
 		area.setEditable(false);
@@ -404,16 +548,31 @@ final class HelpUi {
 		return area;
 	}
 
+	/**
+	 * Returns a color from UI defaults with a fallback value.
+	 * @param key text value for key
+	 * @param fallback fallback value used by the operation
+	 * @return the UI color result
+	 */
 	static Color uiColor(final String key, final Color fallback) {
 		final Color color = UIManager.getColor(key);
 		return color == null ? fallback : color;
 	}
 
+	/**
+	 * Returns a font from UI defaults with a fallback value.
+	 * @param key text value for key
+	 * @param fallback fallback value used by the operation
+	 * @return the UI font result
+	 */
 	static Font uiFont(final String key, final Font fallback) {
 		final Font font = UIManager.getFont(key);
 		return font == null ? fallback : font;
 	}
 
+	/**
+	 * Creates a help UI instance.
+	 */
 	private HelpUi() {
 	}
 

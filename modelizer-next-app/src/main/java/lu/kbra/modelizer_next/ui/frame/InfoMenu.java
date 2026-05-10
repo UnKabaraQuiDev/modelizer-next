@@ -22,10 +22,17 @@ import lu.kbra.modelizer_next.common.App;
 import lu.kbra.modelizer_next.ui.help.HelpDialog;
 import lu.kbra.pclib.PCUtils;
 
+/**
+ * Help and information menu builder.
+ */
 final class InfoMenu extends JMenu {
 
 	private static final long serialVersionUID = 1L;
 
+	/**
+	 * Creates an info menu instance.
+	 * @param frame frame that owns the created UI component
+	 */
 	InfoMenu(final MainFrame frame) {
 		super("Info");
 		this.add(this.createHelpItem());
@@ -43,6 +50,10 @@ final class InfoMenu extends JMenu {
 //				.createOpenUrlItem("Website...", App.WEBSITE_URL, "Visit website", "The website link has been copied to your clipboard:"));
 	}
 
+	/**
+	 * Adds the bootstrap cleanup if available.
+	 * @param frame frame that owns the created UI component
+	 */
 	private void addBootstrapCleanupIfAvailable(final MainFrame frame) {
 		final Optional<UpdateRuntime> bootstrapRuntime = frame.bootstrapRuntime();
 		if (bootstrapRuntime.isEmpty()) {
@@ -79,6 +90,10 @@ final class InfoMenu extends JMenu {
 		this.add(bootstrapSpaceInfo);
 	}
 
+	/**
+	 * Adds the bootstrap version info if available.
+	 * @param frame frame that owns the created UI component
+	 */
 	private void addBootstrapVersionInfoIfAvailable(final MainFrame frame) {
 		final Optional<UpdateRuntime> bootstrapRuntime = frame.bootstrapRuntime();
 		if (bootstrapRuntime.isEmpty()) {
@@ -101,6 +116,11 @@ final class InfoMenu extends JMenu {
 		this.add(bootstrapVersionInfo);
 	}
 
+	/**
+	 * Creates an auto update item.
+	 * @param frame frame that owns the created UI component
+	 * @return the created auto update item
+	 */
 	private JCheckBoxMenuItem createAutoUpdateItem(final MainFrame frame) {
 		final Optional<UpdateRuntime> bootstrapRuntime = frame.bootstrapRuntime();
 		final boolean updateRuntimeAvailable = bootstrapRuntime.isPresent();
@@ -112,18 +132,35 @@ final class InfoMenu extends JMenu {
 		return autoCheckUpdates;
 	}
 
+	/**
+	 * Creates a check for updates item.
+	 * @param frame frame that owns the created UI component
+	 * @return the created check for updates item
+	 */
 	private JMenuItem createCheckForUpdatesItem(final MainFrame frame) {
 		final JMenuItem checkForUpdates = new JMenuItem("Check for updates...");
 		checkForUpdates.addActionListener(event -> frame.checkForUpdatesManually());
 		return checkForUpdates;
 	}
 
+	/**
+	 * Creates a help item.
+	 * @return the created help item
+	 */
 	private JMenuItem createHelpItem() {
 		final JMenuItem checkForUpdates = new JMenuItem("Help...");
 		checkForUpdates.addActionListener(event -> new HelpDialog().setVisible(true));
 		return checkForUpdates;
 	}
 
+	/**
+	 * Creates an open URL item.
+	 * @param text text to display or edit
+	 * @param url URL to use
+	 * @param title title text to display
+	 * @param fallbackMessage text value for fallback message
+	 * @return the created open URL item
+	 */
 	private JMenuItem createOpenUrlItem(final String text, final String url, final String title, final String fallbackMessage) {
 		final JMenuItem item = new JMenuItem(text);
 		item.addActionListener(action -> {
@@ -141,6 +178,11 @@ final class InfoMenu extends JMenu {
 		return item;
 	}
 
+	/**
+	 * Creates an update channel menu.
+	 * @param frame frame that owns the created UI component
+	 * @return the created update channel menu
+	 */
 	private JMenu createUpdateChannelMenu(final MainFrame frame) {
 		final Optional<UpdateRuntime> bootstrapRuntime = frame.bootstrapRuntime();
 		final boolean updateRuntimeAvailable = bootstrapRuntime.isPresent();
@@ -161,6 +203,11 @@ final class InfoMenu extends JMenu {
 		return channelMenu;
 	}
 
+	/**
+	 * Creates a version info item.
+	 * @param frame frame that owns the created UI component
+	 * @return the created version info item
+	 */
 	private JMenuItem createVersionInfoItem(final MainFrame frame) {
 		final JMenuItem versionInfo = new JMenuItem("Version: " + App.VERSION + " [" + App.DISTRIBUTOR + "]");
 		versionInfo.setToolTipText("Click to copy version informations.");

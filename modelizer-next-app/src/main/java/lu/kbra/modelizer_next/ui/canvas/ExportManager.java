@@ -27,6 +27,12 @@ import lu.kbra.modelizer_next.ui.export.ViewExportScope;
  */
 public interface ExportManager extends DiagramCanvasExt {
 
+	/**
+	 * Computes the export content bounds on the active canvas.
+	 * @param g2 graphics context used for drawing
+	 * @param scope export scope to use
+	 * @return the compute export content bounds result
+	 */
 	default Rectangle2D.Double computeExportContentBounds(final Graphics2D g2, final ViewExportScope scope) {
 		final LinkedHashSet<SelectedElement> previousFilter = this.getCanvas().exportSelectionFilter;
 		if (scope == ViewExportScope.SELECTION && this.getCanvas().exportSelectionFilter == null) {
@@ -109,6 +115,12 @@ public interface ExportManager extends DiagramCanvasExt {
 		}
 	}
 
+	/**
+	 * Computes the export size on the active canvas.
+	 * @param g2 graphics context used for drawing
+	 * @param scope export scope to use
+	 * @return the compute export size result
+	 */
 	default Dimension computeExportSize(final Graphics2D g2, final ViewExportScope scope) {
 		if (scope == ViewExportScope.VIEW) {
 			return this.getCanvas().getViewportExportSize();
@@ -123,6 +135,12 @@ public interface ExportManager extends DiagramCanvasExt {
 				Math.max(1, (int) Math.ceil(contentBounds.getHeight() + DiagramCanvas.EXPORT_MARGIN * 2.0)));
 	}
 
+	/**
+	 * Computes the export world bounds on the active canvas.
+	 * @param g2 graphics context used for drawing
+	 * @param scope export scope to use
+	 * @return the compute export world bounds result
+	 */
 	default Rectangle2D.Double computeExportWorldBounds(final Graphics2D g2, final ViewExportScope scope) {
 		if (scope == ViewExportScope.VIEW) {
 			final PanelState state = this.getCanvas().getPanelState();
@@ -144,6 +162,11 @@ public interface ExportManager extends DiagramCanvasExt {
 				contentBounds.getHeight() + DiagramCanvas.EXPORT_MARGIN * 2.0);
 	}
 
+	/**
+	 * Computes the selection bounds.
+	 * @param selection selection state to read or update
+	 * @return the compute selection bounds result
+	 */
 	default Rectangle2D.Double computeSelectionBounds(final List<SelectedElement> selection) {
 		Rectangle2D.Double bounds = null;
 		final Set<String> seenNodeLayouts = new HashSet<>();
@@ -198,6 +221,10 @@ public interface ExportManager extends DiagramCanvasExt {
 		return bounds;
 	}
 
+	/**
+	 * Returns the viewport export size on the active canvas.
+	 * @return the viewport export size
+	 */
 	default Dimension getViewportExportSize() {
 		return new Dimension(this.getCanvas().getWidth() <= 0 ? DiagramCanvas.DEFAULT_EXPORT_WIDTH : this.getCanvas().getWidth(),
 				this.getCanvas().getHeight() <= 0 ? DiagramCanvas.DEFAULT_EXPORT_HEIGHT : this.getCanvas().getHeight());

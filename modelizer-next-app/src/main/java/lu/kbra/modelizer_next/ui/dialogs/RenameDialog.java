@@ -18,13 +18,26 @@ import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 
+/**
+ * Small dialog for renaming an element.
+ */
 public final class RenameDialog {
 
+	/**
+	 * Represents a result holder in the dialog part of the application.
+	 */
 	private static final class ResultHolder {
 		private boolean cancelled;
 		private String value;
 	}
 
+	/**
+	 * Shows the dialog.
+	 * @param parent parent component used for dialog ownership
+	 * @param title title text to display
+	 * @param initialValue text value for initial value
+	 * @return the show dialog result
+	 */
 	public static String showDialog(final Component parent, final String title, final String initialValue) {
 		final Window owner = parent == null ? null : SwingUtilities.getWindowAncestor(parent);
 		final JDialog dialog = owner instanceof final Frame frame ? new JDialog(frame, title, true)
@@ -86,6 +99,9 @@ public final class RenameDialog {
 		return resultHolder.cancelled ? null : resultHolder.value;
 	}
 
+	/**
+	 * Creates a rename dialog instance.
+	 */
 	private RenameDialog() {
 	}
 

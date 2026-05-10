@@ -40,6 +40,9 @@ import lu.kbra.modelizer_next.ui.frame.MainFrame;
 import lu.kbra.modelizer_next.ui.impl.DocumentChangeListener;
 import lu.kbra.pclib.PCUtils;
 
+/**
+ * Swing component that displays and edits one diagram panel.
+ */
 public class DiagramCanvas extends JPanel implements DiagramModelLookup, NodeLayoutCache, SelectionController, NameResolver,
 		PaletteController, ClipboardController, LinkGeometryResolver, ConceptualAnchorCache, CanvasHitTester, CanvasExportRenderer,
 		DiagramModelEditor, DragSelectionController, DiagramPathBuilder, MouseInteractionController, ElementEditor, ElementRenderer,
@@ -159,6 +162,13 @@ public class DiagramCanvas extends JPanel implements DiagramModelLookup, NodeLay
 		return aSelected ? -1 : 1;
 	};
 
+	/**
+	 * Creates a diagram canvas instance.
+	 * @param mainFrame main frame that owns the canvas or action
+	 * @param modelDocument document to read or modify
+	 * @param panelType diagram panel type whose model or layout should be used
+	 * @param documentEventListener listener notified when the document changes
+	 */
 	public DiagramCanvas(
 			final MainFrame mainFrame,
 			final ModelDocument modelDocument,
@@ -185,14 +195,28 @@ public class DiagramCanvas extends JPanel implements DiagramModelLookup, NodeLay
 		super.setLayout(null);
 	}
 
+	/**
+	 * Returns the canvas action.
+	 * @param actionKey key under which the action is registered
+	 * @return the canvas action
+	 */
 	public Action getCanvasAction(final String actionKey) {
 		return this.getActionMap().get(actionKey);
 	}
 
+	/**
+	 * Returns the height on the active canvas.
+	 * @param bodyFont font used for measurement or drawing
+	 * @return the height
+	 */
 	public float getHeight(final Font bodyFont) {
 		return bodyFont.getLineMetrics("Ag", this.fontRenderContext).getHeight();
 	}
 
+	/**
+	 * Paints the component.
+	 * @param g graphics context supplied by Swing
+	 */
 	@Override
 	public void paintComponent(final Graphics g) {
 		this.fontRenderContext = ((Graphics2D) g).getFontRenderContext();
@@ -219,6 +243,9 @@ public class DiagramCanvas extends JPanel implements DiagramModelLookup, NodeLay
 		g2.setTransform(oldTransform);
 	}
 
+	/**
+	 * Resets the UI after document restore on the active canvas.
+	 */
 	public void resetUiAfterDocumentRestore() {
 		this.draggedSelection = null;
 		this.lastScreenPoint = null;
@@ -243,6 +270,12 @@ public class DiagramCanvas extends JPanel implements DiagramModelLookup, NodeLay
 		this.repaint();
 	}
 
+	/**
+	 * Measures the width of text with the supplied font.
+	 * @param titleFont font used for measurement or drawing
+	 * @param classTitle text value for class title
+	 * @return the string width result
+	 */
 	public double stringWidth(final Font titleFont, final String classTitle) {
 		if (classTitle == null || classTitle.isBlank()) {
 			return 0;

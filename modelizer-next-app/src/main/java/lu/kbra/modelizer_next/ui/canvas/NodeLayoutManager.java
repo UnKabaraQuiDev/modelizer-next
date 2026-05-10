@@ -23,6 +23,14 @@ import lu.kbra.modelizer_next.ui.canvas.datastruct.DraggedLayout;
  */
 public interface NodeLayoutManager extends DiagramCanvasExt {
 
+	/**
+	 * Applies the node layout.
+	 * @param type type value that selects the operation mode
+	 * @param objectId id of the element to read or modify
+	 * @param copiedLayout layout object to read or modify
+	 * @param deltaX numeric delta x value
+	 * @param deltaY numeric delta y value
+	 */
 	default void applyNodeLayout(
 			final LayoutObjectType type,
 			final String objectId,
@@ -36,6 +44,12 @@ public interface NodeLayoutManager extends DiagramCanvasExt {
 		layout.setSize(new Size2D(copiedLayout.width(), copiedLayout.height()));
 	}
 
+	/**
+	 * Computes the class bounds.
+	 * @param classModel class model affected by the operation
+	 * @param layout layout object to read or update
+	 * @return the compute class bounds result
+	 */
 	default Rectangle2D computeClassBounds(final ClassModel classModel, final NodeLayout layout) {
 		int width = (int) Math.max(DiagramCanvas.CLASS_MIN_WIDTH,
 				this.getCanvas().stringWidth(DiagramCanvas.TITLE_FONT, this.getCanvas().resolveClassTitle(classModel))
@@ -65,6 +79,11 @@ public interface NodeLayoutManager extends DiagramCanvasExt {
 				height);
 	}
 
+	/**
+	 * Computes the clipboard bounds on the active canvas.
+	 * @param clipboard clipboard value used by the operation
+	 * @return the compute clipboard bounds result
+	 */
 	default Rectangle2D.Double computeClipboardBounds(final ClipboardSnapshot clipboard) {
 		Rectangle2D.Double bounds = null;
 
@@ -98,6 +117,12 @@ public interface NodeLayoutManager extends DiagramCanvasExt {
 		return bounds;
 	}
 
+	/**
+	 * Computes the comment bounds.
+	 * @param text text to display or edit
+	 * @param layout layout object to read or update
+	 * @return the compute comment bounds result
+	 */
 	default Rectangle2D computeCommentBounds(final String text, final NodeLayout layout) {
 		final double width = layout.getSize().getWidth() > 0.0 ? layout.getSize().getWidth() : DiagramCanvas.COMMENT_MIN_WIDTH;
 		final List<String> wrappedLines = this.getCanvas()
@@ -118,6 +143,15 @@ public interface NodeLayoutManager extends DiagramCanvasExt {
 				Math.max(DiagramCanvas.COMMENT_MIN_HEIGHT, layout.getSize().getHeight()));
 	}
 
+	/**
+	 * Expands the bounds on the active canvas.
+	 * @param bounds bounds used for layout or hit testing
+	 * @param x x coordinate
+	 * @param y y coordinate
+	 * @param width width value
+	 * @param height height value
+	 * @return the expand bounds result
+	 */
 	default Rectangle2D.Double expandBounds(
 			final Rectangle2D.Double bounds,
 			final double x,
@@ -141,6 +175,11 @@ public interface NodeLayoutManager extends DiagramCanvasExt {
 		return bounds;
 	}
 
+	/**
+	 * Resolves the render layout from the current model and layout state.
+	 * @param layout layout object to read or update
+	 * @return the resolved render layout
+	 */
 	default NodeLayout resolveRenderLayout(final NodeLayout layout) {
 		if (layout == null || !this.getCanvas().isDragRenderingActive()) {
 			return layout;

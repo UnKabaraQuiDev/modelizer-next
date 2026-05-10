@@ -26,6 +26,13 @@ import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectedElement.SelectedType;
  */
 interface LinkGeometryResolver extends DiagramCanvasExt {
 
+	/**
+	 * Builds a self link points.
+	 * @param linkModel link model affected by the operation
+	 * @param fromPoint point in canvas coordinates
+	 * @param toPoint point in canvas coordinates
+	 * @return the built self link points
+	 */
 	default List<Point2D> buildSelfLinkPoints(final LinkModel linkModel, final Point2D fromPoint, final Point2D toPoint) {
 		final List<Point2D> points = new ArrayList<>();
 		points.add(fromPoint);
@@ -97,6 +104,11 @@ interface LinkGeometryResolver extends DiagramCanvasExt {
 		return points;
 	}
 
+	/**
+	 * Computes the polyline middle point on the active canvas.
+	 * @param points points in canvas coordinates
+	 * @return the compute polyline middle point result
+	 */
 	default Point2D computePolylineMiddlePoint(final List<Point2D> points) {
 		if (points == null || points.size() < 2) {
 			return null;
@@ -132,6 +144,11 @@ interface LinkGeometryResolver extends DiagramCanvasExt {
 		return new Point2D.Double(last.getX(), last.getY());
 	}
 
+	/**
+	 * Computes the upright angle at middle on the active canvas.
+	 * @param points points in canvas coordinates
+	 * @return the compute upright angle at middle result
+	 */
 	default double computeUprightAngleAtMiddle(final List<Point2D> points) {
 		if (points == null || points.size() < 2) {
 			return 0.0;
@@ -182,6 +199,11 @@ interface LinkGeometryResolver extends DiagramCanvasExt {
 		return angle;
 	}
 
+	/**
+	 * Resolves the class center anchor from the current model and layout state.
+	 * @param classId id of the class to look up or modify
+	 * @return the resolved class center anchor
+	 */
 	default Point2D resolveClassCenterAnchor(final String classId) {
 		final ClassModel classModel = this.getCanvas().findClassById(classId);
 		if (classModel == null || !classModel.isVisible(this.getPanelType())) {
@@ -194,6 +216,11 @@ interface LinkGeometryResolver extends DiagramCanvasExt {
 		return new Point2D.Double(bounds.getCenterX(), bounds.getCenterY());
 	}
 
+	/**
+	 * Resolves the comment center anchor from the current model and layout state.
+	 * @param commentId id of the comment to look up or modify
+	 * @return the resolved comment center anchor
+	 */
 	default Point2D resolveCommentCenterAnchor(final String commentId) {
 		final CommentModel commentModel = this.getCanvas().findCommentById(commentId);
 		if (commentModel == null || !this.getCanvas().isCommentVisible(commentModel)) {
@@ -206,6 +233,11 @@ interface LinkGeometryResolver extends DiagramCanvasExt {
 		return new Point2D.Double(bounds.getCenterX(), bounds.getCenterY());
 	}
 
+	/**
+	 * Resolves the link geometry from the current model and layout state.
+	 * @param linkModel link model affected by the operation
+	 * @return the resolved link geometry
+	 */
 	default LinkGeometry resolveLinkGeometry(final LinkModel linkModel) {
 		final Point2D fromPoint;
 		final Point2D toPoint;
@@ -284,12 +316,22 @@ interface LinkGeometryResolver extends DiagramCanvasExt {
 		return new LinkGeometry(fromPoint, toPoint, fromSide, toSide, labelPoint, middlePoint, labelAngle, points);
 	}
 
+	/**
+	 * Resolves the link middle anchor from the current model and layout state.
+	 * @param linkId id of the link to look up or modify
+	 * @return the resolved link middle anchor
+	 */
 	default Point2D resolveLinkMiddleAnchor(final String linkId) {
 		final LinkModel linkModel = this.getCanvas().findLinkById(linkId);
 		final LinkGeometry geometry = linkModel == null ? null : this.getCanvas().resolveLinkGeometry(linkModel);
 		return geometry == null ? null : geometry.middlePoint();
 	}
 
+	/**
+	 * Resolves the preview source anchor from the current model and layout state.
+	 * @param g2 graphics context used for drawing
+	 * @return the resolved preview source anchor
+	 */
 	default Point2D resolvePreviewSourceAnchor(final Graphics2D g2) {
 		if (this.getCanvas().linkCreationState == null) {
 			return null;
@@ -327,6 +369,11 @@ interface LinkGeometryResolver extends DiagramCanvasExt {
 		return this.getCanvas().resolveTechnicalFieldAnchor(source.classId(), source.fieldId(), reference);
 	}
 
+	/**
+	 * Resolves the preview target anchor from the current model and layout state.
+	 * @param target target value used by the operation
+	 * @return the resolved preview target anchor
+	 */
 	default Point2D resolvePreviewTargetAnchor(final SelectedElement target) {
 		if (target == null) {
 			return null;

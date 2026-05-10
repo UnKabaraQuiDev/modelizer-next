@@ -8,6 +8,10 @@ import lu.kbra.modelizer_next.layout.LayoutObjectType;
  */
 public interface ElementDeleter extends DiagramCanvasExt {
 
+	/**
+	 * Deletes the class.
+	 * @param classId id of the class to look up or modify
+	 */
 	default void deleteClass(final String classId) {
 		final ClassModel classModel = this.getCanvas().findClassById(classId);
 		if (classModel == null) {
@@ -40,6 +44,10 @@ public interface ElementDeleter extends DiagramCanvasExt {
 				.removeIf(linkLayout -> this.getCanvas().findLinkById(linkLayout.getLinkId()) == null);
 	}
 
+	/**
+	 * Deletes the comment.
+	 * @param commentId id of the comment to look up or modify
+	 */
 	default void deleteComment(final String commentId) {
 		this.getCanvas().document.getModel().getComments().removeIf(comment -> comment.getId().equals(commentId));
 		this.getCanvas()
@@ -48,6 +56,11 @@ public interface ElementDeleter extends DiagramCanvasExt {
 				.removeIf(layout -> layout.getObjectType() == LayoutObjectType.COMMENT && layout.getObjectId().equals(commentId));
 	}
 
+	/**
+	 * Deletes the field.
+	 * @param classId id of the class to look up or modify
+	 * @param fieldId id of the field to look up or modify
+	 */
 	default void deleteField(final String classId, final String fieldId) {
 		final ClassModel classModel = this.getCanvas().findClassById(classId);
 		if (classModel == null) {
@@ -64,6 +77,10 @@ public interface ElementDeleter extends DiagramCanvasExt {
 				.removeIf(linkLayout -> this.getCanvas().findLinkById(linkLayout.getLinkId()) == null);
 	}
 
+	/**
+	 * Deletes the link.
+	 * @param linkId id of the link to look up or modify
+	 */
 	default void deleteLink(final String linkId) {
 		this.getCanvas().getActiveLinks().removeIf(link -> link.getId().equals(linkId));
 		this.getCanvas().document.getModel().getConceptualLinks().removeIf(link -> link.getId().equals(linkId));

@@ -22,8 +22,15 @@ import lu.kbra.modelizer_next.ui.canvas.data.StyleScope;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.StatusStyleAppearance;
 import lu.kbra.modelizer_next.ui.dialogs.StylePaletteEditorDialog;
 
+/**
+ * Style and palette actions implemented by the main frame.
+ */
 public interface MainFrameStyleController {
 
+	/**
+	 * Creates a default style menu.
+	 * @return the created default style menu
+	 */
 	default JMenu createDefaultStyleMenu() {
 		final MainFrame frame = (MainFrame) this;
 		final JMenu defaultMenu = new JMenu("Default style");
@@ -43,6 +50,10 @@ public interface MainFrameStyleController {
 		return defaultMenu;
 	}
 
+	/**
+	 * Creates a pin menu.
+	 * @return the created pin menu
+	 */
 	default JMenu createPinMenu() {
 		final MainFrame frame = (MainFrame) this;
 		final JMenu pinMenu = new JMenu("Pin to status bar");
@@ -55,6 +66,12 @@ public interface MainFrameStyleController {
 		return pinMenu;
 	}
 
+	/**
+	 * Creates a pinned style button.
+	 * @param palette palette value used by the operation
+	 * @param previewType type value to use
+	 * @return the created pinned style button
+	 */
 	default JButton createPinnedStyleButton(final StylePalette palette, final StyleScope previewType) {
 		final MainFrame frame = (MainFrame) this;
 		final JButton button = new JButton(palette.getName());
@@ -87,12 +104,21 @@ public interface MainFrameStyleController {
 		return button;
 	}
 
+	/**
+	 * Creates a reload styles item.
+	 * @return the created reload styles item
+	 */
 	default JMenuItem createReloadStylesItem() {
 		final JMenuItem reloadItem = new JMenuItem("Reload styles");
 		reloadItem.addActionListener(event -> this.reloadStyles());
 		return reloadItem;
 	}
 
+	/**
+	 * Finds the palette by name that matches the supplied input.
+	 * @param paletteName name value to use
+	 * @return the matching palette by name, or {@code null} when no match exists
+	 */
 	default StylePalette findPaletteByName(final String paletteName) {
 		final MainFrame frame = (MainFrame) this;
 		if (paletteName == null || paletteName.isBlank()) {
@@ -107,6 +133,12 @@ public interface MainFrameStyleController {
 		return null;
 	}
 
+	/**
+	 * Blends the given color with white by the supplied ratio.
+	 * @param color color value to use
+	 * @param amount numeric amount value
+	 * @return the mix with white result
+	 */
 	default Color mixWithWhite(final Color color, final double amount) {
 		if (color == null) {
 			return Color.WHITE;
@@ -119,6 +151,10 @@ public interface MainFrameStyleController {
 		return new Color(red, green, blue);
 	}
 
+	/**
+	 * Rebuilds the style menu from the available palettes.
+	 * @param stylesMenu styles menu value used by the operation
+	 */
 	default void populateStylesMenu(final JMenu stylesMenu) {
 		final MainFrame frame = (MainFrame) this;
 		stylesMenu.removeAll();
@@ -144,6 +180,9 @@ public interface MainFrameStyleController {
 		stylesMenu.add(this.createReloadStylesItem());
 	}
 
+	/**
+	 * Reloads style palettes and refreshes the related UI controls.
+	 */
 	default void reloadStyles() {
 		final MainFrame frame = (MainFrame) this;
 		frame.palettes = StylePaletteService.loadAll();
@@ -155,6 +194,11 @@ public interface MainFrameStyleController {
 		frame.repaint();
 	}
 
+	/**
+	 * Updates a pinned palette name after the palette was renamed.
+	 * @param oldName name value to use
+	 * @param newName name value to use
+	 */
 	default void replacePinnedPaletteName(final String oldName, final String newName) {
 		final MainFrame frame = (MainFrame) this;
 		if (oldName == null || newName == null || oldName.equals(newName)) {
@@ -181,6 +225,12 @@ public interface MainFrameStyleController {
 		App.saveConfig();
 	}
 
+	/**
+	 * Resolves the pinned style appearance from the current model and layout state.
+	 * @param palette palette value used by the operation
+	 * @param previewType type value to use
+	 * @return the resolved pinned style appearance
+	 */
 	default StatusStyleAppearance resolvePinnedStyleAppearance(final StylePalette palette, final StyleScope previewType) {
 		if (palette == null) {
 			return new StatusStyleAppearance(Color.BLACK, Color.WHITE, Color.GRAY);
@@ -198,6 +248,9 @@ public interface MainFrameStyleController {
 		};
 	}
 
+	/**
+	 * Sanitizes the pinned palette names so it can be used safely.
+	 */
 	default void sanitizePinnedPaletteNames() {
 		final List<String> currentNames = new ArrayList<>(App.CONFIG.getPinnedPaletteNames());
 		final List<String> sanitizedNames = new ArrayList<>();
@@ -217,6 +270,9 @@ public interface MainFrameStyleController {
 		App.saveConfig();
 	}
 
+	/**
+	 * Sets the default palette to canvases.
+	 */
 	default void setDefaultPaletteToCanvases() {
 		final MainFrame frame = (MainFrame) this;
 		final StylePalette palette = this.findPaletteByName(App.CONFIG.getDefaultPaletteName());
@@ -225,6 +281,11 @@ public interface MainFrameStyleController {
 		frame.physicalCanvas.setDefaultPalette(palette);
 	}
 
+	/**
+	 * Sets the palette pinned.
+	 * @param paletteName name value to use
+	 * @param pinned whether pinned is enabled
+	 */
 	default void setPalettePinned(final String paletteName, final boolean pinned) {
 		final MainFrame frame = (MainFrame) this;
 		final LinkedHashSet<String> names = new LinkedHashSet<>(App.CONFIG.getPinnedPaletteNames());

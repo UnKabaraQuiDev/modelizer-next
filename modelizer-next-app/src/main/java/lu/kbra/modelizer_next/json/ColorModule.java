@@ -11,10 +11,23 @@ import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 
+/**
+ * Jackson module that serializes and deserializes AWT colors in Modelizer JSON files.
+ */
 public class ColorModule extends SimpleModule {
 
+	/**
+	 * Represents an AWT color deserializer in the JSON import/export part of the application.
+	 */
 	public class AwtColorDeserializer extends JsonDeserializer<Color> {
 
+		/**
+		 * Reads the value from JSON.
+		 * @param p p value used by the operation
+		 * @param ctxt ctxt value used by the operation
+		 * @return the deserialize result
+		 * @throws IOException if the operation cannot be completed
+		 */
 		@Override
 		public Color deserialize(final JsonParser p, final DeserializationContext ctxt) throws IOException {
 			final String raw = p.getValueAsString();
@@ -41,13 +54,27 @@ public class ColorModule extends SimpleModule {
 		}
 	}
 
+	/**
+	 * Represents an AWT color serializer in the JSON import/export part of the application.
+	 */
 	public class AwtColorSerializer extends JsonSerializer<Color> {
 
+		/**
+		 * Handles the d type while converting JSON data.
+		 * @return the handled type result
+		 */
 		@Override
 		public Class<Color> handledType() {
 			return Color.class;
 		}
 
+		/**
+		 * Writes the value to JSON.
+		 * @param value value to process
+		 * @param gen gen value used by the operation
+		 * @param serializers serializers value used by the operation
+		 * @throws IOException if the operation cannot be completed
+		 */
 		@Override
 		public void serialize(final Color value, final JsonGenerator gen, final SerializerProvider serializers) throws IOException {
 			if (value == null) {
@@ -67,6 +94,9 @@ public class ColorModule extends SimpleModule {
 
 	private static final long serialVersionUID = -6363765641985882615L;
 
+	/**
+	 * Creates a color module instance while converting JSON data.
+	 */
 	public ColorModule() {
 		this.addSerializer(new AwtColorSerializer());
 		this.addDeserializer(Color.class, new AwtColorDeserializer());

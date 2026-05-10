@@ -7,10 +7,17 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.KeyStroke;
 
+/**
+ * Edit menu builder for undo, redo, copy, paste, delete, and related actions.
+ */
 final class EditMenu extends JMenu {
 
 	private static final long serialVersionUID = 1L;
 
+	/**
+	 * Creates an edit menu instance.
+	 * @param frame frame that owns the created UI component
+	 */
 	EditMenu(final MainFrame frame) {
 		super("Edit");
 

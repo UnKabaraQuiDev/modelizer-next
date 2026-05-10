@@ -19,8 +19,16 @@ import lu.kbra.modelizer_next.MNMain;
 import lu.kbra.modelizer_next.common.App;
 import lu.kbra.modelizer_next.document.ModelDocument;
 
+/**
+ * Document-level actions implemented by the main frame.
+ */
 public interface MainFrameDocumentController {
 
+	/**
+	 * Confirms whether the close with save should continue.
+	 * @param prompt text value for prompt
+	 * @return {@code true} when the condition is met; otherwise {@code false}
+	 */
 	default boolean confirmCloseWithSave(final String prompt) {
 		if (!this.getSession().isDirty()) {
 			return true;
@@ -39,28 +47,50 @@ public interface MainFrameDocumentController {
 		return choice != JOptionPane.YES_OPTION || this.saveDocument();
 	}
 
+	/**
+	 * Creates an open file chooser.
+	 * @return the created open file chooser
+	 */
 	default JFileChooser createOpenFileChooser() {
 		final JFileChooser chooser = new JFileChooser();
 		chooser.setFileFilter(new FileNameExtensionFilter("Model files (*.mn, *.mod, *.mdlz)", "mn", "mod", "mdlz"));
 		return chooser;
 	}
 
+	/**
+	 * Creates a save file chooser.
+	 * @return the created save file chooser
+	 */
 	default JFileChooser createSaveFileChooser() {
 		final JFileChooser chooser = new JFileChooser();
 		chooser.setFileFilter(new FileNameExtensionFilter("Modelizer Next (*.mn)", "mn"));
 		return chooser;
 	}
 
+	/**
+	 * Returns the document.
+	 * @return the document
+	 */
 	ModelDocument getDocument();
 
+	/**
+	 * Returns the session.
+	 * @return the session
+	 */
 	DocumentSession getSession();
 
+	/**
+	 * Installs the close handling.
+	 */
 	default void installCloseHandling() {
 		final MainFrame frame = (MainFrame) this;
 		frame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 		frame.addWindowListener(new MainFrameCloseHandler(frame));
 	}
 
+	/**
+	 * Installs the file drop support.
+	 */
 	default void installFileDropSupport() {
 		final MainFrame frame = (MainFrame) this;
 		final TransferHandler fileDropHandler = new TransferHandler() {
@@ -110,6 +140,9 @@ public interface MainFrameDocumentController {
 		frame.rootDockingPanel.setTransferHandler(fileDropHandler);
 	}
 
+	/**
+	 * Loads the document.
+	 */
 	default void loadDocument() {
 		final JFileChooser chooser = this.createOpenFileChooser();
 		if (chooser.showOpenDialog((Component) this) != JFileChooser.APPROVE_OPTION) {
@@ -124,6 +157,11 @@ public interface MainFrameDocumentController {
 		}
 	}
 
+	/**
+	 * Loads the document from file.
+	 * @param selectedFile file to read or write
+	 * @return {@code true} when the condition is met; otherwise {@code false}
+	 */
 	default boolean loadDocumentFromFile(final File selectedFile) {
 		if (selectedFile == null || !selectedFile.isFile()) {
 			return false;
@@ -134,16 +172,30 @@ public interface MainFrameDocumentController {
 		return model.isPresent();
 	}
 
+	/**
+	 * Creates and opens a new empty document.
+	 */
 	default void newDocument() {
 		final ModelDocument newDocument = new ModelDocument();
 		newDocument.setSource("New document");
 		this.openInFrame(new DocumentSession(newDocument));
 	}
 
+	/**
+	 * Opens the in frame.
+	 * @param session document session to read or modify
+	 */
 	void openInFrame(DocumentSession session);
 
+	/**
+	 * Refreshes the frame title from the current state.
+	 */
 	void refreshFrameTitle();
 
+	/**
+	 * Saves the document.
+	 * @return {@code true} when the condition is met; otherwise {@code false}
+	 */
 	default boolean saveDocument() {
 		if (this.getSession().getCurrentFile() == null) {
 			return this.saveDocumentAs();
@@ -151,6 +203,10 @@ public interface MainFrameDocumentController {
 		return this.writeDocument(this.getSession().getCurrentFile());
 	}
 
+	/**
+	 * Saves the document as.
+	 * @return {@code true} when the condition is met; otherwise {@code false}
+	 */
 	default boolean saveDocumentAs() {
 		final JFileChooser chooser = this.createSaveFileChooser();
 		if (this.getSession().getCurrentFile() != null) {
@@ -169,8 +225,16 @@ public interface MainFrameDocumentController {
 		return this.writeDocument(selectedFile);
 	}
 
+	/**
+	 * Updates the undo redo menu items.
+	 */
 	void updateUndoRedoMenuItems();
 
+	/**
+	 * Writes the document.
+	 * @param file file to read or write
+	 * @return {@code true} when the condition is met; otherwise {@code false}
+	 */
 	default boolean writeDocument(final File file) {
 		try {
 			this.getDocument().getMeta().setUpdatedAt(Instant.now());

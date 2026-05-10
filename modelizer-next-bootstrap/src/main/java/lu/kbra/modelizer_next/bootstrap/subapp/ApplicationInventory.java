@@ -19,10 +19,18 @@ import lu.kbra.modelizer_next.bootstrap.config.BootstrapApp;
 import lu.kbra.modelizer_next.bootstrap.remote.RemoteUpdateService;
 import lu.kbra.modelizer_next.common.VersionComparator;
 
+/**
+ * Finds installed application versions and chooses the newest usable installation.
+ */
 public final class ApplicationInventory {
 
 	private final ObjectMapper mapper = new ObjectMapper();
 
+	/**
+	 * Finds the latest installed that matches the supplied input.
+	 * @return the matching latest installed, or {@code null} when no match exists
+	 * @throws IOException if the operation cannot be completed
+	 */
 	public Optional<InstalledApplication> findLatestInstalled() throws IOException {
 		final Path applicationsDirectory = BootstrapApp.getApplicationsDirectory().toPath();
 		if (!Files.isDirectory(applicationsDirectory)) {
@@ -37,6 +45,12 @@ public final class ApplicationInventory {
 		}
 	}
 
+	/**
+	 * Finds the latest installed that matches the supplied input.
+	 * @param wantedChannel wanted channel value used by the operation
+	 * @return the matching latest installed, or {@code null} when no match exists
+	 * @throws IOException if the operation cannot be completed
+	 */
 	public Optional<InstalledApplication> findLatestInstalled(UpdateChannel wantedChannel) throws IOException {
 		final Path applicationsDirectory = BootstrapApp.getApplicationsDirectory().toPath();
 		if (!Files.isDirectory(applicationsDirectory)) {
@@ -52,6 +66,13 @@ public final class ApplicationInventory {
 		}
 	}
 
+	/**
+	 * Creates an InstalledApplication value from an installed jar path.
+	 * @param update update metadata to download or install
+	 * @param listener listener notified about progress or changes
+	 * @return the install result
+	 * @throws IOException if the operation cannot be completed
+	 */
 	public InstalledApplication install(final AvailableUpdate update, final ProgressListener listener) throws IOException {
 		final String safeVersion = update.latestVersion().toString().replaceAll("[^A-Za-z0-9._-]", "_");
 		final Path target = BootstrapApp.getApplicationsDirectory().toPath().resolve("modelizer-next-app-" + safeVersion + ".jar");
@@ -62,6 +83,11 @@ public final class ApplicationInventory {
 				.orElseThrow(() -> new IOException("The downloaded application jar is missing app.json metadata."));
 	}
 
+	/**
+	 * Reads the installed application.
+	 * @param jarPath path to read or write
+	 * @return an optional result when a matching value is available
+	 */
 	public Optional<InstalledApplication> readInstalledApplication(final Path jarPath) {
 		try (JarFile jarFile = new JarFile(jarPath.toFile())) {
 			final var entry = jarFile.getJarEntry("app.json");

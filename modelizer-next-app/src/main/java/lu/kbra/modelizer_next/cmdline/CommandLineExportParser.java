@@ -14,49 +14,92 @@ import lu.kbra.modelizer_next.ui.export.ViewExportFormat;
 import lu.kbra.modelizer_next.ui.export.ViewExportScope;
 import lu.kbra.modelizer_next.ui.export.ViewExporter;
 
+/**
+ * Parses and validates command-line arguments for unattended exports.
+ */
 public final class CommandLineExportParser {
 
+	/**
+	 * Exception raised when help requested fails.
+	 */
 	public static final class HelpRequestedException extends IOException {
 
 		private static final long serialVersionUID = -6864019187574255936L;
 
+		/**
+		 * Creates a help requested exception instance.
+		 */
 		public HelpRequestedException() {
 		}
 
+		/**
+		 * Creates a help requested exception instance.
+		 * @param message message shown to the caller or user
+		 */
 		public HelpRequestedException(final String message) {
 			super(message);
 		}
 
 	}
 
+	/**
+	 * Exception raised when invalid argument fails.
+	 */
 	public static class InvalidArgumentException extends RuntimeException {
 
 		private static final long serialVersionUID = 5775841553077652888L;
 
+		/**
+		 * Creates an invalid argument exception instance.
+		 * @param message message shown to the caller or user
+		 */
 		public InvalidArgumentException(final String message) {
 			super(message);
 		}
 
+		/**
+		 * Creates an invalid argument exception instance.
+		 * @param message message shown to the caller or user
+		 * @param cause cause to attach to the created exception
+		 */
 		public InvalidArgumentException(final String message, final Throwable cause) {
 			super(message, cause);
 		}
 
 	}
 
+	/**
+	 * Exception raised when missing argument fails.
+	 */
 	public static class MissingArgumentException extends RuntimeException {
 
 		private static final long serialVersionUID = -2849535395312148162L;
 
+		/**
+		 * Creates a missing argument exception instance.
+		 * @param message message shown to the caller or user
+		 */
 		public MissingArgumentException(final String message) {
 			super(message);
 		}
 
 	}
 
+	/**
+	 * Checks whether export request is enabled or applies.
+	 * @param args command-line arguments supplied by the launcher
+	 * @return {@code true} if export request is enabled or applies; otherwise {@code false}
+	 */
 	public static boolean isExportRequest(final String[] args) {
 		return Arrays.stream(args).anyMatch(arg -> "--export".equals(arg) || "-e".equals(arg) || "--help".equals(arg) || "-h".equals(arg));
 	}
 
+	/**
+	 * Parses the supplied text into the value type used by this class.
+	 * @param args command-line arguments supplied by the launcher
+	 * @return the parsed value
+	 * @throws IOException if the operation cannot be completed
+	 */
 	public static CommandLineExportOptions parse(final String[] args) throws IOException {
 		String inputFile = null;
 		ViewExportFormat format = null;
@@ -127,6 +170,11 @@ public final class CommandLineExportParser {
 				jobCount);
 	}
 
+	/**
+	 * Resolves the home from the current model and layout state.
+	 * @param path file system path to read or write
+	 * @return the resolved home
+	 */
 	public static Path resolveHome(String path) {
 		if (path.startsWith("~")) {
 			path = System.getProperty("user.home") + path.substring(1);
@@ -134,6 +182,9 @@ public final class CommandLineExportParser {
 		return Paths.get(path).normalize();
 	}
 
+	/**
+	 * Prints the help.
+	 */
 	public static void printHelp() {
 		System.out.println("""
 				Usage:
@@ -155,6 +206,11 @@ public final class CommandLineExportParser {
 				.replace("%FILE_PATTERN_TOKENS%", ViewExporter.FILE_PATTERN_TOKENS.stream().collect(Collectors.joining(", "))));
 	}
 
+	/**
+	 * Parses the format from the supplied input.
+	 * @param value value to process
+	 * @return the parsed format
+	 */
 	private static ViewExportFormat parseFormat(final String value) {
 		for (final ViewExportFormat format : ViewExportFormat.values()) {
 			if (format.getExtension().equalsIgnoreCase(value) || format.name().equalsIgnoreCase(value)) {
@@ -165,6 +221,11 @@ public final class CommandLineExportParser {
 		throw new MissingArgumentException("Unsupported export type: " + value);
 	}
 
+	/**
+	 * Parses the panels from the supplied input.
+	 * @param value value to process
+	 * @return the parsed panels
+	 */
 	private static List<PanelType> parsePanels(final String value) {
 		if (value == null || value.isBlank()) {
 			return List.of();
@@ -194,6 +255,11 @@ public final class CommandLineExportParser {
 		return result.stream().distinct().toList();
 	}
 
+	/**
+	 * Parses the scope from the supplied input.
+	 * @param value value to process
+	 * @return the parsed scope
+	 */
 	private static ViewExportScope parseScope(final String value) {
 		return switch (value.toLowerCase()) {
 		case "selection", "e" -> ViewExportScope.SELECTION;
@@ -203,6 +269,14 @@ public final class CommandLineExportParser {
 		};
 	}
 
+	/**
+	 * Reads and validates the required value.
+	 * @param args command-line arguments supplied by the launcher
+	 * @param index zero-based index to read or update
+	 * @param option text value for option
+	 * @return the require value result
+	 * @throws IOException if the operation cannot be completed
+	 */
 	private static String requireValue(final String[] args, final int index, final String option) throws IOException {
 		if (index >= args.length) {
 			throw new MissingArgumentException("Missing value for " + option);
@@ -211,6 +285,9 @@ public final class CommandLineExportParser {
 		return args[index];
 	}
 
+	/**
+	 * Creates a command line export parser instance.
+	 */
 	private CommandLineExportParser() {
 	}
 

@@ -9,10 +9,17 @@ import javax.swing.KeyStroke;
 
 import lu.kbra.modelizer_next.ui.canvas.DiagramCanvas;
 
+/**
+ * Insert menu builder for adding diagram elements.
+ */
 final class InsertMenu extends JMenu {
 
 	private static final long serialVersionUID = 1L;
 
+	/**
+	 * Creates an insert menu instance.
+	 * @param frame frame that owns the created UI component
+	 */
 	InsertMenu(final MainFrame frame) {
 		super("Insert");
 		this.add(this.createCanvasMenuItem(frame, "New table", "addTable", MainFrameMenuBar.ctrl(KeyEvent.VK_T)));
@@ -21,6 +28,14 @@ final class InsertMenu extends JMenu {
 		this.add(this.createCanvasMenuItem(frame, "New link", "addLink", MainFrameMenuBar.ctrl(KeyEvent.VK_L)));
 	}
 
+	/**
+	 * Creates a canvas menu item.
+	 * @param frame frame that owns the created UI component
+	 * @param text text to display or edit
+	 * @param actionKey key under which the action is registered
+	 * @param keyStroke keyboard shortcut to register
+	 * @return the created canvas menu item
+	 */
 	private JMenuItem createCanvasMenuItem(final MainFrame frame, final String text, final String actionKey, final KeyStroke keyStroke) {
 		final JMenuItem item = new JMenuItem(text);
 		item.setAccelerator(keyStroke);

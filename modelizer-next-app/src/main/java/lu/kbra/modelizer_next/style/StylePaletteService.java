@@ -10,8 +10,15 @@ import java.util.List;
 import lu.kbra.modelizer_next.MNMain;
 import lu.kbra.modelizer_next.common.App;
 
+/**
+ * Creates, normalizes, and applies reusable style palettes.
+ */
 public final class StylePaletteService {
 
+	/**
+	 * Deletes the by name.
+	 * @param paletteName name value to use
+	 */
 	public static void deleteByName(final String paletteName) {
 		if (paletteName == null || paletteName.isBlank()) {
 			return;
@@ -23,6 +30,10 @@ public final class StylePaletteService {
 		}
 	}
 
+	/**
+	 * Loads the all.
+	 * @return the matching values
+	 */
 	public static List<StylePalette> loadAll() {
 		App.ensureDirsExists();
 		StylePaletteService.ensureDefaultPalette();
@@ -47,6 +58,10 @@ public final class StylePaletteService {
 		return palettes;
 	}
 
+	/**
+	 * Saves the current state to persistent storage.
+	 * @param palette palette value used by the operation
+	 */
 	public static void save(final StylePalette palette) {
 		App.ensureDirsExists();
 
@@ -60,6 +75,9 @@ public final class StylePaletteService {
 		}
 	}
 
+	/**
+	 * Ensures that the default palette exists or is up to date.
+	 */
 	private static void ensureDefaultPalette() {
 		final File[] files = App.getStylesDirectory().listFiles((dir, name) -> name.toLowerCase().endsWith(".json"));
 		if (files != null && files.length > 0) {
@@ -71,6 +89,11 @@ public final class StylePaletteService {
 		StylePaletteService.save(palette);
 	}
 
+	/**
+	 * Sanitizes the file name so it can be used safely.
+	 * @param name name value to read, write, or display
+	 * @return the sanitize file name result
+	 */
 	private static String sanitizeFileName(final String name) {
 		if (name == null || name.isBlank()) {
 			return "unnamed";
@@ -78,6 +101,9 @@ public final class StylePaletteService {
 		return name.replaceAll("[^a-zA-Z0-9._-]", "_");
 	}
 
+	/**
+	 * Creates a style palette service instance.
+	 */
 	private StylePaletteService() {
 	}
 

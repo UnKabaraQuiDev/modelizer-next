@@ -25,16 +25,39 @@ import javax.swing.WindowConstants;
 import lu.kbra.modelizer_next.domain.ClassModel;
 import lu.kbra.modelizer_next.ui.component.ColorButton;
 
+/**
+ * Dialog for editing a class/table and its display names.
+ */
 public final class ClassEditorDialog {
 
+	/**
+	 * Immutable value object for result data.
+	 * @param conceptualName name value to use
+	 * @param technicalName name value to use
+	 * @param textColor color value to use
+	 * @param backgroundColor color value to use
+	 * @param borderColor color value to use
+	 * @param visibleInConceptual whether visible in conceptual is enabled
+	 * @param visibleInLogical whether visible in logical is enabled
+	 * @param visibleInPhysical whether visible in physical is enabled
+	 */
 	public record Result(String conceptualName, String technicalName, Color textColor, Color backgroundColor, Color borderColor,
 			boolean visibleInConceptual, boolean visibleInLogical, boolean visibleInPhysical) {
 	}
 
+	/**
+	 * Represents a holder in the dialog part of the application.
+	 */
 	private static final class Holder {
 		private Result result;
 	}
 
+	/**
+	 * Shows the dialog.
+	 * @param parent parent component used for dialog ownership
+	 * @param classModel class model affected by the operation
+	 * @return the show dialog result
+	 */
 	public static Result showDialog(final Component parent, final ClassModel classModel) {
 		final Window owner = parent == null ? null : SwingUtilities.getWindowAncestor(parent);
 		final JDialog dialog = new JDialog(owner, "Edit table", Dialog.ModalityType.APPLICATION_MODAL);
@@ -109,6 +132,12 @@ public final class ClassEditorDialog {
 		return holder.result;
 	}
 
+	/**
+	 * Creates one labeled row for a dialog form.
+	 * @param labelText text value for label text
+	 * @param component Swing component to configure
+	 * @return the row result
+	 */
 	private static JPanel row(final String labelText, final Component component) {
 		final JPanel row = new JPanel(new BorderLayout(6, 6));
 		row.setBorder(BorderFactory.createEmptyBorder(4, 0, 4, 0));
@@ -117,6 +146,9 @@ public final class ClassEditorDialog {
 		return row;
 	}
 
+	/**
+	 * Creates a class editor dialog instance.
+	 */
 	private ClassEditorDialog() {
 	}
 

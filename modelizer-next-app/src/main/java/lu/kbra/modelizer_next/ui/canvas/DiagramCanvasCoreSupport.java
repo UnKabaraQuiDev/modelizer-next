@@ -38,6 +38,12 @@ import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectedElement.SelectedType;
  */
 interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 
+	/**
+	 * Appends the suffix on the active canvas.
+	 * @param value value to process
+	 * @param suffix suffix to append when needed
+	 * @return the append suffix result
+	 */
 	default String appendSuffix(final String value, final String suffix) {
 		if (value == null || value.isBlank()) {
 			return value;
@@ -45,10 +51,22 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 		return value + suffix;
 	}
 
+	/**
+	 * Constrains a numeric value to the supplied range.
+	 * @param value value to process
+	 * @param min numeric min value
+	 * @param max numeric max value
+	 * @return the clamp result
+	 */
 	default double clamp(final double value, final double min, final double max) {
 		return Math.max(min, Math.min(max, value));
 	}
 
+	/**
+	 * Returns the next anchor side in clockwise order.
+	 * @param side node side to inspect
+	 * @return the clockwise result
+	 */
 	default AnchorSide clockwise(final AnchorSide side) {
 		return switch (side) {
 		case TOP -> AnchorSide.RIGHT;
@@ -58,11 +76,19 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 		};
 	}
 
+	/**
+	 * Configures the graphics on the active canvas.
+	 * @param g2 graphics context used for drawing
+	 */
 	default void configureGraphics(final Graphics2D g2) {
 		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 	}
 
+	/**
+	 * Creates a graphics context on the active canvas.
+	 * @return the created graphics context
+	 */
 	default Graphics2D createGraphicsContext() {
 		final BufferedImage image = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
 		final Graphics2D g2 = image.createGraphics();
@@ -71,6 +97,9 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 		return g2;
 	}
 
+	/**
+	 * Ensures that the layouts exists or is up to date.
+	 */
 	default void ensureLayouts() {
 		for (final ClassModel classModel : this.getCanvas().document.getModel().getClasses()) {
 			if (classModel.isVisible(this.getPanelType())) {
@@ -85,6 +114,13 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 		}
 	}
 
+	/**
+	 * Ensures that the technical source field exists or is up to date.
+	 * @param sourceClass source class value used by the operation
+	 * @param targetClass target class value used by the operation
+	 * @param targetField target field value used by the operation
+	 * @return the ensure technical source field result
+	 */
 	default FieldModel ensureTechnicalSourceField(
 			final ClassModel sourceClass,
 			final ClassModel targetClass,
@@ -136,6 +172,12 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 		return null;
 	}
 
+	/**
+	 * Finds the bound target anchor that matches the supplied input.
+	 * @param g2 graphics context used for drawing
+	 * @param commentModel comment model affected by the operation
+	 * @return the matching bound target anchor, or {@code null} when no match exists
+	 */
 	default Point2D findBoundTargetAnchor(final Graphics2D g2, final CommentModel commentModel) {
 		if (commentModel.getBinding() == null) {
 			return null;
@@ -158,15 +200,30 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 		return geometry == null ? null : geometry.middlePoint();
 	}
 
+	/**
+	 * Returns the active links.
+	 * @return the active links
+	 */
 	default List<LinkModel> getActiveLinks() {
 		return this.getCanvas().panelType == PanelType.CONCEPTUAL ? this.getCanvas().document.getModel().getConceptualLinks()
 				: this.getCanvas().document.getModel().getTechnicalLinks();
 	}
 
+	/**
+	 * Returns the link creation source.
+	 * @return the link creation source
+	 */
 	default SelectedElement getLinkCreationSource() {
 		return this.getCanvas().linkCreationState == null ? null : this.getCanvas().linkCreationState.toSelectedElement();
 	}
 
+	/**
+	 * Returns the technical side link count.
+	 * @param classId id of the class to look up or modify
+	 * @param side node side to inspect
+	 * @param ignoredLinkId id of the element to read or modify
+	 * @return the technical side link count
+	 */
 	default int getTechnicalSideLinkCount(final String classId, final AnchorSide side, final String ignoredLinkId) {
 		if (classId == null || side != AnchorSide.LEFT && side != AnchorSide.RIGHT) {
 			return 0;
@@ -203,6 +260,11 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 		return count;
 	}
 
+	/**
+	 * Returns the visible fields.
+	 * @param classModel class model affected by the operation
+	 * @return the visible fields
+	 */
 	@Deprecated
 	default List<FieldModel> getVisibleFields(final ClassModel classModel) {
 		final List<FieldModel> visibleFields = new ArrayList<>();
@@ -217,10 +279,21 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 		return visibleFields;
 	}
 
+	/**
+	 * Checks whether this object has an association class.
+	 * @param linkModel link model affected by the operation
+	 * @return {@code true} if association class exists; otherwise {@code false}
+	 */
 	default boolean hasAssociationClass(final LinkModel linkModel) {
 		return linkModel != null && linkModel.getAssociationClassId() != null && !linkModel.getAssociationClassId().isBlank();
 	}
 
+	/**
+	 * Checks whether this object has an outgoing technical link.
+	 * @param classId id of the class to look up or modify
+	 * @param fieldId id of the field to look up or modify
+	 * @return {@code true} if outgoing technical link exists; otherwise {@code false}
+	 */
 	default boolean hasOutgoingTechnicalLink(final String classId, final String fieldId) {
 		for (final LinkModel linkModel : this.getCanvas().document.getModel().getTechnicalLinks()) {
 			if (linkModel.getFrom() == null || linkModel.getTo() == null || linkModel.getFrom().getFieldId() == null
@@ -235,6 +308,9 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 		return false;
 	}
 
+	/**
+	 * Installs the key bindings on the active canvas.
+	 */
 	default void installKeyBindings() {
 		this.getCanvas()
 				.installDefaultKeyBindings(new DiagramCanvasActions(() -> this.getCanvas().renameSelection(false),
@@ -259,6 +335,12 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 						() -> this.getCanvas().editSelectionStyle(true)));
 	}
 
+	/**
+	 * Checks whether link connected to is enabled or applies.
+	 * @param linkModel link model affected by the operation
+	 * @param classId id of the class to look up or modify
+	 * @return {@code true} if link connected to is enabled or applies; otherwise {@code false}
+	 */
 	default boolean isLinkConnectedTo(final LinkModel linkModel, final String classId) {
 		if (linkModel == null || classId == null) {
 			return false;
@@ -267,6 +349,11 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 				|| linkModel.getTo() != null && Objects.equals(linkModel.getTo().getClassId(), classId);
 	}
 
+	/**
+	 * Checks whether valid preview target is enabled or applies on the active canvas.
+	 * @param target target value used by the operation
+	 * @return {@code true} if valid preview target is enabled or applies; otherwise {@code false}
+	 */
 	default boolean isValidPreviewTarget(final SelectedElement target) {
 		if (target == null || this.getCanvas().linkCreationState == null) {
 			return false;
@@ -307,6 +394,12 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 		return source.type() == SelectedType.CLASS;
 	}
 
+	/**
+	 * Maps the ID on the active canvas.
+	 * @param idMap map to read or update
+	 * @param oldId id of the element to read or modify
+	 * @return the map ID result
+	 */
 	default String mapId(final Map<String, String> idMap, final String oldId) {
 		if (oldId == null) {
 			return null;
@@ -314,6 +407,10 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 		return idMap.getOrDefault(oldId, oldId);
 	}
 
+	/**
+	 * Returns the mouse world pos on the active canvas.
+	 * @return the mouse world pos
+	 */
 	default Point2D.Double getMouseWorldPos() {
 		final Point mousePoint = this.getCanvas().getMousePosition();
 
@@ -324,6 +421,10 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 		return this.getCanvas().screenToWorld(mousePoint);
 	}
 
+	/**
+	 * Returns the mouse viewport pos on the active canvas.
+	 * @return the mouse viewport pos
+	 */
 	default Point2D.Double getMouseViewportPos() {
 		final Point mousePoint = this.getCanvas().getMousePosition();
 
@@ -334,6 +435,11 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 		return this.getCanvas().getViewportCenter();
 	}
 
+	/**
+	 * Normalizes the connection source selection.
+	 * @param selection selection state to read or update
+	 * @return the normalize connection source selection result
+	 */
 	default SelectedElement normalizeConnectionSourceSelection(final SelectedElement selection) {
 		if (selection == null) {
 			return null;
@@ -347,6 +453,11 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 		};
 	}
 
+	/**
+	 * Normalizes the connection target selection.
+	 * @param selection selection state to read or update
+	 * @return the normalize connection target selection result
+	 */
 	default SelectedElement normalizeConnectionTargetSelection(final SelectedElement selection) {
 		if (selection == null || this.getCanvas().linkCreationState == null) {
 			return null;
@@ -381,6 +492,9 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 		};
 	}
 
+	/**
+	 * Notifies the frame that the document content changed.
+	 */
 	default void notifyDocumentChanged() {
 		this.getCanvas().invalidateConceptualAnchorCache();
 		if (this.getCanvas().documentEventListener != null) {
@@ -388,12 +502,18 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 		}
 	}
 
+	/**
+	 * Notifies listeners that the selection changed changed.
+	 */
 	default void notifySelectionChanged() {
 		if (this.getCanvas().documentEventListener != null) {
 			this.getCanvas().documentEventListener.onSelectionChanged(this.getCanvas().getSelectionInfo());
 		}
 	}
 
+	/**
+	 * Opens the edit dialog for selection.
+	 */
 	default void openEditDialogForSelection() {
 		if (this.getCanvas().selectedElement == null) {
 			return;
@@ -409,6 +529,12 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 		}
 	}
 
+	/**
+	 * Resolves the conceptual preview anchor from the current model and layout state.
+	 * @param classId id of the class to look up or modify
+	 * @param reference reference value used by the operation
+	 * @return the resolved conceptual preview anchor
+	 */
 	default Point2D resolveConceptualPreviewAnchor(final String classId, final Point2D reference) {
 		final ClassModel classModel = this.getCanvas().findClassById(classId);
 		if (classModel == null || !classModel.isVisible(this.getPanelType())) {
@@ -440,6 +566,12 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 		return best;
 	}
 
+	/**
+	 * Resolves the opposite reference point from the current model and layout state.
+	 * @param classId id of the class to look up or modify
+	 * @param fieldId id of the field to look up or modify
+	 * @return the resolved opposite reference point
+	 */
 	default Point2D resolveOppositeReferencePoint(final String classId, final String fieldId) {
 		final ClassModel classModel = this.getCanvas().findClassById(classId);
 		if (classModel == null || !classModel.isVisible(this.getPanelType())) {
@@ -466,6 +598,10 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 		return new Point2D.Double(classBounds.getCenterX(), classBounds.getCenterY());
 	}
 
+	/**
+	 * Resolves the preview source anchor reference from the current model and layout state.
+	 * @return the resolved preview source anchor reference
+	 */
 	default Point2D resolvePreviewSourceAnchorReference() {
 		if (this.getCanvas().linkCreationState == null) {
 			return this.getCanvas().linkPreviewMousePoint;
@@ -495,6 +631,15 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 		return this.getCanvas().resolveOppositeReferencePoint(source.classId(), source.fieldId());
 	}
 
+	/**
+	 * Resolves the technical endpoint side from the current model and layout state.
+	 * @param classId id of the class to look up or modify
+	 * @param fieldId id of the field to look up or modify
+	 * @param oppositeClassId id of the element to read or modify
+	 * @param oppositeFieldId id of the element to read or modify
+	 * @param selfLink whether self link is enabled
+	 * @return the resolved technical endpoint side
+	 */
 	default AnchorSide resolveTechnicalEndpointSide(
 			final String classId,
 			final String fieldId,
@@ -536,6 +681,13 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 		return oppositeReference.getX() <= centerX ? AnchorSide.LEFT : AnchorSide.RIGHT;
 	}
 
+	/**
+	 * Resolves the technical field anchor from the current model and layout state.
+	 * @param classId id of the class to look up or modify
+	 * @param fieldId id of the field to look up or modify
+	 * @param oppositeReference opposite reference value used by the operation
+	 * @return the resolved technical field anchor
+	 */
 	default Point2D resolveTechnicalFieldAnchor(final String classId, final String fieldId, final Point2D oppositeReference) {
 		final ClassModel classModel = this.getCanvas().findClassById(classId);
 		if (classModel == null || !classModel.isVisible(this.getPanelType())) {
@@ -567,6 +719,14 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 		return new Point2D.Double(x, classBounds.getCenterY());
 	}
 
+	/**
+	 * Resolves the technical field anchor from the current model and layout state.
+	 * @param classId id of the class to look up or modify
+	 * @param fieldId id of the field to look up or modify
+	 * @param oppositeClassId id of the element to read or modify
+	 * @param oppositeFieldId id of the element to read or modify
+	 * @return the resolved technical field anchor
+	 */
 	default FieldAnchor resolveTechnicalFieldAnchor(
 			final String classId,
 			final String fieldId,
@@ -615,6 +775,13 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 				: new FieldAnchor(right, AnchorSide.RIGHT);
 	}
 
+	/**
+	 * Resolves the technical self link anchor from the current model and layout state.
+	 * @param classId id of the class to look up or modify
+	 * @param fieldId id of the field to look up or modify
+	 * @param side node side to inspect
+	 * @return the resolved technical self link anchor
+	 */
 	default Point2D resolveTechnicalSelfLinkAnchor(final String classId, final String fieldId, final AnchorSide side) {
 		final ClassModel classModel = this.getCanvas().findClassById(classId);
 		if (classModel == null || !classModel.isVisible(this.getPanelType())) {
@@ -644,6 +811,12 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 		return new Point2D.Double(x, classBounds.getCenterY());
 	}
 
+	/**
+	 * Resolves the technical source endpoint from the current model and layout state.
+	 * @param source source object used by the operation
+	 * @param target target value used by the operation
+	 * @return the resolved technical source endpoint
+	 */
 	default SelectedElement resolveTechnicalSourceEndpoint(final SelectedElement source, final SelectedElement target) {
 		if (source == null || target == null) {
 			return null;
@@ -669,6 +842,11 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 		return sourceField == null ? null : SelectedElement.forField(sourceClass.getId(), sourceField.getId());
 	}
 
+	/**
+	 * Resolves the technical target endpoint from the current model and layout state.
+	 * @param target target value used by the operation
+	 * @return the resolved technical target endpoint
+	 */
 	default SelectedElement resolveTechnicalTargetEndpoint(final SelectedElement target) {
 		if (target == null) {
 			return null;
@@ -687,11 +865,21 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 		return targetField == null ? null : SelectedElement.forField(target.classId(), targetField.getId());
 	}
 
+	/**
+	 * Converts screen coordinates into world coordinates.
+	 * @param point point in canvas coordinates
+	 * @return the screen to world result
+	 */
 	default Point2D.Double screenToWorld(final Point point) {
 		final PanelState state = this.getCanvas().getPanelState();
 		return new Point2D.Double((point.getX() - state.getPanX()) / state.getZoom(), (point.getY() - state.getPanY()) / state.getZoom());
 	}
 
+	/**
+	 * Sets the association class for link.
+	 * @param classId id of the class to look up or modify
+	 * @param linkId id of the link to look up or modify
+	 */
 	default void setAssociationClassForLink(final String classId, final String linkId) {
 		final LinkModel linkModel = this.getCanvas().findLinkById(linkId);
 		if (classId == null || linkModel == null || this.getCanvas().findClassById(classId) == null
@@ -708,6 +896,11 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 		this.getCanvas().notifyDocumentChanged();
 	}
 
+	/**
+	 * Decides whether the canvas should export class.
+	 * @param classModel class model affected by the operation
+	 * @return {@code true} if the operation should happen; otherwise {@code false}
+	 */
 	default boolean shouldExportClass(final ClassModel classModel) {
 		if (this.getCanvas().exportSelectionFilter == null) {
 			return true;
@@ -726,39 +919,79 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 		return false;
 	}
 
+	/**
+	 * Decides whether the canvas should export comment.
+	 * @param commentModel comment model affected by the operation
+	 * @return {@code true} if the operation should happen; otherwise {@code false}
+	 */
 	default boolean shouldExportComment(final CommentModel commentModel) {
 		return this.getCanvas().exportSelectionFilter == null || commentModel != null
 				&& this.getCanvas().exportSelectionFilter.contains(SelectedElement.forComment(commentModel.getId()));
 	}
 
+	/**
+	 * Decides whether the canvas should export link.
+	 * @param linkModel link model affected by the operation
+	 * @return {@code true} if the operation should happen; otherwise {@code false}
+	 */
 	default boolean shouldExportLink(final LinkModel linkModel) {
 		return this.getCanvas().exportSelectionFilter == null
 				|| linkModel != null && this.getCanvas().exportSelectionFilter.contains(SelectedElement.forLink(linkModel.getId()));
 	}
 
+	/**
+	 * Returns the viewport center world on the active canvas.
+	 * @return the viewport center world
+	 */
 	default Point2D.Double getViewportCenterWorld() {
 		return worldToViewport(getViewportCenter());
 	}
 
+	/**
+	 * Returns the viewport center on the active canvas.
+	 * @return the viewport center
+	 */
 	default Point2D.Double getViewportCenter() {
 		return new Point2D.Double(this.getCanvas().getWidth() / 2.0, this.getCanvas().getHeight() / 2.0);
 	}
 
+	/**
+	 * Converts world coordinates into viewport coordinates.
+	 * @param world world value used by the operation
+	 * @return the world to viewport result
+	 */
 	default Point2D.Double worldToViewport(final Point2D world) {
 		final PanelState state = this.getCanvas().getPanelState();
 		return new Point2D.Double(world.getX() * state.getZoom() + state.getPanX(), world.getY() * state.getZoom() + state.getPanY());
 	}
 
+	/**
+	 * Converts a world-space size into a zoomed viewport size.
+	 * @param world world value used by the operation
+	 * @return the world toviewport zoom result
+	 */
 	default Point2D.Double worldToviewportZoom(final Point2D world) {
 		final PanelState state = this.getCanvas().getPanelState();
 		return new Point2D.Double(world.getX() * state.getZoom(), world.getY() * state.getZoom());
 	}
 
+	/**
+	 * Converts a world-space size into a zoomed viewport size.
+	 * @param world world value used by the operation
+	 * @return the world to viewport zoom result
+	 */
 	default Point2D.Double worldToViewportZoom(Dimension world) {
 		final PanelState state = this.getCanvas().getPanelState();
 		return new Point2D.Double(world.getWidth() * state.getZoom(), world.getHeight() * state.getZoom());
 	}
 
+	/**
+	 * Wraps text into lines that fit within the requested width.
+	 * @param text text to display or edit
+	 * @param font font used for measurement or drawing
+	 * @param maxWidth width value
+	 * @return the matching values
+	 */
 	default List<String> wrapText(final String text, final Font font, final int maxWidth) {
 		if (text == null || text.isEmpty()) {
 			return Collections.emptyList();

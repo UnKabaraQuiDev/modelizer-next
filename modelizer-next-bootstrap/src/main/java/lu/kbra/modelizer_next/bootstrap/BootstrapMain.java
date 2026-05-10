@@ -14,8 +14,14 @@ import com.formdev.flatlaf.FlatLightLaf;
 import lu.kbra.modelizer_next.common.FileOpenBridge;
 import lu.kbra.modelizer_next.common.SystemThemeDetector;
 
+/**
+ * Native bootstrap main class that starts the bootstrap runtime.
+ */
 public final class BootstrapMain {
 
+	/**
+	 * Applies the configured look and feel during bootstrap/update processing.
+	 */
 	public static void applyConfiguredLookAndFeel() {
 		try {
 			if (SystemThemeDetector.isDark()) {
@@ -28,6 +34,10 @@ public final class BootstrapMain {
 		}
 	}
 
+	/**
+	 * Starts the application entry point.
+	 * @param args command-line arguments supplied by the launcher
+	 */
 	public static void main(String[] args) {
 		for (final String arg : args) {
 			if (arg.startsWith("-D")) {
@@ -63,6 +73,10 @@ public final class BootstrapMain {
 		}
 	}
 
+	/**
+	 * Restarts the current Java command with the same arguments.
+	 * @throws Exception if the operation cannot be completed
+	 */
 	public static void restartSameCommand() throws Exception {
 		final ProcessHandle.Info info = ProcessHandle.current().info();
 
@@ -79,6 +93,9 @@ public final class BootstrapMain {
 		System.exit(0);
 	}
 
+	/**
+	 * Creates a bootstrap main instance.
+	 */
 	private BootstrapMain() {
 	}
 }

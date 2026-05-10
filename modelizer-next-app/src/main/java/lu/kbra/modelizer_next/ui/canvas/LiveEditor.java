@@ -51,8 +51,15 @@ import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectedElement.SelectedType;
 import lu.kbra.pclib.datastructure.pair.Pair;
 import lu.kbra.pclib.datastructure.pair.Pairs;
 
+/**
+ * Inline text editing support for class names, field names, and comment text on the canvas.
+ */
 public interface LiveEditor extends DiagramCanvasExt {
 
+	/**
+	 * Opens or applies editing for the selection style.
+	 * @param alternative whether alternative is enabled
+	 */
 	default void editSelectionStyle(final boolean alternative) {
 		if (this.getCanvas().selectedElement == null || this.getCanvas().selectedElement.type() == SelectedType.NONE) {
 			return;
@@ -62,6 +69,12 @@ public interface LiveEditor extends DiagramCanvasExt {
 				this.getStyleObject(this.getCanvas().selectedElement, alternative)));
 	}
 
+	/**
+	 * Returns the style object on the active canvas.
+	 * @param selectedElement selected element to read or update
+	 * @param alternative whether alternative is enabled
+	 * @return the style object
+	 */
 	default Object getStyleObject(final SelectedElement selectedElement, final boolean alternative) {
 		return switch (selectedElement.type()) {
 		case CLASS -> alternative ? Pairs.readOnly(this.getCanvas().findClassById(selectedElement.classId()).getStyle().clone(),
@@ -80,6 +93,10 @@ public interface LiveEditor extends DiagramCanvasExt {
 		};
 	}
 
+	/**
+	 * Renames the selection.
+	 * @param alternative whether alternative is enabled
+	 */
 	default void renameSelection(final boolean alternative) {
 		if (this.getCanvas().selectedElement == null || this.getCanvas().selectedElement.type() == SelectedType.NONE) {
 			return;
@@ -93,6 +110,10 @@ public interface LiveEditor extends DiagramCanvasExt {
 		}
 	}
 
+	/**
+	 * Starts inline style editing for the selected element.
+	 * @param element element value used by the operation
+	 */
 	default void invokeStyleEditingElement(final LiveEditElement element) {
 		if (this.isLiveEditingElement()) {
 			this.cancelLiveEditElement();
@@ -129,6 +150,10 @@ public interface LiveEditor extends DiagramCanvasExt {
 		});
 	}
 
+	/**
+	 * Starts inline renaming for the selected element.
+	 * @param element element value used by the operation
+	 */
 	default void invokeRenamingElement(final LiveEditElement element) {
 		if (this.isLiveEditingElement()) {
 			this.cancelLiveEditElement();
@@ -151,6 +176,9 @@ public interface LiveEditor extends DiagramCanvasExt {
 		this.applyLiveEditContext(ctx);
 	}
 
+	/**
+	 * Updates the live edit layout.
+	 */
 	default void updateLiveEditLayout() {
 		if (!this.isLiveEditingElement()) {
 			return;
@@ -189,6 +217,9 @@ public interface LiveEditor extends DiagramCanvasExt {
 		this.getCanvas().repaint();
 	}
 
+	/**
+	 * Updates the live edit preview on the active canvas.
+	 */
 	default void updateLiveEditPreview() {
 		if (!this.isLiveEditingElement()) {
 			return;
@@ -212,6 +243,10 @@ public interface LiveEditor extends DiagramCanvasExt {
 		this.getCanvas().repaint();
 	}
 
+	/**
+	 * Applies the live edit context on the active canvas.
+	 * @param ctx ctx value used by the operation
+	 */
 	@SuppressWarnings("unchecked")
 	default void applyLiveEditContext(final RenamingContext ctx) {
 		final DiagramCanvas canvas = this.getCanvas();
@@ -259,6 +294,11 @@ public interface LiveEditor extends DiagramCanvasExt {
 		});
 	}
 
+	/**
+	 * Builds a class context.
+	 * @param e event object supplied by Swing
+	 * @return the built class context
+	 */
 	default RenamingContext buildClassContext(final LiveEditElement e) {
 		final var canvas = this.getCanvas();
 
@@ -273,6 +313,11 @@ public interface LiveEditor extends DiagramCanvasExt {
 		return new RenamingContext(pos, size, model.getNames().get(canvas.panelType), model.getStyle(), String.class, model);
 	}
 
+	/**
+	 * Builds a class field context.
+	 * @param e event object supplied by Swing
+	 * @return the built class field context
+	 */
 	default RenamingContext buildClassFieldContext(final LiveEditElement e) {
 		final var canvas = this.getCanvas();
 
@@ -293,6 +338,11 @@ public interface LiveEditor extends DiagramCanvasExt {
 				.worldToViewport(fieldPos), size, field.getNames().get(canvas.panelType), field.getStyle(), String.class, field);
 	}
 
+	/**
+	 * Builds a comment context.
+	 * @param e event object supplied by Swing
+	 * @return the built comment context
+	 */
 	default RenamingContext buildCommentContext(final LiveEditElement e) {
 		final var canvas = this.getCanvas();
 
@@ -305,6 +355,11 @@ public interface LiveEditor extends DiagramCanvasExt {
 		return new RenamingContext(pos, size, comment.getText(), comment.getStyle(), String.class, comment);
 	}
 
+	/**
+	 * Builds a link cardinality context.
+	 * @param e event object supplied by Swing
+	 * @return the built link cardinality context
+	 */
 	default RenamingContext buildLinkCardinalityContext(final LiveEditElement e) {
 		final LinkModel linkModel = this.getCanvas().findLinkById(e.linkId());
 		final LinkGeometry geometry = this.getCanvas().resolveLinkGeometry(linkModel);
@@ -332,6 +387,11 @@ public interface LiveEditor extends DiagramCanvasExt {
 		return new RenamingContext(pos, size, value, new ElementStyle(Color.BLACK, Color.WHITE, Color.BLACK), Cardinality.class, linkModel);
 	}
 
+	/**
+	 * Builds a link label context.
+	 * @param e event object supplied by Swing
+	 * @return the built link label context
+	 */
 	default RenamingContext buildLinkLabelContext(final LiveEditElement e) {
 		final LinkModel linkModel = this.getCanvas().findLinkById(e.linkId());
 		final LinkGeometry geometry = this.getCanvas().resolveLinkGeometry(linkModel);
@@ -363,10 +423,17 @@ public interface LiveEditor extends DiagramCanvasExt {
 		return new RenamingContext(pos, size, value, new ElementStyle(Color.BLACK, Color.WHITE, Color.BLACK), String.class, linkModel);
 	}
 
+	/**
+	 * Checks whether live editing element is enabled or applies on the active canvas.
+	 * @return {@code true} if live editing element is enabled or applies; otherwise {@code false}
+	 */
 	default boolean isLiveEditingElement() {
 		return this.getCanvas().liveEditElement != null;
 	}
 
+	/**
+	 * Checks whether this object can cel live edit element on the active canvas.
+	 */
 	default void cancelLiveEditElement() {
 		if (!this.isLiveEditingElement()) {
 			return;
@@ -384,6 +451,10 @@ public interface LiveEditor extends DiagramCanvasExt {
 		});
 	}
 
+	/**
+	 * Restores the edited element style from a previously captured style object.
+	 * @param liveEditElement live edit element value used by the operation
+	 */
 	default void revertStyleObject(final LiveEditElement liveEditElement) {
 		final Object snapshotValue = liveEditElement.snapshotValue();
 		final SelectedElement selectedElement = liveEditElement.asSelectedElement();
@@ -413,6 +484,11 @@ public interface LiveEditor extends DiagramCanvasExt {
 		}
 	}
 
+	/**
+	 * Confirms whether the renaming element should continue on the active canvas.
+	 * @param nextDir numeric next dir value
+	 * @param alternative whether alternative is enabled
+	 */
 	default void confirmRenamingElement(final int nextDir, final boolean alternative) {
 		if (!this.isLiveEditingElement()) {
 			this.getCanvas().liveEditComponents.setVisible(false);
@@ -531,6 +607,11 @@ public interface LiveEditor extends DiagramCanvasExt {
 		}
 	}
 
+	/**
+	 * Applies the style on the active canvas.
+	 * @param palette palette value used by the operation
+	 * @param liveEditElement live edit element value used by the operation
+	 */
 	default void applyStyle(final StylePalette palette, final LiveEditElement liveEditElement) {
 		switch (liveEditElement.type()) {
 		case CLASS_STYLE -> {
@@ -553,6 +634,10 @@ public interface LiveEditor extends DiagramCanvasExt {
 		}
 	}
 
+	/**
+	 * Creates a renaming field.
+	 * @return the created renaming field
+	 */
 	default LiveEditComponents createRenamingField() {
 		final JTextField textField = new JTextField("editing");
 

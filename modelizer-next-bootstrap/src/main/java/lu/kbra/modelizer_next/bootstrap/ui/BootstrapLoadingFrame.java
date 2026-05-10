@@ -12,12 +12,18 @@ import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 import javax.swing.border.EmptyBorder;
 
+/**
+ * Small Swing progress window shown by the native bootstrapper.
+ */
 public final class BootstrapLoadingFrame extends JFrame {
 
 	private static final long serialVersionUID = 1L;
 	private final JLabel messageLabel = new JLabel("Preparing Modelizer Next...", SwingConstants.CENTER);
 	private final JProgressBar progressBar = new JProgressBar();
 
+	/**
+	 * Creates a bootstrap loading frame instance.
+	 */
 	public BootstrapLoadingFrame() {
 		super("Modelizer Next");
 		this.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
@@ -33,6 +39,12 @@ public final class BootstrapLoadingFrame extends JFrame {
 		this.setLocationRelativeTo(null);
 	}
 
+	/**
+	 * Updates the loading frame progress display.
+	 * @param message message shown to the caller or user
+	 * @param value value to process
+	 * @param max numeric max value
+	 */
 	public void update(final String message, final int value, final int max) {
 		SwingUtilities.invokeLater(() -> {
 			this.messageLabel.setText(message == null || message.isBlank() ? "Preparing Modelizer Next..." : message);

@@ -41,21 +41,54 @@ import lu.kbra.modelizer_next.domain.data.CommentKind;
 import lu.kbra.modelizer_next.layout.PanelType;
 import lu.kbra.modelizer_next.ui.component.ColorButton;
 
+/**
+ * Dialog for editing a comment, its type, and optional binding.
+ */
 public final class CommentEditorDialog {
 
+	/**
+	 * Immutable value object for result data.
+	 * @param text text to display or edit
+	 * @param textColor color value to use
+	 * @param backgroundColor color value to use
+	 * @param borderColor color value to use
+	 * @param kind kind value used by the operation
+	 * @param binding binding value used by the operation
+	 * @param visibleInConceptual whether visible in conceptual is enabled
+	 * @param visibleInLogical whether visible in logical is enabled
+	 * @param visibleInPhysical whether visible in physical is enabled
+	 */
 	public record Result(String text, Color textColor, Color backgroundColor, Color borderColor, CommentKind kind, CommentBinding binding,
 			boolean visibleInConceptual, boolean visibleInLogical, boolean visibleInPhysical) {
 	}
 
+	/**
+	 * Represents a holder in the dialog part of the application.
+	 */
 	private static final class Holder {
 		private Result result;
 	}
 
+	/**
+	 * Immutable value object for association target data.
+	 * @param label text value for label
+	 * @param kind kind value used by the operation
+	 * @param binding binding value used by the operation
+	 */
 	private record AssociationTarget(String label, CommentKind kind, CommentBinding binding) {
+		/**
+		 * Creates an option for a standalone comment without a binding target.
+		 * @return the standalone result
+		 */
 		private static AssociationTarget standalone() {
 			return new AssociationTarget("Standalone", CommentKind.STANDALONE, null);
 		}
 
+		/**
+		 * Creates the default style for class elements.
+		 * @param classModel class model affected by the operation
+		 * @return the for class result
+		 */
 		private static AssociationTarget forClass(final ClassModel classModel) {
 			final String name = classModel.getConceptualName() != null && !classModel.getConceptualName().isBlank()
 					? classModel.getConceptualName()
@@ -65,17 +98,32 @@ public final class CommentEditorDialog {
 					new CommentBinding(BoundTargetType.CLASS, classModel.getId()));
 		}
 
+		/**
+		 * Creates the default style for link elements.
+		 * @param linkModel link model affected by the operation
+		 * @param conceptual whether conceptual is enabled
+		 * @return the for link result
+		 */
 		private static AssociationTarget forLink(final LinkModel linkModel, final boolean conceptual) {
 			final String label = (conceptual ? "Conceptual link: " : "Technical link: ")
 					+ (linkModel.getLabel() == null || linkModel.getLabel().isBlank() ? linkModel.getId() : linkModel.getLabel());
 			return new AssociationTarget(label, CommentKind.BOUND, new CommentBinding(BoundTargetType.LINK, linkModel.getId()));
 		}
 
+		/**
+		 * Computes the hash code that matches this object's equality rules.
+		 * @return the hash code for this object
+		 */
 		@Override
 		public int hashCode() {
 			return Objects.hash(this.binding, this.kind);
 		}
 
+		/**
+		 * Compares this association target with another object for value equality.
+		 * @param obj obj value used by the operation
+		 * @return {@code true} when the condition is met; otherwise {@code false}
+		 */
 		@Override
 		public boolean equals(final Object obj) {
 			if (this == obj) {
@@ -90,6 +138,14 @@ public final class CommentEditorDialog {
 
 	}
 
+	/**
+	 * Shows the dialog.
+	 * @param parent parent component used for dialog ownership
+	 * @param document document to read or modify
+	 * @param initialComment initial comment value used by the operation
+	 * @param panelType diagram panel type whose model or layout should be used
+	 * @return the show dialog result
+	 */
 	public static Result showDialog(
 			final Component parent,
 			final ModelDocument document,
@@ -266,6 +322,12 @@ public final class CommentEditorDialog {
 		return holder.result;
 	}
 
+	/**
+	 * Resolves the initial association from the current model and layout state.
+	 * @param document document to read or modify
+	 * @param initialComment initial comment value used by the operation
+	 * @return the resolved initial association
+	 */
 	private static AssociationTarget resolveInitialAssociation(final ModelDocument document, final CommentModel initialComment) {
 		if (initialComment == null || initialComment.getKind() == CommentKind.STANDALONE || initialComment.getBinding() == null) {
 			return AssociationTarget.standalone();
@@ -293,6 +355,12 @@ public final class CommentEditorDialog {
 		return AssociationTarget.standalone();
 	}
 
+	/**
+	 * Creates one labeled row for a dialog form.
+	 * @param labelText text value for label text
+	 * @param component Swing component to configure
+	 * @return the row result
+	 */
 	private static JPanel row(final String labelText, final Component component) {
 		final JPanel row = new JPanel(new BorderLayout(6, 6));
 		row.setBorder(BorderFactory.createEmptyBorder(4, 0, 4, 0));
@@ -301,10 +369,18 @@ public final class CommentEditorDialog {
 		return row;
 	}
 
+	/**
+	 * Returns safe text for displaying possibly null values.
+	 * @param value value to process
+	 * @return the safe result
+	 */
 	private static String safe(final String value) {
 		return value == null ? "" : value;
 	}
 
+	/**
+	 * Creates a comment editor dialog instance.
+	 */
 	private CommentEditorDialog() {
 	}
 

@@ -45,19 +45,33 @@ import lu.kbra.modelizer_next.ui.export.ViewExportScope;
 import lu.kbra.modelizer_next.ui.export.ViewExporter;
 import lu.kbra.modelizer_next.ui.frame.MainFrame;
 
+/**
+ * Dialog that collects view export settings and previews the resulting export area.
+ */
 public class ViewExportDialog extends JDialog {
 
+	/**
+	 * Represents an export preview panel in the dialog part of the application.
+	 */
 	private static final class ExportPreviewPanel extends JPanel {
 
 		private static final long serialVersionUID = 3338223416144336229L;
 
 		private BufferedImage previewImage;
 
+		/**
+		 * Creates an export preview panel instance.
+		 */
 		private ExportPreviewPanel() {
 			this.setPreferredSize(new Dimension(520, 420));
 			this.setBackground(java.awt.Color.WHITE);
 		}
 
+		/**
+		 * Sets the preview.
+		 * @param canvas canvas instance that owns the operation
+		 * @param scope export scope to use
+		 */
 		private void setPreview(final DiagramCanvas canvas, final ViewExportScope scope) {
 			if (canvas == null || scope == null) {
 				this.previewImage = null;
@@ -69,6 +83,10 @@ public class ViewExportDialog extends JDialog {
 			this.repaint();
 		}
 
+		/**
+		 * Paints the component.
+		 * @param graphics graphics context used for drawing
+		 */
 		@Override
 		protected void paintComponent(final Graphics graphics) {
 			super.paintComponent(graphics);
@@ -91,10 +109,17 @@ public class ViewExportDialog extends JDialog {
 
 	}
 
+	/**
+	 * Represents a pattern text field in the dialog part of the application.
+	 */
 	private static final class PatternTextField extends JTextField {
 
 		private static final long serialVersionUID = 7204067903603166607L;
 
+		/**
+		 * Creates a pattern text field instance.
+		 * @param text text to display or edit
+		 */
 		private PatternTextField(final String text) {
 			super(text);
 			this.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, MainFrame.CTRL_MODIFIER), "showTokenSuggestions");
@@ -116,6 +141,10 @@ public class ViewExportDialog extends JDialog {
 			});
 		}
 
+		/**
+		 * Inserts the selected file-name token into the pattern field.
+		 * @param token text value for token
+		 */
 		private void insertToken(final String token) {
 			final int caretPosition = this.getCaretPosition();
 			if (caretPosition > 0 && this.getText().charAt(caretPosition - 1) == '%') {
@@ -126,6 +155,9 @@ public class ViewExportDialog extends JDialog {
 			this.requestFocusInWindow();
 		}
 
+		/**
+		 * Shows the token suggestions.
+		 */
 		private void showTokenSuggestions() {
 			final JPopupMenu menu = new JPopupMenu();
 			for (final String token : ViewExporter.FILE_PATTERN_TOKENS) {
@@ -143,17 +175,33 @@ public class ViewExportDialog extends JDialog {
 
 	}
 
+	/**
+	 * Immutable value object for simple document listener data.
+	 * @param delegate delegate value used by the operation
+	 */
 	private record SimpleDocumentListener(Runnable delegate) implements DocumentListener {
+		/**
+		 * Updates the preview after the pattern text changes.
+		 * @param event event object supplied by Swing
+		 */
 		@Override
 		public void changedUpdate(final DocumentEvent event) {
 			this.delegate.run();
 		}
 
+		/**
+		 * Updates the preview after the pattern text changes.
+		 * @param event event object supplied by Swing
+		 */
 		@Override
 		public void insertUpdate(final DocumentEvent event) {
 			this.delegate.run();
 		}
 
+		/**
+		 * Removes the update.
+		 * @param event event object supplied by Swing
+		 */
 		@Override
 		public void removeUpdate(final DocumentEvent event) {
 			this.delegate.run();
@@ -162,6 +210,14 @@ public class ViewExportDialog extends JDialog {
 
 	private static final long serialVersionUID = -4894368238563345666L;
 
+	/**
+	 * Shows the dialog.
+	 * @param parent parent component used for dialog ownership
+	 * @param canvases canvases value used by the operation
+	 * @param activePanelType type value to use
+	 * @param defaultOutputDirectory default output directory value used by the operation
+	 * @return the show dialog result
+	 */
 	public static ViewExportRequest showDialog(
 			final Component parent,
 			final Map<PanelType, DiagramCanvas> canvases,
@@ -189,6 +245,13 @@ public class ViewExportDialog extends JDialog {
 
 	private ViewExportRequest result;
 
+	/**
+	 * Creates a view export dialog instance.
+	 * @param parent parent component used for dialog ownership
+	 * @param canvases canvases value used by the operation
+	 * @param activePanelType type value to use
+	 * @param defaultOutputDirectory default output directory value used by the operation
+	 */
 	private ViewExportDialog(
 			final Component parent,
 			final Map<PanelType, DiagramCanvas> canvases,
@@ -223,6 +286,13 @@ public class ViewExportDialog extends JDialog {
 		this.setLocationRelativeTo(parent);
 	}
 
+	/**
+	 * Adds the row.
+	 * @param panel panel to configure or inspect
+	 * @param row row index or row component to use
+	 * @param label text value for label
+	 * @param component Swing component to configure
+	 */
 	private void addRow(final JPanel panel, final int row, final String label, final Component component) {
 		final GridBagConstraints labelGbc = new GridBagConstraints();
 		labelGbc.gridx = 0;
@@ -240,6 +310,9 @@ public class ViewExportDialog extends JDialog {
 		panel.add(component, componentGbc);
 	}
 
+	/**
+	 * Opens a directory chooser and stores the selected export directory.
+	 */
 	private void browseOutputDirectory() {
 		final JFileChooser chooser = new JFileChooser(this.outputDirectoryField.getText());
 		chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
@@ -250,6 +323,10 @@ public class ViewExportDialog extends JDialog {
 		}
 	}
 
+	/**
+	 * Creates a button pane.
+	 * @return the created button pane
+	 */
 	private JPanel createButtonPane() {
 		final JPanel buttons = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 		final JButton cancelButton = new JButton("Cancel");
@@ -263,6 +340,10 @@ public class ViewExportDialog extends JDialog {
 		return buttons;
 	}
 
+	/**
+	 * Creates an options pane.
+	 * @return the created options pane
+	 */
 	private JPanel createOptionsPane() {
 		final JPanel panel = new JPanel(new GridBagLayout());
 		panel.setBorder(BorderFactory.createTitledBorder("Export settings"));
@@ -312,12 +393,20 @@ public class ViewExportDialog extends JDialog {
 		return panel;
 	}
 
+	/**
+	 * Creates a preview pane.
+	 * @return the created preview pane
+	 */
 	private JScrollPane createPreviewPane() {
 		final JScrollPane scrollPane = new JScrollPane(this.previewPanel);
 		scrollPane.setBorder(BorderFactory.createTitledBorder("Preview"));
 		return scrollPane;
 	}
 
+	/**
+	 * Finds the preview canvas that matches the supplied input.
+	 * @return the matching preview canvas, or {@code null} when no match exists
+	 */
 	private DiagramCanvas findPreviewCanvas() {
 		if (this.panelTypeBoxes.getOrDefault(this.activePanelType, new JCheckBox()).isSelected()) {
 			return this.canvases.get(this.activePanelType);
@@ -333,6 +422,10 @@ public class ViewExportDialog extends JDialog {
 		return this.canvases.get(this.activePanelType);
 	}
 
+	/**
+	 * Returns the selected panel types.
+	 * @return the selected panel types
+	 */
 	private List<PanelType> getSelectedPanelTypes() {
 		final List<PanelType> panelTypes = new ArrayList<>();
 		for (final PanelType panelType : PanelType.values()) {
@@ -344,6 +437,9 @@ public class ViewExportDialog extends JDialog {
 		return panelTypes;
 	}
 
+	/**
+	 * Installs the listeners.
+	 */
 	private void installListeners() {
 		this.formatSelector.addActionListener(event -> this.refreshPreview());
 		this.scopeSelector.addActionListener(event -> this.refreshPreview());
@@ -357,6 +453,11 @@ public class ViewExportDialog extends JDialog {
 		this.outputDirectoryField.getDocument().addDocumentListener(new SimpleDocumentListener(this::updateExportButtonState));
 	}
 
+	/**
+	 * Returns the display label for a panel type.
+	 * @param panelType diagram panel type whose model or layout should be used
+	 * @return the panel type label result
+	 */
 	private String panelTypeLabel(final PanelType panelType) {
 		return switch (panelType) {
 		case CONCEPTUAL -> "Conceptual";
@@ -365,11 +466,17 @@ public class ViewExportDialog extends JDialog {
 		};
 	}
 
+	/**
+	 * Refreshes the preview from the current state.
+	 */
 	private void refreshPreview() {
 		final DiagramCanvas canvas = this.findPreviewCanvas();
 		this.previewPanel.setPreview(canvas, (ViewExportScope) this.scopeSelector.getSelectedItem());
 	}
 
+	/**
+	 * Saves the result and close.
+	 */
 	private void saveResultAndClose() {
 		this.result = new ViewExportRequest((ViewExportFormat) this.formatSelector.getSelectedItem(),
 				(ViewExportScope) this.scopeSelector.getSelectedItem(),
@@ -381,6 +488,9 @@ public class ViewExportDialog extends JDialog {
 		this.dispose();
 	}
 
+	/**
+	 * Updates the export button state.
+	 */
 	private void updateExportButtonState() {
 		this.exportButton.setEnabled(!this.getSelectedPanelTypes().isEmpty() && !this.outputDirectoryField.getText().isBlank()
 				&& !this.filePatternField.getText().isBlank());

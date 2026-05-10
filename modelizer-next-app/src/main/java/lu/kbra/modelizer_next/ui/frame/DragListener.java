@@ -10,15 +10,26 @@ import java.awt.event.MouseEvent;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
+/**
+ * Mouse listener used by frame components that support drag-based movement.
+ */
 class DragListener extends MouseAdapter {
 
 	private final JPanel parent;
 	private Component dragged;
 
+	/**
+	 * Creates a drag listener instance.
+	 * @param parent parent component used for dialog ownership
+	 */
 	public DragListener(final JPanel parent) {
 		this.parent = parent;
 	}
 
+	/**
+	 * Handles mouse dragging for the frame drag listener.
+	 * @param e event object supplied by Swing
+	 */
 	@Override
 	public void mouseDragged(final MouseEvent e) {
 		if (this.dragged == null) {
@@ -54,12 +65,20 @@ class DragListener extends MouseAdapter {
 		this.parent.repaint();
 	}
 
+	/**
+	 * Stores the initial mouse position for a drag operation.
+	 * @param e event object supplied by Swing
+	 */
 	@Override
 	public void mousePressed(final MouseEvent e) {
 		this.dragged = e.getComponent();
 		this.dragged.setCursor(Cursor.getPredefinedCursor(Cursor.E_RESIZE_CURSOR));
 	}
 
+	/**
+	 * Finishes the active mouse drag operation.
+	 * @param e event object supplied by Swing
+	 */
 	@Override
 	public void mouseReleased(final MouseEvent e) {
 		this.dragged.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));

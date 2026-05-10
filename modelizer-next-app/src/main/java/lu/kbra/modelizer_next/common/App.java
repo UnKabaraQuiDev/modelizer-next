@@ -9,6 +9,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import lu.kbra.modelizer_next.MNMain;
 import lu.kbra.pclib.PCUtils;
 
+/**
+ * Application-wide constants, directories, mapper setup, and metadata used by the desktop client.
+ */
 public class App {
 
 	private static final String APP_DIR_PROPERTY = "APP_DIR";
@@ -29,12 +32,19 @@ public class App {
 
 	public static AppConfig CONFIG;
 
+	/**
+	 * Ensures that the dirs exists exists or is up to date.
+	 */
 	public static void ensureDirsExists() {
 		App.getAppDirectory().mkdirs();
 		App.getStylesDirectory().mkdirs();
 		App.getUpdateDownloadsDirectory().mkdirs();
 	}
 
+	/**
+	 * Returns the application directory.
+	 * @return the application directory
+	 */
 	public static File getAppDirectory() {
 		final String override = System.getProperty(App.APP_DIR_PROPERTY);
 		if (override != null && !override.isBlank()) {
@@ -60,18 +70,34 @@ public class App {
 		return new File(home, "." + App.APP_FOLDER_NAME);
 	}
 
+	/**
+	 * Returns the config file.
+	 * @return the config file
+	 */
 	public static File getConfigFile() {
 		return new File(App.getAppDirectory(), "config.json");
 	}
 
+	/**
+	 * Returns the styles directory.
+	 * @return the styles directory
+	 */
 	public static File getStylesDirectory() {
 		return new File(App.getAppDirectory(), "styles");
 	}
 
+	/**
+	 * Returns the update downloads directory.
+	 * @return the update downloads directory
+	 */
 	public static File getUpdateDownloadsDirectory() {
 		return new File(App.getAppDirectory(), "updates");
 	}
 
+	/**
+	 * Initializes shared state required before the object is used.
+	 * @throws JsonProcessingException if the operation cannot be completed
+	 */
 	public static void init() throws JsonProcessingException {
 		final String fileContent = PCUtils.readPackagedStringFile(App.class, "/app.json");
 		App.JSON = MNMain.OBJECT_MAPPER.readTree(fileContent);
@@ -89,6 +115,9 @@ public class App {
 		App.ensureDirsExists();
 	}
 
+	/**
+	 * Loads the config.
+	 */
 	public static synchronized void loadConfig() {
 		App.ensureDirsExists();
 
@@ -108,6 +137,9 @@ public class App {
 		}
 	}
 
+	/**
+	 * Saves the config.
+	 */
 	public static synchronized void saveConfig() {
 		App.ensureDirsExists();
 
@@ -118,6 +150,11 @@ public class App {
 		}
 	}
 
+	/**
+	 * Builds the application window title from the app metadata.
+	 * @param title title text to display
+	 * @return the title result
+	 */
 	public static String title(final String title) {
 		return App.NAME + " - " + title;
 	}

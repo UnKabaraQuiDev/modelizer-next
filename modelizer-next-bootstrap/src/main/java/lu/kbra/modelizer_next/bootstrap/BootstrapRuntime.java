@@ -33,6 +33,9 @@ import lu.kbra.modelizer_next.common.UnsupportedBootstrapVersionException;
 import lu.kbra.modelizer_next.common.VersionComparator;
 import lu.kbra.modelizer_next.common.VersionComparator.ParsedVersion;
 
+/**
+ * Runtime coordinator that checks updates, prepares the installed application, and launches it.
+ */
 public class BootstrapRuntime implements UpdateRuntime {
 
 	@Deprecated
@@ -41,6 +44,11 @@ public class BootstrapRuntime implements UpdateRuntime {
 	private static final DateTimeFormatter VERSION_DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
 			.withZone(ZoneId.systemDefault());
 
+	/**
+	 * Starts the bootstrap sequence.
+	 * @return the bootstrap result
+	 * @throws IOException if the operation cannot be completed
+	 */
 	public static synchronized BootstrapRuntime bootstrap() throws IOException {
 		BootstrapApp.init();
 
@@ -64,6 +72,11 @@ public class BootstrapRuntime implements UpdateRuntime {
 		return runtime;
 	}
 
+	/**
+	 * Builds a first launch message.
+	 * @param manifest update manifest to inspect
+	 * @return the built first launch message
+	 */
 	private static String buildFirstLaunchMessage(final RemoteUpdateService.UpdateManifest manifest) {
 		final StringBuilder builder = new StringBuilder();
 		builder.append("Choose the update channel to subscribe to.\n\n");
@@ -80,6 +93,12 @@ public class BootstrapRuntime implements UpdateRuntime {
 		return builder.toString();
 	}
 
+	/**
+	 * Returns a readable description of the selected update channel.
+	 * @param channel update channel to query
+	 * @param release release information to inspect
+	 * @return the describe channel option result
+	 */
 	private static String describeChannelOption(final UpdateChannel channel, final RemoteUpdateService.UpdateRelease release) {
 		final StringBuilder builder = new StringBuilder(channel.displayName());
 
@@ -96,6 +115,11 @@ public class BootstrapRuntime implements UpdateRuntime {
 		return builder.toString();
 	}
 
+	/**
+	 * Extracts the publication timestamp from the update manifest entry.
+	 * @param release release information to inspect
+	 * @return the extract published at result
+	 */
 	private static String extractPublishedAt(final RemoteUpdateService.UpdateRelease release) {
 		if (release == null) {
 			return null;
@@ -120,10 +144,18 @@ public class BootstrapRuntime implements UpdateRuntime {
 		}
 	}
 
+	/**
+	 * Returns the instance during bootstrap/update processing.
+	 * @return the instance
+	 */
 	public static synchronized BootstrapRuntime getInstance() {
 		return (BootstrapRuntime) UpdateRuntimes.getInstance();
 	}
 
+	/**
+	 * Checks whether active is enabled or applies during bootstrap/update processing.
+	 * @return {@code true} if active is enabled or applies; otherwise {@code false}
+	 */
 	public static boolean isActive() {
 		return UpdateRuntimes.isActive();
 	}
@@ -138,6 +170,16 @@ public class BootstrapRuntime implements UpdateRuntime {
 
 	private InstalledApplication currentApplication;
 
+	/**
+	 * Creates a bootstrap runtime instance.
+	 * @param configuration configuration value used by the operation
+	 * @param inventory inventory value used by the operation
+	 * @param remoteUpdateService remote update service value used by the operation
+	 * @param applicationLauncher application launcher value used by the operation
+	 * @param updateStorage update storage value used by the operation
+	 * @param automaticUpdatesEnabled whether automatic updates enabled is enabled
+	 * @param forceJarName name value to use
+	 */
 	private BootstrapRuntime(
 			final BootstrapConfiguration configuration,
 			final ApplicationInventory inventory,
@@ -155,6 +197,11 @@ public class BootstrapRuntime implements UpdateRuntime {
 		this.forceJarName = forceJarName;
 	}
 
+	/**
+	 * Checks the for updates.
+	 * @return the check for updates result
+	 * @throws IOException if the operation cannot be completed
+	 */
 	@Override
 	public AvailableUpdate checkForUpdates() throws IOException {
 		try {
@@ -167,46 +214,89 @@ public class BootstrapRuntime implements UpdateRuntime {
 		}
 	}
 
+	/**
+	 * Returns the installed updates disk usage bytes.
+	 * @return the installed updates disk usage bytes
+	 * @throws IOException if the operation cannot be completed
+	 */
 	@Override
 	public long getInstalledUpdatesDiskUsageBytes() throws IOException {
 		return this.updateStorage.calculateDiskUsageBytes();
 	}
 
+	/**
+	 * Returns the installed updates file count.
+	 * @return the installed updates file count
+	 * @throws IOException if the operation cannot be completed
+	 */
 	@Override
 	public int getInstalledUpdatesFileCount() throws IOException {
 		return this.updateStorage.countFiles();
 	}
 
+	/**
+	 * Returns the installed updates directory.
+	 * @return the installed updates directory
+	 */
 	@Override
 	public Path getInstalledUpdatesDirectory() {
 		return this.updateStorage.getUpdatesDirectory();
 	}
 
+	/**
+	 * Deletes installed update folders that are no longer needed.
+	 * @return the free unused installed updates result
+	 * @throws IOException if the operation cannot be completed
+	 */
 	@Override
 	public long freeUnusedInstalledUpdates() throws IOException {
 		return this.updateStorage.freeUnusedUpdates(this.configuration.getUpdateChannel(), this.currentApplication);
 	}
 
+	/**
+	 * Returns the bootstrap config.
+	 * @return the bootstrap config
+	 */
 	@Override
 	public BootstrapConfig getBootstrapConfig() {
 		return BootstrapApp.BOOTSTRAP_CONFIG;
 	}
 
+	/**
+	 * Returns the bootstrap JSON.
+	 * @return the bootstrap JSON
+	 */
 	@Override
 	public JsonNode getBootstrapJson() {
 		return BootstrapApp.JSON;
 	}
 
+	/**
+	 * Returns the current application version.
+	 * @return the current application version
+	 */
 	@Override
 	public ParsedVersion getCurrentApplicationVersion() {
 		return this.currentApplication == null ? null : this.currentApplication.version();
 	}
 
+	/**
+	 * Returns the selected channel during bootstrap/update processing.
+	 * @return the selected channel
+	 */
 	@Override
 	public UpdateChannel getSelectedChannel() {
 		return this.configuration.getUpdateChannel();
 	}
 
+	/**
+	 * Installs the update and restart.
+	 * @param parentComponent parent component value used by the operation
+	 * @param update update metadata to download or install
+	 * @param preparation preparation value used by the operation
+	 * @return {@code true} when the condition is met; otherwise {@code false}
+	 * @throws IOException if the operation cannot be completed
+	 */
 	@Override
 	public boolean installUpdateAndRestart(
 			final Component parentComponent,
@@ -246,25 +336,48 @@ public class BootstrapRuntime implements UpdateRuntime {
 		return true;
 	}
 
+	/**
+	 * Checks whether auto check updates is enabled or applies.
+	 * @return {@code true} if auto check updates is enabled or applies; otherwise {@code false}
+	 */
 	@Override
 	public boolean isAutoCheckUpdates() {
 		return this.configuration.isAutoCheckUpdates();
 	}
 
+	/**
+	 * Checks whether automatic update checks enabled by property is enabled or applies.
+	 * @return {@code true} if automatic update checks enabled by property is enabled or applies; otherwise {@code
+	 *         false}
+	 */
 	@Override
 	public boolean isAutomaticUpdateChecksEnabledByProperty() {
 		return this.automaticUpdatesEnabled;
 	}
 
+	/**
+	 * Checks whether available is enabled or applies during bootstrap/update processing.
+	 * @return {@code true} if available is enabled or applies; otherwise {@code false}
+	 */
 	@Override
 	public boolean isAvailable() {
 		return true;
 	}
 
+	/**
+	 * Returns the force jar name during bootstrap/update processing.
+	 * @return the force jar name
+	 */
 	public String getForceJarName() {
 		return forceJarName;
 	}
 
+	/**
+	 * Launches the installed application.
+	 * @param args command-line arguments supplied by the launcher
+	 * @param toBeOpened to be opened value used by the operation
+	 * @throws Exception if the operation cannot be completed
+	 */
 	public void launch(final String[] args, Queue<File> toBeOpened) throws Exception {
 		final BootstrapLoadingFrame loadingFrame = new BootstrapLoadingFrame();
 		loadingFrame.setVisible(true);
@@ -313,6 +426,10 @@ public class BootstrapRuntime implements UpdateRuntime {
 		}
 	}
 
+	/**
+	 * Prompts the user to reinstall the bootstrapper when a newer bootstrap installer is available.
+	 * @throws Exception if the operation cannot be completed
+	 */
 	private void promptForBootstrapReinstallIfRequired() throws Exception {
 		final RemoteUpdateService.UpdateManifest manifest = this.remoteUpdateService.fetchManifest();
 		if (manifest.bootstrapVersion == null) {
@@ -334,6 +451,12 @@ public class BootstrapRuntime implements UpdateRuntime {
 		}
 	}
 
+	/**
+	 * Handles the outdated bootstrap launcher.
+	 * @param launchException launch exception value used by the operation
+	 * @param forced whether forced is enabled
+	 * @throws Exception if the operation cannot be completed
+	 */
 	private void handleOutdatedBootstrapLauncher(final AppLaunchException launchException, final boolean forced) throws Exception {
 		final ParsedVersion currentBootstrapVersion = VersionComparator.parse(BootstrapApp.VERSION);
 		final BootstrapLoadingFrame loadingFrame = new BootstrapLoadingFrame();
@@ -373,6 +496,11 @@ public class BootstrapRuntime implements UpdateRuntime {
 		}
 	}
 
+	/**
+	 * Checks whether the bootstrapper needs an update.
+	 * @param throwable throwable value used by the operation
+	 * @return {@code true} when the condition is met; otherwise {@code false}
+	 */
 	private boolean needsBootstrappUpdate(final Throwable throwable) {
 		for (Throwable current = throwable; current != null; current = current.getCause()) {
 			if (current instanceof ClassNotFoundException || current instanceof NoClassDefFoundError
@@ -383,6 +511,10 @@ public class BootstrapRuntime implements UpdateRuntime {
 		return false;
 	}
 
+	/**
+	 * Prompts the user for for initial channel selection.
+	 * @throws IOException if the operation cannot be completed
+	 */
 	private void promptForInitialChannelSelection() throws IOException {
 		RemoteUpdateService.UpdateManifest manifest = null;
 		try {
@@ -422,6 +554,13 @@ public class BootstrapRuntime implements UpdateRuntime {
 		this.configuration.setUpdateChannel(selectedChannel);
 	}
 
+	/**
+	 * Reads and validates the required installable update.
+	 * @param channel update channel to query
+	 * @param currentVersion currently installed version
+	 * @return the require installable update result
+	 * @throws IOException if the operation cannot be completed
+	 */
 	private AvailableUpdate requireInstallableUpdate(final UpdateChannel channel, final ParsedVersion currentVersion) throws IOException {
 		try {
 			final AvailableUpdate update = this.remoteUpdateService.findLatest(channel, currentVersion);
@@ -436,12 +575,20 @@ public class BootstrapRuntime implements UpdateRuntime {
 		}
 	}
 
+	/**
+	 * Sets the auto check updates.
+	 * @param enabled whether enabled is enabled
+	 */
 	@Override
 	public void setAutoCheckUpdates(final boolean enabled) {
 		this.configuration.setAutoCheckUpdates(enabled);
 		BootstrapApp.saveConfiguration(this.configuration);
 	}
 
+	/**
+	 * Sets the selected channel during bootstrap/update processing.
+	 * @param updateChannel update channel value used by the operation
+	 */
 	@Override
 	public void setSelectedChannel(final UpdateChannel updateChannel) {
 		this.configuration.setUpdateChannel(updateChannel);

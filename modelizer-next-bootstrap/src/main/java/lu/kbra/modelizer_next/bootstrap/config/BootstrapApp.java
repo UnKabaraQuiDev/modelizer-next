@@ -10,6 +10,9 @@ import lu.kbra.modelizer_next.bootstrap.BootstrapConfig;
 import lu.kbra.modelizer_next.common.ParsedVersionModule;
 import lu.kbra.pclib.PCUtils;
 
+/**
+ * Constants and JSON mapper setup for the bootstrap module.
+ */
 public final class BootstrapApp {
 
 	public static final ObjectMapper MAPPER = createMapper();
@@ -34,12 +37,20 @@ public final class BootstrapApp {
 
 	public static BootstrapConfig BOOTSTRAP_CONFIG;
 
+	/**
+	 * Ensures that the directories exists or is up to date during bootstrap/update processing.
+	 * @throws IOException if the operation cannot be completed
+	 */
 	public static void ensureDirectories() throws IOException {
 		BootstrapApp.getHomeDirectory().mkdirs();
 		BootstrapApp.getApplicationsDirectory().mkdirs();
 		BootstrapApp.getTempDirectory().mkdirs();
 	}
 
+	/**
+	 * Creates a mapper during bootstrap/update processing.
+	 * @return the created mapper
+	 */
 	private static ObjectMapper createMapper() {
 		final ObjectMapper mapper = new ObjectMapper();
 
@@ -48,14 +59,26 @@ public final class BootstrapApp {
 		return mapper;
 	}
 
+	/**
+	 * Returns the applications directory.
+	 * @return the applications directory
+	 */
 	public static File getApplicationsDirectory() {
 		return new File(BootstrapApp.getHomeDirectory(), "updates");
 	}
 
+	/**
+	 * Returns the bootstrap config file.
+	 * @return the bootstrap config file
+	 */
 	public static File getBootstrapConfigFile() {
 		return new File(BootstrapApp.getHomeDirectory(), "bootstrap-config.json");
 	}
 
+	/**
+	 * Returns the home directory during bootstrap/update processing.
+	 * @return the home directory
+	 */
 	public static File getHomeDirectory() {
 		final String override = System.getProperty(APP_DIR_PROPERTY);
 		if (override != null && !override.isBlank()) {
@@ -77,10 +100,18 @@ public final class BootstrapApp {
 		return new File(home, "." + APP_FOLDER_NAME);
 	}
 
+	/**
+	 * Returns the temp directory during bootstrap/update processing.
+	 * @return the temp directory
+	 */
 	public static File getTempDirectory() {
 		return new File(BootstrapApp.getHomeDirectory(), "updates");
 	}
 
+	/**
+	 * Initializes shared state required before the object is used during bootstrap/update processing.
+	 * @throws IOException if the operation cannot be completed
+	 */
 	public static void init() throws IOException {
 		BootstrapApp.JSON = BootstrapApp.MAPPER.readTree(PCUtils.readPackagedStringFile("/bootstrap.json"));
 
@@ -104,10 +135,18 @@ public final class BootstrapApp {
 		BootstrapApp.ensureDirectories();
 	}
 
+	/**
+	 * Checks whether first launch is enabled or applies.
+	 * @return {@code true} if first launch is enabled or applies; otherwise {@code false}
+	 */
 	public static boolean isFirstLaunch() {
 		return !BootstrapApp.getBootstrapConfigFile().isFile();
 	}
 
+	/**
+	 * Loads the configuration during bootstrap/update processing.
+	 * @return the load configuration result
+	 */
 	public static BootstrapConfiguration loadConfiguration() {
 		final File file = BootstrapApp.getBootstrapConfigFile();
 		if (!file.isFile()) {
@@ -120,6 +159,10 @@ public final class BootstrapApp {
 		}
 	}
 
+	/**
+	 * Saves the configuration during bootstrap/update processing.
+	 * @param configuration configuration value used by the operation
+	 */
 	public static void saveConfiguration(final BootstrapConfiguration configuration) {
 		try {
 			BootstrapApp.ensureDirectories();
@@ -129,6 +172,9 @@ public final class BootstrapApp {
 		}
 	}
 
+	/**
+	 * Creates a bootstrap application instance.
+	 */
 	private BootstrapApp() {
 	}
 

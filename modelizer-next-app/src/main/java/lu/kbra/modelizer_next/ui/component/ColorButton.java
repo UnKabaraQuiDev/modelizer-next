@@ -7,6 +7,9 @@ import java.util.function.Consumer;
 import javax.swing.JButton;
 import javax.swing.JColorChooser;
 
+/**
+ * Swing button that displays and edits one color value.
+ */
 public class ColorButton extends JButton {
 
 	private static final long serialVersionUID = 1L;
@@ -14,6 +17,11 @@ public class ColorButton extends JButton {
 	private Color selectedColor;
 	private Consumer<Color> callback;
 
+	/**
+	 * Creates a color button instance.
+	 * @param text text to display or edit
+	 * @param initialColor color value to use
+	 */
 	public ColorButton(final String text, final Color initialColor) {
 		super(text);
 		this.selectedColor = initialColor == null ? Color.WHITE : initialColor;
@@ -33,6 +41,12 @@ public class ColorButton extends JButton {
 		});
 	}
 
+	/**
+	 * Creates a color button instance.
+	 * @param text text to display or edit
+	 * @param initialColor color value to use
+	 * @param cb cb value used by the operation
+	 */
 	public ColorButton(final String text, final Color initialColor, final Consumer<Color> cb) {
 		super(text);
 		this.selectedColor = initialColor == null ? Color.WHITE : initialColor;
@@ -53,20 +67,35 @@ public class ColorButton extends JButton {
 		});
 	}
 
+	/**
+	 * Returns the selected color.
+	 * @return the selected color
+	 */
 	public Color getSelectedColor() {
 		return this.selectedColor;
 	}
 
+	/**
+	 * Sets the selected color.
+	 * @param selectedColor color value to use
+	 */
 	public void setSelectedColor(final Color selectedColor) {
 		this.selectedColor = selectedColor;
 		this.refreshStyle();
 	}
 
+	/**
+	 * Builds a debug string for this color button.
+	 * @return a debug string for this object
+	 */
 	@Override
 	public String toString() {
 		return "ColorButton@" + System.identityHashCode(this) + " [selectedColor=" + this.selectedColor + "]";
 	}
 
+	/**
+	 * Refreshes the style from the current state.
+	 */
 	private void refreshStyle() {
 		this.setBackground(this.selectedColor);
 		final int brightness = (this.selectedColor.getRed() + this.selectedColor.getGreen() + this.selectedColor.getBlue()) / 3;

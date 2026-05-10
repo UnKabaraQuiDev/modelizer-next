@@ -4,15 +4,31 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.List;
 
+/**
+ * URL class loader that prefers application jars before parent classes for app isolation.
+ */
 public final class ChildFirstURLClassLoader extends URLClassLoader {
 
 	private final List<String> parentFirstPackages;
 
+	/**
+	 * Creates a child first URL class loader instance during bootstrap/update processing.
+	 * @param urls values for urls
+	 * @param parent parent component used for dialog ownership
+	 * @param parentFirstPackages values for parent first packages
+	 */
 	public ChildFirstURLClassLoader(URL[] urls, ClassLoader parent, List<String> parentFirstPackages) {
 		super(urls, parent);
 		this.parentFirstPackages = parentFirstPackages;
 	}
 
+	/**
+	 * Loads the class during bootstrap/update processing.
+	 * @param name name value to read, write, or display
+	 * @param resolve whether resolve is enabled
+	 * @return the load class result
+	 * @throws ClassNotFoundException if the operation cannot be completed
+	 */
 	@Override
 	protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
 		synchronized (getClassLoadingLock(name)) {
@@ -34,6 +50,12 @@ public final class ChildFirstURLClassLoader extends URLClassLoader {
 		}
 	}
 
+	/**
+	 * Loads the child first during bootstrap/update processing.
+	 * @param name name value to read, write, or display
+	 * @return the load child first result
+	 * @throws ClassNotFoundException if the operation cannot be completed
+	 */
 	private Class<?> loadChildFirst(String name) throws ClassNotFoundException {
 		try {
 			return findClass(name);
@@ -42,6 +64,12 @@ public final class ChildFirstURLClassLoader extends URLClassLoader {
 		}
 	}
 
+	/**
+	 * Loads the parent first during bootstrap/update processing.
+	 * @param name name value to read, write, or display
+	 * @return the load parent first result
+	 * @throws ClassNotFoundException if the operation cannot be completed
+	 */
 	private Class<?> loadParentFirst(String name) throws ClassNotFoundException {
 		try {
 			return getParent().loadClass(name);
@@ -50,11 +78,21 @@ public final class ChildFirstURLClassLoader extends URLClassLoader {
 		}
 	}
 
+	/**
+	 * Checks whether parent first is enabled or applies during bootstrap/update processing.
+	 * @param className name value to use
+	 * @return {@code true} if parent first is enabled or applies; otherwise {@code false}
+	 */
 	private boolean isParentFirst(String className) {
 		return className.startsWith("java.") || className.startsWith("jdk.") || className.startsWith("sun.")
 				|| parentFirstPackages.stream().anyMatch(className::startsWith);
 	}
 
+	/**
+	 * Returns the resource during bootstrap/update processing.
+	 * @param name name value to read, write, or display
+	 * @return the resource
+	 */
 	@Override
 	public URL getResource(String name) {
 		URL resource = findResource(name);

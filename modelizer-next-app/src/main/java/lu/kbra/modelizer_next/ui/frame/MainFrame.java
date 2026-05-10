@@ -57,6 +57,9 @@ import io.github.andrewauclair.moderndocking.DockingRegion;
 import io.github.andrewauclair.moderndocking.app.Docking;
 import io.github.andrewauclair.moderndocking.app.RootDockingPanel;
 
+/**
+ * Main Swing window for editing Modelizer Next documents.
+ */
 public class MainFrame extends JFrame implements MainFrameDocumentController, MainFrameStyleController, MainFrameWindowController {
 
 	private static final long serialVersionUID = 6643164008640695591L;
@@ -80,18 +83,42 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 		IMAGE_ICON = new ImageIcon(MainFrame.ICON);
 	}
 
+	/**
+	 * Confirms whether the modern document version should continue.
+	 * @param parent parent component used for dialog ownership
+	 * @param loadedDocument loaded document value used by the operation
+	 * @return {@code true} when the condition is met; otherwise {@code false}
+	 */
 	public static boolean confirmModernDocumentVersion(final Component parent, final ModelDocument loadedDocument) {
 		return DocumentSessionLoader.confirmModernDocumentVersion(parent, loadedDocument);
 	}
 
+	/**
+	 * Confirms whether the modern document version should continue.
+	 * @param loadedDocument loaded document value used by the operation
+	 * @param handler handler value used by the operation
+	 * @return {@code true} when the condition is met; otherwise {@code false}
+	 */
 	public static boolean confirmModernDocumentVersion(final ModelDocument loadedDocument, final DocumentLoadHandler handler) {
 		return DocumentSessionLoader.confirmModernDocumentVersion(loadedDocument, handler);
 	}
 
+	/**
+	 * Creates a document.
+	 * @param parent parent component used for dialog ownership
+	 * @param selectedFile file to read or write
+	 * @return the created document
+	 */
 	public static Optional<DocumentSession> createDocument(final Component parent, final File selectedFile) {
 		return DocumentSessionLoader.createDocument(parent, selectedFile);
 	}
 
+	/**
+	 * Creates a document.
+	 * @param selectedFile file to read or write
+	 * @param handler handler value used by the operation
+	 * @return the created document
+	 */
 	public static Optional<DocumentSession> createDocument(final File selectedFile, final DocumentLoadHandler handler) {
 		return DocumentSessionLoader.createDocument(selectedFile, handler);
 	}
@@ -115,6 +142,10 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 	JMenuItem undoMenuItem;
 	JMenuItem redoMenuItem;
 
+	/**
+	 * Creates a main frame instance.
+	 * @param session document session to read or modify
+	 */
 	public MainFrame(final DocumentSession session) {
 		super("Modelizer Next");
 		super.setIconImages(MainFrame.ICON_IMAGES);
@@ -124,10 +155,17 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 		this.setLocationRelativeTo(null);
 	}
 
+	/**
+	 * Creates a main frame instance.
+	 * @param document document to read or modify
+	 */
 	public MainFrame(final ModelDocument document) {
 		this(new DocumentSession(document));
 	}
 
+	/**
+	 * Applies the default palette to canvases.
+	 */
 	public void applyDefaultPaletteToCanvases() {
 		final StylePalette palette = this.findPaletteByName(App.CONFIG.getDefaultPaletteName());
 		this.getCanvases().forEach(c -> {
@@ -137,14 +175,26 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 		});
 	}
 
+	/**
+	 * Returns the active canvas.
+	 * @return the active canvas
+	 */
 	public DiagramCanvas getActiveCanvas() {
 		return this.activeCanvas == null ? this.conceptualCanvas : this.activeCanvas;
 	}
 
+	/**
+	 * Returns the canvases.
+	 * @return the canvases
+	 */
 	public List<DiagramCanvas> getCanvases() {
 		return Arrays.asList(this.conceptualCanvas, this.logicalCanvas, this.physicalCanvas);
 	}
 
+	/**
+	 * Returns the canvases by panel type.
+	 * @return the canvases by panel type
+	 */
 	public Map<PanelType, DiagramCanvas> getCanvasesByPanelType() {
 		final Map<PanelType, DiagramCanvas> canvases = new LinkedHashMap<>();
 		canvases.put(PanelType.CONCEPTUAL, this.conceptualCanvas);
@@ -153,25 +203,45 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 		return canvases;
 	}
 
+	/**
+	 * Returns the document.
+	 * @return the document
+	 */
 	@Override
 	public ModelDocument getDocument() {
 		return this.document;
 	}
 
+	/**
+	 * Returns the session.
+	 * @return the session
+	 */
 	@Override
 	public DocumentSession getSession() {
 		return this.session;
 	}
 
+	/**
+	 * Loads the document.
+	 * @param selectedFile file to read or write
+	 * @return {@code true} when the condition is met; otherwise {@code false}
+	 */
 	public boolean loadDocument(final File selectedFile) {
 		return this.loadDocumentFromFile(selectedFile);
 	}
 
+	/**
+	 * Opens the in frame.
+	 * @param session document session to read or modify
+	 */
 	@Override
 	public void openInFrame(final DocumentSession session) {
 		SwingUtilities.invokeLater(() -> this.setContent(session));
 	}
 
+	/**
+	 * Refreshes the frame title from the current state.
+	 */
 	@Override
 	public void refreshFrameTitle() {
 		final String source = this.document.getSource() == null || this.document.getSource().isBlank() ? "Untitled"
@@ -179,6 +249,9 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 		this.setTitle(App.title(source + (this.session.isDirty() ? " *" : "")));
 	}
 
+	/**
+	 * Updates the undo redo menu items.
+	 */
 	@Override
 	public void updateUndoRedoMenuItems() {
 		if (this.undoMenuItem != null) {
@@ -197,6 +270,10 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 		}
 	}
 
+	/**
+	 * Sets the content.
+	 * @param session document session to read or modify
+	 */
 	protected void setContent(final DocumentSession session) {
 		Docking.deregisterAllDockables();
 		Docking.deregisterAllDockingPanels();
@@ -284,16 +361,27 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 		this.repaint();
 	}
 
+	/**
+	 * Applies the theme and reopen.
+	 * @param mode mode value used by the operation
+	 */
 	void applyThemeAndReopen(final ThemeMode mode) {
 		App.CONFIG.setThemeMode(mode);
 		App.saveConfig();
 		this.reopenWithCurrentDocument();
 	}
 
+	/**
+	 * Returns the update runtime provided by the bootstrap layer.
+	 * @return an optional result when a matching value is available
+	 */
 	Optional<UpdateRuntime> bootstrapRuntime() {
 		return UpdateRuntimes.isActive() ? Optional.of(UpdateRuntimes.getInstance()) : Optional.empty();
 	}
 
+	/**
+	 * Checks the for updates manually.
+	 */
 	void checkForUpdatesManually() {
 		final Optional<UpdateRuntime> runtime = this.bootstrapRuntime();
 		if (runtime.isEmpty()) {
@@ -354,6 +442,9 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 		}.execute();
 	}
 
+	/**
+	 * Clears the listeners.
+	 */
 	void clearListeners() {
 		this.removeListener(this.getComponentListeners(), this::removeComponentListener);
 		this.removeListener(this.getContainerListeners(), this::removeContainerListener);
@@ -371,6 +462,13 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 		this.removeListener(this.getPropertyChangeListeners(), this::removePropertyChangeListener);
 	}
 
+	/**
+	 * Creates a dockable canvas panel.
+	 * @param id stable id of the model element
+	 * @param title title text to display
+	 * @param canvas canvas instance that owns the operation
+	 * @return the created dockable canvas panel
+	 */
 	DockableDiagramPanel createDockableCanvasPanel(final String id, final String title, final DiagramCanvas canvas) {
 		return new DockableDiagramPanel("modelizer-next." + System.identityHashCode(this) + "." + id, title, canvas, () -> {
 			this.activeCanvas = canvas;
@@ -379,6 +477,9 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 		});
 	}
 
+	/**
+	 * Exports the image.
+	 */
 	void exportImage() {
 		final DiagramCanvas activeCanvas = this.getActiveCanvas();
 		final ViewExportRequest request = ViewExportDialog.showDialog(this,
@@ -427,6 +528,12 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 		}
 	}
 
+	/**
+	 * Finds the shortcut text that matches the supplied input.
+	 * @param canvas canvas instance that owns the operation
+	 * @param actionKey key under which the action is registered
+	 * @return the matching shortcut text, or {@code null} when no match exists
+	 */
 	String findShortcutText(final DiagramCanvas canvas, final String actionKey) {
 		for (final KeyStroke keyStroke : canvas.getInputMap(JComponent.WHEN_FOCUSED).allKeys()) {
 			if (keyStroke == null) {
@@ -440,6 +547,11 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 		return "";
 	}
 
+	/**
+	 * Formats the key stroke.
+	 * @param keyStroke keyboard shortcut to register
+	 * @return the format key stroke result
+	 */
 	String formatKeyStroke(final KeyStroke keyStroke) {
 		final StringBuilder builder = new StringBuilder();
 
@@ -458,6 +570,10 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 		return builder.toString();
 	}
 
+	/**
+	 * Returns the default export directory.
+	 * @return the default export directory
+	 */
 	File getDefaultExportDirectory() {
 		if (this.session.getCurrentFile() != null && this.session.getCurrentFile().getParentFile() != null) {
 			return this.session.getCurrentFile().getParentFile();
@@ -466,6 +582,10 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 		return new File(System.getProperty("user.home"));
 	}
 
+	/**
+	 * Returns the export source file.
+	 * @return the export source file
+	 */
 	Optional<File> getExportSourceFile() {
 		if (this.session.getCurrentFile() != null) {
 			return Optional.of(this.session.getCurrentFile());
@@ -479,16 +599,27 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 		return Optional.of(new File(source));
 	}
 
+	/**
+	 * Handles the document changed event.
+	 */
 	void onDocumentChanged() {
 		this.session.markChanged();
 		this.updateUndoRedoMenuItems();
 		this.refreshFrameTitle();
 	}
 
+	/**
+	 * Prepares the for update install.
+	 * @return {@code true} when the condition is met; otherwise {@code false}
+	 * @throws IOException if the operation cannot be completed
+	 */
 	boolean prepareForUpdateInstall() throws IOException {
 		return this.confirmCloseWithSave("Do you want to save changes before installing the update?");
 	}
 
+	/**
+	 * Restores the next snapshot in the redo history.
+	 */
 	void redo() {
 		if (!this.session.redo()) {
 			return;
@@ -497,6 +628,9 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 		this.refreshAfterHistoryRestore();
 	}
 
+	/**
+	 * Refreshes the after history restore from the current state.
+	 */
 	void refreshAfterHistoryRestore() {
 		this.conceptualCanvas.resetUiAfterDocumentRestore();
 		this.logicalCanvas.resetUiAfterDocumentRestore();
@@ -509,6 +643,9 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 		this.repaint();
 	}
 
+	/**
+	 * Refreshes the pinned styles panel from the current state.
+	 */
 	void refreshPinnedStylesPanel() {
 		this.sanitizePinnedPaletteNames();
 		this.pinnedStylesPanel.removeAll();
@@ -528,6 +665,9 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 		this.pinnedStylesPanel.repaint();
 	}
 
+	/**
+	 * Refreshes the toolbar labels from the current state.
+	 */
 	void refreshToolbarLabels() {
 		for (int i = 0; i < this.toolBar.getComponentCount(); i++) {
 			if (this.toolBar.getComponent(i) instanceof final JButton button) {
@@ -544,12 +684,20 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 		}
 	}
 
+	/**
+	 * Removes the listener.
+	 * @param listeners values for listeners
+	 * @param remove remove value used by the operation
+	 */
 	<T extends EventListener> void removeListener(final T[] listeners, final Consumer<T> remove) {
 		for (final T t : listeners) {
 			remove.accept(t);
 		}
 	}
 
+	/**
+	 * Restarts the application while keeping the current document path.
+	 */
 	void reopenWithCurrentDocument() {
 		SwingUtilities.invokeLater(() -> {
 			MNMain.applyConfiguredLookAndFeel();
@@ -557,6 +705,9 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 		});
 	}
 
+	/**
+	 * Restores the previous snapshot in the undo history.
+	 */
 	void undo() {
 		if (!this.session.undo()) {
 			return;
@@ -565,6 +716,10 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 		this.refreshAfterHistoryRestore();
 	}
 
+	/**
+	 * Updates the selection label.
+	 * @param selectionInfo selection info value used by the operation
+	 */
 	void updateSelectionLabel(final SelectionInfo selectionInfo) {
 		final String path = selectionInfo == null || selectionInfo.path() == null || selectionInfo.path().isBlank() ? "No selection"
 				: selectionInfo.path();
@@ -572,6 +727,10 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 		this.refreshPinnedStylesPanel();
 	}
 
+	/**
+	 * Returns the palettes.
+	 * @return the palettes
+	 */
 	public List<StylePalette> getPalettes() {
 		return palettes;
 	}

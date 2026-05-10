@@ -7,10 +7,17 @@ import lu.kbra.modelizer_next.common.App;
 import lu.kbra.modelizer_next.style.StylePalette;
 import lu.kbra.modelizer_next.ui.canvas.DiagramCanvas;
 
+/**
+ * Menu builder for applying style palettes to selected elements.
+ */
 final class StyleApplyMenu extends JMenu {
 
 	private static final long serialVersionUID = 1L;
 
+	/**
+	 * Creates a style apply menu instance.
+	 * @param frame frame that owns the created UI component
+	 */
 	StyleApplyMenu(final MainFrame frame) {
 		super("Apply style");
 		for (final StylePalette palette : frame.palettes) {

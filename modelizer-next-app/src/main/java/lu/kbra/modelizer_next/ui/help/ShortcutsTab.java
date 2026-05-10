@@ -33,14 +33,24 @@ import javax.swing.Timer;
 
 import com.formdev.flatlaf.FlatClientProperties;
 
+/**
+ * Help tab that lists keyboard shortcuts and mouse gestures.
+ */
 public class ShortcutsTab extends JPanel {
 
+	/**
+	 * Represents a key chip in the help part of the application.
+	 */
 	private static class KeyChip extends JLabel {
 
 		private static final long serialVersionUID = -3120281287769826257L;
 
 		private boolean pressed;
 
+		/**
+		 * Creates a key chip instance.
+		 * @param text text to display or edit
+		 */
 		KeyChip(final String text) {
 			super(text);
 			this.setForeground(HelpUi.TEXT_COLOR);
@@ -51,6 +61,10 @@ public class ShortcutsTab extends JPanel {
 			this.putClientProperty(FlatClientProperties.STYLE, "arc: " + HelpUi.CHIP_ARC);
 		}
 
+		/**
+		 * Sets the pressed.
+		 * @param pressed whether pressed is enabled
+		 */
 		void setPressed(final boolean pressed) {
 			if (this.pressed == pressed) {
 				return;
@@ -63,12 +77,18 @@ public class ShortcutsTab extends JPanel {
 		}
 	}
 
+	/**
+	 * Represents a responsive grid panel in the help part of the application.
+	 */
 	private static class ResponsiveGridPanel extends JPanel {
 
 		private static final long serialVersionUID = -4676952948188047231L;
 
 		private int lastColumnCount = -1;
 
+		/**
+		 * Creates a responsive grid panel instance.
+		 */
 		ResponsiveGridPanel() {
 			super(new GridBagLayout());
 			this.setOpaque(false);
@@ -76,6 +96,11 @@ public class ShortcutsTab extends JPanel {
 			this.setMaximumSize(HelpUi.FULL_WIDTH_MAXIMUM_SIZE);
 		}
 
+		/**
+		 * Adds the component to the responsive grid.
+		 * @param component Swing component to configure
+		 * @return the add result
+		 */
 		@Override
 		public Component add(final Component component) {
 			final Component added = super.add(component);
@@ -83,27 +108,48 @@ public class ShortcutsTab extends JPanel {
 			return added;
 		}
 
+		/**
+		 * Lays out the child components for the current width.
+		 */
 		@Override
 		public void doLayout() {
 			this.updateGridConstraints(this.currentColumnCount());
 			super.doLayout();
 		}
 
+		/**
+		 * Returns the preferred size.
+		 * @return the preferred size
+		 */
 		@Override
 		public Dimension getPreferredSize() {
 			this.updateGridConstraints(this.currentColumnCount());
 			return super.getPreferredSize();
 		}
 
+		/**
+		 * Returns the number of columns that fit in the current width.
+		 * @return the current column count result
+		 */
 		private int currentColumnCount() {
 			final int width = this.getWidth() > 0 ? this.getWidth() : this.getParentWidth();
 			return width > 0 && width < HelpUi.RESPONSIVE_GRID_BREAKPOINT ? 1 : 2;
 		}
 
+		/**
+		 * Returns the parent width.
+		 * @return the parent width
+		 */
 		private int getParentWidth() {
 			return this.getParent() == null ? 0 : this.getParent().getWidth();
 		}
 
+		/**
+		 * Returns the insets used around a child component.
+		 * @param column column index or column value to use
+		 * @param columnCount count value to use
+		 * @return the insets for result
+		 */
 		private java.awt.Insets insetsFor(final int column, final int columnCount) {
 			if (columnCount == 1) {
 				return HelpUi.SECTION_INSETS_SINGLE_COLUMN;
@@ -112,6 +158,10 @@ public class ShortcutsTab extends JPanel {
 			return column == 0 ? HelpUi.SECTION_INSETS_LEFT : HelpUi.SECTION_INSETS_RIGHT;
 		}
 
+		/**
+		 * Updates the grid constraints.
+		 * @param columnCount count value to use
+		 */
 		private void updateGridConstraints(final int columnCount) {
 			if (this.lastColumnCount == columnCount) {
 				return;
@@ -139,16 +189,36 @@ public class ShortcutsTab extends JPanel {
 		}
 	}
 
+	/**
+	 * Immutable value object for shortcut data.
+	 * @param keys values for keys
+	 * @param description text value for description
+	 * @param bindings values for bindings
+	 */
 	private record Shortcut(List<List<String>> keys, String description, List<List<String>> bindings) {
 
+		/**
+		 * Creates a shortcut using default values for omitted constructor arguments.
+		 * @param keys values for keys
+		 * @param description text value for description
+		 */
 		Shortcut(final List<List<String>> keys, final String description) {
 			this(keys, description, keys);
 		}
 	}
 
+	/**
+	 * Immutable value object for shortcut binding data.
+	 * @param keys keys value used by the operation
+	 * @param key text value for key
+	 * @param row row index or row component to use
+	 */
 	private record ShortcutBinding(Set<String> keys, String key, ShortcutRowPanel row) {
 	}
 
+	/**
+	 * Represents a shortcut row panel in the help part of the application.
+	 */
 	private static class ShortcutRowPanel extends JPanel {
 
 		private static final long serialVersionUID = -4690946944232659852L;
@@ -156,11 +226,18 @@ public class ShortcutsTab extends JPanel {
 		private Timer highlightTimer;
 		private boolean highlighted;
 
+		/**
+		 * Creates a shortcut row panel instance.
+		 */
 		ShortcutRowPanel() {
 			super(new GridBagLayout());
 			this.setOpaque(false);
 		}
 
+		/**
+		 * Paints the component.
+		 * @param graphics graphics context used for drawing
+		 */
 		@Override
 		protected void paintComponent(final Graphics graphics) {
 			if (this.highlighted) {
@@ -180,6 +257,9 @@ public class ShortcutsTab extends JPanel {
 			super.paintComponent(graphics);
 		}
 
+		/**
+		 * Highlights the shortcut row for a short time.
+		 */
 		void highlightTemporarily() {
 			if (this.highlightTimer != null) {
 				this.highlightTimer.stop();
@@ -196,6 +276,9 @@ public class ShortcutsTab extends JPanel {
 			this.highlightTimer.start();
 		}
 
+		/**
+		 * Scrolls the selected shortcut row into view.
+		 */
 		void scrollToVisible() {
 			this.scrollRectToVisible(new Rectangle(0, 0, this.getWidth(), this.getHeight()));
 		}
@@ -203,10 +286,20 @@ public class ShortcutsTab extends JPanel {
 
 	private static final long serialVersionUID = -3605281027804194279L;
 
+	/**
+	 * Checks whether gesture label is enabled or applies.
+	 * @param text text to display or edit
+	 * @return {@code true} if gesture label is enabled or applies; otherwise {@code false}
+	 */
 	private static boolean isGestureLabel(final String text) {
 		return text.indexOf(' ') >= 0 || text.indexOf('/') >= 0;
 	}
 
+	/**
+	 * Normalizes the key event.
+	 * @param event event object supplied by Swing
+	 * @return the normalize key event result
+	 */
 	private static String normalizeKeyEvent(final KeyEvent event) {
 		return switch (event.getKeyCode()) {
 		case KeyEvent.VK_CONTROL -> "Ctrl";
@@ -224,6 +317,11 @@ public class ShortcutsTab extends JPanel {
 		};
 	}
 
+	/**
+	 * Normalizes the key name.
+	 * @param key text value for key
+	 * @return the normalize key name result
+	 */
 	private static String normalizeKeyName(final String key) {
 		return switch (key) {
 		case "Control", "CTRL", "ctrl" -> "Ctrl";
@@ -236,6 +334,11 @@ public class ShortcutsTab extends JPanel {
 		};
 	}
 
+	/**
+	 * Builds a searchable key for a shortcut entry.
+	 * @param keys keys value used by the operation
+	 * @return the shortcut key result
+	 */
 	private static String shortcutKey(final Set<String> keys) {
 		return String.join("+", keys);
 	}
@@ -252,12 +355,22 @@ public class ShortcutsTab extends JPanel {
 
 	private final KeyEventDispatcher keyEventDispatcher = this::dispatchHelpKeyEvent;
 
+	/**
+	 * Creates a shortcuts tab instance.
+	 */
 	public ShortcutsTab() {
 		super(new java.awt.BorderLayout());
 		this.setOpaque(false);
 		this.add(this.createShortcutsPage(), java.awt.BorderLayout.CENTER);
 	}
 
+	/**
+	 * Adds the shortcut group.
+	 * @param parent parent component used for dialog ownership
+	 * @param group group value used by the operation
+	 * @param x x coordinate
+	 * @param y y coordinate
+	 */
 	private void addShortcutGroup(final JPanel parent, final JComponent group, final int x, final int y) {
 		final GridBagConstraints constraints = new GridBagConstraints();
 		constraints.gridx = x;
@@ -269,6 +382,10 @@ public class ShortcutsTab extends JPanel {
 		parent.add(group, constraints);
 	}
 
+	/**
+	 * Creates an add group.
+	 * @return the created add group
+	 */
 	private JComponent createAddGroup() {
 		return this.createShortcutGroup("Add table, field, comment, link",
 				List.of(new Shortcut(List.of(List.of("Ctrl", "T")), "Add table"),
@@ -277,6 +394,10 @@ public class ShortcutsTab extends JPanel {
 						new Shortcut(List.of(List.of("Ctrl", "L")), "Add link")));
 	}
 
+	/**
+	 * Creates a copy group.
+	 * @return the created copy group
+	 */
 	private JComponent createCopyGroup() {
 		return this.createShortcutGroup("Copy, paste, undo",
 				List.of(new Shortcut(List.of(List.of("Ctrl", "Z")), "Undo"),
@@ -286,6 +407,10 @@ public class ShortcutsTab extends JPanel {
 						new Shortcut(List.of(List.of("Ctrl", "V")), "Paste selection")));
 	}
 
+	/**
+	 * Creates an edit group.
+	 * @return the created edit group
+	 */
 	private JComponent createEditGroup() {
 		return this.createShortcutGroup("Edit, rename, delete",
 				List.of(new Shortcut(List.of(List.of("Ctrl", "E"), List.of("Double left click")),
@@ -303,6 +428,10 @@ public class ShortcutsTab extends JPanel {
 						new Shortcut(List.of(List.of("Ctrl", "D")), "Duplicate selected element(s)")));
 	}
 
+	/**
+	 * Creates a file group.
+	 * @return the created file group
+	 */
 	private JComponent createFileGroup() {
 		return this.createShortcutGroup("File loading, creating, saving",
 				List.of(new Shortcut(List.of(List.of("Ctrl", "N")), "New document"),
@@ -312,6 +441,10 @@ public class ShortcutsTab extends JPanel {
 						new Shortcut(List.of(List.of("Ctrl", "Shift", "E")), "Export as image")));
 	}
 
+	/**
+	 * Creates a gesture group.
+	 * @return the created gesture group
+	 */
 	private JComponent createGestureGroup() {
 		return this.createShortcutGroup("Gestures",
 				List.of(new Shortcut(List.of(List.of("Drag right click")),
@@ -322,6 +455,11 @@ public class ShortcutsTab extends JPanel {
 						new Shortcut(List.of(List.of("Double left click")), "<html><b>Edit element</b></html>")));
 	}
 
+	/**
+	 * Creates a key chip.
+	 * @param text text to display or edit
+	 * @return the created key chip
+	 */
 	private KeyChip createKeyChip(final String text) {
 		final KeyChip label = new KeyChip(text);
 		label.setHorizontalAlignment(SwingConstants.CENTER);
@@ -334,6 +472,11 @@ public class ShortcutsTab extends JPanel {
 		return label;
 	}
 
+	/**
+	 * Creates a key group.
+	 * @param keyLines values for key lines
+	 * @return the created key group
+	 */
 	private JComponent createKeyGroup(final List<List<String>> keyLines) {
 		final JPanel group = new JPanel();
 		group.setOpaque(false);
@@ -367,6 +510,10 @@ public class ShortcutsTab extends JPanel {
 		return group;
 	}
 
+	/**
+	 * Creates an other group.
+	 * @return the created other group
+	 */
 	private JComponent createOtherGroup() {
 		return this.createShortcutGroup("Others",
 				List.of(new Shortcut(List.of(List.of("Ctrl", "A")), "Select all"),
@@ -375,6 +522,12 @@ public class ShortcutsTab extends JPanel {
 						new Shortcut(List.of(List.of("Alt", "↑"), List.of("Alt", "↓")), "Move a selected field in the list")));
 	}
 
+	/**
+	 * Creates a shortcut group.
+	 * @param title title text to display
+	 * @param rows values for rows
+	 * @return the created shortcut group
+	 */
 	private JComponent createShortcutGroup(final String title, final List<Shortcut> rows) {
 		final HelpUi.CardPanel group = new HelpUi.CardPanel(new GridBagLayout());
 		group.setBackground(HelpUi.GROUP_BACKGROUND);
@@ -415,6 +568,10 @@ public class ShortcutsTab extends JPanel {
 		return group;
 	}
 
+	/**
+	 * Creates a shortcut layout.
+	 * @return the created shortcut layout
+	 */
 	private JComponent createShortcutLayout() {
 		final ResponsiveGridPanel sections = new ResponsiveGridPanel();
 		sections.add(this.createFileGroup());
@@ -426,6 +583,11 @@ public class ShortcutsTab extends JPanel {
 		return sections;
 	}
 
+	/**
+	 * Creates a shortcut row.
+	 * @param shortcut shortcut value used by the operation
+	 * @return the created shortcut row
+	 */
 	private JComponent createShortcutRow(final Shortcut shortcut) {
 		final ShortcutRowPanel row = new ShortcutRowPanel();
 		row.setBorder(HelpUi.ROW_BORDER);
@@ -454,6 +616,10 @@ public class ShortcutsTab extends JPanel {
 		return row;
 	}
 
+	/**
+	 * Creates a shortcuts page.
+	 * @return the created shortcuts page
+	 */
 	private JScrollPane createShortcutsPage() {
 		final JPanel content = HelpUi.createPageContent();
 
@@ -464,6 +630,11 @@ public class ShortcutsTab extends JPanel {
 		return HelpUi.createScrollPane(content);
 	}
 
+	/**
+	 * Dispatches a help-key event to the shortcut search logic.
+	 * @param event event object supplied by Swing
+	 * @return {@code true} when the condition is met; otherwise {@code false}
+	 */
 	private boolean dispatchHelpKeyEvent(final KeyEvent event) {
 		final Window window = SwingUtilities.getWindowAncestor(this);
 		if (!this.isShowing() || window == null || !window.isActive()) {
@@ -491,6 +662,10 @@ public class ShortcutsTab extends JPanel {
 		return false;
 	}
 
+	/**
+	 * Finds the matching shortcut that matches the supplied input.
+	 * @return the matching matching shortcut, or {@code null} when no match exists
+	 */
 	private ShortcutBinding findMatchingShortcut() {
 		for (final ShortcutBinding binding : this.shortcutBindings) {
 			if (this.activeKeys.equals(binding.keys())) {
@@ -501,6 +676,9 @@ public class ShortcutsTab extends JPanel {
 		return null;
 	}
 
+	/**
+	 * Highlights the shortcut that matches the pressed key combination.
+	 */
 	private void highlightMatchingShortcut() {
 		final ShortcutBinding match = this.findMatchingShortcut();
 		if (match == null || match.key().equals(this.activeShortcutKey)) {
@@ -512,6 +690,11 @@ public class ShortcutsTab extends JPanel {
 		match.row().highlightTemporarily();
 	}
 
+	/**
+	 * Registers the shortcut bindings.
+	 * @param shortcut shortcut value used by the operation
+	 * @param row row index or row component to use
+	 */
 	private void registerShortcutBindings(final Shortcut shortcut, final ShortcutRowPanel row) {
 		for (final List<String> keyLine : shortcut.bindings()) {
 			if (keyLine.stream().anyMatch(ShortcutsTab::isGestureLabel)) {
@@ -529,6 +712,9 @@ public class ShortcutsTab extends JPanel {
 		}
 	}
 
+	/**
+	 * Updates the pressed chips.
+	 */
 	private void updatePressedChips() {
 		for (final Map.Entry<String, List<KeyChip>> entry : this.keyChipsByKey.entrySet()) {
 			final boolean pressed = this.activeKeys.contains(entry.getKey());
@@ -539,6 +725,9 @@ public class ShortcutsTab extends JPanel {
 		}
 	}
 
+	/**
+	 * Registers the key dispatcher.
+	 */
 	void registerKeyDispatcher() {
 		if (this.keyDispatcherRegistered) {
 			return;
@@ -548,6 +737,9 @@ public class ShortcutsTab extends JPanel {
 		this.keyDispatcherRegistered = true;
 	}
 
+	/**
+	 * Unregisters the key dispatcher.
+	 */
 	void unregisterKeyDispatcher() {
 		if (!this.keyDispatcherRegistered) {
 			return;

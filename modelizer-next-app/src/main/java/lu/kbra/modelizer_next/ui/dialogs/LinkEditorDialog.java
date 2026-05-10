@@ -33,31 +33,79 @@ import lu.kbra.modelizer_next.domain.data.Cardinality;
 import lu.kbra.modelizer_next.layout.PanelType;
 import lu.kbra.modelizer_next.ui.component.ColorButton;
 
+/**
+ * Dialog for editing a relationship link and its endpoints.
+ */
 public final class LinkEditorDialog {
 
+	/**
+	 * Immutable value object for result data.
+	 * @param name name value to read, write, or display
+	 * @param lineColor color value to use
+	 * @param fromClassId id of the element to read or modify
+	 * @param toClassId id of the element to read or modify
+	 * @param fromFieldId id of the element to read or modify
+	 * @param toFieldId id of the element to read or modify
+	 * @param cardinalityFrom cardinality from value used by the operation
+	 * @param cardinalityTo cardinality to value used by the operation
+	 * @param associationClassId id of the element to read or modify
+	 * @param labelFrom text value for label from
+	 * @param labelTo text value for label to
+	 */
 	public record Result(String name, Color lineColor, String fromClassId, String toClassId, String fromFieldId, String toFieldId,
 			Cardinality cardinalityFrom, Cardinality cardinalityTo, String associationClassId, String labelFrom, String labelTo) {
 	}
 
+	/**
+	 * Immutable value object for association option data.
+	 * @param classId id of the class to look up or modify
+	 * @param label text value for label
+	 */
 	private record AssociationOption(String classId, String label) {
+		/**
+		 * Creates an option that represents no association class.
+		 * @return the none result
+		 */
 		private static AssociationOption none() {
 			return new AssociationOption(null, "None");
 		}
 
+		/**
+		 * Creates the default style for class elements.
+		 * @param classModel class model affected by the operation
+		 * @param panelType diagram panel type whose model or layout should be used
+		 * @return the for class result
+		 */
 		private static AssociationOption forClass(final ClassModel classModel, final PanelType panelType) {
 			final String label = panelType == PanelType.CONCEPTUAL ? classModel.getConceptualName() : classModel.getTechnicalName();
 			return new AssociationOption(classModel.getId(), label);
 		}
 	}
 
+	/**
+	 * Provides class renderer behavior for the dialog part of the application.
+	 */
 	private static final class ClassRenderer extends DefaultListCellRenderer {
 		private static final long serialVersionUID = 1L;
 		private final PanelType panelType;
 
+		/**
+		 * Creates a class renderer instance.
+		 * @param panelType diagram panel type whose model or layout should be used
+		 */
 		private ClassRenderer(final PanelType panelType) {
 			this.panelType = panelType;
 		}
 
+		/**
+		 * Returns the list cell renderer component.
+		 * @param list list to read or update
+		 * @param value value to process
+		 * @param index zero-based index to read or update
+		 * @param isSelected whether is selected is enabled
+		 * @param cellHasFocus whether cell has focus is enabled
+		 * @return the list cell renderer component
+		 */
 		@Override
 		public Component getListCellRendererComponent(
 				final JList<?> list,
@@ -73,14 +121,30 @@ public final class LinkEditorDialog {
 		}
 	}
 
+	/**
+	 * Provides field renderer behavior for the dialog part of the application.
+	 */
 	private static final class FieldRenderer extends DefaultListCellRenderer {
 		private static final long serialVersionUID = 1L;
 		private final PanelType panelType;
 
+		/**
+		 * Creates a field renderer instance.
+		 * @param panelType diagram panel type whose model or layout should be used
+		 */
 		private FieldRenderer(final PanelType panelType) {
 			this.panelType = panelType;
 		}
 
+		/**
+		 * Returns the list cell renderer component.
+		 * @param list list to read or update
+		 * @param value value to process
+		 * @param index zero-based index to read or update
+		 * @param isSelected whether is selected is enabled
+		 * @param cellHasFocus whether cell has focus is enabled
+		 * @return the list cell renderer component
+		 */
 		@Override
 		public Component getListCellRendererComponent(
 				final JList<?> list,
@@ -96,10 +160,21 @@ public final class LinkEditorDialog {
 		}
 	}
 
+	/**
+	 * Represents a holder in the dialog part of the application.
+	 */
 	private static final class Holder {
 		private Result result;
 	}
 
+	/**
+	 * Shows the dialog.
+	 * @param parent parent component used for dialog ownership
+	 * @param document document to read or modify
+	 * @param linkModel link model affected by the operation
+	 * @param panelType diagram panel type whose model or layout should be used
+	 * @return the show dialog result
+	 */
 	public static Result showDialog(
 			final Component parent,
 			final ModelDocument document,
@@ -343,6 +418,12 @@ public final class LinkEditorDialog {
 		return holder.result;
 	}
 
+	/**
+	 * Finds the association option that matches the supplied input.
+	 * @param box box value used by the operation
+	 * @param classId id of the class to look up or modify
+	 * @return the matching association option, or {@code null} when no match exists
+	 */
 	private static AssociationOption findAssociationOption(final JComboBox<AssociationOption> box, final String classId) {
 		for (int i = 0; i < box.getItemCount(); i++) {
 			final AssociationOption option = box.getItemAt(i);
@@ -353,6 +434,12 @@ public final class LinkEditorDialog {
 		return box.getItemAt(0);
 	}
 
+	/**
+	 * Finds the class that matches the supplied input.
+	 * @param classes values for classes
+	 * @param id stable id of the model element
+	 * @return the matching class, or {@code null} when no match exists
+	 */
 	private static ClassModel findClass(final List<ClassModel> classes, final String id) {
 		for (final ClassModel classModel : classes) {
 			if (classModel.getId().equals(id)) {
@@ -362,6 +449,12 @@ public final class LinkEditorDialog {
 		return null;
 	}
 
+	/**
+	 * Finds the field that matches the supplied input.
+	 * @param classModel class model affected by the operation
+	 * @param id stable id of the model element
+	 * @return the matching field, or {@code null} when no match exists
+	 */
 	private static FieldModel findField(final ClassModel classModel, final String id) {
 		if (classModel == null || id == null) {
 			return null;
@@ -374,6 +467,12 @@ public final class LinkEditorDialog {
 		return null;
 	}
 
+	/**
+	 * Creates a labeled option for a combo box or selector.
+	 * @param labelText text value for label text
+	 * @param component Swing component to configure
+	 * @return the labeled result
+	 */
 	private static JPanel labeled(final String labelText, final Component component) {
 		final JPanel panel = new JPanel(new BorderLayout(4, 4));
 		panel.add(new JLabel(labelText), BorderLayout.NORTH);
@@ -381,6 +480,9 @@ public final class LinkEditorDialog {
 		return panel;
 	}
 
+	/**
+	 * Creates a link editor dialog instance.
+	 */
 	private LinkEditorDialog() {
 	}
 

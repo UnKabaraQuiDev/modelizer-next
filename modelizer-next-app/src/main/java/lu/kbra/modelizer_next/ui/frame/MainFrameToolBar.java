@@ -22,10 +22,20 @@ import javax.swing.JToolBar;
 import lu.kbra.modelizer_next.ui.canvas.DiagramCanvas;
 import lu.kbra.pclib.PCUtils;
 
+/**
+ * Toolbar builder for the main frame.
+ */
 final class MainFrameToolBar extends JToolBar {
 
 	private static final long serialVersionUID = 1L;
 
+	/**
+	 * Scales an icon to the requested size.
+	 * @param icon icon value used by the operation
+	 * @param targetWidth width value
+	 * @param targetHeight height value
+	 * @return the scale icon result
+	 */
 	private static ImageIcon scaleIcon(final ImageIcon icon, final int targetWidth, final int targetHeight) {
 		BufferedImage current = MainFrameToolBar.toBufferedImage(icon.getImage());
 		int width = current.getWidth();
@@ -49,6 +59,11 @@ final class MainFrameToolBar extends JToolBar {
 		return new ImageIcon(current);
 	}
 
+	/**
+	 * Converts the input to a buffered image.
+	 * @param image image value used by the operation
+	 * @return the to buffered image result
+	 */
 	private static BufferedImage toBufferedImage(final Image image) {
 		if (image instanceof final BufferedImage bufferedImage) {
 			return bufferedImage;
@@ -70,6 +85,10 @@ final class MainFrameToolBar extends JToolBar {
 
 	JButton redoButton;
 
+	/**
+	 * Creates a main frame tool bar instance.
+	 * @param frame frame that owns the created UI component
+	 */
 	MainFrameToolBar(final MainFrame frame) {
 		this.setFloatable(false);
 		this.setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));
@@ -90,6 +109,14 @@ final class MainFrameToolBar extends JToolBar {
 		this.add(buttons, BorderLayout.WEST);
 	}
 
+	/**
+	 * Creates a toolbar button.
+	 * @param frame frame that owns the created UI component
+	 * @param icon text value for icon
+	 * @param description text value for description
+	 * @param actionKey key under which the action is registered
+	 * @return the created toolbar button
+	 */
 	private JButton createToolbarButton(final MainFrame frame, final String icon, final String description, final String actionKey) {
 		final JButton button = new JButton();
 		button.setIcon(this.getToolbarIcon(frame, icon));
@@ -124,6 +151,12 @@ final class MainFrameToolBar extends JToolBar {
 		return button;
 	}
 
+	/**
+	 * Returns the toolbar icon.
+	 * @param frame frame that owns the created UI component
+	 * @param icon text value for icon
+	 * @return the toolbar icon
+	 */
 	private ImageIcon getToolbarIcon(final MainFrame frame, final String icon) {
 		return this.toolbarIconCache.computeIfAbsent(icon, key -> {
 			final ImageIcon rawIcon = new ImageIcon(PCUtils.readPackagedBytesFile(frame.getClass(), "/icons/" + key));

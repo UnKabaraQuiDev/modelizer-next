@@ -25,6 +25,11 @@ import lu.kbra.modelizer_next.ui.canvas.datastruct.CopiedNodeLayout;
  */
 public interface CaptureManager extends DiagramCanvasExt {
 
+	/**
+	 * Captures the class into a portable snapshot.
+	 * @param classModel class model affected by the operation
+	 * @return the capture class result
+	 */
 	default CopiedClass captureClass(final ClassModel classModel) {
 		final List<CopiedField> fields = new ArrayList<>();
 
@@ -45,6 +50,11 @@ public interface CaptureManager extends DiagramCanvasExt {
 				this.getCanvas().captureNodeLayout(LayoutObjectType.CLASS, classModel.getId()));
 	}
 
+	/**
+	 * Captures the comment into a portable snapshot.
+	 * @param commentModel comment model affected by the operation
+	 * @return the capture comment result
+	 */
 	default CopiedComment captureComment(final CommentModel commentModel) {
 		final CommentBinding binding = commentModel.getBinding();
 
@@ -62,6 +72,12 @@ public interface CaptureManager extends DiagramCanvasExt {
 				this.getCanvas().captureNodeLayout(LayoutObjectType.COMMENT, commentModel.getId()));
 	}
 
+	/**
+	 * Captures the field into a portable snapshot.
+	 * @param ownerClassId id of the element to read or modify
+	 * @param fieldModel field model affected by the operation
+	 * @return the capture field result
+	 */
 	default CopiedField captureField(final String ownerClassId, final FieldModel fieldModel) {
 		return new CopiedField(ownerClassId,
 				fieldModel.getId(),
@@ -76,6 +92,11 @@ public interface CaptureManager extends DiagramCanvasExt {
 				fieldModel.getBackgroundColor());
 	}
 
+	/**
+	 * Captures the link into a portable snapshot.
+	 * @param linkModel link model affected by the operation
+	 * @return the capture link result
+	 */
 	default CopiedLink captureLink(final LinkModel linkModel) {
 		final LinkEnd from = linkModel.getFrom();
 		final LinkEnd to = linkModel.getTo();
@@ -95,6 +116,11 @@ public interface CaptureManager extends DiagramCanvasExt {
 				this.getCanvas().captureLinkLayout(linkModel.getId()));
 	}
 
+	/**
+	 * Captures the link layout into a portable snapshot.
+	 * @param linkId id of the link to look up or modify
+	 * @return the capture link layout result
+	 */
 	default CopiedLinkLayout captureLinkLayout(final String linkId) {
 		final LinkLayout linkLayout = this.getCanvas().findOrCreateLinkLayout(linkId);
 		final List<Point2D.Double> bendPoints = new ArrayList<>();
@@ -109,6 +135,12 @@ public interface CaptureManager extends DiagramCanvasExt {
 		return new CopiedLinkLayout(List.copyOf(bendPoints), labelPosition);
 	}
 
+	/**
+	 * Captures the node layout into a portable snapshot.
+	 * @param type type value that selects the operation mode
+	 * @param objectId id of the element to read or modify
+	 * @return the capture node layout result
+	 */
 	default CopiedNodeLayout captureNodeLayout(final LayoutObjectType type, final String objectId) {
 		final NodeLayout layout = this.getCanvas().findOrCreateNodeLayout(type, objectId);
 

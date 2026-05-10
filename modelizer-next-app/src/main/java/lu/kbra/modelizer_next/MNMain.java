@@ -24,10 +24,17 @@ import lu.kbra.modelizer_next.common.SystemThemeDetector;
 import lu.kbra.modelizer_next.json.ColorModule;
 import lu.kbra.modelizer_next.ui.ThemeMode;
 
+/**
+ * Application main class for the Swing desktop client. It configures UI defaults, registers JSON modules, and
+ * either starts the command-line exporter or opens the main frame.
+ */
 public class MNMain {
 
 	public static final ObjectMapper OBJECT_MAPPER = MNMain.createMapper();
 
+	/**
+	 * Applies the configured look and feel.
+	 */
 	public static void applyConfiguredLookAndFeel() {
 		try {
 			App.loadConfig();
@@ -50,6 +57,10 @@ public class MNMain {
 		}
 	}
 
+	/**
+	 * Starts the application entry point.
+	 * @param args command-line arguments supplied by the launcher
+	 */
 	public static void main(String[] args) {
 		for (final String arg : args) {
 			if (arg.startsWith("-D")) {
@@ -72,6 +83,10 @@ public class MNMain {
 		new ModelizerAppEntryPoint().start(args);
 	}
 
+	/**
+	 * Restarts the current command with the same JVM and application arguments.
+	 * @throws Exception if the operation cannot be completed
+	 */
 	public static void restartSameCommand() throws Exception {
 		final ProcessHandle.Info info = ProcessHandle.current().info();
 
@@ -88,6 +103,10 @@ public class MNMain {
 		System.exit(0);
 	}
 
+	/**
+	 * Creates a mapper.
+	 * @return the created mapper
+	 */
 	private static ObjectMapper createMapper() {
 		final ObjectMapper mapper = new ObjectMapper(JsonFactory.builder()
 				.configure(StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION, true)

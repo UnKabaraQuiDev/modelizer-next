@@ -34,28 +34,57 @@ import lu.kbra.modelizer_next.ui.impl.DocumentChangeListener;
 import lu.kbra.pclib.datastructure.triplet.Triplet;
 import lu.kbra.pclib.pointer.prim.IntPointer;
 
+/**
+ * Runs document exports without opening the interactive desktop frame.
+ */
 public final class CommandLineExporter {
 
+	/**
+	 * Immutable value object for loaded document data.
+	 * @param sourceFile file to read or write
+	 * @param document document to read or modify
+	 */
 	private record LoadedDocument(File sourceFile, ModelDocument document) {
 	}
 
+	/**
+	 * Defines operations for model document producer behavior.
+	 */
 	@FunctionalInterface
 	private interface ModelDocumentProducer {
 
+		/**
+		 * Returns the next value from this producer or iterator.
+		 * @return an optional result when a matching value is available
+		 * @throws IOException if the operation cannot be completed
+		 */
 		Optional<LoadedDocument> next() throws IOException;
 
 	}
 
+	/**
+	 * Represents an input file document producer in the command-line export part of the application.
+	 */
 	private static final class InputFileDocumentProducer implements ModelDocumentProducer {
 
 		private final Iterator<File> inputFiles;
 		private final ConsoleDocumentLoadHandler loadHandler;
 
+		/**
+		 * Creates an input file document producer instance.
+		 * @param inputFiles values for input files
+		 * @param force whether force is enabled
+		 */
 		private InputFileDocumentProducer(final List<File> inputFiles, final boolean force) {
 			this.inputFiles = inputFiles.iterator();
 			this.loadHandler = new ConsoleDocumentLoadHandler(force);
 		}
 
+		/**
+		 * Returns the next value from this producer or iterator.
+		 * @return an optional result when a matching value is available
+		 * @throws IOException if the operation cannot be completed
+		 */
 		@Override
 		public Optional<LoadedDocument> next() throws IOException {
 			if (!this.inputFiles.hasNext()) {
@@ -74,16 +103,28 @@ public final class CommandLineExporter {
 
 	}
 
+	/**
+	 * Exception raised when export aborted fails.
+	 */
 	private static final class ExportAbortedException extends IOException {
 
 		private static final long serialVersionUID = 513442251233551029L;
 
+		/**
+		 * Creates an export aborted exception instance.
+		 * @param inputFile file to read or write
+		 */
 		private ExportAbortedException(final File inputFile) {
 			super("Export aborted for input file: " + inputFile);
 		}
 
 	}
 
+	/**
+	 * Runs the full operation represented by this class.
+	 * @param args command-line arguments supplied by the launcher
+	 * @return the run result
+	 */
 	public static int run(final String[] args) {
 		System.setProperty("java.awt.headless", "true");
 
@@ -157,6 +198,14 @@ public final class CommandLineExporter {
 		}
 	}
 
+	/**
+	 * Resolves the input files from the current model and layout state.
+	 * @param rawInputFile file to read or write
+	 * @param multiple whether multiple input files are allowed
+	 * @param wildcard whether wildcard path matching is enabled
+	 * @return the resolved input files
+	 * @throws IOException if the operation cannot be completed
+	 */
 	private static List<File> resolveInputFiles(final String rawInputFile, final boolean multiple, final boolean wildcard)
 			throws IOException {
 		final String rawInput = rawInputFile == null ? "" : rawInputFile.trim();
@@ -199,6 +248,12 @@ public final class CommandLineExporter {
 		return inputFiles;
 	}
 
+	/**
+	 * Adds the input file.
+	 * @param inputFiles values for input files
+	 * @param usedPaths used paths value used by the operation
+	 * @param inputFile file to read or write
+	 */
 	private static void addInputFile(final List<File> inputFiles, final Set<Path> usedPaths, final File inputFile) {
 		final Path inputPath = CommandLineExporter.toNormalizedAbsolutePath(inputFile);
 
@@ -215,6 +270,12 @@ public final class CommandLineExporter {
 		}
 	}
 
+	/**
+	 * Resolves the wildcard input files from the current model and layout state.
+	 * @param rawPattern text value for raw pattern
+	 * @return the resolved wildcard input files
+	 * @throws IOException if the operation cannot be completed
+	 */
 	private static List<Path> resolveWildcardInputFiles(final String rawPattern) throws IOException {
 		final String pattern = CommandLineExporter.normalizeWildcardSeparators(CommandLineExportParser.resolveHome(rawPattern).toString());
 		final Path searchRoot = CommandLineExporter.findWildcardSearchRoot(pattern);
@@ -235,6 +296,14 @@ public final class CommandLineExporter {
 		}
 	}
 
+	/**
+	 * Checks whether the wildcard matches the expected pattern.
+	 * @param path file system path to read or write
+	 * @param absolutePattern whether absolute pattern is enabled
+	 * @param baseDirectory base directory value used by the operation
+	 * @param matchers values for matchers
+	 * @return {@code true} when the condition is met; otherwise {@code false}
+	 */
 	private static boolean matchesWildcard(
 			final Path path,
 			final boolean absolutePattern,
@@ -253,6 +322,11 @@ public final class CommandLineExporter {
 		return false;
 	}
 
+	/**
+	 * Creates a wildcard matchers.
+	 * @param pattern pattern used for matching or formatting
+	 * @return the created wildcard matchers
+	 */
 	private static List<PathMatcher> createWildcardMatchers(final String pattern) {
 		return CommandLineExporter.expandDoubleStarZeroDirectoryVariants(pattern)
 				.stream()
@@ -260,12 +334,22 @@ public final class CommandLineExporter {
 				.toList();
 	}
 
+	/**
+	 * Expands the double star zero directory variants.
+	 * @param pattern pattern used for matching or formatting
+	 * @return the matching values
+	 */
 	private static List<String> expandDoubleStarZeroDirectoryVariants(final String pattern) {
 		final Set<String> variants = new LinkedHashSet<>();
 		CommandLineExporter.expandDoubleStarZeroDirectoryVariants(pattern, variants);
 		return new ArrayList<>(variants);
 	}
 
+	/**
+	 * Expands the double star zero directory variants.
+	 * @param pattern pattern used for matching or formatting
+	 * @param variants variants value used by the operation
+	 */
 	private static void expandDoubleStarZeroDirectoryVariants(final String pattern, final Set<String> variants) {
 		if (!variants.add(pattern)) {
 			return;
@@ -290,6 +374,11 @@ public final class CommandLineExporter {
 		}
 	}
 
+	/**
+	 * Finds the wildcard search root that matches the supplied input.
+	 * @param pattern pattern used for matching or formatting
+	 * @return the matching wildcard search root, or {@code null} when no match exists
+	 */
 	private static Path findWildcardSearchRoot(final String pattern) {
 		final int firstWildcardIndex = CommandLineExporter.firstWildcardIndex(pattern);
 
@@ -311,6 +400,11 @@ public final class CommandLineExporter {
 		return CommandLineExporter.toNormalizedAbsolutePath(new File(rootText));
 	}
 
+	/**
+	 * Returns the first wildcard index.
+	 * @param value value to process
+	 * @return the first wildcard index result
+	 */
 	private static int firstWildcardIndex(final String value) {
 		final int starIndex = value.indexOf('*');
 		final int questionIndex = value.indexOf('?');
@@ -325,14 +419,29 @@ public final class CommandLineExporter {
 		return Math.min(starIndex, questionIndex);
 	}
 
+	/**
+	 * Checks whether the wildcard is present.
+	 * @param value value to process
+	 * @return {@code true} when the condition is met; otherwise {@code false}
+	 */
 	private static boolean containsWildcard(final String value) {
 		return value != null && CommandLineExporter.firstWildcardIndex(value) >= 0;
 	}
 
+	/**
+	 * Normalizes the wildcard separators.
+	 * @param value value to process
+	 * @return the normalize wildcard separators result
+	 */
 	private static String normalizeWildcardSeparators(final String value) {
 		return value.replace('/', File.separatorChar).replace('\\', File.separatorChar);
 	}
 
+	/**
+	 * Converts the input to a normalized absolute path.
+	 * @param file file to read or write
+	 * @return the to normalized absolute path result
+	 */
 	private static Path toNormalizedAbsolutePath(final File file) {
 		try {
 			return file.toPath().toAbsolutePath().normalize();
@@ -341,6 +450,12 @@ public final class CommandLineExporter {
 		}
 	}
 
+	/**
+	 * Creates a canvases.
+	 * @param document document to read or modify
+	 * @param requestedPanelTypes values for requested panel types
+	 * @return the created canvases
+	 */
 	private static Map<PanelType, DiagramCanvas> createCanvases(final ModelDocument document, final List<PanelType> requestedPanelTypes) {
 		final Map<PanelType, DiagramCanvas> canvases = new LinkedHashMap<>();
 
@@ -361,6 +476,9 @@ public final class CommandLineExporter {
 		return canvases;
 	}
 
+	/**
+	 * Creates a command line exporter instance.
+	 */
 	private CommandLineExporter() {
 	}
 

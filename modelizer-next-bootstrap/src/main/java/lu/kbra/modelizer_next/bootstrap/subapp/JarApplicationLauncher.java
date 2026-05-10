@@ -9,10 +9,20 @@ import java.util.Queue;
 import lu.kbra.modelizer_next.bootstrap.AppMain;
 import lu.kbra.modelizer_next.common.UnsupportedBootstrapVersionException;
 
+/**
+ * Launches an installed app jar through an isolated class loader.
+ */
 public final class JarApplicationLauncher {
 
 	private ChildFirstURLClassLoader activeLoader;
 
+	/**
+	 * Launches the installed application.
+	 * @param args command-line arguments supplied by the launcher
+	 * @param toBeOpened to be opened value used by the operation
+	 * @param application application value used by the operation
+	 * @throws AppLaunchException if the operation cannot be completed
+	 */
 	public void launch(final String[] args, final Queue<File> toBeOpened, final InstalledApplication application)
 			throws AppLaunchException {
 		if (application == null) {

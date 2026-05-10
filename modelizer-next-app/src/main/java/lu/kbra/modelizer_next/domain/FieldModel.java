@@ -13,6 +13,10 @@ import lu.kbra.modelizer_next.domain.impl.StyleOwner;
 import lu.kbra.modelizer_next.domain.shared.ElementNames;
 import lu.kbra.modelizer_next.domain.shared.ElementStyle;
 
+/**
+ * Persistent model of a class field or table column, including names, data type, keys, cardinality, style, and
+ * visibility.
+ */
 public class FieldModel implements NamesOwner, IdOwner, StyleOwner {
 
 	public static final String[] SQL_TYPES = { null, "INT", "BIGINT", "TEXT", "BOOLEAN", "TINYINT", "DATE", "TIMESTAMP" };
@@ -31,6 +35,9 @@ public class FieldModel implements NamesOwner, IdOwner, StyleOwner {
 	private boolean notNull;
 	private String type;
 
+	/**
+	 * Creates a field model instance.
+	 */
 	public FieldModel() {
 		this.id = UUID.randomUUID().toString();
 		this.names = new ElementNames();
@@ -42,88 +49,164 @@ public class FieldModel implements NamesOwner, IdOwner, StyleOwner {
 		this.type = null;
 	}
 
+	/**
+	 * Returns the border color.
+	 * @return the border color
+	 */
 	@Deprecated
 	@Override
 	public Color getBorderColor() {
 		return StyleOwner.super.getBorderColor();
 	}
 
+	/**
+	 * Sets the border color.
+	 * @param c c value used by the operation
+	 */
 	@Deprecated
 	@Override
 	public void setBorderColor(Color c) {
 		StyleOwner.super.setBorderColor(c);
 	}
 
+	/**
+	 * Returns the ID.
+	 * @return the ID
+	 */
 	@Override
 	public String getId() {
 		return this.id;
 	}
 
+	/**
+	 * Returns the names.
+	 * @return the names
+	 */
 	@Override
 	public ElementNames getNames() {
 		return this.names;
 	}
 
+	/**
+	 * Returns the style.
+	 * @return the style
+	 */
 	@Override
 	public ElementStyle getStyle() {
 		return this.style;
 	}
 
+	/**
+	 * Returns the type.
+	 * @return the type
+	 */
 	public String getType() {
 		return this.type;
 	}
 
+	/**
+	 * Checks whether not null is enabled or applies.
+	 * @return {@code true} if not null is enabled or applies; otherwise {@code false}
+	 */
 	public boolean isNotNull() {
 		return this.notNull;
 	}
 
+	/**
+	 * Checks whether primary key is enabled or applies.
+	 * @return {@code true} if primary key is enabled or applies; otherwise {@code false}
+	 */
 	public boolean isPrimaryKey() {
 		return this.primaryKey;
 	}
 
+	/**
+	 * Checks whether technical only is enabled or applies.
+	 * @return {@code true} if technical only is enabled or applies; otherwise {@code false}
+	 */
 	public boolean isTechnicalOnly() {
 		return this.technicalOnly;
 	}
 
+	/**
+	 * Checks whether unique is enabled or applies.
+	 * @return {@code true} if unique is enabled or applies; otherwise {@code false}
+	 */
 	public boolean isUnique() {
 		return this.unique;
 	}
 
+	/**
+	 * Sets the ID.
+	 * @param id stable id of the model element
+	 */
 	@Override
 	public void setId(final String id) {
 		this.id = id;
 	}
 
+	/**
+	 * Sets the names.
+	 * @param names name values to use
+	 */
 	@Override
 	public void setNames(final ElementNames names) {
 		this.names = names;
 	}
 
+	/**
+	 * Sets the not null.
+	 * @param notNull whether not null is enabled
+	 */
 	public void setNotNull(final boolean notNull) {
 		this.notNull = notNull;
 	}
 
+	/**
+	 * Sets the primary key.
+	 * @param primaryKey whether primary key is enabled
+	 */
 	public void setPrimaryKey(final boolean primaryKey) {
 		this.primaryKey = primaryKey;
 	}
 
+	/**
+	 * Sets the style.
+	 * @param style style value used by the operation
+	 */
 	@Override
 	public void setStyle(final ElementStyle style) {
 		this.style = style;
 	}
 
+	/**
+	 * Sets the technical only.
+	 * @param notConceptual whether not conceptual is enabled
+	 */
 	public void setTechnicalOnly(final boolean notConceptual) {
 		this.technicalOnly = notConceptual;
 	}
 
+	/**
+	 * Sets the type.
+	 * @param type type value that selects the operation mode
+	 */
 	public void setType(final String type) {
 		this.type = type;
 	}
 
+	/**
+	 * Sets the unique.
+	 * @param unique whether unique is enabled
+	 */
 	public void setUnique(final boolean unique) {
 		this.unique = unique;
 	}
 
+	/**
+	 * Returns the flags.
+	 * @return the flags
+	 */
 	public List<String> getFlags() {
 		final List<String> ll = new ArrayList<>();
 		if (primaryKey) {
@@ -138,10 +221,18 @@ public class FieldModel implements NamesOwner, IdOwner, StyleOwner {
 		return ll;
 	}
 
+	/**
+	 * Checks whether this object has a flags.
+	 * @return {@code true} if flags exists; otherwise {@code false}
+	 */
 	public boolean hasFlags() {
 		return primaryKey || notNull || unique;
 	}
 
+	/**
+	 * Builds a debug string for this field model.
+	 * @return a debug string for this object
+	 */
 	@Override
 	public String toString() {
 		return "FieldModel@" + System.identityHashCode(this) + " [id=" + this.id + ", names=" + this.names + ", notConceptual="

@@ -32,6 +32,9 @@ import lu.kbra.pclib.PCUtils;
 import lu.kbra.pclib.datastructure.triplet.Triplet;
 import lu.kbra.pclib.datastructure.triplet.Triplets;
 
+/**
+ * Exports one or more document views to image files.
+ */
 public final class ViewExporter {
 
 	public static final String DEFAULT_FILE_PATTERN = "%FILENAME%-%TYPE%.%EXTENSION%";
@@ -41,6 +44,15 @@ public final class ViewExporter {
 	private static final DateTimeFormatter TIME_FORMAT = DateTimeFormatter.ofPattern("HH-mm-ss");
 	private static final String SVG_NAMESPACE_URI = "http://www.w3.org/2000/svg";
 
+	/**
+	 * Exports the views.
+	 * @param canvases canvases value used by the operation
+	 * @param request export request being processed
+	 * @param sourceFileName name value to use
+	 * @param callback callback value used by the operation
+	 * @return an optional result when a matching value is available
+	 * @throws IOException if the operation cannot be completed
+	 */
 	public static List<Triplet<Optional<File>, PanelType, File>> exportViews(
 			final Map<PanelType, DiagramCanvas> canvases,
 			final ViewExportRequest request,
@@ -94,6 +106,12 @@ public final class ViewExporter {
 
 	}
 
+	/**
+	 * Returns an unused output path by adding a numeric suffix when needed.
+	 * @param originalFile file to read or write
+	 * @param usedPaths used paths value used by the operation
+	 * @return the avoid duplicate path result
+	 */
 	private static File avoidDuplicatePath(final File originalFile, final Set<String> usedPaths) {
 		File candidate = originalFile;
 		int counter = 2;
@@ -107,6 +125,14 @@ public final class ViewExporter {
 		return candidate;
 	}
 
+	/**
+	 * Builds a file name.
+	 * @param rawPattern text value for raw pattern
+	 * @param sourceFileName name value to use
+	 * @param panelType diagram panel type whose model or layout should be used
+	 * @param format export format to use
+	 * @return the built file name
+	 */
 	private static String buildFileName(
 			final String rawPattern,
 			final String sourceFileName,
@@ -125,6 +151,12 @@ public final class ViewExporter {
 		return cleaned.isBlank() ? sourceFileName + "-" + ViewExporter.typeToken(panelType) + "." + format.getExtension() : cleaned;
 	}
 
+	/**
+	 * Ensures that the extension exists or is up to date.
+	 * @param file file to read or write
+	 * @param extension text value for extension
+	 * @return the ensure extension result
+	 */
 	private static File ensureExtension(final File file, final String extension) {
 		if (file.getName().toLowerCase().endsWith("." + extension.toLowerCase())) {
 			return file;
@@ -132,11 +164,21 @@ public final class ViewExporter {
 		return new File(file.getParentFile(), file.getName() + "." + extension);
 	}
 
+	/**
+	 * Returns the extension.
+	 * @param fileName name value to use
+	 * @return the extension
+	 */
 	private static String getExtension(final String fileName) {
 		final int dotIndex = fileName.lastIndexOf('.');
 		return dotIndex < 0 || dotIndex == fileName.length() - 1 ? "" : fileName.substring(dotIndex + 1);
 	}
 
+	/**
+	 * Sanitizes the file name so it can be used safely.
+	 * @param value value to process
+	 * @return the sanitize file name result
+	 */
 	private static String sanitizeFileName(final String value) {
 		if (value == null) {
 			return "";
@@ -146,6 +188,11 @@ public final class ViewExporter {
 		return normalized.replaceAll("[\\\\/:*?\"<>|]", "-").trim();
 	}
 
+	/**
+	 * Returns the file-name token for a panel type.
+	 * @param panelType diagram panel type whose model or layout should be used
+	 * @return the type token result
+	 */
 	private static String typeToken(final PanelType panelType) {
 		return switch (panelType) {
 		case CONCEPTUAL -> "conceptual";
@@ -154,6 +201,13 @@ public final class ViewExporter {
 		};
 	}
 
+	/**
+	 * Writes the PNG.
+	 * @param canvas canvas instance that owns the operation
+	 * @param scope export scope to use
+	 * @param outputFile file to read or write
+	 * @throws IOException if the operation cannot be completed
+	 */
 	private static void writePng(final DiagramCanvas canvas, final ViewExportScope scope, final File outputFile) throws IOException {
 		final BufferedImage image = canvas.createExportImage(scope);
 		try (OutputStream outputStream = Files.newOutputStream(outputFile.toPath())) {
@@ -163,6 +217,13 @@ public final class ViewExporter {
 		}
 	}
 
+	/**
+	 * Writes the SVG.
+	 * @param canvas canvas instance that owns the operation
+	 * @param scope export scope to use
+	 * @param outputFile file to read or write
+	 * @throws IOException if the operation cannot be completed
+	 */
 	private static void writeSvg(final DiagramCanvas canvas, final ViewExportScope scope, final File outputFile) throws IOException {
 		final DOMImplementation domImplementation = GenericDOMImplementation.getDOMImplementation();
 		final Document document = domImplementation.createDocument(ViewExporter.SVG_NAMESPACE_URI, "svg", null);
@@ -176,6 +237,9 @@ public final class ViewExporter {
 		}
 	}
 
+	/**
+	 * Creates a view exporter instance.
+	 */
 	private ViewExporter() {
 	}
 

@@ -35,6 +35,9 @@ import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectedElement.SelectedType;
  */
 interface ClipboardController extends DiagramCanvasExt {
 
+	/**
+	 * Copies the selection.
+	 */
 	default void copySelection() {
 		if (this.getCanvas().selectedElements.isEmpty()) {
 			return;
@@ -142,11 +145,17 @@ interface ClipboardController extends DiagramCanvasExt {
 				List.copyOf(copiedLinks));
 	}
 
+	/**
+	 * Cuts the selection and places it on the clipboard.
+	 */
 	default void cutSelection() {
 		this.copySelection();
 		this.getCanvas().deleteSelection();
 	}
 
+	/**
+	 * Duplicates the selection.
+	 */
 	default void duplicateSelection() {
 		if (this.getCanvas().selectedElements.isEmpty()) {
 			return;
@@ -362,6 +371,9 @@ interface ClipboardController extends DiagramCanvasExt {
 		this.getCanvas().repaint();
 	}
 
+	/**
+	 * Pastes the selection from the clipboard.
+	 */
 	default void pasteSelection() {
 		final ClipboardSnapshot clipboard = DiagramCanvas.clipboardSnapshot;
 

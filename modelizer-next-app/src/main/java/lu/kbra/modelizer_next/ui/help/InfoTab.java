@@ -19,13 +19,30 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 import lu.kbra.modelizer_next.common.App;
 
+/**
+ * Help tab that displays application, runtime, and license information.
+ */
 public class InfoTab extends JPanel {
 
+	/**
+	 * Defines operations for package value reader behavior.
+	 */
 	private interface PackageValueReader {
 
+		/**
+		 * Reads the requested value.
+		 * @param appPackage application package value used by the operation
+		 * @return the read result
+		 */
 		String read(Package appPackage);
 	}
 
+	/**
+	 * Immutable value object for license item data.
+	 * @param name name value to read, write, or display
+	 * @param license text value for license
+	 * @param description text value for description
+	 */
 	private record LicenseItem(String name, String license, String description) {
 	}
 
@@ -43,12 +60,20 @@ public class InfoTab extends JPanel {
 			new LicenseItem("Modern Docking Single App", "MIT License", "Docking layout support."),
 			new LicenseItem("Modern Docking UI", "MIT License", "Docking user interface components."));
 
+	/**
+	 * Creates an info tab instance.
+	 */
 	public InfoTab() {
 		super(new BorderLayout());
 		this.setOpaque(false);
 		this.add(this.createInfoPage(), BorderLayout.CENTER);
 	}
 
+	/**
+	 * Builds the application metadata JSON shown in the info tab.
+	 * @param key text value for key
+	 * @return the application JSON text result
+	 */
 	private String appJsonText(final String key) {
 		final JsonNode json = App.JSON;
 		if (json == null) {
@@ -58,6 +83,10 @@ public class InfoTab extends JPanel {
 		return json.path(key).asText("");
 	}
 
+	/**
+	 * Creates an about card.
+	 * @return the created about card
+	 */
 	private JComponent createAboutCard() {
 		final HelpUi.CardPanel card = this.createCard();
 
@@ -75,6 +104,10 @@ public class InfoTab extends JPanel {
 		return card;
 	}
 
+	/**
+	 * Creates a bootstrap build card.
+	 * @return the created bootstrap build card
+	 */
 	private JComponent createBootstrapBuildCard() {
 		final HelpUi.CardPanel card = this.createCard();
 
@@ -95,6 +128,10 @@ public class InfoTab extends JPanel {
 		return card;
 	}
 
+	/**
+	 * Creates a build card.
+	 * @return the created build card
+	 */
 	private JComponent createBuildCard() {
 		final HelpUi.CardPanel card = this.createCard();
 
@@ -110,6 +147,10 @@ public class InfoTab extends JPanel {
 		return card;
 	}
 
+	/**
+	 * Creates a card.
+	 * @return the created card
+	 */
 	private HelpUi.CardPanel createCard() {
 		final HelpUi.CardPanel card = new HelpUi.CardPanel(new BorderLayout(0, 14));
 		card.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -118,6 +159,10 @@ public class InfoTab extends JPanel {
 		return card;
 	}
 
+	/**
+	 * Creates an info page.
+	 * @return the created info page
+	 */
 	private JScrollPane createInfoPage() {
 		final JPanel content = HelpUi.createPageContent();
 
@@ -136,6 +181,11 @@ public class InfoTab extends JPanel {
 		return HelpUi.createScrollPane(content);
 	}
 
+	/**
+	 * Creates a license row.
+	 * @param item menu item to configure
+	 * @return the created license row
+	 */
 	private JComponent createLicenseRow(final LicenseItem item) {
 		final JPanel row = new JPanel();
 		row.setOpaque(false);
@@ -155,6 +205,10 @@ public class InfoTab extends JPanel {
 		return row;
 	}
 
+	/**
+	 * Creates a licenses card.
+	 * @return the created licenses card
+	 */
 	private JComponent createLicensesCard() {
 		final HelpUi.CardPanel card = this.createCard();
 
@@ -188,6 +242,10 @@ public class InfoTab extends JPanel {
 		return card;
 	}
 
+	/**
+	 * Creates a links button panel.
+	 * @return the created links button panel
+	 */
 	private JPanel createLinksButtonPanel() {
 		final JPanel buttons = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
 		buttons.setOpaque(false);
@@ -196,6 +254,10 @@ public class InfoTab extends JPanel {
 		return buttons;
 	}
 
+	/**
+	 * Creates a links card.
+	 * @return the created links card
+	 */
 	private JComponent createLinksCard() {
 		final HelpUi.CardPanel card = this.createCard();
 
@@ -218,6 +280,10 @@ public class InfoTab extends JPanel {
 		return card;
 	}
 
+	/**
+	 * Creates a vertical body.
+	 * @return the created vertical body
+	 */
 	private JPanel createVerticalBody() {
 		final JPanel body = new JPanel();
 		body.setOpaque(false);
@@ -227,6 +293,11 @@ public class InfoTab extends JPanel {
 		return body;
 	}
 
+	/**
+	 * Reads package metadata and falls back to a default value.
+	 * @param reader reader value used by the operation
+	 * @return the package text result
+	 */
 	private String packageText(final PackageValueReader reader) {
 		final Package appPackage = InfoTab.class.getPackage();
 		if (appPackage == null) {
@@ -237,6 +308,11 @@ public class InfoTab extends JPanel {
 		return value == null ? "" : value;
 	}
 
+	/**
+	 * Reads a system property and falls back to a default value.
+	 * @param key text value for key
+	 * @return the system property result
+	 */
 	private String systemProperty(final String key) {
 		return System.getProperty(key, "Unknown");
 	}

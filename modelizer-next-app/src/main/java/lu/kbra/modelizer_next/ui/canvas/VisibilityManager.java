@@ -13,6 +13,11 @@ import lu.kbra.modelizer_next.domain.data.CommentKind;
  */
 public interface VisibilityManager extends DiagramCanvasExt {
 
+	/**
+	 * Checks whether comment visible is enabled or applies.
+	 * @param commentModel comment model affected by the operation
+	 * @return {@code true} if comment visible is enabled or applies; otherwise {@code false}
+	 */
 	default boolean isCommentVisible(final CommentModel commentModel) {
 		final boolean visibleInPanel = commentModel.isVisible(this.getPanelType());
 

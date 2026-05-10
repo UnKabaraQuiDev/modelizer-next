@@ -14,6 +14,9 @@ import javax.swing.border.Border;
 import lu.kbra.modelizer_next.style.StylePalette;
 import lu.kbra.modelizer_next.ui.canvas.data.StyleScope;
 
+/**
+ * Swing list renderer for style palette previews.
+ */
 public class StylePaletteCellRenderer extends JPanel implements ListCellRenderer<StylePalette> {
 
 	private static final long serialVersionUID = 3461088611588880072L;
@@ -24,6 +27,9 @@ public class StylePaletteCellRenderer extends JPanel implements ListCellRenderer
 
 	private StyleScope scope = StyleScope.CLASS;
 
+	/**
+	 * Creates a style palette cell renderer instance.
+	 */
 	public StylePaletteCellRenderer() {
 		this.setLayout(new BorderLayout());
 		this.add(this.label, BorderLayout.CENTER);
@@ -34,10 +40,23 @@ public class StylePaletteCellRenderer extends JPanel implements ListCellRenderer
 		this.setOpaque(true);
 	}
 
+	/**
+	 * Sets the scope on the active canvas.
+	 * @param scope export scope to use
+	 */
 	public void setScope(final StyleScope scope) {
 		this.scope = scope;
 	}
 
+	/**
+	 * Returns the list cell renderer component.
+	 * @param list list to read or update
+	 * @param value value to process
+	 * @param index zero-based index to read or update
+	 * @param isSelected whether is selected is enabled
+	 * @param cellHasFocus whether cell has focus is enabled
+	 * @return the list cell renderer component
+	 */
 	@Override
 	public Component getListCellRendererComponent(
 			final JList<? extends StylePalette> list,

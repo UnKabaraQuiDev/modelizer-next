@@ -28,6 +28,9 @@ import lu.kbra.modelizer_next.ui.dialogs.LinkEditorDialog;
  */
 interface DiagramModelEditor extends DiagramCanvasExt {
 
+	/**
+	 * Opens or applies editing for the selected on the active canvas.
+	 */
 	@SuppressWarnings("incomplete-switch")
 	default void editSelected() {
 		if (this.getCanvas().selectedElement == null || this.getCanvas().selectedElement.type() == SelectedType.NONE) {
@@ -42,6 +45,9 @@ interface DiagramModelEditor extends DiagramCanvasExt {
 		}
 	}
 
+	/**
+	 * Adds the comment.
+	 */
 	default void addComment() {
 		final CommentModel commentModel = new CommentModel();
 		commentModel.setKind(CommentKind.STANDALONE);
@@ -81,6 +87,9 @@ interface DiagramModelEditor extends DiagramCanvasExt {
 		this.getCanvas().repaint();
 	}
 
+	/**
+	 * Adds the field.
+	 */
 	default void addField() {
 		final ClassModel targetClass;
 
@@ -112,6 +121,9 @@ interface DiagramModelEditor extends DiagramCanvasExt {
 		this.getCanvas().invokeRenamingElement(LiveEditElement.forField(targetClass.getId(), fieldModel.getId()));
 	}
 
+	/**
+	 * Adds the link.
+	 */
 	default void addLink() {
 		final LinkModel linkModel = new LinkModel();
 		if (this.getCanvas().selectedElement != null && this.getCanvas().selectedElement.type() == SelectedType.CLASS) {
@@ -163,6 +175,9 @@ interface DiagramModelEditor extends DiagramCanvasExt {
 		this.getCanvas().repaint();
 	}
 
+	/**
+	 * Adds the table on the active canvas.
+	 */
 	default void addTable() {
 		final ClassModel classModel = new ClassModel();
 		classModel.setConceptualName("New table");
@@ -184,6 +199,9 @@ interface DiagramModelEditor extends DiagramCanvasExt {
 		this.getCanvas().invokeRenamingElement(LiveEditElement.forClass(classModel.getId()));
 	}
 
+	/**
+	 * Deletes the selection.
+	 */
 	default void deleteSelection() {
 		if (this.getCanvas().selectedElements.isEmpty()) {
 			return;
@@ -207,6 +225,10 @@ interface DiagramModelEditor extends DiagramCanvasExt {
 		this.getCanvas().repaint();
 	}
 
+	/**
+	 * Moves the field selection.
+	 * @param delta numeric delta value
+	 */
 	default void moveFieldSelection(final int delta) {
 		if (this.getCanvas().selectedElement != null && this.getCanvas().selectedElement.type() == SelectedType.CLASS) {
 			final ClassModel classModel = this.getCanvas().findClassById(this.getCanvas().selectedElement.classId());
@@ -253,6 +275,10 @@ interface DiagramModelEditor extends DiagramCanvasExt {
 		this.getCanvas().select(SelectedElement.forField(classModel.getId(), visibleFields.get(newIndex).getId()));
 	}
 
+	/**
+	 * Moves the selected field in list.
+	 * @param delta numeric delta value
+	 */
 	default void moveSelectedFieldInList(final int delta) {
 		if (this.getCanvas().selectedElement == null || this.getCanvas().selectedElement.type() != SelectedType.FIELD) {
 			return;

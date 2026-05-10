@@ -24,6 +24,15 @@ import lu.kbra.modelizer_next.ui.canvas.datastruct.LinkAnchorPlacement;
  */
 interface ConceptualAnchorCache extends DiagramCanvasExt {
 
+	/**
+	 * Computes the conceptual anchor point on the active canvas.
+	 * @param bounds bounds used for layout or hit testing
+	 * @param side node side to inspect
+	 * @param index zero-based index to read or update
+	 * @param big whether big is enabled
+	 * @param totalCount count value to use
+	 * @return the compute conceptual anchor point result
+	 */
 	default Point2D computeConceptualAnchorPoint(
 			final Rectangle2D bounds,
 			final AnchorSide side,
@@ -39,10 +48,20 @@ interface ConceptualAnchorCache extends DiagramCanvasExt {
 		};
 	}
 
+	/**
+	 * Computes the conceptual side center on the active canvas.
+	 * @param bounds bounds used for layout or hit testing
+	 * @param side node side to inspect
+	 * @param big whether big is enabled
+	 * @return the compute conceptual side center result
+	 */
 	default Point2D computeConceptualSideCenter(final Rectangle2D bounds, final AnchorSide side, final boolean big) {
 		return this.getCanvas().computeConceptualAnchorPoint(bounds, side, 0, big, 1);
 	}
 
+	/**
+	 * Ensures that the conceptual anchor cache exists or is up to date on the active canvas.
+	 */
 	default void ensureConceptualAnchorCache() {
 		if (this.getPanelType() != PanelType.CONCEPTUAL || this.getCanvas().conceptualAnchorCacheValid) {
 			return;
@@ -51,11 +70,20 @@ interface ConceptualAnchorCache extends DiagramCanvasExt {
 		this.getCanvas().rebuildConceptualAnchorCache();
 	}
 
+	/**
+	 * Returns the conceptual side link count.
+	 * @param classId id of the class to look up or modify
+	 * @param side node side to inspect
+	 * @return the conceptual side link count
+	 */
 	default int getConceptualSideLinkCount(final String classId, final AnchorSide side) {
 		final List<String> links = this.getCanvas().conceptualSideLinkCache.get(new ClassSideKey(classId, side));
 		return links == null ? 0 : links.size();
 	}
 
+	/**
+	 * Invalidates the conceptual anchor cache so it will be recalculated on the active canvas.
+	 */
 	default void invalidateConceptualAnchorCache() {
 		this.getCanvas().conceptualAnchorCache.clear();
 		this.getCanvas().conceptualAnchorPlacements.clear();
@@ -63,6 +91,9 @@ interface ConceptualAnchorCache extends DiagramCanvasExt {
 		this.getCanvas().conceptualAnchorCacheValid = false;
 	}
 
+	/**
+	 * Rebuilds the conceptual anchor cache on the active canvas.
+	 */
 	default void rebuildConceptualAnchorCache() {
 		this.getCanvas().invalidateConceptualAnchorCache();
 

@@ -11,24 +11,43 @@ import lu.kbra.modelizer_next.bootstrap.UpdateChannel;
 import lu.kbra.modelizer_next.bootstrap.config.BootstrapApp;
 import lu.kbra.modelizer_next.common.VersionComparator;
 
+/**
+ * Handles paths and file operations for downloaded application update artifacts.
+ */
 public final class ApplicationUpdateStorage {
 
 	public static final int MAX_RETAINED_UPDATES_PER_CHANNEL = 3;
 
 	private final ApplicationInventory inventory;
 
+	/**
+	 * Creates an application update storage instance.
+	 */
 	public ApplicationUpdateStorage() {
 		this(new ApplicationInventory());
 	}
 
+	/**
+	 * Creates an application update storage instance.
+	 * @param inventory inventory value used by the operation
+	 */
 	public ApplicationUpdateStorage(final ApplicationInventory inventory) {
 		this.inventory = inventory;
 	}
 
+	/**
+	 * Returns the updates directory.
+	 * @return the updates directory
+	 */
 	public Path getUpdatesDirectory() {
 		return BootstrapApp.getApplicationsDirectory().toPath();
 	}
 
+	/**
+	 * Counts regular files in the supplied directory tree.
+	 * @return the count files result
+	 * @throws IOException if the operation cannot be completed
+	 */
 	public int countFiles() throws IOException {
 		final Path directory = this.getUpdatesDirectory();
 		if (!Files.isDirectory(directory)) {
@@ -39,6 +58,11 @@ public final class ApplicationUpdateStorage {
 		}
 	}
 
+	/**
+	 * Calculates the disk usage bytes during bootstrap/update processing.
+	 * @return the calculate disk usage bytes result
+	 * @throws IOException if the operation cannot be completed
+	 */
 	public long calculateDiskUsageBytes() throws IOException {
 		final Path directory = this.getUpdatesDirectory();
 		if (!Files.isDirectory(directory)) {
@@ -49,6 +73,13 @@ public final class ApplicationUpdateStorage {
 		}
 	}
 
+	/**
+	 * Deletes downloaded update files that are no longer needed.
+	 * @param activeChannel active channel value used by the operation
+	 * @param activeApplication active application value used by the operation
+	 * @return the free unused updates result
+	 * @throws IOException if the operation cannot be completed
+	 */
 	public long freeUnusedUpdates(final UpdateChannel activeChannel, final InstalledApplication activeApplication) throws IOException {
 		final Path directory = this.getUpdatesDirectory();
 		if (!Files.isDirectory(directory)) {
@@ -93,16 +124,32 @@ public final class ApplicationUpdateStorage {
 		return freed;
 	}
 
+	/**
+	 * Checks whether temporary update file is enabled or applies.
+	 * @param path file system path to read or write
+	 * @return {@code true} if temporary update file is enabled or applies; otherwise {@code false}
+	 */
 	private boolean isTemporaryUpdateFile(final Path path) {
 		final String name = path.getFileName().toString();
 		return name.endsWith(".part") || name.endsWith(".tmp");
 	}
 
+	/**
+	 * Deletes the if exists during bootstrap/update processing.
+	 * @param path file system path to read or write
+	 * @return the delete if exists result
+	 * @throws IOException if the operation cannot be completed
+	 */
 	private long deleteIfExists(final Path path) throws IOException {
 		final long size = sizeOf(path);
 		return Files.deleteIfExists(path) ? size : 0L;
 	}
 
+	/**
+	 * Returns the size of a file or directory tree in bytes.
+	 * @param path file system path to read or write
+	 * @return the size of result
+	 */
 	private long sizeOf(final Path path) {
 		try {
 			return Files.size(path);

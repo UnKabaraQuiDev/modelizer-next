@@ -8,10 +8,17 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.KeyStroke;
 
+/**
+ * File menu builder for open, save, import, export, and exit actions.
+ */
 final class FileMenu extends JMenu {
 
 	private static final long serialVersionUID = 1L;
 
+	/**
+	 * Creates a file menu instance.
+	 * @param frame frame that owns the created UI component
+	 */
 	FileMenu(final MainFrame frame) {
 		super("File");
 		this.add(this.createMenuItem("New", MainFrameMenuBar.ctrl(KeyEvent.VK_N), frame::newDocument));
@@ -22,6 +29,13 @@ final class FileMenu extends JMenu {
 		this.add(this.createMenuItem("Export...", MainFrameMenuBar.ctrlShift(KeyEvent.VK_E), frame::exportImage));
 	}
 
+	/**
+	 * Creates a menu item.
+	 * @param text text to display or edit
+	 * @param keyStroke keyboard shortcut to register
+	 * @param action action to register or execute
+	 * @return the created menu item
+	 */
 	private JMenuItem createMenuItem(final String text, final KeyStroke keyStroke, final Runnable action) {
 		final JMenuItem item = new JMenuItem(new AbstractAction(text) {
 			@Override

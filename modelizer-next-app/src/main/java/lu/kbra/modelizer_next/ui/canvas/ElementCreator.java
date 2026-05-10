@@ -22,6 +22,11 @@ import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectedElement.SelectedType;
  */
 public interface ElementCreator extends DiagramCanvasExt {
 
+	/**
+	 * Creates a conceptual link.
+	 * @param fromClassId id of the element to read or modify
+	 * @param toClassId id of the element to read or modify
+	 */
 	default void createConceptualLink(final String fromClassId, final String toClassId) {
 		final LinkModel linkModel = new LinkModel();
 		linkModel.setFrom(new LinkEnd(fromClassId, null));
@@ -36,6 +41,12 @@ public interface ElementCreator extends DiagramCanvasExt {
 		this.getCanvas().notifyDocumentChanged();
 	}
 
+	/**
+	 * Creates a field from clipboard.
+	 * @param copiedField copied field value used by the operation
+	 * @param rename name value to use
+	 * @return the created field from clipboard
+	 */
 	default FieldModel createFieldFromClipboard(final CopiedField copiedField, final boolean rename) {
 		final FieldModel fieldCopy = new FieldModel();
 
@@ -56,6 +67,13 @@ public interface ElementCreator extends DiagramCanvasExt {
 		return fieldCopy;
 	}
 
+	/**
+	 * Creates a link from clipboard.
+	 * @param copiedLink copied link value used by the operation
+	 * @param classIdMap map to read or update
+	 * @param fieldIdMap map to read or update
+	 * @return the created link from clipboard
+	 */
 	default LinkModel createLinkFromClipboard(
 			final CopiedLink copiedLink,
 			final Map<String, String> classIdMap,
@@ -90,6 +108,13 @@ public interface ElementCreator extends DiagramCanvasExt {
 		return linkCopy;
 	}
 
+	/**
+	 * Creates a remapped comment binding.
+	 * @param copiedComment copied comment value used by the operation
+	 * @param classIdMap map to read or update
+	 * @param linkIdMap map to read or update
+	 * @return the created remapped comment binding
+	 */
 	default CommentBinding createRemappedCommentBinding(
 			final CopiedComment copiedComment,
 			final Map<String, String> classIdMap,
@@ -112,6 +137,11 @@ public interface ElementCreator extends DiagramCanvasExt {
 		return new CommentBinding(copiedComment.bindingTargetType(), targetId);
 	}
 
+	/**
+	 * Creates a technical link.
+	 * @param fromEndpoint point in canvas coordinates
+	 * @param toEndpoint point in canvas coordinates
+	 */
 	default void createTechnicalLink(final SelectedElement fromEndpoint, final SelectedElement toEndpoint) {
 		final LinkModel linkModel = new LinkModel();
 		linkModel.setFrom(new LinkEnd(fromEndpoint.classId(), fromEndpoint.fieldId()));
@@ -126,6 +156,10 @@ public interface ElementCreator extends DiagramCanvasExt {
 		this.getCanvas().notifyDocumentChanged();
 	}
 
+	/**
+	 * Finishes the link creation.
+	 * @param worldPoint point in canvas coordinates
+	 */
 	default void finishLinkCreation(final Point2D.Double worldPoint) {
 		if (this.getCanvas().linkCreationState == null) {
 			return;

@@ -10,6 +10,13 @@ import lu.kbra.modelizer_next.layout.PanelType;
  */
 interface NameResolver extends DiagramCanvasExt {
 
+	/**
+	 * Returns the fallback text when the preferred value is blank.
+	 * @param primary text value for primary
+	 * @param secondary text value for secondary
+	 * @param fallback text value for fallback
+	 * @return the blank to fallback result
+	 */
 	default String blankToFallback(final String primary, final String secondary, final String fallback) {
 		if (primary != null && !primary.isBlank()) {
 			return primary;
@@ -20,10 +27,20 @@ interface NameResolver extends DiagramCanvasExt {
 		return fallback;
 	}
 
+	/**
+	 * Returns the editable class name.
+	 * @param classModel class model affected by the operation
+	 * @return the editable class name
+	 */
 	default String getEditableClassName(final ClassModel classModel) {
 		return this.getPanelType() == PanelType.CONCEPTUAL ? classModel.getConceptualName() : classModel.getTechnicalName();
 	}
 
+	/**
+	 * Returns the editable comment text.
+	 * @param commentId id of the comment to look up or modify
+	 * @return the editable comment text
+	 */
 	default String getEditableCommentText(final String commentId) {
 		final CommentModel commentModel = this.getCanvas().findCommentById(commentId);
 		if (commentModel == null) {
@@ -33,10 +50,20 @@ interface NameResolver extends DiagramCanvasExt {
 		return commentModel.getText();
 	}
 
+	/**
+	 * Returns the editable field name.
+	 * @param fieldModel field model affected by the operation
+	 * @return the editable field name
+	 */
 	default String getEditableFieldName(final FieldModel fieldModel) {
 		return this.getPanelType() == PanelType.CONCEPTUAL ? fieldModel.getConceptualName() : fieldModel.getTechnicalName();
 	}
 
+	/**
+	 * Resolves the class title from the current model and layout state.
+	 * @param classModel class model affected by the operation
+	 * @return the resolved class title
+	 */
 	default String resolveClassTitle(final ClassModel classModel) {
 		if (this.getPanelType() == PanelType.CONCEPTUAL) {
 			return this.blankToFallback(classModel.getConceptualName(), classModel.getTechnicalName(), "Unnamed class");
@@ -44,6 +71,11 @@ interface NameResolver extends DiagramCanvasExt {
 		return this.blankToFallback(classModel.getTechnicalName(), classModel.getConceptualName(), "Unnamed class");
 	}
 
+	/**
+	 * Resolves the field name from the current model and layout state.
+	 * @param fieldModel field model affected by the operation
+	 * @return the resolved field name
+	 */
 	default String resolveFieldName(final FieldModel fieldModel) {
 		final String baseName;
 		if (this.getPanelType() == PanelType.CONCEPTUAL) {
@@ -73,6 +105,11 @@ interface NameResolver extends DiagramCanvasExt {
 //				+ (fieldModel.getType() == null ? "No type" : fieldModel.getType());
 	}
 
+	/**
+	 * Sets the editable class name.
+	 * @param classModel class model affected by the operation
+	 * @param value value to process
+	 */
 	default void setEditableClassName(final ClassModel classModel, final String value) {
 		if (classModel == null) {
 			return;
@@ -85,6 +122,11 @@ interface NameResolver extends DiagramCanvasExt {
 		}
 	}
 
+	/**
+	 * Sets the editable comment text.
+	 * @param commentId id of the comment to look up or modify
+	 * @param value value to process
+	 */
 	default void setEditableCommentText(final String commentId, final String value) {
 		final CommentModel commentModel = this.getCanvas().findCommentById(commentId);
 		if (commentModel == null) {
@@ -94,6 +136,11 @@ interface NameResolver extends DiagramCanvasExt {
 		commentModel.setText(value);
 	}
 
+	/**
+	 * Sets the editable field name.
+	 * @param fieldModel field model affected by the operation
+	 * @param value value to process
+	 */
 	default void setEditableFieldName(final FieldModel fieldModel, final String value) {
 		if (fieldModel == null) {
 			return;

@@ -24,14 +24,25 @@ import lu.kbra.modelizer_next.common.Platform;
 import lu.kbra.modelizer_next.common.VersionComparator;
 import lu.kbra.modelizer_next.common.VersionComparator.ParsedVersion;
 
+/**
+ * HTTP client for fetching update manifests and downloading application updates.
+ */
 public final class RemoteUpdateService {
 
+	/**
+	 * Represents an update manifest in the remote update part of the application.
+	 */
 	public static final class UpdateManifest {
 		public UpdateRelease release;
 		public UpdateRelease snapshot;
 		public UpdateRelease nightly;
 		public ParsedVersion bootstrapVersion;
 
+		/**
+		 * Returns the manifest release entry for the requested update channel.
+		 * @param channel update channel to query
+		 * @return the channel result
+		 */
 		public UpdateRelease channel(final UpdateChannel channel) {
 			return switch (channel) {
 			case RELEASE -> this.release;
@@ -41,6 +52,9 @@ public final class RemoteUpdateService {
 		}
 	}
 
+	/**
+	 * Represents an update release in the remote update part of the application.
+	 */
 	public static final class UpdateRelease {
 		public ParsedVersion version;
 		public String url;
@@ -48,6 +62,10 @@ public final class RemoteUpdateService {
 		public String notes;
 		public String tag;
 
+		/**
+		 * Returns the configured release URL or the default release page when none is set.
+		 * @return the release URL or default result
+		 */
 		public String releaseUrlOrDefault() {
 			return this.releaseUrl == null || this.releaseUrl.isBlank() ? BootstrapApp.RELEASES_URL : this.releaseUrl;
 		}
@@ -58,6 +76,13 @@ public final class RemoteUpdateService {
 			.followRedirects(HttpClient.Redirect.NORMAL)
 			.build();
 
+	/**
+	 * Downloads an update artifact.
+	 * @param update update metadata to download or install
+	 * @param destination destination path that receives generated data
+	 * @param listener listener notified about progress or changes
+	 * @throws IOException if the operation cannot be completed
+	 */
 	public void download(final AvailableUpdate update, final Path destination, final ProgressListener listener) throws IOException {
 		if (update == null || update.downloadUri() == null) {
 			throw new IOException("No downloadable update is available.");
@@ -65,6 +90,14 @@ public final class RemoteUpdateService {
 		this.download(update.downloadUri(), destination, update.latestVersion().toString(), listener);
 	}
 
+	/**
+	 * Downloads an update artifact.
+	 * @param downloadUri URI of the file to download
+	 * @param destination destination path that receives generated data
+	 * @param displayVersion version text shown in progress messages
+	 * @param listener listener notified about progress or changes
+	 * @throws IOException if the operation cannot be completed
+	 */
 	public void download(final URI downloadUri, final Path destination, final String displayVersion, final ProgressListener listener)
 			throws IOException {
 		if (downloadUri == null) {
@@ -105,6 +138,14 @@ public final class RemoteUpdateService {
 		}
 	}
 
+	/**
+	 * Finds the latest bootstrap installer that matches the supplied input.
+	 * @param channel update channel to query
+	 * @param currentVersion currently installed version
+	 * @return the matching latest bootstrap installer, or {@code null} when no match exists
+	 * @throws IOException if the operation cannot be completed
+	 * @throws InterruptedException if the operation cannot be completed
+	 */
 	public BootstrapInstallerUpdate findLatestBootstrapInstaller(final UpdateChannel channel, final ParsedVersion currentVersion)
 			throws IOException, InterruptedException {
 		final JsonNode manifest = this.fetchReleaseManifestJson();
@@ -133,10 +174,22 @@ public final class RemoteUpdateService {
 				platform);
 	}
 
+	/**
+	 * Fetches the manifest.
+	 * @return the fetch manifest result
+	 * @throws IOException if the operation cannot be completed
+	 * @throws InterruptedException if the operation cannot be completed
+	 */
 	public UpdateManifest fetchManifest() throws IOException, InterruptedException {
 		return BootstrapApp.MAPPER.treeToValue(this.fetchManifestJson(), UpdateManifest.class);
 	}
 
+	/**
+	 * Fetches the release manifest JSON.
+	 * @return the fetch release manifest JSON result
+	 * @throws IOException if the operation cannot be completed
+	 * @throws InterruptedException if the operation cannot be completed
+	 */
 	public JsonNode fetchReleaseManifestJson() throws IOException, InterruptedException {
 		final HttpRequest request = HttpRequest.newBuilder(URI.create(BootstrapApp.RELEASES_MANIFEST_URL))
 				.header("Accept", "application/json")
@@ -152,6 +205,12 @@ public final class RemoteUpdateService {
 		return BootstrapApp.MAPPER.readTree(response.body());
 	}
 
+	/**
+	 * Fetches the manifest JSON.
+	 * @return the fetch manifest JSON result
+	 * @throws IOException if the operation cannot be completed
+	 * @throws InterruptedException if the operation cannot be completed
+	 */
 	public JsonNode fetchManifestJson() throws IOException, InterruptedException {
 		final HttpRequest request = HttpRequest.newBuilder(URI.create(BootstrapApp.UPDATES_MANIFEST_URL))
 				.header("Accept", "application/json")
@@ -167,6 +226,14 @@ public final class RemoteUpdateService {
 		return BootstrapApp.MAPPER.readTree(response.body());
 	}
 
+	/**
+	 * Finds the latest that matches the supplied input.
+	 * @param channel update channel to query
+	 * @param currentVersion currently installed version
+	 * @return the matching latest, or {@code null} when no match exists
+	 * @throws IOException if the operation cannot be completed
+	 * @throws InterruptedException if the operation cannot be completed
+	 */
 	public AvailableUpdate findLatest(final UpdateChannel channel, final ParsedVersion currentVersion)
 			throws IOException, InterruptedException {
 		final UpdateManifest manifest = this.fetchManifest();
@@ -193,10 +260,20 @@ public final class RemoteUpdateService {
 				URI.create(release.releaseUrlOrDefault()));
 	}
 
+	/**
+	 * Detects the current value from the runtime environment.
+	 * @return the detect platform result
+	 */
 	private Platform detectPlatform() {
 		return Platform.get();
 	}
 
+	/**
+	 * Finds the bootstrap node that matches the supplied input.
+	 * @param manifest update manifest to inspect
+	 * @param channel update channel to query
+	 * @return the matching bootstrap node, or {@code null} when no match exists
+	 */
 	private JsonNode findBootstrapNode(final JsonNode manifest, final UpdateChannel channel) {
 		final String latest = manifest.path("version").asText();
 		final Platform platform = this.detectPlatform();
@@ -211,6 +288,12 @@ public final class RemoteUpdateService {
 		return null;
 	}
 
+	/**
+	 * Finds the installer URI that matches the supplied input.
+	 * @param bootstrap bootstrap value used by the operation
+	 * @param platform target platform to match
+	 * @return the matching installer URI, or {@code null} when no match exists
+	 */
 	private URI findInstallerUri(final JsonNode bootstrap, final Platform platform) {
 		final JsonNode assets = bootstrap.path("assets");
 		if (platform == Platform.UNSUPPORTED || assets == null || assets.isMissingNode() || !assets.isArray()) {

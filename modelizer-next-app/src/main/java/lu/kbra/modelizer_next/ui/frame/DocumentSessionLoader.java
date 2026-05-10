@@ -17,8 +17,17 @@ import lu.kbra.modelizer_next.json.OnlineModelizerImporter;
 import lu.kbra.modelizer_next.ui.impl.DocumentLoadHandler;
 import lu.kbra.pclib.PCUtils;
 
+/**
+ * Loads, imports, and creates document sessions for the main frame.
+ */
 public final class DocumentSessionLoader {
 
+	/**
+	 * Confirms whether the modern document version should continue.
+	 * @param parent parent component used for dialog ownership
+	 * @param loadedDocument loaded document value used by the operation
+	 * @return {@code true} when the condition is met; otherwise {@code false}
+	 */
 	public static boolean confirmModernDocumentVersion(final Component parent, final ModelDocument loadedDocument) {
 		final String fileVersion = loadedDocument.getMeta() == null ? null : loadedDocument.getMeta().getApplicationVersion();
 
@@ -35,6 +44,12 @@ public final class DocumentSessionLoader {
 		return true;
 	}
 
+	/**
+	 * Confirms whether the modern document version should continue.
+	 * @param loadedDocument loaded document value used by the operation
+	 * @param handler handler value used by the operation
+	 * @return {@code true} when the condition is met; otherwise {@code false}
+	 */
 	public static boolean confirmModernDocumentVersion(final ModelDocument loadedDocument, final DocumentLoadHandler handler) {
 		final String fileVersion = loadedDocument.getMeta() == null ? null : loadedDocument.getMeta().getApplicationVersion();
 
@@ -45,10 +60,22 @@ public final class DocumentSessionLoader {
 		return true;
 	}
 
+	/**
+	 * Creates a document.
+	 * @param parent parent component used for dialog ownership
+	 * @param selectedFile file to read or write
+	 * @return the created document
+	 */
 	public static Optional<DocumentSession> createDocument(final Component parent, final File selectedFile) {
 		return DocumentSessionLoader.createDocument(selectedFile, new SwingDocumentLoadHandler(parent));
 	}
 
+	/**
+	 * Creates a document.
+	 * @param selectedFile file to read or write
+	 * @param handler handler value used by the operation
+	 * @return the created document
+	 */
 	public static Optional<DocumentSession> createDocument(final File selectedFile, final DocumentLoadHandler handler) {
 		final String extension = PCUtils.getFileExtension(selectedFile.getName());
 
@@ -94,6 +121,9 @@ public final class DocumentSessionLoader {
 		}
 	}
 
+	/**
+	 * Creates a document session loader instance.
+	 */
 	private DocumentSessionLoader() {
 	}
 

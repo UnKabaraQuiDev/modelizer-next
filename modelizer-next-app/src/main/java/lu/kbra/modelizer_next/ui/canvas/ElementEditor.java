@@ -21,6 +21,11 @@ import lu.kbra.modelizer_next.ui.dialogs.LinkEditorDialog;
  */
 public interface ElementEditor extends DiagramCanvasExt {
 
+	/**
+	 * Binds the comment to target.
+	 * @param commentId id of the comment to look up or modify
+	 * @param target target value used by the operation
+	 */
 	default void bindCommentToTarget(final String commentId, final SelectedElement target) {
 		final CommentModel commentModel = this.getCanvas().findCommentById(commentId);
 		if (commentModel == null || target == null) {
@@ -38,6 +43,10 @@ public interface ElementEditor extends DiagramCanvasExt {
 		this.getCanvas().notifyDocumentChanged();
 	}
 
+	/**
+	 * Opens or applies editing for the class.
+	 * @param classId id of the class to look up or modify
+	 */
 	default void editClass(final String classId) {
 		final ClassModel classModel = this.getCanvas().findClassById(classId);
 		if (classModel == null) {
@@ -61,6 +70,10 @@ public interface ElementEditor extends DiagramCanvasExt {
 		this.getCanvas().repaint();
 	}
 
+	/**
+	 * Opens or applies editing for the comment.
+	 * @param commentId id of the comment to look up or modify
+	 */
 	default void editComment(final String commentId) {
 		final CommentModel commentModel = this.getCanvas().findCommentById(commentId);
 		if (commentModel == null) {
@@ -86,6 +99,11 @@ public interface ElementEditor extends DiagramCanvasExt {
 		this.getCanvas().repaint();
 	}
 
+	/**
+	 * Opens or applies editing for the field.
+	 * @param classId id of the class to look up or modify
+	 * @param fieldId id of the field to look up or modify
+	 */
 	default void editField(final String classId, final String fieldId) {
 		final FieldModel fieldModel = this.getCanvas().findFieldById(classId, fieldId);
 		if (fieldModel == null) {
@@ -113,6 +131,10 @@ public interface ElementEditor extends DiagramCanvasExt {
 		this.getCanvas().repaint();
 	}
 
+	/**
+	 * Opens or applies editing for the link.
+	 * @param linkId id of the link to look up or modify
+	 */
 	default void editLink(final String linkId) {
 		final LinkModel linkModel = this.getCanvas().findLinkById(linkId);
 		if (linkModel == null) {

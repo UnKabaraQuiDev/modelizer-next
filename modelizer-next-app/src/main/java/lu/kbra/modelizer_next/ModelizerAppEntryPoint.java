@@ -23,8 +23,15 @@ import lu.kbra.modelizer_next.ui.frame.DocumentSession;
 import lu.kbra.modelizer_next.ui.frame.MainFrame;
 import lu.kbra.pclib.PCUtils;
 
+/**
+ * Bootstrap-facing entry point that starts the normal Modelizer Next application from an external runtime.
+ */
 public class ModelizerAppEntryPoint implements AppMain {
 
+	/**
+	 * Starts the application entry point.
+	 * @param args command-line arguments supplied by the launcher
+	 */
 	@Override
 	public void start(final String[] args) {
 		LicensePrinter.print();

@@ -17,6 +17,12 @@ import lu.kbra.modelizer_next.ui.canvas.datastruct.CopiedLinkLayout;
  */
 public interface LinkLayoutManager extends DiagramCanvasExt {
 
+	/**
+	 * Applies the link layout.
+	 * @param linkId id of the link to look up or modify
+	 * @param copiedLayout layout object to read or modify
+	 * @param offset numeric offset value
+	 */
 	default void applyLinkLayout(final String linkId, final CopiedLinkLayout copiedLayout, final double offset) {
 
 		final LinkLayout linkLayout = this.getCanvas().findOrCreateLinkLayout(linkId);
@@ -33,6 +39,13 @@ public interface LinkLayoutManager extends DiagramCanvasExt {
 		}
 	}
 
+	/**
+	 * Applies the link layout.
+	 * @param linkId id of the link to look up or modify
+	 * @param copiedLayout layout object to read or modify
+	 * @param deltaX numeric delta x value
+	 * @param deltaY numeric delta y value
+	 */
 	default void applyLinkLayout(final String linkId, final CopiedLinkLayout copiedLayout, final double deltaX, final double deltaY) {
 
 		final LinkLayout linkLayout = this.getCanvas().findOrCreateLinkLayout(linkId);
@@ -49,6 +62,15 @@ public interface LinkLayoutManager extends DiagramCanvasExt {
 		}
 	}
 
+	/**
+	 * Chooses the best conceptual side pair on the active canvas.
+	 * @param fromClassId id of the element to read or modify
+	 * @param fromBounds bounds used for layout or hit testing
+	 * @param toClassId id of the element to read or modify
+	 * @param toBounds bounds used for layout or hit testing
+	 * @param big whether big is enabled
+	 * @return the choose best conceptual side pair result
+	 */
 	default AnchorSidePair chooseBestConceptualSidePair(
 			final String fromClassId,
 			final Rectangle2D fromBounds,
@@ -83,6 +105,11 @@ public interface LinkLayoutManager extends DiagramCanvasExt {
 		return bestPair;
 	}
 
+	/**
+	 * Chooses the self link from side.
+	 * @param classId id of the class to look up or modify
+	 * @return the choose self link from side result
+	 */
 	default AnchorSide chooseSelfLinkFromSide(final String classId) {
 		AnchorSide bestSide = AnchorSide.TOP;
 		int bestCount = Integer.MAX_VALUE;
@@ -98,6 +125,11 @@ public interface LinkLayoutManager extends DiagramCanvasExt {
 		return bestSide;
 	}
 
+	/**
+	 * Chooses the technical self link side.
+	 * @param linkModel link model affected by the operation
+	 * @return the choose technical self link side result
+	 */
 	default AnchorSide chooseTechnicalSelfLinkSide(final LinkModel linkModel) {
 		final String classId = linkModel.getFrom().getClassId();
 		final int leftCount = this.getCanvas().getTechnicalSideLinkCount(classId, AnchorSide.LEFT, linkModel.getId());
@@ -105,6 +137,15 @@ public interface LinkLayoutManager extends DiagramCanvasExt {
 		return leftCount <= rightCount ? AnchorSide.LEFT : AnchorSide.RIGHT;
 	}
 
+	/**
+	 * Computes the conceptual sort value on the active canvas.
+	 * @param linkId id of the link to look up or modify
+	 * @param classId id of the class to look up or modify
+	 * @param side node side to inspect
+	 * @param boundsByClassId id of the element to read or modify
+	 * @param sidePairs side pairs value used by the operation
+	 * @return the compute conceptual sort value result
+	 */
 	default double computeConceptualSortValue(
 			final String linkId,
 			final String classId,
@@ -153,6 +194,11 @@ public interface LinkLayoutManager extends DiagramCanvasExt {
 		};
 	}
 
+	/**
+	 * Resolves the conceptual anchor pair from the current model and layout state.
+	 * @param targetLink target link value used by the operation
+	 * @return the resolved conceptual anchor pair
+	 */
 	default AnchorPair resolveConceptualAnchorPair(final LinkModel targetLink) {
 		this.getCanvas().ensureConceptualAnchorCache();
 		return this.getCanvas().conceptualAnchorCache.get(targetLink.getId());

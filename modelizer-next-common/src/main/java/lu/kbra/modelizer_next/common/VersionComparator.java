@@ -8,10 +8,23 @@ import java.util.stream.Collectors;
 
 import lu.kbra.modelizer_next.bootstrap.UpdateChannel;
 
+/**
+ * Parses and compares Modelizer version strings, including release, snapshot, and nightly variants.
+ */
 public class VersionComparator implements Comparator<String> {
 
+	/**
+	 * Immutable value object for parsed version data.
+	 * @param numbers values for numbers
+	 * @param updateChannel update channel value used by the operation
+	 * @param buildNumber numeric build number value
+	 */
 	public record ParsedVersion(List<Integer> numbers, UpdateChannel updateChannel, long buildNumber) {
 
+		/**
+		 * Builds a debug string for this parsed version.
+		 * @return a debug string for this object
+		 */
 		@Override
 		public final String toString() {
 			return numbers.stream().map(v -> Integer.toString(v)).collect(Collectors.joining(".")) + "-" + updateChannel.name() + "-"
@@ -38,6 +51,12 @@ public class VersionComparator implements Comparator<String> {
 		return Long.compare(a.buildNumber(), b.buildNumber());
 	};
 
+	/**
+	 * Compares two values using this comparator's ordering rules.
+	 * @param left text value for left
+	 * @param right text value for right
+	 * @return a negative value, zero, or a positive value according to the ordering rules
+	 */
 	@Override
 	public int compare(final String left, final String right) {
 		final ParsedVersion a = VersionComparator.parse(left);
@@ -47,6 +66,11 @@ public class VersionComparator implements Comparator<String> {
 
 	}
 
+	/**
+	 * Parses the supplied text into the value type used by this class.
+	 * @param version text value for version
+	 * @return the parsed value
+	 */
 	public static ParsedVersion parse(final String version) {
 		if (version == null || version.isBlank()) {
 			return new ParsedVersion(List.of(0), UpdateChannel.NIGHTLY, 0L);
@@ -94,6 +118,11 @@ public class VersionComparator implements Comparator<String> {
 		return new ParsedVersion(numbers, UpdateChannel.byId(channelRank), buildNumber);
 	}
 
+	/**
+	 * Parses the channel rank from the supplied input.
+	 * @param token text value for token
+	 * @return the parsed channel rank
+	 */
 	private static int parseChannelRank(final String token) {
 		return switch (token.toUpperCase(Locale.ROOT)) {
 		case "NIGHTLY" -> UpdateChannel.CHANNEL_NIGHTLY;

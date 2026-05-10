@@ -25,11 +25,25 @@ import lu.kbra.modelizer_next.layout.NodeLayout;
 import lu.kbra.modelizer_next.layout.PanelState;
 import lu.kbra.modelizer_next.layout.PanelType;
 
+/**
+ * Imports diagrams from the legacy Modelizer JSON structure into the current domain model.
+ */
 public class LegacyModelizerImporter {
 
+	/**
+	 * Immutable value object for legacy ref data.
+	 * @param tableName name value to use
+	 * @param fieldName name value to use
+	 */
 	private record LegacyRef(String tableName, String fieldName) {
 	}
 
+	/**
+	 * Imports the file.
+	 * @param file file to read or write
+	 * @return the import file result
+	 * @throws IOException if the operation cannot be completed
+	 */
 	public static ModelDocument importFile(final File file) throws IOException {
 		final JsonNode root = MNMain.OBJECT_MAPPER.readTree(file);
 		if (!LegacyModelizerImporter.isLegacyRoot(root)) {
@@ -39,6 +53,12 @@ public class LegacyModelizerImporter {
 		return LegacyModelizerImporter.importRoot(root);
 	}
 
+	/**
+	 * Checks whether legacy file is enabled or applies while converting JSON data.
+	 * @param file file to read or write
+	 * @return {@code true} if legacy file is enabled or applies; otherwise {@code false}
+	 * @throws IOException if the operation cannot be completed
+	 */
 	public static boolean isLegacyFile(final File file) throws IOException {
 		if (file == null) {
 			return false;
@@ -52,6 +72,13 @@ public class LegacyModelizerImporter {
 		return LegacyModelizerImporter.isLegacyRoot(MNMain.OBJECT_MAPPER.readTree(file));
 	}
 
+	/**
+	 * Adds the class layout while converting JSON data.
+	 * @param panelState panel state value used by the operation
+	 * @param classId id of the class to look up or modify
+	 * @param x x coordinate
+	 * @param y y coordinate
+	 */
 	private static void addClassLayout(final PanelState panelState, final String classId, final double x, final double y) {
 		final NodeLayout layout = new NodeLayout();
 		layout.setObjectType(LayoutObjectType.CLASS);
@@ -61,6 +88,13 @@ public class LegacyModelizerImporter {
 		panelState.getNodeLayouts().add(layout);
 	}
 
+	/**
+	 * Adds the comment layout while converting JSON data.
+	 * @param panelState panel state value used by the operation
+	 * @param commentId id of the comment to look up or modify
+	 * @param x x coordinate
+	 * @param y y coordinate
+	 */
 	private static void addCommentLayout(final PanelState panelState, final String commentId, final double x, final double y) {
 		final NodeLayout layout = new NodeLayout();
 		layout.setObjectType(LayoutObjectType.COMMENT);
@@ -70,6 +104,12 @@ public class LegacyModelizerImporter {
 		panelState.getNodeLayouts().add(layout);
 	}
 
+	/**
+	 * Creates a conceptual link while converting JSON data.
+	 * @param linkNode link node value used by the operation
+	 * @param classIdsByName name value to use
+	 * @return the created conceptual link
+	 */
 	private static LinkModel createConceptualLink(final JsonNode linkNode, final Map<String, String> classIdsByName) {
 		final JsonNode endpoints = linkNode.path("endpoints");
 		if (!endpoints.isArray() || endpoints.size() < 2) {
@@ -106,6 +146,11 @@ public class LegacyModelizerImporter {
 		return linkModel;
 	}
 
+	/**
+	 * Creates a standalone comment while converting JSON data.
+	 * @param commentNode comment node value used by the operation
+	 * @return the created standalone comment
+	 */
 	private static CommentModel createStandaloneComment(final JsonNode commentNode) {
 		final String text = LegacyModelizerImporter
 				.readText(commentNode, "text", LegacyModelizerImporter.readText(commentNode, "comment", ""));
@@ -124,6 +169,13 @@ public class LegacyModelizerImporter {
 		return commentModel;
 	}
 
+	/**
+	 * Creates a technical link while converting JSON data.
+	 * @param linkNode link node value used by the operation
+	 * @param classIdsByName name value to use
+	 * @param fieldIdsByQualifiedName name value to use
+	 * @return the created technical link
+	 */
 	private static LinkModel createTechnicalLink(
 			final JsonNode linkNode,
 			final Map<String, String> classIdsByName,
@@ -155,6 +207,11 @@ public class LegacyModelizerImporter {
 		return linkModel;
 	}
 
+	/**
+	 * Imports the root.
+	 * @param root root value used by the operation
+	 * @return the import root result
+	 */
 	private static ModelDocument importRoot(final JsonNode root) {
 		final ModelDocument document = new ModelDocument();
 		final Map<String, String> classIdsByName = new HashMap<>();
@@ -271,10 +328,20 @@ public class LegacyModelizerImporter {
 		return document;
 	}
 
+	/**
+	 * Checks whether legacy root is enabled or applies while converting JSON data.
+	 * @param root root value used by the operation
+	 * @return {@code true} if legacy root is enabled or applies; otherwise {@code false}
+	 */
 	private static boolean isLegacyRoot(final JsonNode root) {
 		return root != null && root.isObject() && root.has("tables") && !root.has("model") && !root.has("workspace");
 	}
 
+	/**
+	 * Parses the cardinality from the supplied input while converting JSON data.
+	 * @param rawCardinality text value for raw cardinality
+	 * @return the parsed cardinality
+	 */
 	private static Cardinality parseCardinality(final String rawCardinality) {
 		return switch (rawCardinality == null ? "" : rawCardinality.trim()) {
 		case "0..1" -> Cardinality.ZERO_OR_ONE;
@@ -285,6 +352,12 @@ public class LegacyModelizerImporter {
 		};
 	}
 
+	/**
+	 * Parses the color from the supplied input while converting JSON data.
+	 * @param colorNode color node value used by the operation
+	 * @param fallback fallback value used by the operation
+	 * @return the parsed color
+	 */
 	private static Color parseColor(final JsonNode colorNode, final Color fallback) {
 		if (colorNode == null || colorNode.isNull()) {
 			return fallback;
@@ -302,6 +375,11 @@ public class LegacyModelizerImporter {
 		}
 	}
 
+	/**
+	 * Parses the ref from the supplied input while converting JSON data.
+	 * @param rawRef text value for raw ref
+	 * @return the parsed ref
+	 */
 	private static LegacyRef parseRef(final String rawRef) {
 		if (rawRef == null || rawRef.isBlank()) {
 			return null;
@@ -314,6 +392,13 @@ public class LegacyModelizerImporter {
 		return new LegacyRef(parts[0], parts[1]);
 	}
 
+	/**
+	 * Stores the mapping between a source class id and the imported class model.
+	 * @param classIdsByName name value to use
+	 * @param conceptualName name value to use
+	 * @param technicalName name value to use
+	 * @param classId id of the class to look up or modify
+	 */
 	private static void putClassMapping(
 			final Map<String, String> classIdsByName,
 			final String conceptualName,
@@ -327,6 +412,13 @@ public class LegacyModelizerImporter {
 		}
 	}
 
+	/**
+	 * Stores an alternate field id that points to the imported field model.
+	 * @param fieldIdsByQualifiedName name value to use
+	 * @param className name value to use
+	 * @param fieldName name value to use
+	 * @param fieldId id of the field to look up or modify
+	 */
 	private static void putFieldAlias(
 			final Map<String, String> fieldIdsByQualifiedName,
 			final String className,
@@ -338,6 +430,15 @@ public class LegacyModelizerImporter {
 		fieldIdsByQualifiedName.put(className + "." + fieldName, fieldId);
 	}
 
+	/**
+	 * Stores the mapping between a source field id and the imported field model.
+	 * @param fieldIdsByQualifiedName name value to use
+	 * @param conceptualClassName name value to use
+	 * @param technicalClassName name value to use
+	 * @param conceptualFieldName name value to use
+	 * @param technicalFieldName name value to use
+	 * @param fieldId id of the field to look up or modify
+	 */
 	private static void putFieldMapping(
 			final Map<String, String> fieldIdsByQualifiedName,
 			final String conceptualClassName,
@@ -351,6 +452,13 @@ public class LegacyModelizerImporter {
 		LegacyModelizerImporter.putFieldAlias(fieldIdsByQualifiedName, technicalClassName, technicalFieldName, fieldId);
 	}
 
+	/**
+	 * Reads the text while converting JSON data.
+	 * @param node JSON node to read
+	 * @param fieldName name value to use
+	 * @param fallback text value for fallback
+	 * @return the read text result
+	 */
 	private static String readText(final JsonNode node, final String fieldName, final String fallback) {
 		if (node == null || fieldName == null) {
 			return fallback;
@@ -365,6 +473,9 @@ public class LegacyModelizerImporter {
 		return value == null || value.isBlank() ? fallback : value;
 	}
 
+	/**
+	 * Creates a legacy modelizer importer instance.
+	 */
 	private LegacyModelizerImporter() {
 	}
 

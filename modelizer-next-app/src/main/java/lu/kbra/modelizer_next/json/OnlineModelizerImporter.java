@@ -18,8 +18,17 @@ import lu.kbra.modelizer_next.domain.LinkModel;
 import lu.kbra.modelizer_next.domain.data.Cardinality;
 import lu.kbra.modelizer_next.layout.PanelType;
 
+/**
+ * Imports data from the online Modelizer format into a Modelizer Next document.
+ */
 public final class OnlineModelizerImporter {
 
+	/**
+	 * Imports the file.
+	 * @param file file to read or write
+	 * @return the import file result
+	 * @throws IOException if the operation cannot be completed
+	 */
 	public static ModelDocument importFile(final File file) throws IOException {
 		final JsonNode root = MNMain.OBJECT_MAPPER.readTree(file);
 		if (!OnlineModelizerImporter.isOnlineRoot(root)) {
@@ -29,6 +38,13 @@ public final class OnlineModelizerImporter {
 		return OnlineModelizerImporter.importRoot(root);
 	}
 
+	/**
+	 * Adds the node layouts while converting JSON data.
+	 * @param document document to read or modify
+	 * @param node JSON node to read
+	 * @param objectId id of the element to read or modify
+	 * @param comment whether comment is enabled
+	 */
 	private static void addNodeLayouts(final ModelDocument document, final JsonNode node, final String objectId, final boolean comment) {
 		final JsonNode dataNode = node.path("data");
 		final JsonNode viewPositions = dataNode.path("viewPositions");
@@ -64,6 +80,17 @@ public final class OnlineModelizerImporter {
 				height);
 	}
 
+	/**
+	 * Adds the panel layout while converting JSON data.
+	 * @param document document to read or modify
+	 * @param panelType diagram panel type whose model or layout should be used
+	 * @param objectId id of the element to read or modify
+	 * @param comment whether comment is enabled
+	 * @param preferredPosition preferred position value used by the operation
+	 * @param fallbackPosition fallback position value used by the operation
+	 * @param width width value
+	 * @param height height value
+	 */
 	private static void addPanelLayout(
 			final ModelDocument document,
 			final PanelType panelType,
@@ -85,6 +112,11 @@ public final class OnlineModelizerImporter {
 		}
 	}
 
+	/**
+	 * Creates a comment while converting JSON data.
+	 * @param node JSON node to read
+	 * @return the created comment
+	 */
 	private static CommentModel createComment(final JsonNode node) {
 		final JsonNode dataNode = node.path("data");
 		final String text = ImportJsonSupport.readText(dataNode, "text", ImportJsonSupport.readText(dataNode, "label", ""));
@@ -103,6 +135,15 @@ public final class OnlineModelizerImporter {
 		return commentModel;
 	}
 
+	/**
+	 * Creates a link while converting JSON data.
+	 * @param edgeNode edge node value used by the operation
+	 * @param classIdsBySourceId id of the element to read or modify
+	 * @param fieldIdsBySourceId id of the element to read or modify
+	 * @param classIdsByName name value to use
+	 * @param fieldIdsByQualifiedName name value to use
+	 * @return the created link
+	 */
 	private static LinkModel createLink(
 			final JsonNode edgeNode,
 			final Map<String, String> classIdsBySourceId,
@@ -153,6 +194,11 @@ public final class OnlineModelizerImporter {
 		return linkModel;
 	}
 
+	/**
+	 * Imports the root.
+	 * @param root root value used by the operation
+	 * @return the import root result
+	 */
 	private static ModelDocument importRoot(final JsonNode root) {
 		final ModelDocument document = new ModelDocument();
 		final Map<String, String> classIdsBySourceId = new HashMap<>();
@@ -243,11 +289,21 @@ public final class OnlineModelizerImporter {
 		return document;
 	}
 
+	/**
+	 * Checks whether online root is enabled or applies while converting JSON data.
+	 * @param root root value used by the operation
+	 * @return {@code true} if online root is enabled or applies; otherwise {@code false}
+	 */
 	private static boolean isOnlineRoot(final JsonNode root) {
 		return root != null && root.isObject() && root.has("nodes") && root.has("edges") && root.has("modelName") && !root.has("model")
 				&& !root.has("workspace");
 	}
 
+	/**
+	 * Parses the cardinality from the supplied input while converting JSON data.
+	 * @param rawCardinality text value for raw cardinality
+	 * @return the parsed cardinality
+	 */
 	private static Cardinality parseCardinality(final String rawCardinality) {
 		return switch (rawCardinality == null ? "" : rawCardinality.trim()) {
 		case "0..1" -> Cardinality.ZERO_OR_ONE;
@@ -258,6 +314,15 @@ public final class OnlineModelizerImporter {
 		};
 	}
 
+	/**
+	 * Reads the edge text while converting JSON data.
+	 * @param primaryNode primary node value used by the operation
+	 * @param secondaryNode secondary node value used by the operation
+	 * @param primaryField text value for primary field
+	 * @param secondaryField text value for secondary field
+	 * @param fallback text value for fallback
+	 * @return the read edge text result
+	 */
 	private static String readEdgeText(
 			final JsonNode primaryNode,
 			final JsonNode secondaryNode,
@@ -271,6 +336,13 @@ public final class OnlineModelizerImporter {
 		return ImportJsonSupport.readText(secondaryNode, secondaryField, fallback);
 	}
 
+	/**
+	 * Resolves the class ID from the current model and layout state while converting JSON data.
+	 * @param rawClassRef text value for raw class ref
+	 * @param classIdsBySourceId id of the element to read or modify
+	 * @param classIdsByName name value to use
+	 * @return the resolved class ID
+	 */
 	private static String resolveClassId(
 			final String rawClassRef,
 			final Map<String, String> classIdsBySourceId,
@@ -286,6 +358,13 @@ public final class OnlineModelizerImporter {
 		return classIdsByName.get(rawClassRef);
 	}
 
+	/**
+	 * Resolves the field ID from the current model and layout state while converting JSON data.
+	 * @param rawFieldRef text value for raw field ref
+	 * @param fieldIdsBySourceId id of the element to read or modify
+	 * @param fieldIdsByQualifiedName name value to use
+	 * @return the resolved field ID
+	 */
 	private static String resolveFieldId(
 			final String rawFieldRef,
 			final Map<String, String> fieldIdsBySourceId,
@@ -301,6 +380,9 @@ public final class OnlineModelizerImporter {
 		return fieldIdsByQualifiedName.get(rawFieldRef);
 	}
 
+	/**
+	 * Creates an online modelizer importer instance.
+	 */
 	private OnlineModelizerImporter() {
 	}
 }

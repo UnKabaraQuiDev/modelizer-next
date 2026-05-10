@@ -14,6 +14,12 @@ import lu.kbra.modelizer_next.layout.PanelState;
  */
 public interface NodeLayoutCache extends DiagramCanvasExt {
 
+	/**
+	 * Finds the node layout that matches the supplied input.
+	 * @param objectType type value to use
+	 * @param objectId id of the element to read or modify
+	 * @return the matching node layout, or {@code null} when no match exists
+	 */
 	default Optional<NodeLayout> findNodeLayout(final LayoutObjectType objectType, final String objectId) {
 		if (objectId == null) {
 			return Optional.empty();
@@ -28,6 +34,11 @@ public interface NodeLayoutCache extends DiagramCanvasExt {
 		return Optional.empty();
 	}
 
+	/**
+	 * Finds the existing link layout, or creates one when none exists.
+	 * @param linkId id of the link to look up or modify
+	 * @return the matching or create link layout, or {@code null} when no match exists
+	 */
 	default LinkLayout findOrCreateLinkLayout(final String linkId) {
 		for (final LinkLayout linkLayout : this.getCanvas().getPanelState().getLinkLayouts()) {
 			if (linkLayout.getLinkId().equals(linkId)) {
@@ -41,6 +52,12 @@ public interface NodeLayoutCache extends DiagramCanvasExt {
 		return linkLayout;
 	}
 
+	/**
+	 * Finds the existing node layout, or creates one when none exists.
+	 * @param objectType type value to use
+	 * @param objectId id of the element to read or modify
+	 * @return the matching or create node layout, or {@code null} when no match exists
+	 */
 	default NodeLayout findOrCreateNodeLayout(final LayoutObjectType objectType, final String objectId) {
 		for (final NodeLayout layout : this.getCanvas().getPanelState().getNodeLayouts()) {
 			if (layout.getObjectType() == objectType && layout.getObjectId().equals(objectId)) {
@@ -58,6 +75,10 @@ public interface NodeLayoutCache extends DiagramCanvasExt {
 		return layout;
 	}
 
+	/**
+	 * Returns the panel state on the active canvas.
+	 * @return the panel state
+	 */
 	default PanelState getPanelState() {
 		return this.getDocument().getWorkspace().getPanels().get(this.getPanelType());
 	}

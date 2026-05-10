@@ -19,6 +19,13 @@ import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectedElement;
  */
 interface DragSelectionController extends DiagramCanvasExt {
 
+	/**
+	 * Adds the dragged layout.
+	 * @param layouts layout objects to read or modify
+	 * @param seen seen value used by the operation
+	 * @param element element value used by the operation
+	 * @param fallbackLayout layout object to read or modify
+	 */
 	default void addDraggedLayout(
 			final List<DraggedLayout> layouts,
 			final Set<String> seen,
@@ -37,10 +44,22 @@ interface DragSelectionController extends DiagramCanvasExt {
 		layouts.add(new DraggedLayout(layout, layout.getPosition().getX(), layout.getPosition().getY()));
 	}
 
+	/**
+	 * Builds a drag render layers.
+	 * @param selection selection state to read or update
+	 */
 	default void buildDragRenderLayers(final DraggedSelection selection) {
 		this.getCanvas().currentDragOffset = new Point2D.Double();
 	}
 
+	/**
+	 * Creates a dragged selection.
+	 * @param hitSelection hit selection value used by the operation
+	 * @param hitLayout layout object to read or modify
+	 * @param worldPoint point in canvas coordinates
+	 * @param hitBounds bounds used for layout or hit testing
+	 * @return the created dragged selection
+	 */
 	default DraggedSelection createDraggedSelection(
 			final SelectedElement hitSelection,
 			final NodeLayout hitLayout,
@@ -71,10 +90,20 @@ interface DragSelectionController extends DiagramCanvasExt {
 		return selection;
 	}
 
+	/**
+	 * Checks whether drag rendering active is enabled or applies.
+	 * @return {@code true} if drag rendering active is enabled or applies; otherwise {@code false}
+	 */
 	default boolean isDragRenderingActive() {
 		return this.getCanvas().draggedSelection != null;
 	}
 
+	/**
+	 * Resolves the node layout for selection from the current model and layout state.
+	 * @param element element value used by the operation
+	 * @param fallbackLayout layout object to read or modify
+	 * @return the resolved node layout for selection
+	 */
 	default NodeLayout resolveNodeLayoutForSelection(final SelectedElement element, final NodeLayout fallbackLayout) {
 		if (element == null) {
 			return fallbackLayout;
