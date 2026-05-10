@@ -4,5 +4,6 @@ import java.awt.geom.Point2D;
 
 import lu.kbra.modelizer_next.domain.shared.ElementStyle;
 
-public record RenamingContext(Point2D pos, @Deprecated Point2D size, Object value, ElementStyle style, Class<?> valueType, Object owner) {
+public record RenamingContext(Point2D pos, @Deprecated
+Point2D size, Object value, ElementStyle style, Class<?> valueType, Object owner) {
 }
