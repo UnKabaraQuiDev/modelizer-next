@@ -17,7 +17,7 @@ public final class LicensePrinter {
 	 * Prints bundled license text to the supplied output.
 	 */
 	public static final void print() {
-		System.out.println(PCUtils.readPackagedStringFile("/LICENSE_PART"));
+		System.out.println(PCUtils.readPackagedStringFile(LicensePrinter.class.getClass(), "/LICENSE_PART"));
 		System.out.println();
 	}
 
