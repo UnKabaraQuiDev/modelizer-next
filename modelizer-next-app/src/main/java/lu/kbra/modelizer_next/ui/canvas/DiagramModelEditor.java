@@ -189,7 +189,7 @@ interface DiagramModelEditor extends DiagramCanvasExt {
 				.resolveRenderLayout(this.getCanvas().findOrCreateNodeLayout(LayoutObjectType.CLASS, classModel.getId()));
 		final Point2D.Double center = this.getCanvas().getMouseWorldPos();
 		layout.setPosition(new Point2D.Double(center.getX() - 100, center.getY() - 40));
-		layout.setSize(new Size2D(180, DiagramCanvas.CLASS_HEADER_HEIGHT));
+		layout.setSize(new Size2D(DiagramCanvas.CLASS_MIN_WIDTH, DiagramCanvas.CLASS_HEADER_HEIGHT));
 
 //		confirmRenamingElement(0);
 		this.getCanvas().select(SelectedElement.forClass(classModel.getId()));

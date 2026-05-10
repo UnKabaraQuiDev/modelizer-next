@@ -45,7 +45,7 @@ import lu.kbra.modelizer_next.ui.canvas.datastruct.LinkGeometry;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.LiveEditComponents;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.LiveEditElement;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.LiveEditElement.LiveEditType;
-import lu.kbra.modelizer_next.ui.canvas.datastruct.RenamingContext;
+import lu.kbra.modelizer_next.ui.canvas.datastruct.LiveEditContext;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectedElement;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectedElement.SelectedType;
 import lu.kbra.pclib.datastructure.pair.Pair;
@@ -169,7 +169,7 @@ public interface LiveEditor extends DiagramCanvasExt {
 		canvas.liveEditElement = element;
 		canvas.select(element.asSelectedElement());
 
-		final RenamingContext ctx = switch (element.type()) {
+		final LiveEditContext ctx = switch (element.type()) {
 		case CLASS -> this.buildClassContext(element);
 		case CLASS_FIELD -> this.buildClassFieldContext(element);
 		case COMMENT -> this.buildCommentContext(element);
@@ -200,7 +200,7 @@ public interface LiveEditor extends DiagramCanvasExt {
 				DiagramCanvas.BODY_FONT.deriveFont(DiagramCanvas.BODY_FONT.getSize() * (float) this.getCanvas().getPanelState().getZoom()));
 
 		final Dimension preferredSize = comp.getPreferredSize();
-		comp.setSize((int) (preferredSize.getWidth() + DiagramCanvas.TEXT_PADDING * getCanvas().getPanelState().getZoom()),
+		comp.setSize((int) (preferredSize.getWidth() + DiagramCanvas.TEXT_PADDING * this.getCanvas().getPanelState().getZoom()),
 				(int) preferredSize.getHeight());
 
 		if (liveEditElement.type().isStyle()) {
@@ -208,7 +208,7 @@ public interface LiveEditor extends DiagramCanvasExt {
 			return;
 		}
 
-		final RenamingContext ctx = switch (liveEditElement.type()) {
+		final LiveEditContext ctx = switch (liveEditElement.type()) {
 		case CLASS -> this.buildClassContext(liveEditElement);
 		case CLASS_FIELD -> this.buildClassFieldContext(liveEditElement);
 		case COMMENT -> this.buildCommentContext(liveEditElement);
@@ -218,6 +218,9 @@ public interface LiveEditor extends DiagramCanvasExt {
 		};
 
 		comp.setLocation((int) ctx.pos().getX(), (int) ctx.pos().getY());
+		if (ctx.fixedSize()) {
+			comp.setSize((int) ctx.size().getX(), (int) ctx.size().getY());
+		}
 
 		this.getCanvas().repaint();
 	}
@@ -254,7 +257,7 @@ public interface LiveEditor extends DiagramCanvasExt {
 	 * @param ctx ctx value used by the operation
 	 */
 	@SuppressWarnings("unchecked")
-	default void applyLiveEditContext(final RenamingContext ctx) {
+	default void applyLiveEditContext(final LiveEditContext ctx) {
 		final DiagramCanvas canvas = this.getCanvas();
 
 		final LiveEditElement renamingElement = canvas.liveEditElement;
@@ -288,8 +291,10 @@ public interface LiveEditor extends DiagramCanvasExt {
 			comp.setFont(DiagramCanvas.BODY_FONT
 					.deriveFont(DiagramCanvas.BODY_FONT.getSize() * (float) this.getCanvas().getPanelState().getZoom()));
 			final Dimension preferredSize = comp.getPreferredSize();
-			comp.setSize((int) (preferredSize.getWidth() + DiagramCanvas.TEXT_PADDING * getCanvas().getPanelState().getZoom()),
-					(int) preferredSize.getHeight());
+			if (!ctx.fixedSize()) {
+				comp.setSize((int) (preferredSize.getWidth() + DiagramCanvas.TEXT_PADDING * this.getCanvas().getPanelState().getZoom()),
+						(int) preferredSize.getHeight());
+			}
 
 			comp.setVisible(true);
 			comp.requestFocus();
@@ -306,10 +311,11 @@ public interface LiveEditor extends DiagramCanvasExt {
 	 * @param e event object supplied by Swing
 	 * @return the built class context
 	 */
-	default RenamingContext buildClassContext(final LiveEditElement e) {
+	default LiveEditContext buildClassContext(final LiveEditElement e) {
 		final var canvas = this.getCanvas();
 
 		final NodeLayout nl = canvas.findOrCreateNodeLayout(LayoutObjectType.CLASS, e.classId());
+		System.err.println(nl.getSize());
 		final ClassModel model = canvas.findClassById(e.classId());
 
 		final Point2D pos = canvas.worldToViewport(nl.getPosition());
@@ -317,7 +323,7 @@ public interface LiveEditor extends DiagramCanvasExt {
 			"deprecation"
 		) final Point2D size = canvas.worldToviewportZoom(new Point2D.Double(nl.getSize().getX(), DiagramCanvas.CLASS_HEADER_HEIGHT));
 
-		return new RenamingContext(pos, size, model.getNames().get(canvas.panelType), model.getStyle(), String.class, model);
+		return new LiveEditContext(pos, size, model.getNames().get(canvas.panelType), model.getStyle(), String.class, model, true);
 	}
 
 	/**
@@ -326,7 +332,7 @@ public interface LiveEditor extends DiagramCanvasExt {
 	 * @param e event object supplied by Swing
 	 * @return the built class field context
 	 */
-	default RenamingContext buildClassFieldContext(final LiveEditElement e) {
+	default LiveEditContext buildClassFieldContext(final LiveEditElement e) {
 		final var canvas = this.getCanvas();
 
 		final NodeLayout nl = canvas.findOrCreateNodeLayout(LayoutObjectType.CLASS, e.classId());
@@ -342,8 +348,8 @@ public interface LiveEditor extends DiagramCanvasExt {
 			"deprecation"
 		) final Point2D size = canvas.worldToviewportZoom(new Point2D.Double(nl.getSize().getX(), DiagramCanvas.CLASS_ROW_HEIGHT));
 
-		return new RenamingContext(canvas
-				.worldToViewport(fieldPos), size, field.getNames().get(canvas.panelType), field.getStyle(), String.class, field);
+		return new LiveEditContext(canvas
+				.worldToViewport(fieldPos), size, field.getNames().get(canvas.panelType), field.getStyle(), String.class, field, true);
 	}
 
 	/**
@@ -352,7 +358,7 @@ public interface LiveEditor extends DiagramCanvasExt {
 	 * @param e event object supplied by Swing
 	 * @return the built comment context
 	 */
-	default RenamingContext buildCommentContext(final LiveEditElement e) {
+	default LiveEditContext buildCommentContext(final LiveEditElement e) {
 		final var canvas = this.getCanvas();
 
 		final NodeLayout nl = canvas.findOrCreateNodeLayout(LayoutObjectType.COMMENT, e.commentId());
@@ -361,7 +367,7 @@ public interface LiveEditor extends DiagramCanvasExt {
 		final Point2D pos = canvas.worldToViewport(nl.getPosition());
 		final Point2D size = canvas.worldToviewportZoom(nl.getSize());
 
-		return new RenamingContext(pos, size, comment.getText(), comment.getStyle(), String.class, comment);
+		return new LiveEditContext(pos, size, comment.getText(), comment.getStyle(), String.class, comment, true);
 	}
 
 	/**
@@ -370,7 +376,7 @@ public interface LiveEditor extends DiagramCanvasExt {
 	 * @param e event object supplied by Swing
 	 * @return the built link cardinality context
 	 */
-	default RenamingContext buildLinkCardinalityContext(final LiveEditElement e) {
+	default LiveEditContext buildLinkCardinalityContext(final LiveEditElement e) {
 		final LinkModel linkModel = this.getCanvas().findLinkById(e.linkId());
 		final LinkGeometry geometry = this.getCanvas().resolveLinkGeometry(linkModel);
 
@@ -394,7 +400,13 @@ public interface LiveEditor extends DiagramCanvasExt {
 				this.getCanvas().liveEditComponents.textField().getPreferredSize().getHeight());
 		pos.setLocation(pos.getX() - size.getX() / 2, pos.getY() - size.getY() / 2);
 
-		return new RenamingContext(pos, size, value, new ElementStyle(Color.BLACK, Color.WHITE, Color.BLACK), Cardinality.class, linkModel);
+		return new LiveEditContext(pos,
+				size,
+				value,
+				new ElementStyle(Color.BLACK, Color.WHITE, Color.BLACK),
+				Cardinality.class,
+				linkModel,
+				false);
 	}
 
 	/**
@@ -403,7 +415,7 @@ public interface LiveEditor extends DiagramCanvasExt {
 	 * @param e event object supplied by Swing
 	 * @return the built link label context
 	 */
-	default RenamingContext buildLinkLabelContext(final LiveEditElement e) {
+	default LiveEditContext buildLinkLabelContext(final LiveEditElement e) {
 		final LinkModel linkModel = this.getCanvas().findLinkById(e.linkId());
 		final LinkGeometry geometry = this.getCanvas().resolveLinkGeometry(linkModel);
 
@@ -431,7 +443,13 @@ public interface LiveEditor extends DiagramCanvasExt {
 				this.getCanvas().liveEditComponents.textField().getPreferredSize().getHeight());
 		pos.setLocation(pos.getX() - size.getX() / 2, pos.getY() - size.getY() / 2);
 
-		return new RenamingContext(pos, size, value, new ElementStyle(Color.BLACK, Color.WHITE, Color.BLACK), String.class, linkModel);
+		return new LiveEditContext(pos,
+				size,
+				value,
+				new ElementStyle(Color.BLACK, Color.WHITE, Color.BLACK),
+				String.class,
+				linkModel,
+				false);
 	}
 
 	/**
@@ -710,7 +728,7 @@ public interface LiveEditor extends DiagramCanvasExt {
 					((JList) e.getComponent()).setSelectedIndex(index);
 					final Action action = ((JList) e.getComponent()).getActionMap().get("submit");
 					if (action != null) {
-						action.actionPerformed(new ActionEvent(((JList) e.getComponent()), ActionEvent.ACTION_PERFORMED, "submit"));
+						action.actionPerformed(new ActionEvent(e.getComponent(), ActionEvent.ACTION_PERFORMED, "submit"));
 					}
 				}
 
