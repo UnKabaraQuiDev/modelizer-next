@@ -23,10 +23,13 @@ import lu.kbra.pclib.PCUtils;
 public final class DocumentSessionLoader {
 
 	/**
-	 * Confirms whether the modern document version should continue.
-	 * @param parent parent component used for dialog ownership
+	 * Confirms whether the document should be loaded even if it has been written in a newer version of
+	 * the software.
+	 * 
+	 * @param parent         parent component used for dialog ownership
 	 * @param loadedDocument loaded document value used by the operation
-	 * @return {@code true} when the condition is met; otherwise {@code false}
+	 * @return {@code true} if it is an older version or a newer one and the user acknowledged;
+	 *         otherwise {@code false}
 	 */
 	public static boolean confirmModernDocumentVersion(final Component parent, final ModelDocument loadedDocument) {
 		final String fileVersion = loadedDocument.getMeta() == null ? null : loadedDocument.getMeta().getApplicationVersion();
@@ -45,9 +48,11 @@ public final class DocumentSessionLoader {
 	}
 
 	/**
-	 * Confirms whether the modern document version should continue.
+	 * Confirms whether the document should be loaded even if it has been written in a newer version of
+	 * the software, using the given {@link DocumentLoadHandler}.
+	 * 
 	 * @param loadedDocument loaded document value used by the operation
-	 * @param handler handler value used by the operation
+	 * @param handler        handler value used by the operation
 	 * @return {@code true} when the condition is met; otherwise {@code false}
 	 */
 	public static boolean confirmModernDocumentVersion(final ModelDocument loadedDocument, final DocumentLoadHandler handler) {
@@ -61,8 +66,10 @@ public final class DocumentSessionLoader {
 	}
 
 	/**
-	 * Creates a document.
-	 * @param parent parent component used for dialog ownership
+	 * Loads a document from a files, supports {@code mod}, {@code mdlz}, {@code mn} file extensions.
+	 * Uses the {@link SwingDocumentLoadHandler} by default.
+	 * 
+	 * @param parent       parent component used for dialog ownership
 	 * @param selectedFile file to read or write
 	 * @return the created document
 	 */
@@ -71,9 +78,10 @@ public final class DocumentSessionLoader {
 	}
 
 	/**
-	 * Creates a document.
+	 * Loads a document from a files, supports {@code mod}, {@code mdlz}, {@code mn} file extensions.
+	 * 
 	 * @param selectedFile file to read or write
-	 * @param handler handler value used by the operation
+	 * @param handler      handler value used by the operation
 	 * @return the created document
 	 */
 	public static Optional<DocumentSession> createDocument(final File selectedFile, final DocumentLoadHandler handler) {
@@ -121,9 +129,6 @@ public final class DocumentSessionLoader {
 		}
 	}
 
-	/**
-	 * Creates a document session loader instance.
-	 */
 	private DocumentSessionLoader() {
 	}
 

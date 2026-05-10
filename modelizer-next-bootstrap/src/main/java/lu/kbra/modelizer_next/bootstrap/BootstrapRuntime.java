@@ -32,6 +32,7 @@ import lu.kbra.modelizer_next.common.Platform;
 import lu.kbra.modelizer_next.common.UnsupportedBootstrapVersionException;
 import lu.kbra.modelizer_next.common.VersionComparator;
 import lu.kbra.modelizer_next.common.VersionComparator.ParsedVersion;
+import lu.kbra.pclib.PCUtils;
 
 /**
  * Runtime coordinator that checks updates, prepares the installed application, and launches it.
@@ -46,6 +47,7 @@ public class BootstrapRuntime implements UpdateRuntime {
 
 	/**
 	 * Starts the bootstrap sequence.
+	 * 
 	 * @return the bootstrap result
 	 * @throws IOException if the operation cannot be completed
 	 */
@@ -74,6 +76,7 @@ public class BootstrapRuntime implements UpdateRuntime {
 
 	/**
 	 * Builds a first launch message.
+	 * 
 	 * @param manifest update manifest to inspect
 	 * @return the built first launch message
 	 */
@@ -95,6 +98,7 @@ public class BootstrapRuntime implements UpdateRuntime {
 
 	/**
 	 * Returns a readable description of the selected update channel.
+	 * 
 	 * @param channel update channel to query
 	 * @param release release information to inspect
 	 * @return the describe channel option result
@@ -117,6 +121,7 @@ public class BootstrapRuntime implements UpdateRuntime {
 
 	/**
 	 * Extracts the publication timestamp from the update manifest entry.
+	 * 
 	 * @param release release information to inspect
 	 * @return the extract published at result
 	 */
@@ -146,6 +151,7 @@ public class BootstrapRuntime implements UpdateRuntime {
 
 	/**
 	 * Returns the instance during bootstrap/update processing.
+	 * 
 	 * @return the instance
 	 */
 	public static synchronized BootstrapRuntime getInstance() {
@@ -154,6 +160,7 @@ public class BootstrapRuntime implements UpdateRuntime {
 
 	/**
 	 * Checks whether active is enabled or applies during bootstrap/update processing.
+	 * 
 	 * @return {@code true} if active is enabled or applies; otherwise {@code false}
 	 */
 	public static boolean isActive() {
@@ -172,13 +179,14 @@ public class BootstrapRuntime implements UpdateRuntime {
 
 	/**
 	 * Creates a bootstrap runtime instance.
-	 * @param configuration configuration value used by the operation
-	 * @param inventory inventory value used by the operation
-	 * @param remoteUpdateService remote update service value used by the operation
-	 * @param applicationLauncher application launcher value used by the operation
-	 * @param updateStorage update storage value used by the operation
+	 * 
+	 * @param configuration           configuration value used by the operation
+	 * @param inventory               inventory value used by the operation
+	 * @param remoteUpdateService     remote update service value used by the operation
+	 * @param applicationLauncher     application launcher value used by the operation
+	 * @param updateStorage           update storage value used by the operation
 	 * @param automaticUpdatesEnabled whether automatic updates enabled is enabled
-	 * @param forceJarName name value to use
+	 * @param forceJarName            name value to use
 	 */
 	private BootstrapRuntime(
 			final BootstrapConfiguration configuration,
@@ -199,6 +207,7 @@ public class BootstrapRuntime implements UpdateRuntime {
 
 	/**
 	 * Checks the for updates.
+	 * 
 	 * @return the check for updates result
 	 * @throws IOException if the operation cannot be completed
 	 */
@@ -216,6 +225,7 @@ public class BootstrapRuntime implements UpdateRuntime {
 
 	/**
 	 * Returns the installed updates disk usage bytes.
+	 * 
 	 * @return the installed updates disk usage bytes
 	 * @throws IOException if the operation cannot be completed
 	 */
@@ -226,6 +236,7 @@ public class BootstrapRuntime implements UpdateRuntime {
 
 	/**
 	 * Returns the installed updates file count.
+	 * 
 	 * @return the installed updates file count
 	 * @throws IOException if the operation cannot be completed
 	 */
@@ -236,6 +247,7 @@ public class BootstrapRuntime implements UpdateRuntime {
 
 	/**
 	 * Returns the installed updates directory.
+	 * 
 	 * @return the installed updates directory
 	 */
 	@Override
@@ -245,6 +257,7 @@ public class BootstrapRuntime implements UpdateRuntime {
 
 	/**
 	 * Deletes installed update folders that are no longer needed.
+	 * 
 	 * @return the free unused installed updates result
 	 * @throws IOException if the operation cannot be completed
 	 */
@@ -255,6 +268,7 @@ public class BootstrapRuntime implements UpdateRuntime {
 
 	/**
 	 * Returns the bootstrap config.
+	 * 
 	 * @return the bootstrap config
 	 */
 	@Override
@@ -264,6 +278,7 @@ public class BootstrapRuntime implements UpdateRuntime {
 
 	/**
 	 * Returns the bootstrap JSON.
+	 * 
 	 * @return the bootstrap JSON
 	 */
 	@Override
@@ -273,6 +288,7 @@ public class BootstrapRuntime implements UpdateRuntime {
 
 	/**
 	 * Returns the current application version.
+	 * 
 	 * @return the current application version
 	 */
 	@Override
@@ -282,6 +298,7 @@ public class BootstrapRuntime implements UpdateRuntime {
 
 	/**
 	 * Returns the selected channel during bootstrap/update processing.
+	 * 
 	 * @return the selected channel
 	 */
 	@Override
@@ -291,9 +308,10 @@ public class BootstrapRuntime implements UpdateRuntime {
 
 	/**
 	 * Installs the update and restart.
+	 * 
 	 * @param parentComponent parent component value used by the operation
-	 * @param update update metadata to download or install
-	 * @param preparation preparation value used by the operation
+	 * @param update          update metadata to download or install
+	 * @param preparation     preparation value used by the operation
 	 * @return {@code true} when the condition is met; otherwise {@code false}
 	 * @throws IOException if the operation cannot be completed
 	 */
@@ -331,6 +349,11 @@ public class BootstrapRuntime implements UpdateRuntime {
 		try {
 			BootstrapMain.restartSameCommand();
 		} catch (Exception e) {
+			e.printStackTrace();
+			JOptionPane.showMessageDialog(parentComponent,
+					"Couldn't restart process, you may do it manually.\n" + PCUtils.toString(e),
+					"Error",
+					JOptionPane.ERROR_MESSAGE);
 			System.exit(0);
 		}
 		return true;
@@ -338,6 +361,7 @@ public class BootstrapRuntime implements UpdateRuntime {
 
 	/**
 	 * Checks whether auto check updates is enabled or applies.
+	 * 
 	 * @return {@code true} if auto check updates is enabled or applies; otherwise {@code false}
 	 */
 	@Override
@@ -347,7 +371,9 @@ public class BootstrapRuntime implements UpdateRuntime {
 
 	/**
 	 * Checks whether automatic update checks enabled by property is enabled or applies.
-	 * @return {@code true} if automatic update checks enabled by property is enabled or applies; otherwise {@code
+	 * 
+	 * @return {@code true} if automatic update checks enabled by property is enabled or applies;
+	 *         otherwise {@code
 	 *         false}
 	 */
 	@Override
@@ -357,6 +383,7 @@ public class BootstrapRuntime implements UpdateRuntime {
 
 	/**
 	 * Checks whether available is enabled or applies during bootstrap/update processing.
+	 * 
 	 * @return {@code true} if available is enabled or applies; otherwise {@code false}
 	 */
 	@Override
@@ -366,6 +393,7 @@ public class BootstrapRuntime implements UpdateRuntime {
 
 	/**
 	 * Returns the force jar name during bootstrap/update processing.
+	 * 
 	 * @return the force jar name
 	 */
 	public String getForceJarName() {
@@ -374,7 +402,8 @@ public class BootstrapRuntime implements UpdateRuntime {
 
 	/**
 	 * Launches the installed application.
-	 * @param args command-line arguments supplied by the launcher
+	 * 
+	 * @param args       command-line arguments supplied by the launcher
 	 * @param toBeOpened to be opened value used by the operation
 	 * @throws Exception if the operation cannot be completed
 	 */
@@ -428,6 +457,7 @@ public class BootstrapRuntime implements UpdateRuntime {
 
 	/**
 	 * Prompts the user to reinstall the bootstrapper when a newer bootstrap installer is available.
+	 * 
 	 * @throws Exception if the operation cannot be completed
 	 */
 	private void promptForBootstrapReinstallIfRequired() throws Exception {
@@ -453,8 +483,9 @@ public class BootstrapRuntime implements UpdateRuntime {
 
 	/**
 	 * Handles the outdated bootstrap launcher.
+	 * 
 	 * @param launchException launch exception value used by the operation
-	 * @param forced whether forced is enabled
+	 * @param forced          whether forced is enabled
 	 * @throws Exception if the operation cannot be completed
 	 */
 	private void handleOutdatedBootstrapLauncher(final AppLaunchException launchException, final boolean forced) throws Exception {
@@ -498,6 +529,7 @@ public class BootstrapRuntime implements UpdateRuntime {
 
 	/**
 	 * Checks whether the bootstrapper needs an update.
+	 * 
 	 * @param throwable throwable value used by the operation
 	 * @return {@code true} when the condition is met; otherwise {@code false}
 	 */
@@ -513,6 +545,7 @@ public class BootstrapRuntime implements UpdateRuntime {
 
 	/**
 	 * Prompts the user for for initial channel selection.
+	 * 
 	 * @throws IOException if the operation cannot be completed
 	 */
 	private void promptForInitialChannelSelection() throws IOException {
@@ -556,7 +589,8 @@ public class BootstrapRuntime implements UpdateRuntime {
 
 	/**
 	 * Reads and validates the required installable update.
-	 * @param channel update channel to query
+	 * 
+	 * @param channel        update channel to query
 	 * @param currentVersion currently installed version
 	 * @return the require installable update result
 	 * @throws IOException if the operation cannot be completed
@@ -577,6 +611,7 @@ public class BootstrapRuntime implements UpdateRuntime {
 
 	/**
 	 * Sets the auto check updates.
+	 * 
 	 * @param enabled whether enabled is enabled
 	 */
 	@Override
@@ -587,6 +622,7 @@ public class BootstrapRuntime implements UpdateRuntime {
 
 	/**
 	 * Sets the selected channel during bootstrap/update processing.
+	 * 
 	 * @param updateChannel update channel value used by the operation
 	 */
 	@Override
