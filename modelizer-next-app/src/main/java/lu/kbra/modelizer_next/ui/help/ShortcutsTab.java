@@ -324,6 +324,7 @@ public class ShortcutsTab extends JPanel {
 		case KeyEvent.VK_UP -> "↑";
 		case KeyEvent.VK_DOWN -> "↓";
 		case KeyEvent.VK_F2 -> "F2";
+		case KeyEvent.VK_DECIMAL -> ".";
 		default -> {
 			final String text = KeyEvent.getKeyText(event.getKeyCode());
 			yield text == null ? "" : ShortcutsTab.normalizeKeyName(text.toUpperCase());
@@ -378,25 +379,6 @@ public class ShortcutsTab extends JPanel {
 		super(new java.awt.BorderLayout());
 		this.setOpaque(false);
 		this.add(this.createShortcutsPage(), java.awt.BorderLayout.CENTER);
-	}
-
-	/**
-	 * Adds the shortcut group.
-	 *
-	 * @param parent parent component used for dialog ownership
-	 * @param group  group value used by the operation
-	 * @param x      x coordinate
-	 * @param y      y coordinate
-	 */
-	private void addShortcutGroup(final JPanel parent, final JComponent group, final int x, final int y) {
-		final GridBagConstraints constraints = new GridBagConstraints();
-		constraints.gridx = x;
-		constraints.gridy = y;
-		constraints.weightx = 1.0;
-		constraints.weighty = 1.0;
-		constraints.fill = GridBagConstraints.BOTH;
-		constraints.insets = x == 0 ? HelpUi.SECTION_INSETS_LEFT : HelpUi.SECTION_INSETS_RIGHT;
-		parent.add(group, constraints);
 	}
 
 	/**
@@ -544,7 +526,9 @@ public class ShortcutsTab extends JPanel {
 				List.of(new Shortcut(List.of(List.of("Ctrl", "A")), "Select all"),
 						new Shortcut(List.of(List.of("Esc")), "Clear selection"),
 						new Shortcut(List.of(List.of("↑", "↓")), "Move through fields", List.of(List.of("↑"), List.of("↓"))),
-						new Shortcut(List.of(List.of("Alt", "↑"), List.of("Alt", "↓")), "Move a selected field in the list")));
+						new Shortcut(List.of(List.of("Alt", "↑"), List.of("Alt", "↓")), "Move a selected field in the list"),
+						new Shortcut(List.of(List.of("F"), List.of(".")), "Focus current selection"),
+						new Shortcut(List.of(List.of("Shift", "F"), List.of("Ctrl", ".")), "Focus all elements")));
 	}
 
 	/**
