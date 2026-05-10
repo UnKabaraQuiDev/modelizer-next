@@ -1101,9 +1101,23 @@ div.title-button-container {
     padding: 28px;
 }
 
+.cli-card .header {
+    display: grid;
+    grid-template-columns: 48px 1fr;
+    gap: 16px;
+    align-items: center;
+}
+
 .cli-card .icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 48px;
+    aspect-ratio: 1 / 1;
+
     font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-    font-weight: 900
+    font-weight: 900;
 }
 
 .cli-card > div:first-child {
