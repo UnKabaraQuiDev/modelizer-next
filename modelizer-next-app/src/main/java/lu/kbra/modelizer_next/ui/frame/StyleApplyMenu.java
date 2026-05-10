@@ -29,7 +29,6 @@ final class StyleApplyMenu extends JMenu {
 					canvas.applyPaletteToSelection(palette);
 					App.CONFIG.setSelectedPaletteName(palette.getName());
 					App.saveConfig();
-					frame.refreshPinnedStylesPanel();
 				}
 			});
 			this.add(item);

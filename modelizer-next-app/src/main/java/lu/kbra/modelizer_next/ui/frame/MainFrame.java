@@ -31,6 +31,9 @@ import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
+import io.github.andrewauclair.moderndocking.DockingRegion;
+import io.github.andrewauclair.moderndocking.app.Docking;
+import io.github.andrewauclair.moderndocking.app.RootDockingPanel;
 import lu.kbra.modelizer_next.MNMain;
 import lu.kbra.modelizer_next.bootstrap.AvailableUpdate;
 import lu.kbra.modelizer_next.bootstrap.UpdateRuntime;
@@ -42,7 +45,6 @@ import lu.kbra.modelizer_next.style.StylePalette;
 import lu.kbra.modelizer_next.style.StylePaletteService;
 import lu.kbra.modelizer_next.ui.ThemeMode;
 import lu.kbra.modelizer_next.ui.canvas.DiagramCanvas;
-import lu.kbra.modelizer_next.ui.canvas.data.StyleScope;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectionInfo;
 import lu.kbra.modelizer_next.ui.dialogs.ViewExportDialog;
 import lu.kbra.modelizer_next.ui.export.ViewExportRequest;
@@ -52,10 +54,6 @@ import lu.kbra.modelizer_next.ui.impl.DocumentLoadHandler;
 import lu.kbra.pclib.PCUtils;
 import lu.kbra.pclib.datastructure.pair.Pair;
 import lu.kbra.pclib.datastructure.triplet.Triplet;
-
-import io.github.andrewauclair.moderndocking.DockingRegion;
-import io.github.andrewauclair.moderndocking.app.Docking;
-import io.github.andrewauclair.moderndocking.app.RootDockingPanel;
 
 /**
  * Main Swing window for editing Modelizer Next documents.
@@ -139,7 +137,6 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 	DiagramCanvas physicalCanvas;
 
 	MainFrameToolBar toolBar;
-	JPanel pinnedStylesPanel;
 
 	List<StylePalette> palettes;
 
@@ -285,7 +282,6 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 		this.installCloseHandling();
 
 		this.palettes = StylePaletteService.loadAll();
-		this.sanitizePinnedPaletteNames();
 
 		this.statusLabel = this.createStatusLabel();
 		this.selectionPathLabel = this.createSelectionPathLabel();
@@ -336,10 +332,7 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 
 		this.setJMenuBar(new MainFrameMenuBar(this));
 
-		this.pinnedStylesPanel = this.createPinnedStylesPanel();
-
 		this.toolBar = new MainFrameToolBar(this);
-		this.toolBar.add(this.pinnedStylesPanel, BorderLayout.EAST);
 		this.add(this.toolBar, BorderLayout.NORTH);
 
 		final JPanel statusPanel = this.createStatusPanel();
@@ -648,28 +641,6 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 	}
 
 	/**
-	 * Refreshes the pinned styles panel from the current state.
-	 */
-	void refreshPinnedStylesPanel() {
-		this.sanitizePinnedPaletteNames();
-		this.pinnedStylesPanel.removeAll();
-
-		final DiagramCanvas canvas = this.getActiveCanvas();
-		final StyleScope previewType = canvas == null ? StyleScope.NONE : canvas.getStyleScope();
-
-		for (final String paletteName : App.CONFIG.getPinnedPaletteNames()) {
-			final StylePalette palette = this.findPaletteByName(paletteName);
-			if (palette != null) {
-				this.pinnedStylesPanel.add(this.createPinnedStyleButton(palette, previewType));
-			}
-		}
-
-		this.pinnedStylesPanel.setVisible(this.pinnedStylesPanel.getComponentCount() > 0);
-		this.pinnedStylesPanel.revalidate();
-		this.pinnedStylesPanel.repaint();
-	}
-
-	/**
 	 * Refreshes the toolbar labels from the current state.
 	 */
 	void refreshToolbarLabels() {
@@ -730,7 +701,6 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 		final String path = selectionInfo == null || selectionInfo.path() == null || selectionInfo.path().isBlank() ? "No selection"
 				: selectionInfo.path();
 		this.selectionPathLabel.setText(path);
-		this.refreshPinnedStylesPanel();
 	}
 
 	/**

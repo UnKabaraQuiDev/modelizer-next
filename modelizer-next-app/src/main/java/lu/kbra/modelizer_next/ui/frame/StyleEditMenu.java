@@ -50,7 +50,6 @@ final class StyleEditMenu extends JMenu {
 			if (oldName.equals(App.CONFIG.getSelectedPaletteName())) {
 				App.CONFIG.setSelectedPaletteName(edited.getName());
 			}
-			frame.replacePinnedPaletteName(oldName, edited.getName());
 			App.saveConfig();
 		}
 

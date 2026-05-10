@@ -315,7 +315,6 @@ public interface LiveEditor extends DiagramCanvasExt {
 		final var canvas = this.getCanvas();
 
 		final NodeLayout nl = canvas.findOrCreateNodeLayout(LayoutObjectType.CLASS, e.classId());
-		System.err.println(nl.getSize());
 		final ClassModel model = canvas.findClassById(e.classId());
 
 		final Point2D pos = canvas.worldToViewport(nl.getPosition());
