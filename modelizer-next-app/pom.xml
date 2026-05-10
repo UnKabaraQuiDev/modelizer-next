@@ -18,7 +18,7 @@
 		<app.mainClass>lu.kbra.modelizer_next.MNMain</app.mainClass>
 		<jpackage.name>Modelizer Next App</jpackage.name>
 		<jpackage.macos.name>Modelizer Next (Standalone)</jpackage.macos.name>
-		<common.scope>provided</common.scope>
+		<common.scope>compile</common.scope>
 		<portable>false</portable>
 		<update.path>
 			${user.home}/.modelizer-next/updates/${project.build.finalName}.jar</update.path>
