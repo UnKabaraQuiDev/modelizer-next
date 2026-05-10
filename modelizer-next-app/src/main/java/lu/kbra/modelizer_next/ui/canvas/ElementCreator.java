@@ -24,8 +24,9 @@ public interface ElementCreator extends DiagramCanvasExt {
 
 	/**
 	 * Creates a conceptual link.
+	 *
 	 * @param fromClassId id of the element to read or modify
-	 * @param toClassId id of the element to read or modify
+	 * @param toClassId   id of the element to read or modify
 	 */
 	default void createConceptualLink(final String fromClassId, final String toClassId) {
 		final LinkModel linkModel = new LinkModel();
@@ -43,8 +44,9 @@ public interface ElementCreator extends DiagramCanvasExt {
 
 	/**
 	 * Creates a field from clipboard.
+	 *
 	 * @param copiedField copied field value used by the operation
-	 * @param rename name value to use
+	 * @param rename      name value to use
 	 * @return the created field from clipboard
 	 */
 	default FieldModel createFieldFromClipboard(final CopiedField copiedField, final boolean rename) {
@@ -69,6 +71,7 @@ public interface ElementCreator extends DiagramCanvasExt {
 
 	/**
 	 * Creates a link from clipboard.
+	 *
 	 * @param copiedLink copied link value used by the operation
 	 * @param classIdMap map to read or update
 	 * @param fieldIdMap map to read or update
@@ -110,9 +113,10 @@ public interface ElementCreator extends DiagramCanvasExt {
 
 	/**
 	 * Creates a remapped comment binding.
+	 *
 	 * @param copiedComment copied comment value used by the operation
-	 * @param classIdMap map to read or update
-	 * @param linkIdMap map to read or update
+	 * @param classIdMap    map to read or update
+	 * @param linkIdMap     map to read or update
 	 * @return the created remapped comment binding
 	 */
 	default CommentBinding createRemappedCommentBinding(
@@ -139,8 +143,9 @@ public interface ElementCreator extends DiagramCanvasExt {
 
 	/**
 	 * Creates a technical link.
+	 *
 	 * @param fromEndpoint point in canvas coordinates
-	 * @param toEndpoint point in canvas coordinates
+	 * @param toEndpoint   point in canvas coordinates
 	 */
 	default void createTechnicalLink(final SelectedElement fromEndpoint, final SelectedElement toEndpoint) {
 		final LinkModel linkModel = new LinkModel();
@@ -158,6 +163,7 @@ public interface ElementCreator extends DiagramCanvasExt {
 
 	/**
 	 * Finishes the link creation.
+	 *
 	 * @param worldPoint point in canvas coordinates
 	 */
 	default void finishLinkCreation(final Point2D.Double worldPoint) {

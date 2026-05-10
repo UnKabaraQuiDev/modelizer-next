@@ -16,6 +16,7 @@ public class AbstractBootstrapRuntime {
 	public interface UpdatePreparation {
 		/**
 		 * Prepares the for exit during bootstrap/update processing.
+		 *
 		 * @return {@code true} when the condition is met; otherwise {@code false}
 		 * @throws IOException if the operation cannot be completed
 		 */
@@ -26,6 +27,7 @@ public class AbstractBootstrapRuntime {
 
 	/**
 	 * Returns the instance during bootstrap/update processing.
+	 *
 	 * @return the instance
 	 */
 	public static AbstractBootstrapRuntime getInstance() {
@@ -34,6 +36,7 @@ public class AbstractBootstrapRuntime {
 
 	/**
 	 * Checks whether active is enabled or applies during bootstrap/update processing.
+	 *
 	 * @return {@code true} if active is enabled or applies; otherwise {@code false}
 	 */
 	public static boolean isActive() {
@@ -48,6 +51,7 @@ public class AbstractBootstrapRuntime {
 
 	/**
 	 * Checks the for updates.
+	 *
 	 * @return the check for updates result
 	 * @throws IOException if the operation cannot be completed
 	 */
@@ -57,6 +61,7 @@ public class AbstractBootstrapRuntime {
 
 	/**
 	 * Returns the installed updates disk usage bytes.
+	 *
 	 * @return the installed updates disk usage bytes
 	 * @throws IOException if the operation cannot be completed
 	 */
@@ -66,6 +71,7 @@ public class AbstractBootstrapRuntime {
 
 	/**
 	 * Returns the installed updates file count.
+	 *
 	 * @return the installed updates file count
 	 * @throws IOException if the operation cannot be completed
 	 */
@@ -75,6 +81,7 @@ public class AbstractBootstrapRuntime {
 
 	/**
 	 * Returns the installed updates directory.
+	 *
 	 * @return the installed updates directory
 	 */
 	public Path getInstalledUpdatesDirectory() {
@@ -83,6 +90,7 @@ public class AbstractBootstrapRuntime {
 
 	/**
 	 * Deletes installed update folders that are no longer needed.
+	 *
 	 * @return the free unused installed updates result
 	 * @throws IOException if the operation cannot be completed
 	 */
@@ -92,6 +100,7 @@ public class AbstractBootstrapRuntime {
 
 	/**
 	 * Returns the current application version.
+	 *
 	 * @return the current application version
 	 */
 	public String getCurrentApplicationVersion() {
@@ -100,6 +109,7 @@ public class AbstractBootstrapRuntime {
 
 	/**
 	 * Returns the selected channel during bootstrap/update processing.
+	 *
 	 * @return the selected channel
 	 */
 	public UpdateChannel getSelectedChannel() {
@@ -108,9 +118,10 @@ public class AbstractBootstrapRuntime {
 
 	/**
 	 * Installs the update and exit.
+	 *
 	 * @param parentComponent parent component value used by the operation
-	 * @param update update metadata to download or install
-	 * @param preparation preparation value used by the operation
+	 * @param update          update metadata to download or install
+	 * @param preparation     preparation value used by the operation
 	 * @return {@code true} when the condition is met; otherwise {@code false}
 	 * @throws IOException if the operation cannot be completed
 	 */
@@ -121,6 +132,7 @@ public class AbstractBootstrapRuntime {
 
 	/**
 	 * Checks whether auto check updates is enabled or applies.
+	 *
 	 * @return {@code true} if auto check updates is enabled or applies; otherwise {@code false}
 	 */
 	public boolean isAutoCheckUpdates() {
@@ -129,7 +141,9 @@ public class AbstractBootstrapRuntime {
 
 	/**
 	 * Checks whether automatic update checks enabled by property is enabled or applies.
-	 * @return {@code true} if automatic update checks enabled by property is enabled or applies; otherwise {@code
+	 *
+	 * @return {@code true} if automatic update checks enabled by property is enabled or applies;
+	 *         otherwise {@code
 	 *         false}
 	 */
 	public boolean isAutomaticUpdateChecksEnabledByProperty() {
@@ -138,6 +152,7 @@ public class AbstractBootstrapRuntime {
 
 	/**
 	 * Sets the auto check updates.
+	 *
 	 * @param enabled whether enabled is enabled
 	 */
 	public void setAutoCheckUpdates(final boolean enabled) {
@@ -145,6 +160,7 @@ public class AbstractBootstrapRuntime {
 
 	/**
 	 * Sets the selected channel during bootstrap/update processing.
+	 *
 	 * @param updateChannel update channel value used by the operation
 	 */
 	public void setSelectedChannel(final UpdateChannel updateChannel) {

@@ -7,6 +7,7 @@ public interface DisplayValueOwner {
 
 	/**
 	 * Returns the display value.
+	 *
 	 * @return the display value
 	 */
 	String getDisplayValue();

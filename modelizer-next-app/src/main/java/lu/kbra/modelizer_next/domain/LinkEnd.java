@@ -18,6 +18,7 @@ public class LinkEnd {
 
 	/**
 	 * Creates a link end instance.
+	 *
 	 * @param classId id of the class to look up or modify
 	 * @param fieldId id of the field to look up or modify
 	 */
@@ -28,6 +29,7 @@ public class LinkEnd {
 
 	/**
 	 * Returns the class ID.
+	 *
 	 * @return the class ID
 	 */
 	public String getClassId() {
@@ -36,6 +38,7 @@ public class LinkEnd {
 
 	/**
 	 * Returns the field ID.
+	 *
 	 * @return the field ID
 	 */
 	public String getFieldId() {
@@ -44,6 +47,7 @@ public class LinkEnd {
 
 	/**
 	 * Sets the class ID.
+	 *
 	 * @param classId id of the class to look up or modify
 	 */
 	public void setClassId(final String classId) {
@@ -52,6 +56,7 @@ public class LinkEnd {
 
 	/**
 	 * Sets the field ID.
+	 *
 	 * @param fieldId id of the field to look up or modify
 	 */
 	public void setFieldId(final String fieldId) {
@@ -60,6 +65,7 @@ public class LinkEnd {
 
 	/**
 	 * Builds a debug string for this link end.
+	 *
 	 * @return a debug string for this object
 	 */
 	@Override

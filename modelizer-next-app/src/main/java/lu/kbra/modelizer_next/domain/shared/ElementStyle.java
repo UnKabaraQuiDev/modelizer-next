@@ -11,6 +11,7 @@ public class ElementStyle implements ModelElement {
 
 	/**
 	 * Creates the default style for class elements.
+	 *
 	 * @return the for class result
 	 */
 	public static ElementStyle forClass() {
@@ -23,6 +24,7 @@ public class ElementStyle implements ModelElement {
 
 	/**
 	 * Creates the default style for field elements.
+	 *
 	 * @return the for field result
 	 */
 	public static ElementStyle forField() {
@@ -44,9 +46,10 @@ public class ElementStyle implements ModelElement {
 
 	/**
 	 * Creates an element style instance.
-	 * @param textColor color value to use
+	 *
+	 * @param textColor       color value to use
 	 * @param backgroundColor color value to use
-	 * @param borderColor color value to use
+	 * @param borderColor     color value to use
 	 */
 	public ElementStyle(final Color textColor, final Color backgroundColor, final Color borderColor) {
 		this.textColor = textColor;
@@ -56,6 +59,7 @@ public class ElementStyle implements ModelElement {
 
 	/**
 	 * Returns the background color.
+	 *
 	 * @return the background color
 	 */
 	public Color getBackgroundColor() {
@@ -64,6 +68,7 @@ public class ElementStyle implements ModelElement {
 
 	/**
 	 * Returns the border color.
+	 *
 	 * @return the border color
 	 */
 	public Color getBorderColor() {
@@ -72,6 +77,7 @@ public class ElementStyle implements ModelElement {
 
 	/**
 	 * Returns the text color.
+	 *
 	 * @return the text color
 	 */
 	public Color getTextColor() {
@@ -80,6 +86,7 @@ public class ElementStyle implements ModelElement {
 
 	/**
 	 * Sets the background color.
+	 *
 	 * @param backgroundColor color value to use
 	 */
 	public void setBackgroundColor(final Color backgroundColor) {
@@ -88,6 +95,7 @@ public class ElementStyle implements ModelElement {
 
 	/**
 	 * Sets the border color.
+	 *
 	 * @param borderColor color value to use
 	 */
 	public void setBorderColor(final Color borderColor) {
@@ -96,6 +104,7 @@ public class ElementStyle implements ModelElement {
 
 	/**
 	 * Sets the text color.
+	 *
 	 * @param textColor color value to use
 	 */
 	public void setTextColor(final Color textColor) {
@@ -104,6 +113,7 @@ public class ElementStyle implements ModelElement {
 
 	/**
 	 * Creates a copy of this object so callers can modify it without changing the original.
+	 *
 	 * @return the clone result
 	 */
 	@Override
@@ -117,6 +127,7 @@ public class ElementStyle implements ModelElement {
 
 	/**
 	 * Builds a debug string for this element style.
+	 *
 	 * @return a debug string for this object
 	 */
 	@Override

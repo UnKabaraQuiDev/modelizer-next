@@ -40,6 +40,7 @@ public final class RemoteUpdateService {
 
 		/**
 		 * Returns the manifest release entry for the requested update channel.
+		 *
 		 * @param channel update channel to query
 		 * @return the channel result
 		 */
@@ -64,6 +65,7 @@ public final class RemoteUpdateService {
 
 		/**
 		 * Returns the configured release URL or the default release page when none is set.
+		 *
 		 * @return the release URL or default result
 		 */
 		public String releaseUrlOrDefault() {
@@ -78,9 +80,10 @@ public final class RemoteUpdateService {
 
 	/**
 	 * Downloads an update artifact.
-	 * @param update update metadata to download or install
+	 *
+	 * @param update      update metadata to download or install
 	 * @param destination destination path that receives generated data
-	 * @param listener listener notified about progress or changes
+	 * @param listener    listener notified about progress or changes
 	 * @throws IOException if the operation cannot be completed
 	 */
 	public void download(final AvailableUpdate update, final Path destination, final ProgressListener listener) throws IOException {
@@ -92,10 +95,11 @@ public final class RemoteUpdateService {
 
 	/**
 	 * Downloads an update artifact.
-	 * @param downloadUri URI of the file to download
-	 * @param destination destination path that receives generated data
+	 *
+	 * @param downloadUri    URI of the file to download
+	 * @param destination    destination path that receives generated data
 	 * @param displayVersion version text shown in progress messages
-	 * @param listener listener notified about progress or changes
+	 * @param listener       listener notified about progress or changes
 	 * @throws IOException if the operation cannot be completed
 	 */
 	public void download(final URI downloadUri, final Path destination, final String displayVersion, final ProgressListener listener)
@@ -140,10 +144,11 @@ public final class RemoteUpdateService {
 
 	/**
 	 * Finds the latest bootstrap installer that matches the supplied input.
-	 * @param channel update channel to query
+	 *
+	 * @param channel        update channel to query
 	 * @param currentVersion currently installed version
 	 * @return the matching latest bootstrap installer, or {@code null} when no match exists
-	 * @throws IOException if the operation cannot be completed
+	 * @throws IOException          if the operation cannot be completed
 	 * @throws InterruptedException if the operation cannot be completed
 	 */
 	public BootstrapInstallerUpdate findLatestBootstrapInstaller(final UpdateChannel channel, final ParsedVersion currentVersion)
@@ -176,8 +181,9 @@ public final class RemoteUpdateService {
 
 	/**
 	 * Fetches the manifest.
+	 *
 	 * @return the fetch manifest result
-	 * @throws IOException if the operation cannot be completed
+	 * @throws IOException          if the operation cannot be completed
 	 * @throws InterruptedException if the operation cannot be completed
 	 */
 	public UpdateManifest fetchManifest() throws IOException, InterruptedException {
@@ -186,8 +192,9 @@ public final class RemoteUpdateService {
 
 	/**
 	 * Fetches the release manifest JSON.
+	 *
 	 * @return the fetch release manifest JSON result
-	 * @throws IOException if the operation cannot be completed
+	 * @throws IOException          if the operation cannot be completed
 	 * @throws InterruptedException if the operation cannot be completed
 	 */
 	public JsonNode fetchReleaseManifestJson() throws IOException, InterruptedException {
@@ -207,8 +214,9 @@ public final class RemoteUpdateService {
 
 	/**
 	 * Fetches the manifest JSON.
+	 *
 	 * @return the fetch manifest JSON result
-	 * @throws IOException if the operation cannot be completed
+	 * @throws IOException          if the operation cannot be completed
 	 * @throws InterruptedException if the operation cannot be completed
 	 */
 	public JsonNode fetchManifestJson() throws IOException, InterruptedException {
@@ -228,10 +236,11 @@ public final class RemoteUpdateService {
 
 	/**
 	 * Finds the latest that matches the supplied input.
-	 * @param channel update channel to query
+	 *
+	 * @param channel        update channel to query
 	 * @param currentVersion currently installed version
 	 * @return the matching latest, or {@code null} when no match exists
-	 * @throws IOException if the operation cannot be completed
+	 * @throws IOException          if the operation cannot be completed
 	 * @throws InterruptedException if the operation cannot be completed
 	 */
 	public AvailableUpdate findLatest(final UpdateChannel channel, final ParsedVersion currentVersion)
@@ -262,6 +271,7 @@ public final class RemoteUpdateService {
 
 	/**
 	 * Detects the current value from the runtime environment.
+	 *
 	 * @return the detect platform result
 	 */
 	private Platform detectPlatform() {
@@ -270,8 +280,9 @@ public final class RemoteUpdateService {
 
 	/**
 	 * Finds the bootstrap node that matches the supplied input.
+	 *
 	 * @param manifest update manifest to inspect
-	 * @param channel update channel to query
+	 * @param channel  update channel to query
 	 * @return the matching bootstrap node, or {@code null} when no match exists
 	 */
 	private JsonNode findBootstrapNode(final JsonNode manifest, final UpdateChannel channel) {
@@ -290,8 +301,9 @@ public final class RemoteUpdateService {
 
 	/**
 	 * Finds the installer URI that matches the supplied input.
+	 *
 	 * @param bootstrap bootstrap value used by the operation
-	 * @param platform target platform to match
+	 * @param platform  target platform to match
 	 * @return the matching installer URI, or {@code null} when no match exists
 	 */
 	private URI findInstallerUri(final JsonNode bootstrap, final Platform platform) {

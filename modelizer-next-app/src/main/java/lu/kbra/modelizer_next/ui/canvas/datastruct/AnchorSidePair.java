@@ -4,13 +4,15 @@ import lu.kbra.modelizer_next.ui.canvas.data.AnchorSide;
 
 /**
  * Pair of node sides used when resolving link anchors.
+ *
  * @param fromSide from side value used by the operation
- * @param toSide to side value used by the operation
+ * @param toSide   to side value used by the operation
  */
 public record AnchorSidePair(AnchorSide fromSide, AnchorSide toSide) {
 
 	/**
 	 * Checks whether from vertical is enabled or applies on the active canvas.
+	 *
 	 * @return {@code true} if from vertical is enabled or applies; otherwise {@code false}
 	 */
 	public boolean isFromVertical() {
@@ -19,6 +21,7 @@ public record AnchorSidePair(AnchorSide fromSide, AnchorSide toSide) {
 
 	/**
 	 * Checks whether to vertical is enabled or applies on the active canvas.
+	 *
 	 * @return {@code true} if to vertical is enabled or applies; otherwise {@code false}
 	 */
 	public boolean isToVertical() {

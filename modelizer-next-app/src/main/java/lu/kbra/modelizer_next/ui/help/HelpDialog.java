@@ -29,6 +29,7 @@ public class HelpDialog extends JFrame {
 
 	/**
 	 * Starts the application entry point.
+	 *
 	 * @param args command-line arguments supplied by the launcher
 	 */
 	public static void main(final String[] args) {
@@ -85,6 +86,7 @@ public class HelpDialog extends JFrame {
 
 	/**
 	 * Creates a tabs.
+	 *
 	 * @return the created tabs
 	 */
 	private JTabbedPane createTabs() {

@@ -26,6 +26,7 @@ public interface MainFrameDocumentController {
 
 	/**
 	 * Confirms whether the close with save should continue.
+	 *
 	 * @param prompt text value for prompt
 	 * @return {@code true} when the condition is met; otherwise {@code false}
 	 */
@@ -49,6 +50,7 @@ public interface MainFrameDocumentController {
 
 	/**
 	 * Creates an open file chooser.
+	 *
 	 * @return the created open file chooser
 	 */
 	default JFileChooser createOpenFileChooser() {
@@ -59,6 +61,7 @@ public interface MainFrameDocumentController {
 
 	/**
 	 * Creates a save file chooser.
+	 *
 	 * @return the created save file chooser
 	 */
 	default JFileChooser createSaveFileChooser() {
@@ -69,12 +72,14 @@ public interface MainFrameDocumentController {
 
 	/**
 	 * Returns the document.
+	 *
 	 * @return the document
 	 */
 	ModelDocument getDocument();
 
 	/**
 	 * Returns the session.
+	 *
 	 * @return the session
 	 */
 	DocumentSession getSession();
@@ -159,6 +164,7 @@ public interface MainFrameDocumentController {
 
 	/**
 	 * Loads the document from file.
+	 *
 	 * @param selectedFile file to read or write
 	 * @return {@code true} when the condition is met; otherwise {@code false}
 	 */
@@ -183,6 +189,7 @@ public interface MainFrameDocumentController {
 
 	/**
 	 * Opens the in frame.
+	 *
 	 * @param session document session to read or modify
 	 */
 	void openInFrame(DocumentSession session);
@@ -194,6 +201,7 @@ public interface MainFrameDocumentController {
 
 	/**
 	 * Saves the document.
+	 *
 	 * @return {@code true} when the condition is met; otherwise {@code false}
 	 */
 	default boolean saveDocument() {
@@ -205,6 +213,7 @@ public interface MainFrameDocumentController {
 
 	/**
 	 * Saves the document as.
+	 *
 	 * @return {@code true} when the condition is met; otherwise {@code false}
 	 */
 	default boolean saveDocumentAs() {
@@ -232,6 +241,7 @@ public interface MainFrameDocumentController {
 
 	/**
 	 * Writes the document.
+	 *
 	 * @param file file to read or write
 	 * @return {@code true} when the condition is met; otherwise {@code false}
 	 */

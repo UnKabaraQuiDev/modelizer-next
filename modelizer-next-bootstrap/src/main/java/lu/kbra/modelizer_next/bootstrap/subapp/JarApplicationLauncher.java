@@ -18,8 +18,9 @@ public final class JarApplicationLauncher {
 
 	/**
 	 * Launches the installed application.
-	 * @param args command-line arguments supplied by the launcher
-	 * @param toBeOpened to be opened value used by the operation
+	 *
+	 * @param args        command-line arguments supplied by the launcher
+	 * @param toBeOpened  to be opened value used by the operation
 	 * @param application application value used by the operation
 	 * @throws AppLaunchException if the operation cannot be completed
 	 */

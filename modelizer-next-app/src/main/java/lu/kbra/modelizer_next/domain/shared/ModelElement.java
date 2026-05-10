@@ -7,6 +7,7 @@ public interface ModelElement extends Cloneable {
 
 	/**
 	 * Creates a copy of this object so callers can modify it without changing the original.
+	 *
 	 * @return the clone result
 	 */
 	Object clone();

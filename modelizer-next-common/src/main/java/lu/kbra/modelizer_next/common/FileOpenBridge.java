@@ -16,6 +16,7 @@ public final class FileOpenBridge {
 
 	/**
 	 * Sets the callback.
+	 *
 	 * @param ping ping value used by the operation
 	 */
 	public static void setCallback(Runnable ping) {

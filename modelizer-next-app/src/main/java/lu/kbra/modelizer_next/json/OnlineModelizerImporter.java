@@ -25,6 +25,7 @@ public final class OnlineModelizerImporter {
 
 	/**
 	 * Imports the file.
+	 *
 	 * @param file file to read or write
 	 * @return the import file result
 	 * @throws IOException if the operation cannot be completed
@@ -40,10 +41,11 @@ public final class OnlineModelizerImporter {
 
 	/**
 	 * Adds the node layouts while converting JSON data.
+	 *
 	 * @param document document to read or modify
-	 * @param node JSON node to read
+	 * @param node     JSON node to read
 	 * @param objectId id of the element to read or modify
-	 * @param comment whether comment is enabled
+	 * @param comment  whether comment is enabled
 	 */
 	private static void addNodeLayouts(final ModelDocument document, final JsonNode node, final String objectId, final boolean comment) {
 		final JsonNode dataNode = node.path("data");
@@ -82,14 +84,15 @@ public final class OnlineModelizerImporter {
 
 	/**
 	 * Adds the panel layout while converting JSON data.
-	 * @param document document to read or modify
-	 * @param panelType diagram panel type whose model or layout should be used
-	 * @param objectId id of the element to read or modify
-	 * @param comment whether comment is enabled
+	 *
+	 * @param document          document to read or modify
+	 * @param panelType         diagram panel type whose model or layout should be used
+	 * @param objectId          id of the element to read or modify
+	 * @param comment           whether comment is enabled
 	 * @param preferredPosition preferred position value used by the operation
-	 * @param fallbackPosition fallback position value used by the operation
-	 * @param width width value
-	 * @param height height value
+	 * @param fallbackPosition  fallback position value used by the operation
+	 * @param width             width value
+	 * @param height            height value
 	 */
 	private static void addPanelLayout(
 			final ModelDocument document,
@@ -114,6 +117,7 @@ public final class OnlineModelizerImporter {
 
 	/**
 	 * Creates a comment while converting JSON data.
+	 *
 	 * @param node JSON node to read
 	 * @return the created comment
 	 */
@@ -137,10 +141,11 @@ public final class OnlineModelizerImporter {
 
 	/**
 	 * Creates a link while converting JSON data.
-	 * @param edgeNode edge node value used by the operation
-	 * @param classIdsBySourceId id of the element to read or modify
-	 * @param fieldIdsBySourceId id of the element to read or modify
-	 * @param classIdsByName name value to use
+	 *
+	 * @param edgeNode                edge node value used by the operation
+	 * @param classIdsBySourceId      id of the element to read or modify
+	 * @param fieldIdsBySourceId      id of the element to read or modify
+	 * @param classIdsByName          name value to use
 	 * @param fieldIdsByQualifiedName name value to use
 	 * @return the created link
 	 */
@@ -196,6 +201,7 @@ public final class OnlineModelizerImporter {
 
 	/**
 	 * Imports the root.
+	 *
 	 * @param root root value used by the operation
 	 * @return the import root result
 	 */
@@ -291,6 +297,7 @@ public final class OnlineModelizerImporter {
 
 	/**
 	 * Checks whether online root is enabled or applies while converting JSON data.
+	 *
 	 * @param root root value used by the operation
 	 * @return {@code true} if online root is enabled or applies; otherwise {@code false}
 	 */
@@ -301,6 +308,7 @@ public final class OnlineModelizerImporter {
 
 	/**
 	 * Parses the cardinality from the supplied input while converting JSON data.
+	 *
 	 * @param rawCardinality text value for raw cardinality
 	 * @return the parsed cardinality
 	 */
@@ -316,11 +324,12 @@ public final class OnlineModelizerImporter {
 
 	/**
 	 * Reads the edge text while converting JSON data.
-	 * @param primaryNode primary node value used by the operation
-	 * @param secondaryNode secondary node value used by the operation
-	 * @param primaryField text value for primary field
+	 *
+	 * @param primaryNode    primary node value used by the operation
+	 * @param secondaryNode  secondary node value used by the operation
+	 * @param primaryField   text value for primary field
 	 * @param secondaryField text value for secondary field
-	 * @param fallback text value for fallback
+	 * @param fallback       text value for fallback
 	 * @return the read edge text result
 	 */
 	private static String readEdgeText(
@@ -338,9 +347,10 @@ public final class OnlineModelizerImporter {
 
 	/**
 	 * Resolves the class ID from the current model and layout state while converting JSON data.
-	 * @param rawClassRef text value for raw class ref
+	 *
+	 * @param rawClassRef        text value for raw class ref
 	 * @param classIdsBySourceId id of the element to read or modify
-	 * @param classIdsByName name value to use
+	 * @param classIdsByName     name value to use
 	 * @return the resolved class ID
 	 */
 	private static String resolveClassId(
@@ -360,8 +370,9 @@ public final class OnlineModelizerImporter {
 
 	/**
 	 * Resolves the field ID from the current model and layout state while converting JSON data.
-	 * @param rawFieldRef text value for raw field ref
-	 * @param fieldIdsBySourceId id of the element to read or modify
+	 *
+	 * @param rawFieldRef             text value for raw field ref
+	 * @param fieldIdsBySourceId      id of the element to read or modify
 	 * @param fieldIdsByQualifiedName name value to use
 	 * @return the resolved field ID
 	 */

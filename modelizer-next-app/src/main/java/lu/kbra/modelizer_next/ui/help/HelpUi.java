@@ -74,6 +74,7 @@ final class HelpUi {
 
 		/**
 		 * Returns the preferred scrollable viewport size.
+		 *
 		 * @return the preferred scrollable viewport size
 		 */
 		@Override
@@ -83,9 +84,10 @@ final class HelpUi {
 
 		/**
 		 * Returns the scrollable block increment.
+		 *
 		 * @param visibleRect visible rect value used by the operation
 		 * @param orientation numeric orientation value
-		 * @param direction numeric direction value
+		 * @param direction   numeric direction value
 		 * @return the scrollable block increment
 		 */
 		@Override
@@ -95,6 +97,7 @@ final class HelpUi {
 
 		/**
 		 * Returns the scrollable tracks viewport height.
+		 *
 		 * @return {@code true} when the condition is met; otherwise {@code false}
 		 */
 		@Override
@@ -104,6 +107,7 @@ final class HelpUi {
 
 		/**
 		 * Returns the scrollable tracks viewport width.
+		 *
 		 * @return {@code true} when the condition is met; otherwise {@code false}
 		 */
 		@Override
@@ -113,9 +117,10 @@ final class HelpUi {
 
 		/**
 		 * Returns the scrollable unit increment.
+		 *
 		 * @param visibleRect visible rect value used by the operation
 		 * @param orientation numeric orientation value
-		 * @param direction numeric direction value
+		 * @param direction   numeric direction value
 		 * @return the scrollable unit increment
 		 */
 		@Override
@@ -133,6 +138,7 @@ final class HelpUi {
 
 		/**
 		 * Creates a wrapping text area instance.
+		 *
 		 * @param text text to display or edit
 		 */
 		WrappingTextArea(final String text) {
@@ -141,6 +147,7 @@ final class HelpUi {
 
 		/**
 		 * Returns the preferred size.
+		 *
 		 * @return the preferred size
 		 */
 		@Override
@@ -164,6 +171,7 @@ final class HelpUi {
 
 		/**
 		 * Creates a card panel instance.
+		 *
 		 * @param layout layout object to read or update
 		 */
 		CardPanel(final java.awt.LayoutManager layout) {
@@ -175,6 +183,7 @@ final class HelpUi {
 
 		/**
 		 * Returns the maximum size.
+		 *
 		 * @return the maximum size
 		 */
 		@Override
@@ -184,6 +193,7 @@ final class HelpUi {
 
 		/**
 		 * Paints the component.
+		 *
 		 * @param graphics graphics context used for drawing
 		 */
 		@Override
@@ -285,6 +295,7 @@ final class HelpUi {
 
 	/**
 	 * Removes simple HTML tags from text used in the help UI.
+	 *
 	 * @param text text to display or edit
 	 * @return the strip simple HTML result
 	 */
@@ -294,9 +305,10 @@ final class HelpUi {
 
 	/**
 	 * Blends two colors using the supplied ratio.
+	 *
 	 * @param foreground foreground color to use
 	 * @param background background color to use
-	 * @param amount numeric amount value
+	 * @param amount     numeric amount value
 	 * @return the blend result
 	 */
 	static Color blend(final Color foreground, final Color background, final float amount) {
@@ -309,6 +321,7 @@ final class HelpUi {
 
 	/**
 	 * Creates a formatted title component for a help card.
+	 *
 	 * @param text text to display or edit
 	 * @return the card title result
 	 */
@@ -321,6 +334,7 @@ final class HelpUi {
 
 	/**
 	 * Creates a small rounded label component.
+	 *
 	 * @param text text to display or edit
 	 * @return the chip result
 	 */
@@ -336,6 +350,7 @@ final class HelpUi {
 
 	/**
 	 * Creates a heading.
+	 *
 	 * @param title title text to display
 	 * @return the created heading
 	 */
@@ -359,6 +374,7 @@ final class HelpUi {
 
 	/**
 	 * Creates a page content.
+	 *
 	 * @return the created page content
 	 */
 	static JPanel createPageContent() {
@@ -373,6 +389,7 @@ final class HelpUi {
 
 	/**
 	 * Creates a scroll pane.
+	 *
 	 * @param content content value used by the operation
 	 * @return the created scroll pane
 	 */
@@ -391,6 +408,7 @@ final class HelpUi {
 
 	/**
 	 * Creates a label used for secondary help text.
+	 *
 	 * @param description text value for description
 	 * @return the description label result
 	 */
@@ -404,7 +422,8 @@ final class HelpUi {
 
 	/**
 	 * Returns a fallback value when the preferred value is missing.
-	 * @param value value to process
+	 *
+	 * @param value    value to process
 	 * @param fallback text value for fallback
 	 * @return the fallback result
 	 */
@@ -414,6 +433,7 @@ final class HelpUi {
 
 	/**
 	 * Creates a chip that describes a mouse gesture.
+	 *
 	 * @param text text to display or edit
 	 * @return the gesture chip result
 	 */
@@ -425,6 +445,7 @@ final class HelpUi {
 
 	/**
 	 * Creates a title label for a shortcut group.
+	 *
 	 * @param text text to display or edit
 	 * @return the group title result
 	 */
@@ -437,6 +458,7 @@ final class HelpUi {
 
 	/**
 	 * Checks whether this object has a text.
+	 *
 	 * @param value value to process
 	 * @return {@code true} if text exists; otherwise {@code false}
 	 */
@@ -446,6 +468,7 @@ final class HelpUi {
 
 	/**
 	 * Creates one information row for the help page.
+	 *
 	 * @param label text value for label
 	 * @param value value to process
 	 * @return the info row result
@@ -485,8 +508,9 @@ final class HelpUi {
 
 	/**
 	 * Creates a button that opens a help or external link.
+	 *
 	 * @param text text to display or edit
-	 * @param url URL to use
+	 * @param url  URL to use
 	 * @return the link button result
 	 */
 	static JButton linkButton(final String text, final String url) {
@@ -507,6 +531,7 @@ final class HelpUi {
 
 	/**
 	 * Opens the link.
+	 *
 	 * @param url URL to use
 	 */
 	static void openLink(final String url) {
@@ -530,6 +555,7 @@ final class HelpUi {
 
 	/**
 	 * Creates a wrapped paragraph component.
+	 *
 	 * @param text text to display or edit
 	 * @return the paragraph result
 	 */
@@ -550,7 +576,8 @@ final class HelpUi {
 
 	/**
 	 * Returns a color from UI defaults with a fallback value.
-	 * @param key text value for key
+	 *
+	 * @param key      text value for key
 	 * @param fallback fallback value used by the operation
 	 * @return the UI color result
 	 */
@@ -561,7 +588,8 @@ final class HelpUi {
 
 	/**
 	 * Returns a font from UI defaults with a fallback value.
-	 * @param key text value for key
+	 *
+	 * @param key      text value for key
 	 * @param fallback fallback value used by the operation
 	 * @return the UI font result
 	 */

@@ -15,6 +15,7 @@ interface DiagramPathBuilder extends DiagramCanvasExt {
 
 	/**
 	 * Builds a foreign key field name.
+	 *
 	 * @param targetClass target class value used by the operation
 	 * @param targetField target field value used by the operation
 	 * @return the built foreign key field name
@@ -28,6 +29,7 @@ interface DiagramPathBuilder extends DiagramCanvasExt {
 
 	/**
 	 * Builds a foreign key field technical name.
+	 *
 	 * @param targetClass target class value used by the operation
 	 * @param targetField target field value used by the operation
 	 * @return the built foreign key field technical name
@@ -39,6 +41,7 @@ interface DiagramPathBuilder extends DiagramCanvasExt {
 
 	/**
 	 * Builds a link path.
+	 *
 	 * @param linkModel link model affected by the operation
 	 * @return the built link path
 	 */
@@ -72,6 +75,7 @@ interface DiagramPathBuilder extends DiagramCanvasExt {
 
 	/**
 	 * Builds a selection path.
+	 *
 	 * @return the built selection path
 	 */
 	default String buildSelectionPath() {

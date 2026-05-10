@@ -34,16 +34,17 @@ public final class FieldEditorDialog {
 
 	/**
 	 * Immutable value object for result data.
-	 * @param name name value to read, write, or display
-	 * @param technicalName name value to use
-	 * @param primaryKey whether primary key is enabled
-	 * @param unique whether unique is enabled
-	 * @param notNull whether not null is enabled
-	 * @param textColor color value to use
+	 *
+	 * @param name            name value to read, write, or display
+	 * @param technicalName   name value to use
+	 * @param primaryKey      whether primary key is enabled
+	 * @param unique          whether unique is enabled
+	 * @param notNull         whether not null is enabled
+	 * @param textColor       color value to use
 	 * @param backgroundColor color value to use
-	 * @param moveDelta numeric move delta value
-	 * @param type type value that selects the operation mode
-	 * @param technicalOnly whether technical only is enabled
+	 * @param moveDelta       numeric move delta value
+	 * @param type            type value that selects the operation mode
+	 * @param technicalOnly   whether technical only is enabled
 	 */
 	public record Result(String name, String technicalName, boolean primaryKey, boolean unique, boolean notNull, Color textColor,
 			Color backgroundColor, int moveDelta, String type, boolean technicalOnly) {
@@ -58,8 +59,9 @@ public final class FieldEditorDialog {
 
 	/**
 	 * Shows the dialog.
-	 * @param parent parent component used for dialog ownership
-	 * @param fieldModel field model affected by the operation
+	 *
+	 * @param parent       parent component used for dialog ownership
+	 * @param fieldModel   field model affected by the operation
 	 * @param moveCallback move callback value used by the operation
 	 * @return the show dialog result
 	 */
@@ -181,16 +183,17 @@ public final class FieldEditorDialog {
 
 	/**
 	 * Applies the field values.
-	 * @param fieldModel field model affected by the operation
-	 * @param nameField name field value used by the operation
-	 * @param technicalNameField technical name field value used by the operation
-	 * @param primaryKeyBox primary key box value used by the operation
-	 * @param uniqueBox unique box value used by the operation
-	 * @param notNullBox not null box value used by the operation
-	 * @param textColorButton button to configure
+	 *
+	 * @param fieldModel            field model affected by the operation
+	 * @param nameField             name field value used by the operation
+	 * @param technicalNameField    technical name field value used by the operation
+	 * @param primaryKeyBox         primary key box value used by the operation
+	 * @param uniqueBox             unique box value used by the operation
+	 * @param notNullBox            not null box value used by the operation
+	 * @param textColorButton       button to configure
 	 * @param backgroundColorButton button to configure
-	 * @param typeField type field value used by the operation
-	 * @param technicalOnly technical only value used by the operation
+	 * @param typeField             type field value used by the operation
+	 * @param technicalOnly         technical only value used by the operation
 	 */
 	private static void applyFieldValues(
 			final FieldModel fieldModel,
@@ -216,6 +219,7 @@ public final class FieldEditorDialog {
 
 	/**
 	 * Creates one labeled row for a dialog form.
+	 *
 	 * @param labelText text value for label text
 	 * @param component Swing component to configure
 	 * @return the row result

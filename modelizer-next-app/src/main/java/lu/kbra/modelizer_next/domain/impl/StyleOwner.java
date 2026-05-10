@@ -11,6 +11,7 @@ public interface StyleOwner {
 
 	/**
 	 * Returns the background color.
+	 *
 	 * @return the background color
 	 */
 	default Color getBackgroundColor() {
@@ -19,6 +20,7 @@ public interface StyleOwner {
 
 	/**
 	 * Returns the border color.
+	 *
 	 * @return the border color
 	 */
 	default Color getBorderColor() {
@@ -27,12 +29,14 @@ public interface StyleOwner {
 
 	/**
 	 * Returns the style.
+	 *
 	 * @return the style
 	 */
 	ElementStyle getStyle();
 
 	/**
 	 * Returns the text color.
+	 *
 	 * @return the text color
 	 */
 	default Color getTextColor() {
@@ -41,6 +45,7 @@ public interface StyleOwner {
 
 	/**
 	 * Sets the background color.
+	 *
 	 * @param c c value used by the operation
 	 */
 	default void setBackgroundColor(final Color c) {
@@ -49,6 +54,7 @@ public interface StyleOwner {
 
 	/**
 	 * Sets the border color.
+	 *
 	 * @param c c value used by the operation
 	 */
 	default void setBorderColor(final Color c) {
@@ -57,12 +63,14 @@ public interface StyleOwner {
 
 	/**
 	 * Sets the style.
+	 *
 	 * @param style style value used by the operation
 	 */
 	void setStyle(ElementStyle style);
 
 	/**
 	 * Sets the text color.
+	 *
 	 * @param c c value used by the operation
 	 */
 	default void setTextColor(final Color c) {

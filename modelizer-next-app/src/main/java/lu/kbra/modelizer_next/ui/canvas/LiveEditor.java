@@ -58,6 +58,7 @@ public interface LiveEditor extends DiagramCanvasExt {
 
 	/**
 	 * Opens or applies editing for the selection style.
+	 *
 	 * @param alternative whether alternative is enabled
 	 */
 	default void editSelectionStyle(final boolean alternative) {
@@ -71,8 +72,9 @@ public interface LiveEditor extends DiagramCanvasExt {
 
 	/**
 	 * Returns the style object on the active canvas.
+	 *
 	 * @param selectedElement selected element to read or update
-	 * @param alternative whether alternative is enabled
+	 * @param alternative     whether alternative is enabled
 	 * @return the style object
 	 */
 	default Object getStyleObject(final SelectedElement selectedElement, final boolean alternative) {
@@ -95,6 +97,7 @@ public interface LiveEditor extends DiagramCanvasExt {
 
 	/**
 	 * Renames the selection.
+	 *
 	 * @param alternative whether alternative is enabled
 	 */
 	default void renameSelection(final boolean alternative) {
@@ -112,6 +115,7 @@ public interface LiveEditor extends DiagramCanvasExt {
 
 	/**
 	 * Starts inline style editing for the selected element.
+	 *
 	 * @param element element value used by the operation
 	 */
 	default void invokeStyleEditingElement(final LiveEditElement element) {
@@ -152,6 +156,7 @@ public interface LiveEditor extends DiagramCanvasExt {
 
 	/**
 	 * Starts inline renaming for the selected element.
+	 *
 	 * @param element element value used by the operation
 	 */
 	default void invokeRenamingElement(final LiveEditElement element) {
@@ -245,6 +250,7 @@ public interface LiveEditor extends DiagramCanvasExt {
 
 	/**
 	 * Applies the live edit context on the active canvas.
+	 *
 	 * @param ctx ctx value used by the operation
 	 */
 	@SuppressWarnings("unchecked")
@@ -296,6 +302,7 @@ public interface LiveEditor extends DiagramCanvasExt {
 
 	/**
 	 * Builds a class context.
+	 *
 	 * @param e event object supplied by Swing
 	 * @return the built class context
 	 */
@@ -315,6 +322,7 @@ public interface LiveEditor extends DiagramCanvasExt {
 
 	/**
 	 * Builds a class field context.
+	 *
 	 * @param e event object supplied by Swing
 	 * @return the built class field context
 	 */
@@ -340,6 +348,7 @@ public interface LiveEditor extends DiagramCanvasExt {
 
 	/**
 	 * Builds a comment context.
+	 *
 	 * @param e event object supplied by Swing
 	 * @return the built comment context
 	 */
@@ -357,6 +366,7 @@ public interface LiveEditor extends DiagramCanvasExt {
 
 	/**
 	 * Builds a link cardinality context.
+	 *
 	 * @param e event object supplied by Swing
 	 * @return the built link cardinality context
 	 */
@@ -389,6 +399,7 @@ public interface LiveEditor extends DiagramCanvasExt {
 
 	/**
 	 * Builds a link label context.
+	 *
 	 * @param e event object supplied by Swing
 	 * @return the built link label context
 	 */
@@ -425,6 +436,7 @@ public interface LiveEditor extends DiagramCanvasExt {
 
 	/**
 	 * Checks whether live editing element is enabled or applies on the active canvas.
+	 *
 	 * @return {@code true} if live editing element is enabled or applies; otherwise {@code false}
 	 */
 	default boolean isLiveEditingElement() {
@@ -453,6 +465,7 @@ public interface LiveEditor extends DiagramCanvasExt {
 
 	/**
 	 * Restores the edited element style from a previously captured style object.
+	 *
 	 * @param liveEditElement live edit element value used by the operation
 	 */
 	default void revertStyleObject(final LiveEditElement liveEditElement) {
@@ -486,7 +499,8 @@ public interface LiveEditor extends DiagramCanvasExt {
 
 	/**
 	 * Confirms whether the renaming element should continue on the active canvas.
-	 * @param nextDir numeric next dir value
+	 *
+	 * @param nextDir     numeric next dir value
 	 * @param alternative whether alternative is enabled
 	 */
 	default void confirmRenamingElement(final int nextDir, final boolean alternative) {
@@ -609,7 +623,8 @@ public interface LiveEditor extends DiagramCanvasExt {
 
 	/**
 	 * Applies the style on the active canvas.
-	 * @param palette palette value used by the operation
+	 *
+	 * @param palette         palette value used by the operation
 	 * @param liveEditElement live edit element value used by the operation
 	 */
 	default void applyStyle(final StylePalette palette, final LiveEditElement liveEditElement) {
@@ -636,6 +651,7 @@ public interface LiveEditor extends DiagramCanvasExt {
 
 	/**
 	 * Creates a renaming field.
+	 *
 	 * @return the created renaming field
 	 */
 	default LiveEditComponents createRenamingField() {

@@ -5,12 +5,14 @@ import lu.kbra.modelizer_next.layout.PanelType;
 import lu.kbra.modelizer_next.ui.frame.MainFrame;
 
 /**
- * Base extension contract that gives canvas mixins access to the owning DiagramCanvas and panel type.
+ * Base extension contract that gives canvas mixins access to the owning DiagramCanvas and panel
+ * type.
  */
 public interface DiagramCanvasExt {
 
 	/**
 	 * Returns the canvas.
+	 *
 	 * @return the canvas
 	 */
 	default DiagramCanvas getCanvas() {
@@ -19,6 +21,7 @@ public interface DiagramCanvasExt {
 
 	/**
 	 * Returns the document on the active canvas.
+	 *
 	 * @return the document
 	 */
 	default ModelDocument getDocument() {
@@ -27,6 +30,7 @@ public interface DiagramCanvasExt {
 
 	/**
 	 * Returns the panel type on the active canvas.
+	 *
 	 * @return the panel type
 	 */
 	default PanelType getPanelType() {
@@ -35,6 +39,7 @@ public interface DiagramCanvasExt {
 
 	/**
 	 * Returns the frame on the active canvas.
+	 *
 	 * @return the frame
 	 */
 	default MainFrame getFrame() {

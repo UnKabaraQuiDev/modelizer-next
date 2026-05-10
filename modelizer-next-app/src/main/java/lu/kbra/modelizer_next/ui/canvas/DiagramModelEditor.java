@@ -227,6 +227,7 @@ interface DiagramModelEditor extends DiagramCanvasExt {
 
 	/**
 	 * Moves the field selection.
+	 *
 	 * @param delta numeric delta value
 	 */
 	default void moveFieldSelection(final int delta) {
@@ -277,6 +278,7 @@ interface DiagramModelEditor extends DiagramCanvasExt {
 
 	/**
 	 * Moves the selected field in list.
+	 *
 	 * @param delta numeric delta value
 	 */
 	default void moveSelectedFieldInList(final int delta) {

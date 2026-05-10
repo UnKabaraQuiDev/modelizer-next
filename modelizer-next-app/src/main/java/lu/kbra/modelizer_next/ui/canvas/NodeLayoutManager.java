@@ -25,11 +25,12 @@ public interface NodeLayoutManager extends DiagramCanvasExt {
 
 	/**
 	 * Applies the node layout.
-	 * @param type type value that selects the operation mode
-	 * @param objectId id of the element to read or modify
+	 *
+	 * @param type         type value that selects the operation mode
+	 * @param objectId     id of the element to read or modify
 	 * @param copiedLayout layout object to read or modify
-	 * @param deltaX numeric delta x value
-	 * @param deltaY numeric delta y value
+	 * @param deltaX       numeric delta x value
+	 * @param deltaY       numeric delta y value
 	 */
 	default void applyNodeLayout(
 			final LayoutObjectType type,
@@ -46,8 +47,9 @@ public interface NodeLayoutManager extends DiagramCanvasExt {
 
 	/**
 	 * Computes the class bounds.
+	 *
 	 * @param classModel class model affected by the operation
-	 * @param layout layout object to read or update
+	 * @param layout     layout object to read or update
 	 * @return the compute class bounds result
 	 */
 	default Rectangle2D computeClassBounds(final ClassModel classModel, final NodeLayout layout) {
@@ -81,6 +83,7 @@ public interface NodeLayoutManager extends DiagramCanvasExt {
 
 	/**
 	 * Computes the clipboard bounds on the active canvas.
+	 *
 	 * @param clipboard clipboard value used by the operation
 	 * @return the compute clipboard bounds result
 	 */
@@ -119,7 +122,8 @@ public interface NodeLayoutManager extends DiagramCanvasExt {
 
 	/**
 	 * Computes the comment bounds.
-	 * @param text text to display or edit
+	 *
+	 * @param text   text to display or edit
 	 * @param layout layout object to read or update
 	 * @return the compute comment bounds result
 	 */
@@ -145,10 +149,11 @@ public interface NodeLayoutManager extends DiagramCanvasExt {
 
 	/**
 	 * Expands the bounds on the active canvas.
+	 *
 	 * @param bounds bounds used for layout or hit testing
-	 * @param x x coordinate
-	 * @param y y coordinate
-	 * @param width width value
+	 * @param x      x coordinate
+	 * @param y      y coordinate
+	 * @param width  width value
 	 * @param height height value
 	 * @return the expand bounds result
 	 */
@@ -177,6 +182,7 @@ public interface NodeLayoutManager extends DiagramCanvasExt {
 
 	/**
 	 * Resolves the render layout from the current model and layout state.
+	 *
 	 * @param layout layout object to read or update
 	 * @return the resolved render layout
 	 */

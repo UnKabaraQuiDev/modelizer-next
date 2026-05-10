@@ -18,6 +18,7 @@ public final class DocumentSession {
 
 	/**
 	 * Creates a document session instance.
+	 *
 	 * @param document document to read or modify
 	 */
 	public DocumentSession(final ModelDocument document) {
@@ -26,7 +27,8 @@ public final class DocumentSession {
 
 	/**
 	 * Creates a document session instance.
-	 * @param document document to read or modify
+	 *
+	 * @param document    document to read or modify
 	 * @param currentFile file to read or write
 	 */
 	public DocumentSession(final ModelDocument document, final File currentFile) {
@@ -39,6 +41,7 @@ public final class DocumentSession {
 
 	/**
 	 * Checks whether this object can redo.
+	 *
 	 * @return {@code true} if the operation is allowed; otherwise {@code false}
 	 */
 	public boolean canRedo() {
@@ -47,6 +50,7 @@ public final class DocumentSession {
 
 	/**
 	 * Checks whether this object can undo.
+	 *
 	 * @return {@code true} if the operation is allowed; otherwise {@code false}
 	 */
 	public boolean canUndo() {
@@ -55,6 +59,7 @@ public final class DocumentSession {
 
 	/**
 	 * Returns the current file.
+	 *
 	 * @return the current file
 	 */
 	public File getCurrentFile() {
@@ -63,6 +68,7 @@ public final class DocumentSession {
 
 	/**
 	 * Returns the document.
+	 *
 	 * @return the document
 	 */
 	public ModelDocument getDocument() {
@@ -71,6 +77,7 @@ public final class DocumentSession {
 
 	/**
 	 * Checks whether dirty is enabled or applies.
+	 *
 	 * @return {@code true} if dirty is enabled or applies; otherwise {@code false}
 	 */
 	public boolean isDirty() {
@@ -86,6 +93,7 @@ public final class DocumentSession {
 
 	/**
 	 * Marks the current document session as saved.
+	 *
 	 * @param file file to read or write
 	 */
 	public void markSaved(final File file) {
@@ -95,6 +103,7 @@ public final class DocumentSession {
 
 	/**
 	 * Restores the next snapshot in the redo history.
+	 *
 	 * @return {@code true} when the condition is met; otherwise {@code false}
 	 */
 	public boolean redo() {
@@ -103,6 +112,7 @@ public final class DocumentSession {
 
 	/**
 	 * Builds a debug string for this document session.
+	 *
 	 * @return a debug string for this object
 	 */
 	@Override
@@ -113,6 +123,7 @@ public final class DocumentSession {
 
 	/**
 	 * Restores the previous snapshot in the undo history.
+	 *
 	 * @return {@code true} when the condition is met; otherwise {@code false}
 	 */
 	public boolean undo() {

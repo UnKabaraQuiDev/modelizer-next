@@ -24,6 +24,7 @@ interface MouseInteractionController extends DiagramCanvasExt {
 
 	/**
 	 * Creates a mouse adapter on the active canvas.
+	 *
 	 * @return the created mouse adapter
 	 */
 	default MouseAdapter createMouseAdapter() {
@@ -54,6 +55,7 @@ interface MouseInteractionController extends DiagramCanvasExt {
 
 	/**
 	 * Handles the mouse dragged on the active canvas.
+	 *
 	 * @param event event object supplied by Swing
 	 */
 	default void handleMouseDragged(final MouseEvent event) {
@@ -115,6 +117,7 @@ interface MouseInteractionController extends DiagramCanvasExt {
 
 	/**
 	 * Returns the selected drag anchor on the active canvas.
+	 *
 	 * @param element element value used by the operation
 	 * @return the selected drag anchor
 	 */
@@ -140,6 +143,7 @@ interface MouseInteractionController extends DiagramCanvasExt {
 
 	/**
 	 * Handles the mouse pressed on the active canvas.
+	 *
 	 * @param event event object supplied by Swing
 	 */
 	default void handleMousePressed(final MouseEvent event) {
@@ -252,6 +256,7 @@ interface MouseInteractionController extends DiagramCanvasExt {
 
 	/**
 	 * Handles the mouse released on the active canvas.
+	 *
 	 * @param event event object supplied by Swing
 	 */
 	default void handleMouseReleased(final MouseEvent event) {
@@ -323,6 +328,7 @@ interface MouseInteractionController extends DiagramCanvasExt {
 
 	/**
 	 * Handles the mouse wheel moved on the active canvas.
+	 *
 	 * @param event event object supplied by Swing
 	 */
 	default void handleMouseWheelMoved(final MouseWheelEvent event) {

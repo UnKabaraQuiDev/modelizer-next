@@ -17,10 +17,11 @@ public class EnumCellRenderer extends DefaultListCellRenderer {
 
 	/**
 	 * Returns the list cell renderer component.
-	 * @param list list to read or update
-	 * @param value value to process
-	 * @param index zero-based index to read or update
-	 * @param isSelected whether is selected is enabled
+	 *
+	 * @param list         list to read or update
+	 * @param value        value to process
+	 * @param index        zero-based index to read or update
+	 * @param isSelected   whether is selected is enabled
 	 * @param cellHasFocus whether cell has focus is enabled
 	 * @return the list cell renderer component
 	 */

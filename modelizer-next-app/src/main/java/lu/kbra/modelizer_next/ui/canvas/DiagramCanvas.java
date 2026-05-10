@@ -164,9 +164,10 @@ public class DiagramCanvas extends JPanel implements DiagramModelLookup, NodeLay
 
 	/**
 	 * Creates a diagram canvas instance.
-	 * @param mainFrame main frame that owns the canvas or action
-	 * @param modelDocument document to read or modify
-	 * @param panelType diagram panel type whose model or layout should be used
+	 *
+	 * @param mainFrame             main frame that owns the canvas or action
+	 * @param modelDocument         document to read or modify
+	 * @param panelType             diagram panel type whose model or layout should be used
 	 * @param documentEventListener listener notified when the document changes
 	 */
 	public DiagramCanvas(
@@ -197,6 +198,7 @@ public class DiagramCanvas extends JPanel implements DiagramModelLookup, NodeLay
 
 	/**
 	 * Returns the canvas action.
+	 *
 	 * @param actionKey key under which the action is registered
 	 * @return the canvas action
 	 */
@@ -206,6 +208,7 @@ public class DiagramCanvas extends JPanel implements DiagramModelLookup, NodeLay
 
 	/**
 	 * Returns the height on the active canvas.
+	 *
 	 * @param bodyFont font used for measurement or drawing
 	 * @return the height
 	 */
@@ -215,6 +218,7 @@ public class DiagramCanvas extends JPanel implements DiagramModelLookup, NodeLay
 
 	/**
 	 * Paints the component.
+	 *
 	 * @param g graphics context supplied by Swing
 	 */
 	@Override
@@ -268,19 +272,6 @@ public class DiagramCanvas extends JPanel implements DiagramModelLookup, NodeLay
 		this.notifySelectionChanged();
 		this.revalidate();
 		this.repaint();
-	}
-
-	/**
-	 * Measures the width of text with the supplied font.
-	 * @param titleFont font used for measurement or drawing
-	 * @param classTitle text value for class title
-	 * @return the string width result
-	 */
-	public double stringWidth(final Font titleFont, final String classTitle) {
-		if (classTitle == null || classTitle.isBlank()) {
-			return 0;
-		}
-		return titleFont.getStringBounds(classTitle, this.fontRenderContext).getWidth();
 	}
 
 }

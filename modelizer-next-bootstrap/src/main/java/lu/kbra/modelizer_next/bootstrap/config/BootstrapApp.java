@@ -39,6 +39,7 @@ public final class BootstrapApp {
 
 	/**
 	 * Ensures that the directories exists or is up to date during bootstrap/update processing.
+	 *
 	 * @throws IOException if the operation cannot be completed
 	 */
 	public static void ensureDirectories() throws IOException {
@@ -49,6 +50,7 @@ public final class BootstrapApp {
 
 	/**
 	 * Creates a mapper during bootstrap/update processing.
+	 *
 	 * @return the created mapper
 	 */
 	private static ObjectMapper createMapper() {
@@ -61,6 +63,7 @@ public final class BootstrapApp {
 
 	/**
 	 * Returns the applications directory.
+	 *
 	 * @return the applications directory
 	 */
 	public static File getApplicationsDirectory() {
@@ -69,6 +72,7 @@ public final class BootstrapApp {
 
 	/**
 	 * Returns the bootstrap config file.
+	 *
 	 * @return the bootstrap config file
 	 */
 	public static File getBootstrapConfigFile() {
@@ -77,6 +81,7 @@ public final class BootstrapApp {
 
 	/**
 	 * Returns the home directory during bootstrap/update processing.
+	 *
 	 * @return the home directory
 	 */
 	public static File getHomeDirectory() {
@@ -102,6 +107,7 @@ public final class BootstrapApp {
 
 	/**
 	 * Returns the temp directory during bootstrap/update processing.
+	 *
 	 * @return the temp directory
 	 */
 	public static File getTempDirectory() {
@@ -110,6 +116,7 @@ public final class BootstrapApp {
 
 	/**
 	 * Initializes shared state required before the object is used during bootstrap/update processing.
+	 *
 	 * @throws IOException if the operation cannot be completed
 	 */
 	public static void init() throws IOException {
@@ -137,6 +144,7 @@ public final class BootstrapApp {
 
 	/**
 	 * Checks whether first launch is enabled or applies.
+	 *
 	 * @return {@code true} if first launch is enabled or applies; otherwise {@code false}
 	 */
 	public static boolean isFirstLaunch() {
@@ -145,6 +153,7 @@ public final class BootstrapApp {
 
 	/**
 	 * Loads the configuration during bootstrap/update processing.
+	 *
 	 * @return the load configuration result
 	 */
 	public static BootstrapConfiguration loadConfiguration() {
@@ -161,6 +170,7 @@ public final class BootstrapApp {
 
 	/**
 	 * Saves the configuration during bootstrap/update processing.
+	 *
 	 * @param configuration configuration value used by the operation
 	 */
 	public static void saveConfiguration(final BootstrapConfiguration configuration) {

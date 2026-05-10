@@ -38,6 +38,7 @@ public interface DocumentChangeListener {
 
 	/**
 	 * Handles the selection changed event.
+	 *
 	 * @param selectionInfo selection info value used by the operation
 	 */
 	void onSelectionChanged(SelectionInfo selectionInfo);

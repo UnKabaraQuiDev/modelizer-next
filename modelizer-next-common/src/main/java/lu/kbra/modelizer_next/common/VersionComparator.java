@@ -15,14 +15,16 @@ public class VersionComparator implements Comparator<String> {
 
 	/**
 	 * Immutable value object for parsed version data.
-	 * @param numbers values for numbers
+	 *
+	 * @param numbers       values for numbers
 	 * @param updateChannel update channel value used by the operation
-	 * @param buildNumber numeric build number value
+	 * @param buildNumber   numeric build number value
 	 */
 	public record ParsedVersion(List<Integer> numbers, UpdateChannel updateChannel, long buildNumber) {
 
 		/**
 		 * Builds a debug string for this parsed version.
+		 *
 		 * @return a debug string for this object
 		 */
 		@Override
@@ -53,7 +55,8 @@ public class VersionComparator implements Comparator<String> {
 
 	/**
 	 * Compares two values using this comparator's ordering rules.
-	 * @param left text value for left
+	 *
+	 * @param left  text value for left
 	 * @param right text value for right
 	 * @return a negative value, zero, or a positive value according to the ordering rules
 	 */
@@ -68,6 +71,7 @@ public class VersionComparator implements Comparator<String> {
 
 	/**
 	 * Parses the supplied text into the value type used by this class.
+	 *
 	 * @param version text value for version
 	 * @return the parsed value
 	 */
@@ -120,6 +124,7 @@ public class VersionComparator implements Comparator<String> {
 
 	/**
 	 * Parses the channel rank from the supplied input.
+	 *
 	 * @param token text value for token
 	 * @return the parsed channel rank
 	 */

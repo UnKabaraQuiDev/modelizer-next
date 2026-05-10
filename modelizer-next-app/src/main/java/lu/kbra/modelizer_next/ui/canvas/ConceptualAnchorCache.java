@@ -26,10 +26,11 @@ interface ConceptualAnchorCache extends DiagramCanvasExt {
 
 	/**
 	 * Computes the conceptual anchor point on the active canvas.
-	 * @param bounds bounds used for layout or hit testing
-	 * @param side node side to inspect
-	 * @param index zero-based index to read or update
-	 * @param big whether big is enabled
+	 *
+	 * @param bounds     bounds used for layout or hit testing
+	 * @param side       node side to inspect
+	 * @param index      zero-based index to read or update
+	 * @param big        whether big is enabled
 	 * @param totalCount count value to use
 	 * @return the compute conceptual anchor point result
 	 */
@@ -50,9 +51,10 @@ interface ConceptualAnchorCache extends DiagramCanvasExt {
 
 	/**
 	 * Computes the conceptual side center on the active canvas.
+	 *
 	 * @param bounds bounds used for layout or hit testing
-	 * @param side node side to inspect
-	 * @param big whether big is enabled
+	 * @param side   node side to inspect
+	 * @param big    whether big is enabled
 	 * @return the compute conceptual side center result
 	 */
 	default Point2D computeConceptualSideCenter(final Rectangle2D bounds, final AnchorSide side, final boolean big) {
@@ -72,8 +74,9 @@ interface ConceptualAnchorCache extends DiagramCanvasExt {
 
 	/**
 	 * Returns the conceptual side link count.
+	 *
 	 * @param classId id of the class to look up or modify
-	 * @param side node side to inspect
+	 * @param side    node side to inspect
 	 * @return the conceptual side link count
 	 */
 	default int getConceptualSideLinkCount(final String classId, final AnchorSide side) {
@@ -123,7 +126,7 @@ interface ConceptualAnchorCache extends DiagramCanvasExt {
 			final AnchorSidePair sidePair;
 			if (linkModel.isSelfLinking()) {
 				final AnchorSide fromSide = this.getCanvas().chooseSelfLinkFromSide(fromClass.getId());
-				sidePair = new AnchorSidePair(fromSide, this.getCanvas().clockwise(fromSide));
+				sidePair = new AnchorSidePair(fromSide, fromSide.clockwise());
 			} else {
 				sidePair = this.getCanvas()
 						.chooseBestConceptualSidePair(fromClass.getId(), fromBounds, toClass.getId(), toBounds, linkModel.hasTargetLabel());

@@ -13,6 +13,7 @@ public final class ConsoleDocumentLoadHandler implements DocumentLoadHandler {
 
 	/**
 	 * Creates a console document load handler instance.
+	 *
 	 * @param force whether force is enabled
 	 */
 	public ConsoleDocumentLoadHandler(final boolean force) {
@@ -21,6 +22,7 @@ public final class ConsoleDocumentLoadHandler implements DocumentLoadHandler {
 
 	/**
 	 * Confirms whether the legacy import should continue.
+	 *
 	 * @param file file to read or write
 	 * @return {@code true} when the condition is met; otherwise {@code false}
 	 */
@@ -39,8 +41,9 @@ public final class ConsoleDocumentLoadHandler implements DocumentLoadHandler {
 
 	/**
 	 * Confirms whether the newer version should continue.
+	 *
 	 * @param fileVersion text value for file version
-	 * @param appVersion text value for application version
+	 * @param appVersion  text value for application version
 	 * @return {@code true} when the condition is met; otherwise {@code false}
 	 */
 	@Override
@@ -59,8 +62,9 @@ public final class ConsoleDocumentLoadHandler implements DocumentLoadHandler {
 
 	/**
 	 * Reports the error.
+	 *
 	 * @param message message shown to the caller or user
-	 * @param ex exception that caused the failure
+	 * @param ex      exception that caused the failure
 	 */
 	@Override
 	public void error(final String message, final Exception ex) {

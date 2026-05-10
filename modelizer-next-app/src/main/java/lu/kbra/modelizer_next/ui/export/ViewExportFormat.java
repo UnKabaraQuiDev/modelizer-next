@@ -13,7 +13,8 @@ public enum ViewExportFormat {
 
 	/**
 	 * Creates a view export format instance.
-	 * @param extension text value for extension
+	 *
+	 * @param extension   text value for extension
 	 * @param displayName name value to use
 	 */
 	ViewExportFormat(final String extension, final String displayName) {
@@ -23,6 +24,7 @@ public enum ViewExportFormat {
 
 	/**
 	 * Returns the display name.
+	 *
 	 * @return the display name
 	 */
 	public String getDisplayName() {
@@ -31,6 +33,7 @@ public enum ViewExportFormat {
 
 	/**
 	 * Returns the extension.
+	 *
 	 * @return the extension
 	 */
 	public String getExtension() {
@@ -39,6 +42,7 @@ public enum ViewExportFormat {
 
 	/**
 	 * Builds a debug string for this view export format.
+	 *
 	 * @return a debug string for this object
 	 */
 	@Override

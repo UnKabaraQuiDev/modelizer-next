@@ -19,9 +19,10 @@ public interface LinkLayoutManager extends DiagramCanvasExt {
 
 	/**
 	 * Applies the link layout.
-	 * @param linkId id of the link to look up or modify
+	 *
+	 * @param linkId       id of the link to look up or modify
 	 * @param copiedLayout layout object to read or modify
-	 * @param offset numeric offset value
+	 * @param offset       numeric offset value
 	 */
 	default void applyLinkLayout(final String linkId, final CopiedLinkLayout copiedLayout, final double offset) {
 
@@ -41,10 +42,11 @@ public interface LinkLayoutManager extends DiagramCanvasExt {
 
 	/**
 	 * Applies the link layout.
-	 * @param linkId id of the link to look up or modify
+	 *
+	 * @param linkId       id of the link to look up or modify
 	 * @param copiedLayout layout object to read or modify
-	 * @param deltaX numeric delta x value
-	 * @param deltaY numeric delta y value
+	 * @param deltaX       numeric delta x value
+	 * @param deltaY       numeric delta y value
 	 */
 	default void applyLinkLayout(final String linkId, final CopiedLinkLayout copiedLayout, final double deltaX, final double deltaY) {
 
@@ -64,11 +66,12 @@ public interface LinkLayoutManager extends DiagramCanvasExt {
 
 	/**
 	 * Chooses the best conceptual side pair on the active canvas.
+	 *
 	 * @param fromClassId id of the element to read or modify
-	 * @param fromBounds bounds used for layout or hit testing
-	 * @param toClassId id of the element to read or modify
-	 * @param toBounds bounds used for layout or hit testing
-	 * @param big whether big is enabled
+	 * @param fromBounds  bounds used for layout or hit testing
+	 * @param toClassId   id of the element to read or modify
+	 * @param toBounds    bounds used for layout or hit testing
+	 * @param big         whether big is enabled
 	 * @return the choose best conceptual side pair result
 	 */
 	default AnchorSidePair chooseBestConceptualSidePair(
@@ -107,6 +110,7 @@ public interface LinkLayoutManager extends DiagramCanvasExt {
 
 	/**
 	 * Chooses the self link from side.
+	 *
 	 * @param classId id of the class to look up or modify
 	 * @return the choose self link from side result
 	 */
@@ -127,6 +131,7 @@ public interface LinkLayoutManager extends DiagramCanvasExt {
 
 	/**
 	 * Chooses the technical self link side.
+	 *
 	 * @param linkModel link model affected by the operation
 	 * @return the choose technical self link side result
 	 */
@@ -139,11 +144,12 @@ public interface LinkLayoutManager extends DiagramCanvasExt {
 
 	/**
 	 * Computes the conceptual sort value on the active canvas.
-	 * @param linkId id of the link to look up or modify
-	 * @param classId id of the class to look up or modify
-	 * @param side node side to inspect
+	 *
+	 * @param linkId          id of the link to look up or modify
+	 * @param classId         id of the class to look up or modify
+	 * @param side            node side to inspect
 	 * @param boundsByClassId id of the element to read or modify
-	 * @param sidePairs side pairs value used by the operation
+	 * @param sidePairs       side pairs value used by the operation
 	 * @return the compute conceptual sort value result
 	 */
 	default double computeConceptualSortValue(
@@ -196,6 +202,7 @@ public interface LinkLayoutManager extends DiagramCanvasExt {
 
 	/**
 	 * Resolves the conceptual anchor pair from the current model and layout state.
+	 *
 	 * @param targetLink target link value used by the operation
 	 * @return the resolved conceptual anchor pair
 	 */

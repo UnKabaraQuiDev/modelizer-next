@@ -22,6 +22,7 @@ public class LayerVisibility {
 
 	/**
 	 * Creates a layer visibility instance.
+	 *
 	 * @param pts values for pts
 	 */
 	public LayerVisibility(final PanelType... pts) {
@@ -39,6 +40,7 @@ public class LayerVisibility {
 
 	/**
 	 * Checks whether conceptual is enabled or applies.
+	 *
 	 * @return {@code true} if conceptual is enabled or applies; otherwise {@code false}
 	 */
 	public boolean isConceptual() {
@@ -47,6 +49,7 @@ public class LayerVisibility {
 
 	/**
 	 * Checks whether logical is enabled or applies.
+	 *
 	 * @return {@code true} if logical is enabled or applies; otherwise {@code false}
 	 */
 	public boolean isLogical() {
@@ -55,6 +58,7 @@ public class LayerVisibility {
 
 	/**
 	 * Checks whether physical is enabled or applies.
+	 *
 	 * @return {@code true} if physical is enabled or applies; otherwise {@code false}
 	 */
 	public boolean isPhysical() {
@@ -63,6 +67,7 @@ public class LayerVisibility {
 
 	/**
 	 * Checks whether visible is enabled or applies.
+	 *
 	 * @param pt pt value used by the operation
 	 * @return {@code true} if visible is enabled or applies; otherwise {@code false}
 	 */
@@ -76,6 +81,7 @@ public class LayerVisibility {
 
 	/**
 	 * Sets the value for the requested panel or key.
+	 *
 	 * @param c whether c is enabled
 	 * @param l whether l is enabled
 	 * @param p whether p is enabled
@@ -88,6 +94,7 @@ public class LayerVisibility {
 
 	/**
 	 * Sets the value for the requested panel or key.
+	 *
 	 * @param pts values for pts
 	 */
 	public void set(final PanelType... pts) {
@@ -103,6 +110,7 @@ public class LayerVisibility {
 
 	/**
 	 * Sets the conceptual.
+	 *
 	 * @param conceptual whether conceptual is enabled
 	 */
 	public void setConceptual(final boolean conceptual) {
@@ -111,6 +119,7 @@ public class LayerVisibility {
 
 	/**
 	 * Sets the logical.
+	 *
 	 * @param logical whether logical is enabled
 	 */
 	public void setLogical(final boolean logical) {
@@ -119,6 +128,7 @@ public class LayerVisibility {
 
 	/**
 	 * Sets the physical.
+	 *
 	 * @param physical whether physical is enabled
 	 */
 	public void setPhysical(final boolean physical) {
@@ -127,6 +137,7 @@ public class LayerVisibility {
 
 	/**
 	 * Builds a debug string for this layer visibility.
+	 *
 	 * @return a debug string for this object
 	 */
 	@Override

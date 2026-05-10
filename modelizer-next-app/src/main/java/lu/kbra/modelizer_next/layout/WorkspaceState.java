@@ -10,6 +10,7 @@ public class WorkspaceState {
 
 	/**
 	 * Creates a default.
+	 *
 	 * @return the created default
 	 */
 	public static WorkspaceState createDefault() {
@@ -33,6 +34,7 @@ public class WorkspaceState {
 
 	/**
 	 * Returns the dock layout.
+	 *
 	 * @return the dock layout
 	 */
 	public DockLayoutState getDockLayout() {
@@ -41,6 +43,7 @@ public class WorkspaceState {
 
 	/**
 	 * Returns the panels.
+	 *
 	 * @return the panels
 	 */
 	public Map<PanelType, PanelState> getPanels() {
@@ -49,6 +52,7 @@ public class WorkspaceState {
 
 	/**
 	 * Sets the dock layout.
+	 *
 	 * @param dockLayout layout object to read or modify
 	 */
 	public void setDockLayout(final DockLayoutState dockLayout) {
@@ -57,6 +61,7 @@ public class WorkspaceState {
 
 	/**
 	 * Sets the panels.
+	 *
 	 * @param panels panels value used by the operation
 	 */
 	public void setPanels(final Map<PanelType, PanelState> panels) {
@@ -65,6 +70,7 @@ public class WorkspaceState {
 
 	/**
 	 * Builds a debug string for this workspace state.
+	 *
 	 * @return a debug string for this object
 	 */
 	@Override

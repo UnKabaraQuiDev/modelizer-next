@@ -20,8 +20,9 @@ public class CommentBinding {
 
 	/**
 	 * Creates a comment binding instance.
+	 *
 	 * @param targetType type value to use
-	 * @param targetId id of the element to read or modify
+	 * @param targetId   id of the element to read or modify
 	 */
 	public CommentBinding(final BoundTargetType targetType, final String targetId) {
 		this.targetType = targetType;
@@ -30,6 +31,7 @@ public class CommentBinding {
 
 	/**
 	 * Returns the target ID.
+	 *
 	 * @return the target ID
 	 */
 	public String getTargetId() {
@@ -38,6 +40,7 @@ public class CommentBinding {
 
 	/**
 	 * Returns the target type.
+	 *
 	 * @return the target type
 	 */
 	public BoundTargetType getTargetType() {
@@ -46,6 +49,7 @@ public class CommentBinding {
 
 	/**
 	 * Sets the target ID.
+	 *
 	 * @param targetId id of the element to read or modify
 	 */
 	public void setTargetId(final String targetId) {
@@ -54,6 +58,7 @@ public class CommentBinding {
 
 	/**
 	 * Sets the target type.
+	 *
 	 * @param targetType type value to use
 	 */
 	public void setTargetType(final BoundTargetType targetType) {
@@ -62,6 +67,7 @@ public class CommentBinding {
 
 	/**
 	 * Builds a debug string for this comment binding.
+	 *
 	 * @return a debug string for this object
 	 */
 	@Override

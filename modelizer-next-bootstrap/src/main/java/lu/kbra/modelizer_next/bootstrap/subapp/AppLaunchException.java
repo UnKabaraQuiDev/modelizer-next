@@ -9,6 +9,7 @@ public final class AppLaunchException extends Exception {
 
 	/**
 	 * Creates an application launch exception instance.
+	 *
 	 * @param message message shown to the caller or user
 	 */
 	public AppLaunchException(final String message) {
@@ -17,8 +18,9 @@ public final class AppLaunchException extends Exception {
 
 	/**
 	 * Creates an application launch exception instance.
+	 *
 	 * @param message message shown to the caller or user
-	 * @param cause cause to attach to the created exception
+	 * @param cause   cause to attach to the created exception
 	 */
 	public AppLaunchException(final String message, final Throwable cause) {
 		super(message, cause);

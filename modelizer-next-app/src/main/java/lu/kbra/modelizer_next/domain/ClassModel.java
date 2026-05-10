@@ -14,8 +14,8 @@ import lu.kbra.modelizer_next.domain.shared.LayerVisibility;
 import lu.kbra.modelizer_next.layout.PanelType;
 
 /**
- * Persistent model of a diagram class/table. It owns display names, style, visibility, and the ordered list of
- * fields.
+ * Persistent model of a diagram class/table. It owns display names, style, visibility, and the
+ * ordered list of fields.
  */
 public class ClassModel implements VisibilityOwner, IdOwner, StyleOwner, NamesOwner {
 
@@ -38,7 +38,8 @@ public class ClassModel implements VisibilityOwner, IdOwner, StyleOwner, NamesOw
 
 	/**
 	 * Returns the field.
-	 * @param i zero-based index to read or update
+	 *
+	 * @param i         zero-based index to read or update
 	 * @param panelType diagram panel type whose model or layout should be used
 	 * @return the field
 	 */
@@ -61,6 +62,7 @@ public class ClassModel implements VisibilityOwner, IdOwner, StyleOwner, NamesOw
 
 	/**
 	 * Returns the field count.
+	 *
 	 * @param panelType diagram panel type whose model or layout should be used
 	 * @return the field count
 	 */
@@ -80,6 +82,7 @@ public class ClassModel implements VisibilityOwner, IdOwner, StyleOwner, NamesOw
 
 	/**
 	 * Returns the field index.
+	 *
 	 * @param fieldId id of the field to look up or modify
 	 * @return the field index
 	 */
@@ -95,7 +98,8 @@ public class ClassModel implements VisibilityOwner, IdOwner, StyleOwner, NamesOw
 
 	/**
 	 * Returns the field index.
-	 * @param fieldId id of the field to look up or modify
+	 *
+	 * @param fieldId   id of the field to look up or modify
 	 * @param panelType diagram panel type whose model or layout should be used
 	 * @return the field index
 	 */
@@ -118,6 +122,7 @@ public class ClassModel implements VisibilityOwner, IdOwner, StyleOwner, NamesOw
 
 	/**
 	 * Returns the fields.
+	 *
 	 * @return the fields
 	 */
 	public List<FieldModel> getFields() {
@@ -126,6 +131,7 @@ public class ClassModel implements VisibilityOwner, IdOwner, StyleOwner, NamesOw
 
 	/**
 	 * Returns the fields.
+	 *
 	 * @param panelType diagram panel type whose model or layout should be used
 	 * @return the fields
 	 */
@@ -145,6 +151,7 @@ public class ClassModel implements VisibilityOwner, IdOwner, StyleOwner, NamesOw
 
 	/**
 	 * Returns the ID.
+	 *
 	 * @return the ID
 	 */
 	@Override
@@ -154,6 +161,7 @@ public class ClassModel implements VisibilityOwner, IdOwner, StyleOwner, NamesOw
 
 	/**
 	 * Returns the names.
+	 *
 	 * @return the names
 	 */
 	@Override
@@ -163,6 +171,7 @@ public class ClassModel implements VisibilityOwner, IdOwner, StyleOwner, NamesOw
 
 	/**
 	 * Returns the style.
+	 *
 	 * @return the style
 	 */
 	@Override
@@ -172,6 +181,7 @@ public class ClassModel implements VisibilityOwner, IdOwner, StyleOwner, NamesOw
 
 	/**
 	 * Returns the visibility.
+	 *
 	 * @return the visibility
 	 */
 	@Override
@@ -181,6 +191,7 @@ public class ClassModel implements VisibilityOwner, IdOwner, StyleOwner, NamesOw
 
 	/**
 	 * Sets the fields.
+	 *
 	 * @param fields values for fields
 	 */
 	public void setFields(final List<FieldModel> fields) {
@@ -189,6 +200,7 @@ public class ClassModel implements VisibilityOwner, IdOwner, StyleOwner, NamesOw
 
 	/**
 	 * Sets the ID.
+	 *
 	 * @param id stable id of the model element
 	 */
 	@Override
@@ -198,6 +210,7 @@ public class ClassModel implements VisibilityOwner, IdOwner, StyleOwner, NamesOw
 
 	/**
 	 * Sets the names.
+	 *
 	 * @param names name values to use
 	 */
 	@Override
@@ -207,6 +220,7 @@ public class ClassModel implements VisibilityOwner, IdOwner, StyleOwner, NamesOw
 
 	/**
 	 * Sets the style.
+	 *
 	 * @param style style value used by the operation
 	 */
 	@Override
@@ -216,6 +230,7 @@ public class ClassModel implements VisibilityOwner, IdOwner, StyleOwner, NamesOw
 
 	/**
 	 * Sets the visibility.
+	 *
 	 * @param visibility visibility value used by the operation
 	 */
 	@Override
@@ -225,6 +240,7 @@ public class ClassModel implements VisibilityOwner, IdOwner, StyleOwner, NamesOw
 
 	/**
 	 * Builds a debug string for this class model.
+	 *
 	 * @return a debug string for this object
 	 */
 	@Override

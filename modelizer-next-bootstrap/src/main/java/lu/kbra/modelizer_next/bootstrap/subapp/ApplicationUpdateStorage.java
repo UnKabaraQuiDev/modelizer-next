@@ -29,6 +29,7 @@ public final class ApplicationUpdateStorage {
 
 	/**
 	 * Creates an application update storage instance.
+	 *
 	 * @param inventory inventory value used by the operation
 	 */
 	public ApplicationUpdateStorage(final ApplicationInventory inventory) {
@@ -37,6 +38,7 @@ public final class ApplicationUpdateStorage {
 
 	/**
 	 * Returns the updates directory.
+	 *
 	 * @return the updates directory
 	 */
 	public Path getUpdatesDirectory() {
@@ -45,6 +47,7 @@ public final class ApplicationUpdateStorage {
 
 	/**
 	 * Counts regular files in the supplied directory tree.
+	 *
 	 * @return the count files result
 	 * @throws IOException if the operation cannot be completed
 	 */
@@ -60,6 +63,7 @@ public final class ApplicationUpdateStorage {
 
 	/**
 	 * Calculates the disk usage bytes during bootstrap/update processing.
+	 *
 	 * @return the calculate disk usage bytes result
 	 * @throws IOException if the operation cannot be completed
 	 */
@@ -75,7 +79,8 @@ public final class ApplicationUpdateStorage {
 
 	/**
 	 * Deletes downloaded update files that are no longer needed.
-	 * @param activeChannel active channel value used by the operation
+	 *
+	 * @param activeChannel     active channel value used by the operation
 	 * @param activeApplication active application value used by the operation
 	 * @return the free unused updates result
 	 * @throws IOException if the operation cannot be completed
@@ -126,6 +131,7 @@ public final class ApplicationUpdateStorage {
 
 	/**
 	 * Checks whether temporary update file is enabled or applies.
+	 *
 	 * @param path file system path to read or write
 	 * @return {@code true} if temporary update file is enabled or applies; otherwise {@code false}
 	 */
@@ -136,6 +142,7 @@ public final class ApplicationUpdateStorage {
 
 	/**
 	 * Deletes the if exists during bootstrap/update processing.
+	 *
 	 * @param path file system path to read or write
 	 * @return the delete if exists result
 	 * @throws IOException if the operation cannot be completed
@@ -147,6 +154,7 @@ public final class ApplicationUpdateStorage {
 
 	/**
 	 * Returns the size of a file or directory tree in bytes.
+	 *
 	 * @param path file system path to read or write
 	 * @return the size of result
 	 */

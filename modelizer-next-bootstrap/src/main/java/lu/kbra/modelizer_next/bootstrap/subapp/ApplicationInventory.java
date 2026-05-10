@@ -28,6 +28,7 @@ public final class ApplicationInventory {
 
 	/**
 	 * Finds the latest installed that matches the supplied input.
+	 *
 	 * @return the matching latest installed, or {@code null} when no match exists
 	 * @throws IOException if the operation cannot be completed
 	 */
@@ -47,6 +48,7 @@ public final class ApplicationInventory {
 
 	/**
 	 * Finds the latest installed that matches the supplied input.
+	 *
 	 * @param wantedChannel wanted channel value used by the operation
 	 * @return the matching latest installed, or {@code null} when no match exists
 	 * @throws IOException if the operation cannot be completed
@@ -68,7 +70,8 @@ public final class ApplicationInventory {
 
 	/**
 	 * Creates an InstalledApplication value from an installed jar path.
-	 * @param update update metadata to download or install
+	 *
+	 * @param update   update metadata to download or install
 	 * @param listener listener notified about progress or changes
 	 * @return the install result
 	 * @throws IOException if the operation cannot be completed
@@ -85,6 +88,7 @@ public final class ApplicationInventory {
 
 	/**
 	 * Reads the installed application.
+	 *
 	 * @param jarPath path to read or write
 	 * @return an optional result when a matching value is available
 	 */

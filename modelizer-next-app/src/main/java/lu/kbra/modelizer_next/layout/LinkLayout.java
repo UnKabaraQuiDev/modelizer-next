@@ -24,6 +24,7 @@ public class LinkLayout {
 
 	/**
 	 * Returns the bend points.
+	 *
 	 * @return the bend points
 	 */
 	public List<Point2D.Double> getBendPoints() {
@@ -32,6 +33,7 @@ public class LinkLayout {
 
 	/**
 	 * Returns the link ID.
+	 *
 	 * @return the link ID
 	 */
 	public String getLinkId() {
@@ -40,6 +42,7 @@ public class LinkLayout {
 
 	/**
 	 * Returns the name label position.
+	 *
 	 * @return the name label position
 	 */
 	public Point2D.Double getNameLabelPosition() {
@@ -48,6 +51,7 @@ public class LinkLayout {
 
 	/**
 	 * Sets the bend points.
+	 *
 	 * @param bendPoints points in canvas coordinates
 	 */
 	public void setBendPoints(final List<Point2D.Double> bendPoints) {
@@ -56,6 +60,7 @@ public class LinkLayout {
 
 	/**
 	 * Sets the link ID.
+	 *
 	 * @param linkId id of the link to look up or modify
 	 */
 	public void setLinkId(final String linkId) {
@@ -64,6 +69,7 @@ public class LinkLayout {
 
 	/**
 	 * Sets the name label position.
+	 *
 	 * @param nameLabelPosition name label position value used by the operation
 	 */
 	public void setNameLabelPosition(final Point2D.Double nameLabelPosition) {
@@ -72,6 +78,7 @@ public class LinkLayout {
 
 	/**
 	 * Builds a debug string for this link layout.
+	 *
 	 * @return a debug string for this object
 	 */
 	@Override

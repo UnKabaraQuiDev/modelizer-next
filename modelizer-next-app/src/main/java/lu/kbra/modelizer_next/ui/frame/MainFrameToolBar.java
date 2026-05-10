@@ -31,8 +31,9 @@ final class MainFrameToolBar extends JToolBar {
 
 	/**
 	 * Scales an icon to the requested size.
-	 * @param icon icon value used by the operation
-	 * @param targetWidth width value
+	 *
+	 * @param icon         icon value used by the operation
+	 * @param targetWidth  width value
 	 * @param targetHeight height value
 	 * @return the scale icon result
 	 */
@@ -61,6 +62,7 @@ final class MainFrameToolBar extends JToolBar {
 
 	/**
 	 * Converts the input to a buffered image.
+	 *
 	 * @param image image value used by the operation
 	 * @return the to buffered image result
 	 */
@@ -87,6 +89,7 @@ final class MainFrameToolBar extends JToolBar {
 
 	/**
 	 * Creates a main frame tool bar instance.
+	 *
 	 * @param frame frame that owns the created UI component
 	 */
 	MainFrameToolBar(final MainFrame frame) {
@@ -111,10 +114,11 @@ final class MainFrameToolBar extends JToolBar {
 
 	/**
 	 * Creates a toolbar button.
-	 * @param frame frame that owns the created UI component
-	 * @param icon text value for icon
+	 *
+	 * @param frame       frame that owns the created UI component
+	 * @param icon        text value for icon
 	 * @param description text value for description
-	 * @param actionKey key under which the action is registered
+	 * @param actionKey   key under which the action is registered
 	 * @return the created toolbar button
 	 */
 	private JButton createToolbarButton(final MainFrame frame, final String icon, final String description, final String actionKey) {
@@ -153,8 +157,9 @@ final class MainFrameToolBar extends JToolBar {
 
 	/**
 	 * Returns the toolbar icon.
+	 *
 	 * @param frame frame that owns the created UI component
-	 * @param icon text value for icon
+	 * @param icon  text value for icon
 	 * @return the toolbar icon
 	 */
 	private ImageIcon getToolbarIcon(final MainFrame frame, final String icon) {

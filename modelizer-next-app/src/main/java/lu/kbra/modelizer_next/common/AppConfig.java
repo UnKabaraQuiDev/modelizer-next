@@ -19,6 +19,7 @@ public class AppConfig {
 
 	/**
 	 * Returns the default palette name.
+	 *
 	 * @return the default palette name
 	 */
 	public String getDefaultPaletteName() {
@@ -27,6 +28,7 @@ public class AppConfig {
 
 	/**
 	 * Returns the pinned palette names.
+	 *
 	 * @return the pinned palette names
 	 */
 	public List<String> getPinnedPaletteNames() {
@@ -38,6 +40,7 @@ public class AppConfig {
 
 	/**
 	 * Returns the selected palette name.
+	 *
 	 * @return the selected palette name
 	 */
 	public String getSelectedPaletteName() {
@@ -46,6 +49,7 @@ public class AppConfig {
 
 	/**
 	 * Returns the skipped update version.
+	 *
 	 * @return the skipped update version
 	 */
 	public String getSkippedUpdateVersion() {
@@ -54,6 +58,7 @@ public class AppConfig {
 
 	/**
 	 * Returns the theme mode.
+	 *
 	 * @return the theme mode
 	 */
 	public ThemeMode getThemeMode() {
@@ -62,6 +67,7 @@ public class AppConfig {
 
 	/**
 	 * Checks whether auto check updates is enabled or applies.
+	 *
 	 * @return {@code true} if auto check updates is enabled or applies; otherwise {@code false}
 	 */
 	public boolean isAutoCheckUpdates() {
@@ -70,6 +76,7 @@ public class AppConfig {
 
 	/**
 	 * Sets the auto check updates.
+	 *
 	 * @param autoCheckUpdates whether auto check updates is enabled
 	 */
 	public void setAutoCheckUpdates(final boolean autoCheckUpdates) {
@@ -78,6 +85,7 @@ public class AppConfig {
 
 	/**
 	 * Sets the default palette name.
+	 *
 	 * @param defaultPaletteName name value to use
 	 */
 	public void setDefaultPaletteName(final String defaultPaletteName) {
@@ -86,6 +94,7 @@ public class AppConfig {
 
 	/**
 	 * Sets the pinned palette names.
+	 *
 	 * @param pinnedPaletteNames name values to use
 	 */
 	public void setPinnedPaletteNames(final List<String> pinnedPaletteNames) {
@@ -94,6 +103,7 @@ public class AppConfig {
 
 	/**
 	 * Sets the selected palette name.
+	 *
 	 * @param selectedPaletteName name value to use
 	 */
 	public void setSelectedPaletteName(final String selectedPaletteName) {
@@ -102,6 +112,7 @@ public class AppConfig {
 
 	/**
 	 * Sets the skipped update version.
+	 *
 	 * @param skippedUpdateVersion text value for skipped update version
 	 */
 	public void setSkippedUpdateVersion(final String skippedUpdateVersion) {
@@ -110,6 +121,7 @@ public class AppConfig {
 
 	/**
 	 * Sets the theme mode.
+	 *
 	 * @param themeMode theme mode value used by the operation
 	 */
 	public void setThemeMode(final ThemeMode themeMode) {
@@ -118,6 +130,7 @@ public class AppConfig {
 
 	/**
 	 * Builds a debug string for this application config.
+	 *
 	 * @return a debug string for this object
 	 */
 	@Override

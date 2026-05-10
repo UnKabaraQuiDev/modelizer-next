@@ -25,7 +25,7 @@ public final class DocumentSessionLoader {
 	/**
 	 * Confirms whether the document should be loaded even if it has been written in a newer version of
 	 * the software.
-	 * 
+	 *
 	 * @param parent         parent component used for dialog ownership
 	 * @param loadedDocument loaded document value used by the operation
 	 * @return {@code true} if it is an older version or a newer one and the user acknowledged;
@@ -50,7 +50,7 @@ public final class DocumentSessionLoader {
 	/**
 	 * Confirms whether the document should be loaded even if it has been written in a newer version of
 	 * the software, using the given {@link DocumentLoadHandler}.
-	 * 
+	 *
 	 * @param loadedDocument loaded document value used by the operation
 	 * @param handler        handler value used by the operation
 	 * @return {@code true} when the condition is met; otherwise {@code false}
@@ -68,7 +68,7 @@ public final class DocumentSessionLoader {
 	/**
 	 * Loads a document from a files, supports {@code mod}, {@code mdlz}, {@code mn} file extensions.
 	 * Uses the {@link SwingDocumentLoadHandler} by default.
-	 * 
+	 *
 	 * @param parent       parent component used for dialog ownership
 	 * @param selectedFile file to read or write
 	 * @return the created document
@@ -79,7 +79,7 @@ public final class DocumentSessionLoader {
 
 	/**
 	 * Loads a document from a files, supports {@code mod}, {@code mdlz}, {@code mn} file extensions.
-	 * 
+	 *
 	 * @param selectedFile file to read or write
 	 * @param handler      handler value used by the operation
 	 * @return the created document

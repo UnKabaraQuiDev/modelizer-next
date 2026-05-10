@@ -38,6 +38,7 @@ public class CommentModel implements StyleOwner, VisibilityOwner, IdOwner {
 
 	/**
 	 * Creates a comment model instance.
+	 *
 	 * @param txt text value for txt
 	 */
 	public CommentModel(final String txt) {
@@ -47,6 +48,7 @@ public class CommentModel implements StyleOwner, VisibilityOwner, IdOwner {
 
 	/**
 	 * Returns the binding.
+	 *
 	 * @return the binding
 	 */
 	public CommentBinding getBinding() {
@@ -55,6 +57,7 @@ public class CommentModel implements StyleOwner, VisibilityOwner, IdOwner {
 
 	/**
 	 * Returns the ID.
+	 *
 	 * @return the ID
 	 */
 	@Override
@@ -64,6 +67,7 @@ public class CommentModel implements StyleOwner, VisibilityOwner, IdOwner {
 
 	/**
 	 * Returns the kind.
+	 *
 	 * @return the kind
 	 */
 	public CommentKind getKind() {
@@ -72,6 +76,7 @@ public class CommentModel implements StyleOwner, VisibilityOwner, IdOwner {
 
 	/**
 	 * Returns the style.
+	 *
 	 * @return the style
 	 */
 	@Override
@@ -81,6 +86,7 @@ public class CommentModel implements StyleOwner, VisibilityOwner, IdOwner {
 
 	/**
 	 * Returns the text.
+	 *
 	 * @return the text
 	 */
 	public String getText() {
@@ -89,6 +95,7 @@ public class CommentModel implements StyleOwner, VisibilityOwner, IdOwner {
 
 	/**
 	 * Returns the visibility.
+	 *
 	 * @return the visibility
 	 */
 	@Override
@@ -98,6 +105,7 @@ public class CommentModel implements StyleOwner, VisibilityOwner, IdOwner {
 
 	/**
 	 * Sets the background color legacy.
+	 *
 	 * @param color color value to use
 	 */
 	@JsonProperty("backgroundColor")
@@ -108,6 +116,7 @@ public class CommentModel implements StyleOwner, VisibilityOwner, IdOwner {
 
 	/**
 	 * Sets the binding.
+	 *
 	 * @param binding binding value used by the operation
 	 */
 	public void setBinding(final CommentBinding binding) {
@@ -116,6 +125,7 @@ public class CommentModel implements StyleOwner, VisibilityOwner, IdOwner {
 
 	/**
 	 * Sets the border color legacy.
+	 *
 	 * @param color color value to use
 	 */
 	@JsonProperty("borderColor")
@@ -126,6 +136,7 @@ public class CommentModel implements StyleOwner, VisibilityOwner, IdOwner {
 
 	/**
 	 * Sets the ID.
+	 *
 	 * @param id stable id of the model element
 	 */
 	@Override
@@ -135,6 +146,7 @@ public class CommentModel implements StyleOwner, VisibilityOwner, IdOwner {
 
 	/**
 	 * Sets the kind.
+	 *
 	 * @param kind kind value used by the operation
 	 */
 	public void setKind(final CommentKind kind) {
@@ -143,6 +155,7 @@ public class CommentModel implements StyleOwner, VisibilityOwner, IdOwner {
 
 	/**
 	 * Sets the style.
+	 *
 	 * @param style style value used by the operation
 	 */
 	@Override
@@ -152,6 +165,7 @@ public class CommentModel implements StyleOwner, VisibilityOwner, IdOwner {
 
 	/**
 	 * Sets the text.
+	 *
 	 * @param text text to display or edit
 	 */
 	public void setText(final String text) {
@@ -160,6 +174,7 @@ public class CommentModel implements StyleOwner, VisibilityOwner, IdOwner {
 
 	/**
 	 * Sets the text color legacy.
+	 *
 	 * @param color color value to use
 	 */
 	@JsonProperty("textColor")
@@ -170,6 +185,7 @@ public class CommentModel implements StyleOwner, VisibilityOwner, IdOwner {
 
 	/**
 	 * Sets the visibility.
+	 *
 	 * @param visibility visibility value used by the operation
 	 */
 	@Override
@@ -179,6 +195,7 @@ public class CommentModel implements StyleOwner, VisibilityOwner, IdOwner {
 
 	/**
 	 * Sets the visible in conceptual legacy.
+	 *
 	 * @param visibleInConceptual whether visible in conceptual is enabled
 	 */
 	@JsonProperty("visibleInConceptual")
@@ -189,6 +206,7 @@ public class CommentModel implements StyleOwner, VisibilityOwner, IdOwner {
 
 	/**
 	 * Sets the visible in logical legacy.
+	 *
 	 * @param visibleInLogical whether visible in logical is enabled
 	 */
 	@JsonProperty("visibleInLogical")
@@ -199,6 +217,7 @@ public class CommentModel implements StyleOwner, VisibilityOwner, IdOwner {
 
 	/**
 	 * Sets the visible in physical legacy.
+	 *
 	 * @param visibleInPhysical whether visible in physical is enabled
 	 */
 	@JsonProperty("visibleInPhysical")
@@ -209,6 +228,7 @@ public class CommentModel implements StyleOwner, VisibilityOwner, IdOwner {
 
 	/**
 	 * Builds a debug string for this comment model.
+	 *
 	 * @return a debug string for this object
 	 */
 	@Override

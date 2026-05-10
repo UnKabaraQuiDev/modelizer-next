@@ -6,7 +6,8 @@ import lu.kbra.modelizer_next.domain.DiagramModel;
 import lu.kbra.modelizer_next.layout.WorkspaceState;
 
 /**
- * Top-level persistent document that owns the diagram model, metadata, workspace layout, and style palettes.
+ * Top-level persistent document that owns the diagram model, metadata, workspace layout, and style
+ * palettes.
  */
 public class ModelDocument {
 
@@ -29,6 +30,7 @@ public class ModelDocument {
 
 	/**
 	 * Returns the meta.
+	 *
 	 * @return the meta
 	 */
 	public DocumentMeta getMeta() {
@@ -37,6 +39,7 @@ public class ModelDocument {
 
 	/**
 	 * Returns the model.
+	 *
 	 * @return the model
 	 */
 	public DiagramModel getModel() {
@@ -45,6 +48,7 @@ public class ModelDocument {
 
 	/**
 	 * Returns the schema version.
+	 *
 	 * @return the schema version
 	 */
 	public int getSchemaVersion() {
@@ -53,6 +57,7 @@ public class ModelDocument {
 
 	/**
 	 * Returns the source.
+	 *
 	 * @return the source
 	 */
 	public String getSource() {
@@ -61,6 +66,7 @@ public class ModelDocument {
 
 	/**
 	 * Returns the workspace.
+	 *
 	 * @return the workspace
 	 */
 	public WorkspaceState getWorkspace() {
@@ -69,6 +75,7 @@ public class ModelDocument {
 
 	/**
 	 * Sets the meta.
+	 *
 	 * @param meta meta value used by the operation
 	 */
 	public void setMeta(final DocumentMeta meta) {
@@ -77,6 +84,7 @@ public class ModelDocument {
 
 	/**
 	 * Sets the model.
+	 *
 	 * @param model diagram model to read or modify
 	 */
 	public void setModel(final DiagramModel model) {
@@ -85,6 +93,7 @@ public class ModelDocument {
 
 	/**
 	 * Sets the schema version.
+	 *
 	 * @param schemaVersion numeric schema version value
 	 */
 	public void setSchemaVersion(final int schemaVersion) {
@@ -93,6 +102,7 @@ public class ModelDocument {
 
 	/**
 	 * Sets the source.
+	 *
 	 * @param source source object used by the operation
 	 */
 	public void setSource(final String source) {
@@ -101,6 +111,7 @@ public class ModelDocument {
 
 	/**
 	 * Sets the workspace.
+	 *
 	 * @param workspace workspace value used by the operation
 	 */
 	public void setWorkspace(final WorkspaceState workspace) {
@@ -109,6 +120,7 @@ public class ModelDocument {
 
 	/**
 	 * Builds a debug string for this model document.
+	 *
 	 * @return a debug string for this object
 	 */
 	@Override

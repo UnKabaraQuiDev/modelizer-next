@@ -16,6 +16,7 @@ public final class SwingDocumentLoadHandler implements DocumentLoadHandler {
 
 	/**
 	 * Creates a Swing document load handler instance.
+	 *
 	 * @param parent parent component used for dialog ownership
 	 */
 	public SwingDocumentLoadHandler(final Component parent) {
@@ -24,6 +25,7 @@ public final class SwingDocumentLoadHandler implements DocumentLoadHandler {
 
 	/**
 	 * Confirms whether the legacy import should continue.
+	 *
 	 * @param file file to read or write
 	 * @return {@code true} when the condition is met; otherwise {@code false}
 	 */
@@ -39,8 +41,9 @@ public final class SwingDocumentLoadHandler implements DocumentLoadHandler {
 
 	/**
 	 * Confirms whether the newer version should continue.
+	 *
 	 * @param fileVersion text value for file version
-	 * @param appVersion text value for application version
+	 * @param appVersion  text value for application version
 	 * @return {@code true} when the condition is met; otherwise {@code false}
 	 */
 	@Override
@@ -57,8 +60,9 @@ public final class SwingDocumentLoadHandler implements DocumentLoadHandler {
 
 	/**
 	 * Reports the error.
+	 *
 	 * @param message message shown to the caller or user
-	 * @param ex exception that caused the failure
+	 * @param ex      exception that caused the failure
 	 */
 	@Override
 	public void error(final String message, final Exception ex) {

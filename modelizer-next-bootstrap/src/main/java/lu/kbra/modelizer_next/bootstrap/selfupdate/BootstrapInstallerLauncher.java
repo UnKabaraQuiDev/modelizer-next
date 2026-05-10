@@ -16,7 +16,8 @@ public final class BootstrapInstallerLauncher {
 
 	/**
 	 * Prompts the user for and start installer.
-	 * @param update update metadata to download or install
+	 *
+	 * @param update        update metadata to download or install
 	 * @param installerPath path to read or write
 	 * @return {@code true} when the condition is met; otherwise {@code false}
 	 * @throws IOException if the operation cannot be completed
@@ -42,7 +43,8 @@ public final class BootstrapInstallerLauncher {
 
 	/**
 	 * Starts the installer during bootstrap/update processing.
-	 * @param platform target platform to match
+	 *
+	 * @param platform      target platform to match
 	 * @param installerPath path to read or write
 	 * @throws IOException if the operation cannot be completed
 	 */
@@ -88,6 +90,7 @@ public final class BootstrapInstallerLauncher {
 
 	/**
 	 * Quotes an argument for use in a POSIX shell command.
+	 *
 	 * @param value value to process
 	 * @return the quote shell result
 	 */
@@ -97,6 +100,7 @@ public final class BootstrapInstallerLauncher {
 
 	/**
 	 * Quotes an argument for use in a PowerShell command.
+	 *
 	 * @param value value to process
 	 * @return the quote power shell result
 	 */

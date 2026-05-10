@@ -85,7 +85,7 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 
 	/**
 	 * Confirms whether the modern document version should continue.
-	 * 
+	 *
 	 * @param parent         parent component used for dialog ownership
 	 * @param loadedDocument loaded document value used by the operation
 	 * @return {@code true} when the condition is met; otherwise {@code false}
@@ -96,7 +96,7 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 
 	/**
 	 * Confirms whether the modern document version should continue.
-	 * 
+	 *
 	 * @param loadedDocument loaded document value used by the operation
 	 * @param handler        handler value used by the operation
 	 * @return {@code true} when the condition is met; otherwise {@code false}
@@ -107,7 +107,7 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 
 	/**
 	 * Creates a document.
-	 * 
+	 *
 	 * @param parent       parent component used for dialog ownership
 	 * @param selectedFile file to read or write
 	 * @return the created document
@@ -118,7 +118,7 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 
 	/**
 	 * Creates a document.
-	 * 
+	 *
 	 * @param selectedFile file to read or write
 	 * @param handler      handler value used by the operation
 	 * @return the created document
@@ -173,7 +173,7 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 
 	/**
 	 * Returns the active canvas, defaults to the conceptual one.
-	 * 
+	 *
 	 * @return the active canvas
 	 */
 	public DiagramCanvas getActiveCanvas() {
@@ -182,7 +182,7 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 
 	/**
 	 * Returns the canvases.
-	 * 
+	 *
 	 * @return the canvases
 	 */
 	public List<DiagramCanvas> getCanvases() {
@@ -191,7 +191,7 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 
 	/**
 	 * Returns the canvases by panel type.
-	 * 
+	 *
 	 * @return the canvases by panel type
 	 */
 	public Map<PanelType, DiagramCanvas> getCanvasesByPanelType() {
@@ -214,7 +214,7 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 
 	/**
 	 * Loads the document from a file.
-	 * 
+	 *
 	 * @param selectedFile file to read or write
 	 * @return {@code true} if the document was successfully loaded; otherwise {@code false}
 	 */
@@ -224,7 +224,7 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 
 	/**
 	 * Overwrites the frame content with the new document session.
-	 * 
+	 *
 	 * @param session document session to read or modify
 	 */
 	@Override
@@ -266,7 +266,7 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 	/**
 	 * Clears the frame state and rebuilds everything for the new document session. This is a
 	 * replacement to disposing of the JFrame and recreating it.
-	 * 
+	 *
 	 * @param session document session to read or modify
 	 */
 	protected void setContent(final DocumentSession session) {
@@ -358,7 +358,7 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 
 	/**
 	 * Applies the theme to the window and reopen.
-	 * 
+	 *
 	 * @param mode mode value used by the operation
 	 */
 	void applyThemeAndReopen(final ThemeMode mode) {
@@ -370,7 +370,7 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 
 	/**
 	 * Returns the update runtime provided by the bootstrap layer.
-	 * 
+	 *
 	 * @return an optional result when a matching value is available
 	 */
 	Optional<UpdateRuntime> bootstrapRuntime() {
@@ -462,7 +462,7 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 
 	/**
 	 * Creates a dockable canvas panel.
-	 * 
+	 *
 	 * @param id     stable id of the model element
 	 * @param title  title text to display
 	 * @param canvas canvas instance that owns the operation
@@ -529,7 +529,7 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 
 	/**
 	 * Finds the shortcut text that matches the supplied input.
-	 * 
+	 *
 	 * @param canvas    canvas instance that owns the operation
 	 * @param actionKey key under which the action is registered
 	 * @return the matching shortcut text, or {@code null} when no match exists
@@ -549,7 +549,7 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 
 	/**
 	 * Formats the key stroke as String.
-	 * 
+	 *
 	 * @param keyStroke keyboard shortcut to register
 	 * @return the format key stroke result
 	 */
@@ -573,7 +573,7 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 
 	/**
 	 * Returns the default export directory.
-	 * 
+	 *
 	 * @return the default export directory
 	 */
 	File getDefaultExportDirectory() {
@@ -586,7 +586,7 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 
 	/**
 	 * Returns the export source file.
-	 * 
+	 *
 	 * @return the export source file
 	 */
 	Optional<File> getExportSourceFile() {
@@ -613,7 +613,7 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 
 	/**
 	 * Prepares the for update install.
-	 * 
+	 *
 	 * @return {@code true} when the condition is met; otherwise {@code false}
 	 * @throws IOException if the operation cannot be completed
 	 */
@@ -690,7 +690,7 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 
 	/**
 	 * Removes the listener.
-	 * 
+	 *
 	 * @param listeners values for listeners
 	 * @param remove    remove value used by the operation
 	 */
@@ -723,7 +723,7 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 
 	/**
 	 * Updates the selection label.
-	 * 
+	 *
 	 * @param selectionInfo selection info value used by the operation
 	 */
 	void updateSelectionLabel(final SelectionInfo selectionInfo) {
@@ -735,7 +735,7 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 
 	/**
 	 * Returns the palettes loaded from the config.
-	 * 
+	 *
 	 * @return the palettes
 	 */
 	public List<StylePalette> getPalettes() {

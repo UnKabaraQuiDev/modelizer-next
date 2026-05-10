@@ -33,8 +33,9 @@ public final class RenameDialog {
 
 	/**
 	 * Shows the dialog.
-	 * @param parent parent component used for dialog ownership
-	 * @param title title text to display
+	 *
+	 * @param parent       parent component used for dialog ownership
+	 * @param title        title text to display
 	 * @param initialValue text value for initial value
 	 * @return the show dialog result
 	 */

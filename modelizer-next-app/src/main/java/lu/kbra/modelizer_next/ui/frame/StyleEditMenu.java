@@ -17,6 +17,7 @@ final class StyleEditMenu extends JMenu {
 
 	/**
 	 * Creates a style edit menu instance.
+	 *
 	 * @param frame frame that owns the created UI component
 	 */
 	StyleEditMenu(final MainFrame frame) {
@@ -30,7 +31,8 @@ final class StyleEditMenu extends JMenu {
 
 	/**
 	 * Opens or applies editing for the palette.
-	 * @param frame frame that owns the created UI component
+	 *
+	 * @param frame   frame that owns the created UI component
 	 * @param palette palette value used by the operation
 	 */
 	private void editPalette(final MainFrame frame, final StylePalette palette) {

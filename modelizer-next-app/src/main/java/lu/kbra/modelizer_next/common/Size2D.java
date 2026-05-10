@@ -17,6 +17,7 @@ public class Size2D extends Double {
 
 	/**
 	 * Creates a size 2 d instance.
+	 *
 	 * @param x x coordinate
 	 * @param y y coordinate
 	 */
@@ -26,6 +27,7 @@ public class Size2D extends Double {
 
 	/**
 	 * Returns the height.
+	 *
 	 * @return the height
 	 */
 	public double getHeight() {
@@ -34,6 +36,7 @@ public class Size2D extends Double {
 
 	/**
 	 * Returns the width.
+	 *
 	 * @return the width
 	 */
 	public double getWidth() {
@@ -42,6 +45,7 @@ public class Size2D extends Double {
 
 	/**
 	 * Returns the x.
+	 *
 	 * @return the x
 	 */
 	@Deprecated
@@ -52,6 +56,7 @@ public class Size2D extends Double {
 
 	/**
 	 * Returns the y.
+	 *
 	 * @return the y
 	 */
 	@Deprecated
@@ -62,6 +67,7 @@ public class Size2D extends Double {
 
 	/**
 	 * Sets the height.
+	 *
 	 * @param y y coordinate
 	 */
 	public void setHeight(final double y) {
@@ -70,6 +76,7 @@ public class Size2D extends Double {
 
 	/**
 	 * Sets the width.
+	 *
 	 * @param x x coordinate
 	 */
 	public void setWidth(final double x) {
@@ -78,6 +85,7 @@ public class Size2D extends Double {
 
 	/**
 	 * Sets the x.
+	 *
 	 * @param x x coordinate
 	 */
 	@Deprecated
@@ -87,6 +95,7 @@ public class Size2D extends Double {
 
 	/**
 	 * Sets the y.
+	 *
 	 * @param y y coordinate
 	 */
 	@Deprecated

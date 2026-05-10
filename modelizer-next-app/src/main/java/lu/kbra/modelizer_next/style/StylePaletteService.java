@@ -17,6 +17,7 @@ public final class StylePaletteService {
 
 	/**
 	 * Deletes the by name.
+	 *
 	 * @param paletteName name value to use
 	 */
 	public static void deleteByName(final String paletteName) {
@@ -32,6 +33,7 @@ public final class StylePaletteService {
 
 	/**
 	 * Loads the all.
+	 *
 	 * @return the matching values
 	 */
 	public static List<StylePalette> loadAll() {
@@ -60,6 +62,7 @@ public final class StylePaletteService {
 
 	/**
 	 * Saves the current state to persistent storage.
+	 *
 	 * @param palette palette value used by the operation
 	 */
 	public static void save(final StylePalette palette) {
@@ -91,6 +94,7 @@ public final class StylePaletteService {
 
 	/**
 	 * Sanitizes the file name so it can be used safely.
+	 *
 	 * @param name name value to read, write, or display
 	 * @return the sanitize file name result
 	 */

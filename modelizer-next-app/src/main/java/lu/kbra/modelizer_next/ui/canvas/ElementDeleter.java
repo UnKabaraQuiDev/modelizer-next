@@ -10,6 +10,7 @@ public interface ElementDeleter extends DiagramCanvasExt {
 
 	/**
 	 * Deletes the class.
+	 *
 	 * @param classId id of the class to look up or modify
 	 */
 	default void deleteClass(final String classId) {
@@ -46,6 +47,7 @@ public interface ElementDeleter extends DiagramCanvasExt {
 
 	/**
 	 * Deletes the comment.
+	 *
 	 * @param commentId id of the comment to look up or modify
 	 */
 	default void deleteComment(final String commentId) {
@@ -58,6 +60,7 @@ public interface ElementDeleter extends DiagramCanvasExt {
 
 	/**
 	 * Deletes the field.
+	 *
 	 * @param classId id of the class to look up or modify
 	 * @param fieldId id of the field to look up or modify
 	 */
@@ -79,6 +82,7 @@ public interface ElementDeleter extends DiagramCanvasExt {
 
 	/**
 	 * Deletes the link.
+	 *
 	 * @param linkId id of the link to look up or modify
 	 */
 	default void deleteLink(final String linkId) {

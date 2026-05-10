@@ -31,6 +31,7 @@ public class DiagramModel {
 
 	/**
 	 * Returns the all links.
+	 *
 	 * @return the all links
 	 */
 	public Collection<LinkModel> getAllLinks() {
@@ -41,6 +42,7 @@ public class DiagramModel {
 
 	/**
 	 * Returns the classes.
+	 *
 	 * @return the classes
 	 */
 	public List<ClassModel> getClasses() {
@@ -49,6 +51,7 @@ public class DiagramModel {
 
 	/**
 	 * Returns the comments.
+	 *
 	 * @return the comments
 	 */
 	public List<CommentModel> getComments() {
@@ -57,6 +60,7 @@ public class DiagramModel {
 
 	/**
 	 * Returns the conceptual links.
+	 *
 	 * @return the conceptual links
 	 */
 	public List<LinkModel> getConceptualLinks() {
@@ -65,6 +69,7 @@ public class DiagramModel {
 
 	/**
 	 * Returns the technical links.
+	 *
 	 * @return the technical links
 	 */
 	public List<LinkModel> getTechnicalLinks() {
@@ -89,6 +94,7 @@ public class DiagramModel {
 
 	/**
 	 * Sets the classes.
+	 *
 	 * @param classes values for classes
 	 */
 	public void setClasses(final List<ClassModel> classes) {
@@ -97,6 +103,7 @@ public class DiagramModel {
 
 	/**
 	 * Sets the comments.
+	 *
 	 * @param comments values for comments
 	 */
 	public void setComments(final List<CommentModel> comments) {
@@ -105,6 +112,7 @@ public class DiagramModel {
 
 	/**
 	 * Builds a debug string for this diagram model.
+	 *
 	 * @return a debug string for this object
 	 */
 	@Override

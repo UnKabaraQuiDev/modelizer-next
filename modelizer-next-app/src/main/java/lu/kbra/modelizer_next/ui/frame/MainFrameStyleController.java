@@ -29,6 +29,7 @@ public interface MainFrameStyleController {
 
 	/**
 	 * Creates a default style menu.
+	 *
 	 * @return the created default style menu
 	 */
 	default JMenu createDefaultStyleMenu() {
@@ -52,6 +53,7 @@ public interface MainFrameStyleController {
 
 	/**
 	 * Creates a pin menu.
+	 *
 	 * @return the created pin menu
 	 */
 	default JMenu createPinMenu() {
@@ -68,7 +70,8 @@ public interface MainFrameStyleController {
 
 	/**
 	 * Creates a pinned style button.
-	 * @param palette palette value used by the operation
+	 *
+	 * @param palette     palette value used by the operation
 	 * @param previewType type value to use
 	 * @return the created pinned style button
 	 */
@@ -106,6 +109,7 @@ public interface MainFrameStyleController {
 
 	/**
 	 * Creates a reload styles item.
+	 *
 	 * @return the created reload styles item
 	 */
 	default JMenuItem createReloadStylesItem() {
@@ -116,6 +120,7 @@ public interface MainFrameStyleController {
 
 	/**
 	 * Finds the palette by name that matches the supplied input.
+	 *
 	 * @param paletteName name value to use
 	 * @return the matching palette by name, or {@code null} when no match exists
 	 */
@@ -135,7 +140,8 @@ public interface MainFrameStyleController {
 
 	/**
 	 * Blends the given color with white by the supplied ratio.
-	 * @param color color value to use
+	 *
+	 * @param color  color value to use
 	 * @param amount numeric amount value
 	 * @return the mix with white result
 	 */
@@ -153,6 +159,7 @@ public interface MainFrameStyleController {
 
 	/**
 	 * Rebuilds the style menu from the available palettes.
+	 *
 	 * @param stylesMenu styles menu value used by the operation
 	 */
 	default void populateStylesMenu(final JMenu stylesMenu) {
@@ -196,6 +203,7 @@ public interface MainFrameStyleController {
 
 	/**
 	 * Updates a pinned palette name after the palette was renamed.
+	 *
 	 * @param oldName name value to use
 	 * @param newName name value to use
 	 */
@@ -227,7 +235,8 @@ public interface MainFrameStyleController {
 
 	/**
 	 * Resolves the pinned style appearance from the current model and layout state.
-	 * @param palette palette value used by the operation
+	 *
+	 * @param palette     palette value used by the operation
 	 * @param previewType type value to use
 	 * @return the resolved pinned style appearance
 	 */
@@ -283,8 +292,9 @@ public interface MainFrameStyleController {
 
 	/**
 	 * Sets the palette pinned.
+	 *
 	 * @param paletteName name value to use
-	 * @param pinned whether pinned is enabled
+	 * @param pinned      whether pinned is enabled
 	 */
 	default void setPalettePinned(final String paletteName, final boolean pinned) {
 		final MainFrame frame = (MainFrame) this;

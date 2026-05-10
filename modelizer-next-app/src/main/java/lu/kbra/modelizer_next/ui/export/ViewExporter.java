@@ -46,10 +46,11 @@ public final class ViewExporter {
 
 	/**
 	 * Exports the views.
-	 * @param canvases canvases value used by the operation
-	 * @param request export request being processed
+	 *
+	 * @param canvases       canvases value used by the operation
+	 * @param request        export request being processed
 	 * @param sourceFileName name value to use
-	 * @param callback callback value used by the operation
+	 * @param callback       callback value used by the operation
 	 * @return an optional result when a matching value is available
 	 * @throws IOException if the operation cannot be completed
 	 */
@@ -108,8 +109,9 @@ public final class ViewExporter {
 
 	/**
 	 * Returns an unused output path by adding a numeric suffix when needed.
+	 *
 	 * @param originalFile file to read or write
-	 * @param usedPaths used paths value used by the operation
+	 * @param usedPaths    used paths value used by the operation
 	 * @return the avoid duplicate path result
 	 */
 	private static File avoidDuplicatePath(final File originalFile, final Set<String> usedPaths) {
@@ -127,10 +129,11 @@ public final class ViewExporter {
 
 	/**
 	 * Builds a file name.
-	 * @param rawPattern text value for raw pattern
+	 *
+	 * @param rawPattern     text value for raw pattern
 	 * @param sourceFileName name value to use
-	 * @param panelType diagram panel type whose model or layout should be used
-	 * @param format export format to use
+	 * @param panelType      diagram panel type whose model or layout should be used
+	 * @param format         export format to use
 	 * @return the built file name
 	 */
 	private static String buildFileName(
@@ -153,7 +156,8 @@ public final class ViewExporter {
 
 	/**
 	 * Ensures that the extension exists or is up to date.
-	 * @param file file to read or write
+	 *
+	 * @param file      file to read or write
 	 * @param extension text value for extension
 	 * @return the ensure extension result
 	 */
@@ -166,6 +170,7 @@ public final class ViewExporter {
 
 	/**
 	 * Returns the extension.
+	 *
 	 * @param fileName name value to use
 	 * @return the extension
 	 */
@@ -176,6 +181,7 @@ public final class ViewExporter {
 
 	/**
 	 * Sanitizes the file name so it can be used safely.
+	 *
 	 * @param value value to process
 	 * @return the sanitize file name result
 	 */
@@ -190,6 +196,7 @@ public final class ViewExporter {
 
 	/**
 	 * Returns the file-name token for a panel type.
+	 *
 	 * @param panelType diagram panel type whose model or layout should be used
 	 * @return the type token result
 	 */
@@ -203,8 +210,9 @@ public final class ViewExporter {
 
 	/**
 	 * Writes the PNG.
-	 * @param canvas canvas instance that owns the operation
-	 * @param scope export scope to use
+	 *
+	 * @param canvas     canvas instance that owns the operation
+	 * @param scope      export scope to use
 	 * @param outputFile file to read or write
 	 * @throws IOException if the operation cannot be completed
 	 */
@@ -219,8 +227,9 @@ public final class ViewExporter {
 
 	/**
 	 * Writes the SVG.
-	 * @param canvas canvas instance that owns the operation
-	 * @param scope export scope to use
+	 *
+	 * @param canvas     canvas instance that owns the operation
+	 * @param scope      export scope to use
 	 * @param outputFile file to read or write
 	 * @throws IOException if the operation cannot be completed
 	 */

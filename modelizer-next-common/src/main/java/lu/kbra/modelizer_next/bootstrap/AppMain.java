@@ -7,6 +7,7 @@ public interface AppMain {
 
 	/**
 	 * Starts the application entry point.
+	 *
 	 * @param args command-line arguments supplied by the launcher
 	 */
 	void start(String[] args);

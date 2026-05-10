@@ -43,6 +43,7 @@ public class App {
 
 	/**
 	 * Returns the application directory.
+	 *
 	 * @return the application directory
 	 */
 	public static File getAppDirectory() {
@@ -72,6 +73,7 @@ public class App {
 
 	/**
 	 * Returns the config file.
+	 *
 	 * @return the config file
 	 */
 	public static File getConfigFile() {
@@ -80,6 +82,7 @@ public class App {
 
 	/**
 	 * Returns the styles directory.
+	 *
 	 * @return the styles directory
 	 */
 	public static File getStylesDirectory() {
@@ -88,6 +91,7 @@ public class App {
 
 	/**
 	 * Returns the update downloads directory.
+	 *
 	 * @return the update downloads directory
 	 */
 	public static File getUpdateDownloadsDirectory() {
@@ -96,6 +100,7 @@ public class App {
 
 	/**
 	 * Initializes shared state required before the object is used.
+	 *
 	 * @throws JsonProcessingException if the operation cannot be completed
 	 */
 	public static void init() throws JsonProcessingException {
@@ -152,6 +157,7 @@ public class App {
 
 	/**
 	 * Builds the application window title from the app metadata.
+	 *
 	 * @param title title text to display
 	 * @return the title result
 	 */

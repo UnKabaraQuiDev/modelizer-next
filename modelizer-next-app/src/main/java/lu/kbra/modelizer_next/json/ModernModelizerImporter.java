@@ -13,6 +13,7 @@ public final class ModernModelizerImporter {
 
 	/**
 	 * Imports the file.
+	 *
 	 * @param file file to read or write
 	 * @return the import file result
 	 * @throws IOException if the operation cannot be completed
@@ -23,6 +24,7 @@ public final class ModernModelizerImporter {
 
 	/**
 	 * Imports the string.
+	 *
 	 * @param file file to read or write
 	 * @return the import string result
 	 * @throws IOException if the operation cannot be completed

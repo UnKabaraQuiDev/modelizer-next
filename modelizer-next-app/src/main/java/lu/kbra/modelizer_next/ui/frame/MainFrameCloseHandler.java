@@ -12,6 +12,7 @@ final class MainFrameCloseHandler extends WindowAdapter {
 
 	/**
 	 * Creates a main frame close handler instance.
+	 *
 	 * @param frame frame that owns the created UI component
 	 */
 	MainFrameCloseHandler(final MainFrame frame) {
@@ -20,6 +21,7 @@ final class MainFrameCloseHandler extends WindowAdapter {
 
 	/**
 	 * Handles the window closing event.
+	 *
 	 * @param e event object supplied by Swing
 	 */
 	@Override

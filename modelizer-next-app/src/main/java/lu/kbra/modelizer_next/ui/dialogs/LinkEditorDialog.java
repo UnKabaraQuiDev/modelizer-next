@@ -40,17 +40,18 @@ public final class LinkEditorDialog {
 
 	/**
 	 * Immutable value object for result data.
-	 * @param name name value to read, write, or display
-	 * @param lineColor color value to use
-	 * @param fromClassId id of the element to read or modify
-	 * @param toClassId id of the element to read or modify
-	 * @param fromFieldId id of the element to read or modify
-	 * @param toFieldId id of the element to read or modify
-	 * @param cardinalityFrom cardinality from value used by the operation
-	 * @param cardinalityTo cardinality to value used by the operation
+	 *
+	 * @param name               name value to read, write, or display
+	 * @param lineColor          color value to use
+	 * @param fromClassId        id of the element to read or modify
+	 * @param toClassId          id of the element to read or modify
+	 * @param fromFieldId        id of the element to read or modify
+	 * @param toFieldId          id of the element to read or modify
+	 * @param cardinalityFrom    cardinality from value used by the operation
+	 * @param cardinalityTo      cardinality to value used by the operation
 	 * @param associationClassId id of the element to read or modify
-	 * @param labelFrom text value for label from
-	 * @param labelTo text value for label to
+	 * @param labelFrom          text value for label from
+	 * @param labelTo            text value for label to
 	 */
 	public record Result(String name, Color lineColor, String fromClassId, String toClassId, String fromFieldId, String toFieldId,
 			Cardinality cardinalityFrom, Cardinality cardinalityTo, String associationClassId, String labelFrom, String labelTo) {
@@ -58,12 +59,14 @@ public final class LinkEditorDialog {
 
 	/**
 	 * Immutable value object for association option data.
+	 *
 	 * @param classId id of the class to look up or modify
-	 * @param label text value for label
+	 * @param label   text value for label
 	 */
 	private record AssociationOption(String classId, String label) {
 		/**
 		 * Creates an option that represents no association class.
+		 *
 		 * @return the none result
 		 */
 		private static AssociationOption none() {
@@ -72,8 +75,9 @@ public final class LinkEditorDialog {
 
 		/**
 		 * Creates the default style for class elements.
+		 *
 		 * @param classModel class model affected by the operation
-		 * @param panelType diagram panel type whose model or layout should be used
+		 * @param panelType  diagram panel type whose model or layout should be used
 		 * @return the for class result
 		 */
 		private static AssociationOption forClass(final ClassModel classModel, final PanelType panelType) {
@@ -91,6 +95,7 @@ public final class LinkEditorDialog {
 
 		/**
 		 * Creates a class renderer instance.
+		 *
 		 * @param panelType diagram panel type whose model or layout should be used
 		 */
 		private ClassRenderer(final PanelType panelType) {
@@ -99,10 +104,11 @@ public final class LinkEditorDialog {
 
 		/**
 		 * Returns the list cell renderer component.
-		 * @param list list to read or update
-		 * @param value value to process
-		 * @param index zero-based index to read or update
-		 * @param isSelected whether is selected is enabled
+		 *
+		 * @param list         list to read or update
+		 * @param value        value to process
+		 * @param index        zero-based index to read or update
+		 * @param isSelected   whether is selected is enabled
 		 * @param cellHasFocus whether cell has focus is enabled
 		 * @return the list cell renderer component
 		 */
@@ -130,6 +136,7 @@ public final class LinkEditorDialog {
 
 		/**
 		 * Creates a field renderer instance.
+		 *
 		 * @param panelType diagram panel type whose model or layout should be used
 		 */
 		private FieldRenderer(final PanelType panelType) {
@@ -138,10 +145,11 @@ public final class LinkEditorDialog {
 
 		/**
 		 * Returns the list cell renderer component.
-		 * @param list list to read or update
-		 * @param value value to process
-		 * @param index zero-based index to read or update
-		 * @param isSelected whether is selected is enabled
+		 *
+		 * @param list         list to read or update
+		 * @param value        value to process
+		 * @param index        zero-based index to read or update
+		 * @param isSelected   whether is selected is enabled
 		 * @param cellHasFocus whether cell has focus is enabled
 		 * @return the list cell renderer component
 		 */
@@ -169,8 +177,9 @@ public final class LinkEditorDialog {
 
 	/**
 	 * Shows the dialog.
-	 * @param parent parent component used for dialog ownership
-	 * @param document document to read or modify
+	 *
+	 * @param parent    parent component used for dialog ownership
+	 * @param document  document to read or modify
 	 * @param linkModel link model affected by the operation
 	 * @param panelType diagram panel type whose model or layout should be used
 	 * @return the show dialog result
@@ -420,7 +429,8 @@ public final class LinkEditorDialog {
 
 	/**
 	 * Finds the association option that matches the supplied input.
-	 * @param box box value used by the operation
+	 *
+	 * @param box     box value used by the operation
 	 * @param classId id of the class to look up or modify
 	 * @return the matching association option, or {@code null} when no match exists
 	 */
@@ -436,8 +446,9 @@ public final class LinkEditorDialog {
 
 	/**
 	 * Finds the class that matches the supplied input.
+	 *
 	 * @param classes values for classes
-	 * @param id stable id of the model element
+	 * @param id      stable id of the model element
 	 * @return the matching class, or {@code null} when no match exists
 	 */
 	private static ClassModel findClass(final List<ClassModel> classes, final String id) {
@@ -451,8 +462,9 @@ public final class LinkEditorDialog {
 
 	/**
 	 * Finds the field that matches the supplied input.
+	 *
 	 * @param classModel class model affected by the operation
-	 * @param id stable id of the model element
+	 * @param id         stable id of the model element
 	 * @return the matching field, or {@code null} when no match exists
 	 */
 	private static FieldModel findField(final ClassModel classModel, final String id) {
@@ -469,6 +481,7 @@ public final class LinkEditorDialog {
 
 	/**
 	 * Creates a labeled option for a combo box or selector.
+	 *
 	 * @param labelText text value for label text
 	 * @param component Swing component to configure
 	 * @return the labeled result

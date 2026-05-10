@@ -32,14 +32,15 @@ public final class ClassEditorDialog {
 
 	/**
 	 * Immutable value object for result data.
-	 * @param conceptualName name value to use
-	 * @param technicalName name value to use
-	 * @param textColor color value to use
-	 * @param backgroundColor color value to use
-	 * @param borderColor color value to use
+	 *
+	 * @param conceptualName      name value to use
+	 * @param technicalName       name value to use
+	 * @param textColor           color value to use
+	 * @param backgroundColor     color value to use
+	 * @param borderColor         color value to use
 	 * @param visibleInConceptual whether visible in conceptual is enabled
-	 * @param visibleInLogical whether visible in logical is enabled
-	 * @param visibleInPhysical whether visible in physical is enabled
+	 * @param visibleInLogical    whether visible in logical is enabled
+	 * @param visibleInPhysical   whether visible in physical is enabled
 	 */
 	public record Result(String conceptualName, String technicalName, Color textColor, Color backgroundColor, Color borderColor,
 			boolean visibleInConceptual, boolean visibleInLogical, boolean visibleInPhysical) {
@@ -54,7 +55,8 @@ public final class ClassEditorDialog {
 
 	/**
 	 * Shows the dialog.
-	 * @param parent parent component used for dialog ownership
+	 *
+	 * @param parent     parent component used for dialog ownership
 	 * @param classModel class model affected by the operation
 	 * @return the show dialog result
 	 */
@@ -134,6 +136,7 @@ public final class ClassEditorDialog {
 
 	/**
 	 * Creates one labeled row for a dialog form.
+	 *
 	 * @param labelText text value for label text
 	 * @param component Swing component to configure
 	 * @return the row result

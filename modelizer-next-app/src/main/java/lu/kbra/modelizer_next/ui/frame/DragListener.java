@@ -20,6 +20,7 @@ class DragListener extends MouseAdapter {
 
 	/**
 	 * Creates a drag listener instance.
+	 *
 	 * @param parent parent component used for dialog ownership
 	 */
 	public DragListener(final JPanel parent) {
@@ -28,6 +29,7 @@ class DragListener extends MouseAdapter {
 
 	/**
 	 * Handles mouse dragging for the frame drag listener.
+	 *
 	 * @param e event object supplied by Swing
 	 */
 	@Override
@@ -67,6 +69,7 @@ class DragListener extends MouseAdapter {
 
 	/**
 	 * Stores the initial mouse position for a drag operation.
+	 *
 	 * @param e event object supplied by Swing
 	 */
 	@Override
@@ -77,6 +80,7 @@ class DragListener extends MouseAdapter {
 
 	/**
 	 * Finishes the active mouse drag operation.
+	 *
 	 * @param e event object supplied by Swing
 	 */
 	@Override

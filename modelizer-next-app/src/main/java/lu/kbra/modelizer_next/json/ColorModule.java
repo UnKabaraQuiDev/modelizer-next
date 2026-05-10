@@ -23,7 +23,8 @@ public class ColorModule extends SimpleModule {
 
 		/**
 		 * Reads the value from JSON.
-		 * @param p p value used by the operation
+		 *
+		 * @param p    p value used by the operation
 		 * @param ctxt ctxt value used by the operation
 		 * @return the deserialize result
 		 * @throws IOException if the operation cannot be completed
@@ -61,6 +62,7 @@ public class ColorModule extends SimpleModule {
 
 		/**
 		 * Handles the d type while converting JSON data.
+		 *
 		 * @return the handled type result
 		 */
 		@Override
@@ -70,8 +72,9 @@ public class ColorModule extends SimpleModule {
 
 		/**
 		 * Writes the value to JSON.
-		 * @param value value to process
-		 * @param gen gen value used by the operation
+		 *
+		 * @param value       value to process
+		 * @param gen         gen value used by the operation
 		 * @param serializers serializers value used by the operation
 		 * @throws IOException if the operation cannot be completed
 		 */

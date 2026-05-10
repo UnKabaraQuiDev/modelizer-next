@@ -10,6 +10,7 @@ public class DockLayoutState {
 
 	/**
 	 * Creates a default.
+	 *
 	 * @return the created default
 	 */
 	public static DockLayoutState createDefault() {
@@ -29,6 +30,7 @@ public class DockLayoutState {
 
 	/**
 	 * Returns the tab groups.
+	 *
 	 * @return the tab groups
 	 */
 	public List<DockedTabGroupState> getTabGroups() {
@@ -37,6 +39,7 @@ public class DockLayoutState {
 
 	/**
 	 * Sets the tab groups.
+	 *
 	 * @param tabGroups values for tab groups
 	 */
 	public void setTabGroups(final List<DockedTabGroupState> tabGroups) {
@@ -45,6 +48,7 @@ public class DockLayoutState {
 
 	/**
 	 * Builds a debug string for this dock layout state.
+	 *
 	 * @return a debug string for this object
 	 */
 	@Override

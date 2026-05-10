@@ -17,12 +17,14 @@ public interface VisibilityOwner {
 
 	/**
 	 * Returns the visibility.
+	 *
 	 * @return the visibility
 	 */
 	LayerVisibility getVisibility();
 
 	/**
 	 * Checks whether visible is enabled or applies.
+	 *
 	 * @param pt pt value used by the operation
 	 * @return {@code true} if visible is enabled or applies; otherwise {@code false}
 	 */
@@ -32,6 +34,7 @@ public interface VisibilityOwner {
 
 	/**
 	 * Checks whether visible in conceptual is enabled or applies.
+	 *
 	 * @return {@code true} if visible in conceptual is enabled or applies; otherwise {@code false}
 	 */
 	default boolean isVisibleInConceptual() {
@@ -40,6 +43,7 @@ public interface VisibilityOwner {
 
 	/**
 	 * Checks whether visible in logical is enabled or applies.
+	 *
 	 * @return {@code true} if visible in logical is enabled or applies; otherwise {@code false}
 	 */
 	default boolean isVisibleInLogical() {
@@ -48,6 +52,7 @@ public interface VisibilityOwner {
 
 	/**
 	 * Checks whether visible in physical is enabled or applies.
+	 *
 	 * @return {@code true} if visible in physical is enabled or applies; otherwise {@code false}
 	 */
 	default boolean isVisibleInPhysical() {
@@ -56,6 +61,7 @@ public interface VisibilityOwner {
 
 	/**
 	 * Sets the visibility.
+	 *
 	 * @param c whether c is enabled
 	 * @param l whether l is enabled
 	 * @param p whether p is enabled
@@ -66,12 +72,14 @@ public interface VisibilityOwner {
 
 	/**
 	 * Sets the visibility.
+	 *
 	 * @param v v value used by the operation
 	 */
 	void setVisibility(LayerVisibility v);
 
 	/**
 	 * Sets the visibility.
+	 *
 	 * @param pts values for pts
 	 */
 	default void setVisibility(final PanelType... pts) {
@@ -80,6 +88,7 @@ public interface VisibilityOwner {
 
 	/**
 	 * Sets the visible in conceptual.
+	 *
 	 * @param c whether c is enabled
 	 */
 	default void setVisibleInConceptual(final boolean c) {
@@ -88,6 +97,7 @@ public interface VisibilityOwner {
 
 	/**
 	 * Sets the visible in logical.
+	 *
 	 * @param c whether c is enabled
 	 */
 	default void setVisibleInLogical(final boolean c) {
@@ -96,6 +106,7 @@ public interface VisibilityOwner {
 
 	/**
 	 * Sets the visible in physical.
+	 *
 	 * @param c whether c is enabled
 	 */
 	default void setVisibleInPhysical(final boolean c) {

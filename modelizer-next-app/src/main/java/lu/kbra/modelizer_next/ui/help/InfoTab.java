@@ -31,6 +31,7 @@ public class InfoTab extends JPanel {
 
 		/**
 		 * Reads the requested value.
+		 *
 		 * @param appPackage application package value used by the operation
 		 * @return the read result
 		 */
@@ -39,8 +40,9 @@ public class InfoTab extends JPanel {
 
 	/**
 	 * Immutable value object for license item data.
-	 * @param name name value to read, write, or display
-	 * @param license text value for license
+	 *
+	 * @param name        name value to read, write, or display
+	 * @param license     text value for license
 	 * @param description text value for description
 	 */
 	private record LicenseItem(String name, String license, String description) {
@@ -71,6 +73,7 @@ public class InfoTab extends JPanel {
 
 	/**
 	 * Builds the application metadata JSON shown in the info tab.
+	 *
 	 * @param key text value for key
 	 * @return the application JSON text result
 	 */
@@ -85,6 +88,7 @@ public class InfoTab extends JPanel {
 
 	/**
 	 * Creates an about card.
+	 *
 	 * @return the created about card
 	 */
 	private JComponent createAboutCard() {
@@ -106,6 +110,7 @@ public class InfoTab extends JPanel {
 
 	/**
 	 * Creates a bootstrap build card.
+	 *
 	 * @return the created bootstrap build card
 	 */
 	private JComponent createBootstrapBuildCard() {
@@ -130,6 +135,7 @@ public class InfoTab extends JPanel {
 
 	/**
 	 * Creates a build card.
+	 *
 	 * @return the created build card
 	 */
 	private JComponent createBuildCard() {
@@ -149,6 +155,7 @@ public class InfoTab extends JPanel {
 
 	/**
 	 * Creates a card.
+	 *
 	 * @return the created card
 	 */
 	private HelpUi.CardPanel createCard() {
@@ -161,6 +168,7 @@ public class InfoTab extends JPanel {
 
 	/**
 	 * Creates an info page.
+	 *
 	 * @return the created info page
 	 */
 	private JScrollPane createInfoPage() {
@@ -183,6 +191,7 @@ public class InfoTab extends JPanel {
 
 	/**
 	 * Creates a license row.
+	 *
 	 * @param item menu item to configure
 	 * @return the created license row
 	 */
@@ -207,6 +216,7 @@ public class InfoTab extends JPanel {
 
 	/**
 	 * Creates a licenses card.
+	 *
 	 * @return the created licenses card
 	 */
 	private JComponent createLicensesCard() {
@@ -244,6 +254,7 @@ public class InfoTab extends JPanel {
 
 	/**
 	 * Creates a links button panel.
+	 *
 	 * @return the created links button panel
 	 */
 	private JPanel createLinksButtonPanel() {
@@ -256,6 +267,7 @@ public class InfoTab extends JPanel {
 
 	/**
 	 * Creates a links card.
+	 *
 	 * @return the created links card
 	 */
 	private JComponent createLinksCard() {
@@ -282,6 +294,7 @@ public class InfoTab extends JPanel {
 
 	/**
 	 * Creates a vertical body.
+	 *
 	 * @return the created vertical body
 	 */
 	private JPanel createVerticalBody() {
@@ -295,6 +308,7 @@ public class InfoTab extends JPanel {
 
 	/**
 	 * Reads package metadata and falls back to a default value.
+	 *
 	 * @param reader reader value used by the operation
 	 * @return the package text result
 	 */
@@ -310,6 +324,7 @@ public class InfoTab extends JPanel {
 
 	/**
 	 * Reads a system property and falls back to a default value.
+	 *
 	 * @param key text value for key
 	 * @return the system property result
 	 */

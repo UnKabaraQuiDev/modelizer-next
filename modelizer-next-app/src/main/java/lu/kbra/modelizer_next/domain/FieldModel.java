@@ -14,8 +14,8 @@ import lu.kbra.modelizer_next.domain.shared.ElementNames;
 import lu.kbra.modelizer_next.domain.shared.ElementStyle;
 
 /**
- * Persistent model of a class field or table column, including names, data type, keys, cardinality, style, and
- * visibility.
+ * Persistent model of a class field or table column, including names, data type, keys, cardinality,
+ * style, and visibility.
  */
 public class FieldModel implements NamesOwner, IdOwner, StyleOwner {
 
@@ -51,6 +51,7 @@ public class FieldModel implements NamesOwner, IdOwner, StyleOwner {
 
 	/**
 	 * Returns the border color.
+	 *
 	 * @return the border color
 	 */
 	@Deprecated
@@ -61,6 +62,7 @@ public class FieldModel implements NamesOwner, IdOwner, StyleOwner {
 
 	/**
 	 * Sets the border color.
+	 *
 	 * @param c c value used by the operation
 	 */
 	@Deprecated
@@ -71,6 +73,7 @@ public class FieldModel implements NamesOwner, IdOwner, StyleOwner {
 
 	/**
 	 * Returns the ID.
+	 *
 	 * @return the ID
 	 */
 	@Override
@@ -80,6 +83,7 @@ public class FieldModel implements NamesOwner, IdOwner, StyleOwner {
 
 	/**
 	 * Returns the names.
+	 *
 	 * @return the names
 	 */
 	@Override
@@ -89,6 +93,7 @@ public class FieldModel implements NamesOwner, IdOwner, StyleOwner {
 
 	/**
 	 * Returns the style.
+	 *
 	 * @return the style
 	 */
 	@Override
@@ -98,6 +103,7 @@ public class FieldModel implements NamesOwner, IdOwner, StyleOwner {
 
 	/**
 	 * Returns the type.
+	 *
 	 * @return the type
 	 */
 	public String getType() {
@@ -106,6 +112,7 @@ public class FieldModel implements NamesOwner, IdOwner, StyleOwner {
 
 	/**
 	 * Checks whether not null is enabled or applies.
+	 *
 	 * @return {@code true} if not null is enabled or applies; otherwise {@code false}
 	 */
 	public boolean isNotNull() {
@@ -114,6 +121,7 @@ public class FieldModel implements NamesOwner, IdOwner, StyleOwner {
 
 	/**
 	 * Checks whether primary key is enabled or applies.
+	 *
 	 * @return {@code true} if primary key is enabled or applies; otherwise {@code false}
 	 */
 	public boolean isPrimaryKey() {
@@ -122,6 +130,7 @@ public class FieldModel implements NamesOwner, IdOwner, StyleOwner {
 
 	/**
 	 * Checks whether technical only is enabled or applies.
+	 *
 	 * @return {@code true} if technical only is enabled or applies; otherwise {@code false}
 	 */
 	public boolean isTechnicalOnly() {
@@ -130,6 +139,7 @@ public class FieldModel implements NamesOwner, IdOwner, StyleOwner {
 
 	/**
 	 * Checks whether unique is enabled or applies.
+	 *
 	 * @return {@code true} if unique is enabled or applies; otherwise {@code false}
 	 */
 	public boolean isUnique() {
@@ -138,6 +148,7 @@ public class FieldModel implements NamesOwner, IdOwner, StyleOwner {
 
 	/**
 	 * Sets the ID.
+	 *
 	 * @param id stable id of the model element
 	 */
 	@Override
@@ -147,6 +158,7 @@ public class FieldModel implements NamesOwner, IdOwner, StyleOwner {
 
 	/**
 	 * Sets the names.
+	 *
 	 * @param names name values to use
 	 */
 	@Override
@@ -156,6 +168,7 @@ public class FieldModel implements NamesOwner, IdOwner, StyleOwner {
 
 	/**
 	 * Sets the not null.
+	 *
 	 * @param notNull whether not null is enabled
 	 */
 	public void setNotNull(final boolean notNull) {
@@ -164,6 +177,7 @@ public class FieldModel implements NamesOwner, IdOwner, StyleOwner {
 
 	/**
 	 * Sets the primary key.
+	 *
 	 * @param primaryKey whether primary key is enabled
 	 */
 	public void setPrimaryKey(final boolean primaryKey) {
@@ -172,6 +186,7 @@ public class FieldModel implements NamesOwner, IdOwner, StyleOwner {
 
 	/**
 	 * Sets the style.
+	 *
 	 * @param style style value used by the operation
 	 */
 	@Override
@@ -181,6 +196,7 @@ public class FieldModel implements NamesOwner, IdOwner, StyleOwner {
 
 	/**
 	 * Sets the technical only.
+	 *
 	 * @param notConceptual whether not conceptual is enabled
 	 */
 	public void setTechnicalOnly(final boolean notConceptual) {
@@ -189,6 +205,7 @@ public class FieldModel implements NamesOwner, IdOwner, StyleOwner {
 
 	/**
 	 * Sets the type.
+	 *
 	 * @param type type value that selects the operation mode
 	 */
 	public void setType(final String type) {
@@ -197,6 +214,7 @@ public class FieldModel implements NamesOwner, IdOwner, StyleOwner {
 
 	/**
 	 * Sets the unique.
+	 *
 	 * @param unique whether unique is enabled
 	 */
 	public void setUnique(final boolean unique) {
@@ -205,6 +223,7 @@ public class FieldModel implements NamesOwner, IdOwner, StyleOwner {
 
 	/**
 	 * Returns the flags.
+	 *
 	 * @return the flags
 	 */
 	public List<String> getFlags() {
@@ -223,6 +242,7 @@ public class FieldModel implements NamesOwner, IdOwner, StyleOwner {
 
 	/**
 	 * Checks whether this object has a flags.
+	 *
 	 * @return {@code true} if flags exists; otherwise {@code false}
 	 */
 	public boolean hasFlags() {
@@ -231,6 +251,7 @@ public class FieldModel implements NamesOwner, IdOwner, StyleOwner {
 
 	/**
 	 * Builds a debug string for this field model.
+	 *
 	 * @return a debug string for this object
 	 */
 	@Override

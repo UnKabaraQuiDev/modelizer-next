@@ -28,9 +28,10 @@ interface LinkGeometryResolver extends DiagramCanvasExt {
 
 	/**
 	 * Builds a self link points.
+	 *
 	 * @param linkModel link model affected by the operation
 	 * @param fromPoint point in canvas coordinates
-	 * @param toPoint point in canvas coordinates
+	 * @param toPoint   point in canvas coordinates
 	 * @return the built self link points
 	 */
 	default List<Point2D> buildSelfLinkPoints(final LinkModel linkModel, final Point2D fromPoint, final Point2D toPoint) {
@@ -106,6 +107,7 @@ interface LinkGeometryResolver extends DiagramCanvasExt {
 
 	/**
 	 * Computes the polyline middle point on the active canvas.
+	 *
 	 * @param points points in canvas coordinates
 	 * @return the compute polyline middle point result
 	 */
@@ -146,6 +148,7 @@ interface LinkGeometryResolver extends DiagramCanvasExt {
 
 	/**
 	 * Computes the upright angle at middle on the active canvas.
+	 *
 	 * @param points points in canvas coordinates
 	 * @return the compute upright angle at middle result
 	 */
@@ -201,6 +204,7 @@ interface LinkGeometryResolver extends DiagramCanvasExt {
 
 	/**
 	 * Resolves the class center anchor from the current model and layout state.
+	 *
 	 * @param classId id of the class to look up or modify
 	 * @return the resolved class center anchor
 	 */
@@ -218,6 +222,7 @@ interface LinkGeometryResolver extends DiagramCanvasExt {
 
 	/**
 	 * Resolves the comment center anchor from the current model and layout state.
+	 *
 	 * @param commentId id of the comment to look up or modify
 	 * @return the resolved comment center anchor
 	 */
@@ -235,6 +240,7 @@ interface LinkGeometryResolver extends DiagramCanvasExt {
 
 	/**
 	 * Resolves the link geometry from the current model and layout state.
+	 *
 	 * @param linkModel link model affected by the operation
 	 * @return the resolved link geometry
 	 */
@@ -318,6 +324,7 @@ interface LinkGeometryResolver extends DiagramCanvasExt {
 
 	/**
 	 * Resolves the link middle anchor from the current model and layout state.
+	 *
 	 * @param linkId id of the link to look up or modify
 	 * @return the resolved link middle anchor
 	 */
@@ -329,6 +336,7 @@ interface LinkGeometryResolver extends DiagramCanvasExt {
 
 	/**
 	 * Resolves the preview source anchor from the current model and layout state.
+	 *
 	 * @param g2 graphics context used for drawing
 	 * @return the resolved preview source anchor
 	 */
@@ -371,6 +379,7 @@ interface LinkGeometryResolver extends DiagramCanvasExt {
 
 	/**
 	 * Resolves the preview target anchor from the current model and layout state.
+	 *
 	 * @param target target value used by the operation
 	 * @return the resolved preview target anchor
 	 */

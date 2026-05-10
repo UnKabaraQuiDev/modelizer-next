@@ -48,15 +48,16 @@ public final class CommentEditorDialog {
 
 	/**
 	 * Immutable value object for result data.
-	 * @param text text to display or edit
-	 * @param textColor color value to use
-	 * @param backgroundColor color value to use
-	 * @param borderColor color value to use
-	 * @param kind kind value used by the operation
-	 * @param binding binding value used by the operation
+	 *
+	 * @param text                text to display or edit
+	 * @param textColor           color value to use
+	 * @param backgroundColor     color value to use
+	 * @param borderColor         color value to use
+	 * @param kind                kind value used by the operation
+	 * @param binding             binding value used by the operation
 	 * @param visibleInConceptual whether visible in conceptual is enabled
-	 * @param visibleInLogical whether visible in logical is enabled
-	 * @param visibleInPhysical whether visible in physical is enabled
+	 * @param visibleInLogical    whether visible in logical is enabled
+	 * @param visibleInPhysical   whether visible in physical is enabled
 	 */
 	public record Result(String text, Color textColor, Color backgroundColor, Color borderColor, CommentKind kind, CommentBinding binding,
 			boolean visibleInConceptual, boolean visibleInLogical, boolean visibleInPhysical) {
@@ -71,13 +72,15 @@ public final class CommentEditorDialog {
 
 	/**
 	 * Immutable value object for association target data.
-	 * @param label text value for label
-	 * @param kind kind value used by the operation
+	 *
+	 * @param label   text value for label
+	 * @param kind    kind value used by the operation
 	 * @param binding binding value used by the operation
 	 */
 	private record AssociationTarget(String label, CommentKind kind, CommentBinding binding) {
 		/**
 		 * Creates an option for a standalone comment without a binding target.
+		 *
 		 * @return the standalone result
 		 */
 		private static AssociationTarget standalone() {
@@ -86,6 +89,7 @@ public final class CommentEditorDialog {
 
 		/**
 		 * Creates the default style for class elements.
+		 *
 		 * @param classModel class model affected by the operation
 		 * @return the for class result
 		 */
@@ -100,7 +104,8 @@ public final class CommentEditorDialog {
 
 		/**
 		 * Creates the default style for link elements.
-		 * @param linkModel link model affected by the operation
+		 *
+		 * @param linkModel  link model affected by the operation
 		 * @param conceptual whether conceptual is enabled
 		 * @return the for link result
 		 */
@@ -112,6 +117,7 @@ public final class CommentEditorDialog {
 
 		/**
 		 * Computes the hash code that matches this object's equality rules.
+		 *
 		 * @return the hash code for this object
 		 */
 		@Override
@@ -121,6 +127,7 @@ public final class CommentEditorDialog {
 
 		/**
 		 * Compares this association target with another object for value equality.
+		 *
 		 * @param obj obj value used by the operation
 		 * @return {@code true} when the condition is met; otherwise {@code false}
 		 */
@@ -140,10 +147,11 @@ public final class CommentEditorDialog {
 
 	/**
 	 * Shows the dialog.
-	 * @param parent parent component used for dialog ownership
-	 * @param document document to read or modify
+	 *
+	 * @param parent         parent component used for dialog ownership
+	 * @param document       document to read or modify
 	 * @param initialComment initial comment value used by the operation
-	 * @param panelType diagram panel type whose model or layout should be used
+	 * @param panelType      diagram panel type whose model or layout should be used
 	 * @return the show dialog result
 	 */
 	public static Result showDialog(
@@ -324,7 +332,8 @@ public final class CommentEditorDialog {
 
 	/**
 	 * Resolves the initial association from the current model and layout state.
-	 * @param document document to read or modify
+	 *
+	 * @param document       document to read or modify
 	 * @param initialComment initial comment value used by the operation
 	 * @return the resolved initial association
 	 */
@@ -357,6 +366,7 @@ public final class CommentEditorDialog {
 
 	/**
 	 * Creates one labeled row for a dialog form.
+	 *
 	 * @param labelText text value for label text
 	 * @param component Swing component to configure
 	 * @return the row result
@@ -371,6 +381,7 @@ public final class CommentEditorDialog {
 
 	/**
 	 * Returns safe text for displaying possibly null values.
+	 *
 	 * @param value value to process
 	 * @return the safe result
 	 */

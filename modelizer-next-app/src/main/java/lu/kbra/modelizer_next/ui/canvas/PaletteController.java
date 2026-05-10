@@ -14,6 +14,7 @@ interface PaletteController extends DiagramCanvasExt {
 
 	/**
 	 * Applies the default palette to class.
+	 *
 	 * @param classModel class model affected by the operation
 	 */
 	default void applyDefaultPaletteToClass(final ClassModel classModel) {
@@ -27,8 +28,9 @@ interface PaletteController extends DiagramCanvasExt {
 
 	/**
 	 * Applies the default palette to class.
-	 * @param classModel class model affected by the operation
-	 * @param deep whether deep is enabled
+	 *
+	 * @param classModel  class model affected by the operation
+	 * @param deep        whether deep is enabled
 	 * @param visibleOnly whether visible only is enabled
 	 */
 	@Deprecated
@@ -48,6 +50,7 @@ interface PaletteController extends DiagramCanvasExt {
 
 	/**
 	 * Applies the default palette to comment.
+	 *
 	 * @param commentModel comment model affected by the operation
 	 */
 	default void applyDefaultPaletteToComment(final CommentModel commentModel) {
@@ -61,6 +64,7 @@ interface PaletteController extends DiagramCanvasExt {
 
 	/**
 	 * Applies the default palette to field.
+	 *
 	 * @param fieldModel field model affected by the operation
 	 */
 	default void applyDefaultPaletteToField(final FieldModel fieldModel) {
@@ -73,6 +77,7 @@ interface PaletteController extends DiagramCanvasExt {
 
 	/**
 	 * Applies the default palette to link.
+	 *
 	 * @param linkModel link model affected by the operation
 	 */
 	default void applyDefaultPaletteToLink(final LinkModel linkModel) {
@@ -84,7 +89,8 @@ interface PaletteController extends DiagramCanvasExt {
 
 	/**
 	 * Applies the palette to class.
-	 * @param palette palette value used by the operation
+	 *
+	 * @param palette    palette value used by the operation
 	 * @param classModel class model affected by the operation
 	 */
 	default void applyPaletteToClass(final StylePalette palette, final ClassModel classModel) {
@@ -98,9 +104,10 @@ interface PaletteController extends DiagramCanvasExt {
 
 	/**
 	 * Applies the palette to class.
-	 * @param palette palette value used by the operation
-	 * @param classModel class model affected by the operation
-	 * @param deep whether deep is enabled
+	 *
+	 * @param palette     palette value used by the operation
+	 * @param classModel  class model affected by the operation
+	 * @param deep        whether deep is enabled
 	 * @param visibleOnly whether visible only is enabled
 	 */
 	default void applyPaletteToClass(
@@ -123,7 +130,8 @@ interface PaletteController extends DiagramCanvasExt {
 
 	/**
 	 * Applies the palette to comment.
-	 * @param palette palette value used by the operation
+	 *
+	 * @param palette      palette value used by the operation
 	 * @param commentModel comment model affected by the operation
 	 */
 	default void applyPaletteToComment(final StylePalette palette, final CommentModel commentModel) {
@@ -137,7 +145,8 @@ interface PaletteController extends DiagramCanvasExt {
 
 	/**
 	 * Applies the palette to field.
-	 * @param palette palette value used by the operation
+	 *
+	 * @param palette    palette value used by the operation
 	 * @param fieldModel field model affected by the operation
 	 */
 	default void applyPaletteToField(final StylePalette palette, final FieldModel fieldModel) {
@@ -150,7 +159,8 @@ interface PaletteController extends DiagramCanvasExt {
 
 	/**
 	 * Applies the palette to link.
-	 * @param palette palette value used by the operation
+	 *
+	 * @param palette   palette value used by the operation
 	 * @param linkModel link model affected by the operation
 	 */
 	default void applyPaletteToLink(final StylePalette palette, final LinkModel linkModel) {
@@ -162,6 +172,7 @@ interface PaletteController extends DiagramCanvasExt {
 
 	/**
 	 * Applies the default palette to selection.
+	 *
 	 * @param palette palette value used by the operation
 	 */
 	default void applyDefaultPaletteToSelection(final StylePalette palette) {
@@ -170,6 +181,7 @@ interface PaletteController extends DiagramCanvasExt {
 
 	/**
 	 * Applies the palette to selection.
+	 *
 	 * @param palette palette value used by the operation
 	 */
 	default void applyPaletteToSelection(final StylePalette palette) {
@@ -206,6 +218,7 @@ interface PaletteController extends DiagramCanvasExt {
 
 	/**
 	 * Sets the default palette on the active canvas.
+	 *
 	 * @param defaultPalette default palette value used by the operation
 	 */
 	default void setDefaultPalette(final StylePalette defaultPalette) {

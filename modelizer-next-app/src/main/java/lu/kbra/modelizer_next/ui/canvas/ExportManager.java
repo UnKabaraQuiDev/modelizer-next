@@ -29,7 +29,8 @@ public interface ExportManager extends DiagramCanvasExt {
 
 	/**
 	 * Computes the export content bounds on the active canvas.
-	 * @param g2 graphics context used for drawing
+	 *
+	 * @param g2    graphics context used for drawing
 	 * @param scope export scope to use
 	 * @return the compute export content bounds result
 	 */
@@ -117,7 +118,8 @@ public interface ExportManager extends DiagramCanvasExt {
 
 	/**
 	 * Computes the export size on the active canvas.
-	 * @param g2 graphics context used for drawing
+	 *
+	 * @param g2    graphics context used for drawing
 	 * @param scope export scope to use
 	 * @return the compute export size result
 	 */
@@ -137,7 +139,8 @@ public interface ExportManager extends DiagramCanvasExt {
 
 	/**
 	 * Computes the export world bounds on the active canvas.
-	 * @param g2 graphics context used for drawing
+	 *
+	 * @param g2    graphics context used for drawing
 	 * @param scope export scope to use
 	 * @return the compute export world bounds result
 	 */
@@ -164,6 +167,7 @@ public interface ExportManager extends DiagramCanvasExt {
 
 	/**
 	 * Computes the selection bounds.
+	 *
 	 * @param selection selection state to read or update
 	 * @return the compute selection bounds result
 	 */
@@ -223,6 +227,7 @@ public interface ExportManager extends DiagramCanvasExt {
 
 	/**
 	 * Returns the viewport export size on the active canvas.
+	 *
 	 * @return the viewport export size
 	 */
 	default Dimension getViewportExportSize() {

@@ -34,6 +34,7 @@ public final class CommandLineExportParser {
 
 		/**
 		 * Creates a help requested exception instance.
+		 *
 		 * @param message message shown to the caller or user
 		 */
 		public HelpRequestedException(final String message) {
@@ -51,6 +52,7 @@ public final class CommandLineExportParser {
 
 		/**
 		 * Creates an invalid argument exception instance.
+		 *
 		 * @param message message shown to the caller or user
 		 */
 		public InvalidArgumentException(final String message) {
@@ -59,8 +61,9 @@ public final class CommandLineExportParser {
 
 		/**
 		 * Creates an invalid argument exception instance.
+		 *
 		 * @param message message shown to the caller or user
-		 * @param cause cause to attach to the created exception
+		 * @param cause   cause to attach to the created exception
 		 */
 		public InvalidArgumentException(final String message, final Throwable cause) {
 			super(message, cause);
@@ -77,6 +80,7 @@ public final class CommandLineExportParser {
 
 		/**
 		 * Creates a missing argument exception instance.
+		 *
 		 * @param message message shown to the caller or user
 		 */
 		public MissingArgumentException(final String message) {
@@ -87,6 +91,7 @@ public final class CommandLineExportParser {
 
 	/**
 	 * Checks whether export request is enabled or applies.
+	 *
 	 * @param args command-line arguments supplied by the launcher
 	 * @return {@code true} if export request is enabled or applies; otherwise {@code false}
 	 */
@@ -96,6 +101,7 @@ public final class CommandLineExportParser {
 
 	/**
 	 * Parses the supplied text into the value type used by this class.
+	 *
 	 * @param args command-line arguments supplied by the launcher
 	 * @return the parsed value
 	 * @throws IOException if the operation cannot be completed
@@ -172,6 +178,7 @@ public final class CommandLineExportParser {
 
 	/**
 	 * Resolves the home from the current model and layout state.
+	 *
 	 * @param path file system path to read or write
 	 * @return the resolved home
 	 */
@@ -208,6 +215,7 @@ public final class CommandLineExportParser {
 
 	/**
 	 * Parses the format from the supplied input.
+	 *
 	 * @param value value to process
 	 * @return the parsed format
 	 */
@@ -223,6 +231,7 @@ public final class CommandLineExportParser {
 
 	/**
 	 * Parses the panels from the supplied input.
+	 *
 	 * @param value value to process
 	 * @return the parsed panels
 	 */
@@ -257,6 +266,7 @@ public final class CommandLineExportParser {
 
 	/**
 	 * Parses the scope from the supplied input.
+	 *
 	 * @param value value to process
 	 * @return the parsed scope
 	 */
@@ -271,8 +281,9 @@ public final class CommandLineExportParser {
 
 	/**
 	 * Reads and validates the required value.
-	 * @param args command-line arguments supplied by the launcher
-	 * @param index zero-based index to read or update
+	 *
+	 * @param args   command-line arguments supplied by the launcher
+	 * @param index  zero-based index to read or update
 	 * @param option text value for option
 	 * @return the require value result
 	 * @throws IOException if the operation cannot be completed

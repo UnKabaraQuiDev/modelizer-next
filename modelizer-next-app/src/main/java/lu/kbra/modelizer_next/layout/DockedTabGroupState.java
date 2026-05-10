@@ -11,6 +11,7 @@ public class DockedTabGroupState {
 
 	/**
 	 * Creates a default.
+	 *
 	 * @return the created default
 	 */
 	public static DockedTabGroupState createDefault() {
@@ -46,6 +47,7 @@ public class DockedTabGroupState {
 
 	/**
 	 * Returns the height.
+	 *
 	 * @return the height
 	 */
 	public double getHeight() {
@@ -54,6 +56,7 @@ public class DockedTabGroupState {
 
 	/**
 	 * Returns the ID.
+	 *
 	 * @return the ID
 	 */
 	public String getId() {
@@ -62,6 +65,7 @@ public class DockedTabGroupState {
 
 	/**
 	 * Returns the selected tab.
+	 *
 	 * @return the selected tab
 	 */
 	public PanelType getSelectedTab() {
@@ -70,6 +74,7 @@ public class DockedTabGroupState {
 
 	/**
 	 * Returns the tabs.
+	 *
 	 * @return the tabs
 	 */
 	public List<PanelType> getTabs() {
@@ -78,6 +83,7 @@ public class DockedTabGroupState {
 
 	/**
 	 * Returns the width.
+	 *
 	 * @return the width
 	 */
 	public double getWidth() {
@@ -86,6 +92,7 @@ public class DockedTabGroupState {
 
 	/**
 	 * Returns the x.
+	 *
 	 * @return the x
 	 */
 	public double getX() {
@@ -94,6 +101,7 @@ public class DockedTabGroupState {
 
 	/**
 	 * Returns the y.
+	 *
 	 * @return the y
 	 */
 	public double getY() {
@@ -102,6 +110,7 @@ public class DockedTabGroupState {
 
 	/**
 	 * Sets the height.
+	 *
 	 * @param height height value
 	 */
 	public void setHeight(final double height) {
@@ -110,6 +119,7 @@ public class DockedTabGroupState {
 
 	/**
 	 * Sets the ID.
+	 *
 	 * @param id stable id of the model element
 	 */
 	public void setId(final String id) {
@@ -118,6 +128,7 @@ public class DockedTabGroupState {
 
 	/**
 	 * Sets the selected tab.
+	 *
 	 * @param selectedTab selected tab value used by the operation
 	 */
 	public void setSelectedTab(final PanelType selectedTab) {
@@ -126,6 +137,7 @@ public class DockedTabGroupState {
 
 	/**
 	 * Sets the tabs.
+	 *
 	 * @param tabs values for tabs
 	 */
 	public void setTabs(final List<PanelType> tabs) {
@@ -134,6 +146,7 @@ public class DockedTabGroupState {
 
 	/**
 	 * Sets the width.
+	 *
 	 * @param width width value
 	 */
 	public void setWidth(final double width) {
@@ -142,6 +155,7 @@ public class DockedTabGroupState {
 
 	/**
 	 * Sets the x.
+	 *
 	 * @param x x coordinate
 	 */
 	public void setX(final double x) {
@@ -150,6 +164,7 @@ public class DockedTabGroupState {
 
 	/**
 	 * Sets the y.
+	 *
 	 * @param y y coordinate
 	 */
 	public void setY(final double y) {
@@ -158,6 +173,7 @@ public class DockedTabGroupState {
 
 	/**
 	 * Builds a debug string for this docked tab group state.
+	 *
 	 * @return a debug string for this object
 	 */
 	@Override

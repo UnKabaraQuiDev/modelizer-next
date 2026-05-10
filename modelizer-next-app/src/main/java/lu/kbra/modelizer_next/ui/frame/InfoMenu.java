@@ -31,6 +31,7 @@ final class InfoMenu extends JMenu {
 
 	/**
 	 * Creates an info menu instance.
+	 *
 	 * @param frame frame that owns the created UI component
 	 */
 	InfoMenu(final MainFrame frame) {
@@ -52,6 +53,7 @@ final class InfoMenu extends JMenu {
 
 	/**
 	 * Adds the bootstrap cleanup if available.
+	 *
 	 * @param frame frame that owns the created UI component
 	 */
 	private void addBootstrapCleanupIfAvailable(final MainFrame frame) {
@@ -92,6 +94,7 @@ final class InfoMenu extends JMenu {
 
 	/**
 	 * Adds the bootstrap version info if available.
+	 *
 	 * @param frame frame that owns the created UI component
 	 */
 	private void addBootstrapVersionInfoIfAvailable(final MainFrame frame) {
@@ -118,6 +121,7 @@ final class InfoMenu extends JMenu {
 
 	/**
 	 * Creates an auto update item.
+	 *
 	 * @param frame frame that owns the created UI component
 	 * @return the created auto update item
 	 */
@@ -134,6 +138,7 @@ final class InfoMenu extends JMenu {
 
 	/**
 	 * Creates a check for updates item.
+	 *
 	 * @param frame frame that owns the created UI component
 	 * @return the created check for updates item
 	 */
@@ -145,6 +150,7 @@ final class InfoMenu extends JMenu {
 
 	/**
 	 * Creates a help item.
+	 *
 	 * @return the created help item
 	 */
 	private JMenuItem createHelpItem() {
@@ -155,9 +161,10 @@ final class InfoMenu extends JMenu {
 
 	/**
 	 * Creates an open URL item.
-	 * @param text text to display or edit
-	 * @param url URL to use
-	 * @param title title text to display
+	 *
+	 * @param text            text to display or edit
+	 * @param url             URL to use
+	 * @param title           title text to display
 	 * @param fallbackMessage text value for fallback message
 	 * @return the created open URL item
 	 */
@@ -180,6 +187,7 @@ final class InfoMenu extends JMenu {
 
 	/**
 	 * Creates an update channel menu.
+	 *
 	 * @param frame frame that owns the created UI component
 	 * @return the created update channel menu
 	 */
@@ -205,6 +213,7 @@ final class InfoMenu extends JMenu {
 
 	/**
 	 * Creates a version info item.
+	 *
 	 * @param frame frame that owns the created UI component
 	 * @return the created version info item
 	 */

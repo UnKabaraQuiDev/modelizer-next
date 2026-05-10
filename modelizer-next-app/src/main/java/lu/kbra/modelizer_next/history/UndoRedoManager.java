@@ -17,6 +17,7 @@ public class UndoRedoManager {
 
 	/**
 	 * Checks whether this object can redo.
+	 *
 	 * @return {@code true} if the operation is allowed; otherwise {@code false}
 	 */
 	public boolean canRedo() {
@@ -25,6 +26,7 @@ public class UndoRedoManager {
 
 	/**
 	 * Checks whether this object can undo.
+	 *
 	 * @return {@code true} if the operation is allowed; otherwise {@code false}
 	 */
 	public boolean canUndo() {
@@ -33,6 +35,7 @@ public class UndoRedoManager {
 
 	/**
 	 * Records the state in history.
+	 *
 	 * @param document document to read or modify
 	 */
 	public void recordState(final ModelDocument document) {
@@ -51,6 +54,7 @@ public class UndoRedoManager {
 
 	/**
 	 * Restores the next snapshot in the redo history.
+	 *
 	 * @param document document to read or modify
 	 * @return {@code true} when the condition is met; otherwise {@code false}
 	 */
@@ -67,6 +71,7 @@ public class UndoRedoManager {
 
 	/**
 	 * Clears the current state and starts a new history baseline.
+	 *
 	 * @param document document to read or modify
 	 */
 	public void reset(final ModelDocument document) {
@@ -77,6 +82,7 @@ public class UndoRedoManager {
 
 	/**
 	 * Restores the previous snapshot in the undo history.
+	 *
 	 * @param document document to read or modify
 	 * @return {@code true} when the condition is met; otherwise {@code false}
 	 */

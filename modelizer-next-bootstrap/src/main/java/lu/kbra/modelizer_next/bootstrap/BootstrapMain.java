@@ -36,6 +36,7 @@ public final class BootstrapMain {
 
 	/**
 	 * Starts the application entry point.
+	 *
 	 * @param args command-line arguments supplied by the launcher
 	 */
 	public static void main(String[] args) {
@@ -75,6 +76,7 @@ public final class BootstrapMain {
 
 	/**
 	 * Restarts the current Java command with the same arguments.
+	 *
 	 * @throws Exception if the operation cannot be completed
 	 */
 	public static void restartSameCommand() throws Exception {

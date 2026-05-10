@@ -69,8 +69,9 @@ public class ViewExportDialog extends JDialog {
 
 		/**
 		 * Sets the preview.
+		 *
 		 * @param canvas canvas instance that owns the operation
-		 * @param scope export scope to use
+		 * @param scope  export scope to use
 		 */
 		private void setPreview(final DiagramCanvas canvas, final ViewExportScope scope) {
 			if (canvas == null || scope == null) {
@@ -85,6 +86,7 @@ public class ViewExportDialog extends JDialog {
 
 		/**
 		 * Paints the component.
+		 *
 		 * @param graphics graphics context used for drawing
 		 */
 		@Override
@@ -118,6 +120,7 @@ public class ViewExportDialog extends JDialog {
 
 		/**
 		 * Creates a pattern text field instance.
+		 *
 		 * @param text text to display or edit
 		 */
 		private PatternTextField(final String text) {
@@ -143,6 +146,7 @@ public class ViewExportDialog extends JDialog {
 
 		/**
 		 * Inserts the selected file-name token into the pattern field.
+		 *
 		 * @param token text value for token
 		 */
 		private void insertToken(final String token) {
@@ -177,11 +181,13 @@ public class ViewExportDialog extends JDialog {
 
 	/**
 	 * Immutable value object for simple document listener data.
+	 *
 	 * @param delegate delegate value used by the operation
 	 */
 	private record SimpleDocumentListener(Runnable delegate) implements DocumentListener {
 		/**
 		 * Updates the preview after the pattern text changes.
+		 *
 		 * @param event event object supplied by Swing
 		 */
 		@Override
@@ -191,6 +197,7 @@ public class ViewExportDialog extends JDialog {
 
 		/**
 		 * Updates the preview after the pattern text changes.
+		 *
 		 * @param event event object supplied by Swing
 		 */
 		@Override
@@ -200,6 +207,7 @@ public class ViewExportDialog extends JDialog {
 
 		/**
 		 * Removes the update.
+		 *
 		 * @param event event object supplied by Swing
 		 */
 		@Override
@@ -212,9 +220,10 @@ public class ViewExportDialog extends JDialog {
 
 	/**
 	 * Shows the dialog.
-	 * @param parent parent component used for dialog ownership
-	 * @param canvases canvases value used by the operation
-	 * @param activePanelType type value to use
+	 *
+	 * @param parent                 parent component used for dialog ownership
+	 * @param canvases               canvases value used by the operation
+	 * @param activePanelType        type value to use
 	 * @param defaultOutputDirectory default output directory value used by the operation
 	 * @return the show dialog result
 	 */
@@ -247,9 +256,10 @@ public class ViewExportDialog extends JDialog {
 
 	/**
 	 * Creates a view export dialog instance.
-	 * @param parent parent component used for dialog ownership
-	 * @param canvases canvases value used by the operation
-	 * @param activePanelType type value to use
+	 *
+	 * @param parent                 parent component used for dialog ownership
+	 * @param canvases               canvases value used by the operation
+	 * @param activePanelType        type value to use
 	 * @param defaultOutputDirectory default output directory value used by the operation
 	 */
 	private ViewExportDialog(
@@ -288,9 +298,10 @@ public class ViewExportDialog extends JDialog {
 
 	/**
 	 * Adds the row.
-	 * @param panel panel to configure or inspect
-	 * @param row row index or row component to use
-	 * @param label text value for label
+	 *
+	 * @param panel     panel to configure or inspect
+	 * @param row       row index or row component to use
+	 * @param label     text value for label
 	 * @param component Swing component to configure
 	 */
 	private void addRow(final JPanel panel, final int row, final String label, final Component component) {
@@ -325,6 +336,7 @@ public class ViewExportDialog extends JDialog {
 
 	/**
 	 * Creates a button pane.
+	 *
 	 * @return the created button pane
 	 */
 	private JPanel createButtonPane() {
@@ -342,6 +354,7 @@ public class ViewExportDialog extends JDialog {
 
 	/**
 	 * Creates an options pane.
+	 *
 	 * @return the created options pane
 	 */
 	private JPanel createOptionsPane() {
@@ -395,6 +408,7 @@ public class ViewExportDialog extends JDialog {
 
 	/**
 	 * Creates a preview pane.
+	 *
 	 * @return the created preview pane
 	 */
 	private JScrollPane createPreviewPane() {
@@ -405,6 +419,7 @@ public class ViewExportDialog extends JDialog {
 
 	/**
 	 * Finds the preview canvas that matches the supplied input.
+	 *
 	 * @return the matching preview canvas, or {@code null} when no match exists
 	 */
 	private DiagramCanvas findPreviewCanvas() {
@@ -424,6 +439,7 @@ public class ViewExportDialog extends JDialog {
 
 	/**
 	 * Returns the selected panel types.
+	 *
 	 * @return the selected panel types
 	 */
 	private List<PanelType> getSelectedPanelTypes() {
@@ -455,6 +471,7 @@ public class ViewExportDialog extends JDialog {
 
 	/**
 	 * Returns the display label for a panel type.
+	 *
 	 * @param panelType diagram panel type whose model or layout should be used
 	 * @return the panel type label result
 	 */

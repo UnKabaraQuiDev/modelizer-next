@@ -17,6 +17,7 @@ final class FileMenu extends JMenu {
 
 	/**
 	 * Creates a file menu instance.
+	 *
 	 * @param frame frame that owns the created UI component
 	 */
 	FileMenu(final MainFrame frame) {
@@ -31,9 +32,10 @@ final class FileMenu extends JMenu {
 
 	/**
 	 * Creates a menu item.
-	 * @param text text to display or edit
+	 *
+	 * @param text      text to display or edit
 	 * @param keyStroke keyboard shortcut to register
-	 * @param action action to register or execute
+	 * @param action    action to register or execute
 	 * @return the created menu item
 	 */
 	private JMenuItem createMenuItem(final String text, final KeyStroke keyStroke, final Runnable action) {

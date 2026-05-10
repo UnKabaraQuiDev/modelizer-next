@@ -14,6 +14,7 @@ public enum Cardinality implements DisplayValueOwner {
 
 	/**
 	 * Creates a cardinality instance.
+	 *
 	 * @param displayValue text value for display value
 	 */
 	Cardinality(final String displayValue) {
@@ -22,6 +23,7 @@ public enum Cardinality implements DisplayValueOwner {
 
 	/**
 	 * Returns the display value.
+	 *
 	 * @return the display value
 	 */
 	@Override

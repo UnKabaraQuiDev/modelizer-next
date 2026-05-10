@@ -25,8 +25,8 @@ import lu.kbra.modelizer_next.json.ColorModule;
 import lu.kbra.modelizer_next.ui.ThemeMode;
 
 /**
- * Application main class for the Swing desktop client. It configures UI defaults, registers JSON modules, and
- * either starts the command-line exporter or opens the main frame.
+ * Application main class for the Swing desktop client. It configures UI defaults, registers JSON
+ * modules, and either starts the command-line exporter or opens the main frame.
  */
 public class MNMain {
 
@@ -59,6 +59,7 @@ public class MNMain {
 
 	/**
 	 * Starts the application entry point.
+	 *
 	 * @param args command-line arguments supplied by the launcher
 	 */
 	public static void main(String[] args) {
@@ -85,6 +86,7 @@ public class MNMain {
 
 	/**
 	 * Restarts the current command with the same JVM and application arguments.
+	 *
 	 * @throws Exception if the operation cannot be completed
 	 */
 	public static void restartSameCommand() throws Exception {
@@ -105,6 +107,7 @@ public class MNMain {
 
 	/**
 	 * Creates a mapper.
+	 *
 	 * @return the created mapper
 	 */
 	private static ObjectMapper createMapper() {

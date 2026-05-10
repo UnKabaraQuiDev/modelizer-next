@@ -15,6 +15,7 @@ public enum UpdateChannel {
 
 	/**
 	 * Returns the human-readable display name.
+	 *
 	 * @return the display name result
 	 */
 	public String displayName() {
@@ -27,6 +28,7 @@ public enum UpdateChannel {
 
 	/**
 	 * Returns the string key used in update manifests.
+	 *
 	 * @return the manifest key result
 	 */
 	public String manifestKey() {
@@ -35,6 +37,7 @@ public enum UpdateChannel {
 
 	/**
 	 * Returns the update channel with the supplied numeric id.
+	 *
 	 * @param channelRank numeric channel rank value
 	 * @return the by ID result
 	 */

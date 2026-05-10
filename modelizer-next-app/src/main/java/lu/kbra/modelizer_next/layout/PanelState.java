@@ -27,6 +27,7 @@ public class PanelState {
 
 	/**
 	 * Returns the link layouts.
+	 *
 	 * @return the link layouts
 	 */
 	public List<LinkLayout> getLinkLayouts() {
@@ -35,6 +36,7 @@ public class PanelState {
 
 	/**
 	 * Returns the node layouts.
+	 *
 	 * @return the node layouts
 	 */
 	public List<NodeLayout> getNodeLayouts() {
@@ -43,6 +45,7 @@ public class PanelState {
 
 	/**
 	 * Returns the pan x.
+	 *
 	 * @return the pan x
 	 */
 	public double getPanX() {
@@ -51,6 +54,7 @@ public class PanelState {
 
 	/**
 	 * Returns the pan y.
+	 *
 	 * @return the pan y
 	 */
 	public double getPanY() {
@@ -59,6 +63,7 @@ public class PanelState {
 
 	/**
 	 * Returns the zoom.
+	 *
 	 * @return the zoom
 	 */
 	public double getZoom() {
@@ -67,6 +72,7 @@ public class PanelState {
 
 	/**
 	 * Sets the link layouts.
+	 *
 	 * @param linkLayouts layout objects to read or modify
 	 */
 	public void setLinkLayouts(final List<LinkLayout> linkLayouts) {
@@ -75,6 +81,7 @@ public class PanelState {
 
 	/**
 	 * Sets the node layouts.
+	 *
 	 * @param nodeLayouts layout objects to read or modify
 	 */
 	public void setNodeLayouts(final List<NodeLayout> nodeLayouts) {
@@ -83,6 +90,7 @@ public class PanelState {
 
 	/**
 	 * Sets the pan x.
+	 *
 	 * @param panX numeric pan x value
 	 */
 	public void setPanX(final double panX) {
@@ -91,6 +99,7 @@ public class PanelState {
 
 	/**
 	 * Sets the pan y.
+	 *
 	 * @param panY numeric pan y value
 	 */
 	public void setPanY(final double panY) {
@@ -99,6 +108,7 @@ public class PanelState {
 
 	/**
 	 * Sets the zoom.
+	 *
 	 * @param zoom numeric zoom value
 	 */
 	public void setZoom(final double zoom) {
@@ -107,6 +117,7 @@ public class PanelState {
 
 	/**
 	 * Builds a debug string for this panel state.
+	 *
 	 * @return a debug string for this object
 	 */
 	@Override

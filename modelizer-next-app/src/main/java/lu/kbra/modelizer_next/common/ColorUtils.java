@@ -11,6 +11,7 @@ public class ColorUtils {
 
 	/**
 	 * Creates a value from the supplied argb.
+	 *
 	 * @param argb numeric argb value
 	 * @return the of argb result
 	 */
@@ -20,6 +21,7 @@ public class ColorUtils {
 
 	/**
 	 * Creates a value from the supplied hex.
+	 *
 	 * @param string text value for string
 	 * @return the of hex result
 	 */
@@ -29,6 +31,7 @@ public class ColorUtils {
 
 	/**
 	 * Creates a value from the supplied rgb.
+	 *
 	 * @param rgb numeric rgb value
 	 * @return the of rgb result
 	 */

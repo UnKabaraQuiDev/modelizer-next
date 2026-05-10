@@ -27,6 +27,7 @@ public interface CaptureManager extends DiagramCanvasExt {
 
 	/**
 	 * Captures the class into a portable snapshot.
+	 *
 	 * @param classModel class model affected by the operation
 	 * @return the capture class result
 	 */
@@ -52,6 +53,7 @@ public interface CaptureManager extends DiagramCanvasExt {
 
 	/**
 	 * Captures the comment into a portable snapshot.
+	 *
 	 * @param commentModel comment model affected by the operation
 	 * @return the capture comment result
 	 */
@@ -74,8 +76,9 @@ public interface CaptureManager extends DiagramCanvasExt {
 
 	/**
 	 * Captures the field into a portable snapshot.
+	 *
 	 * @param ownerClassId id of the element to read or modify
-	 * @param fieldModel field model affected by the operation
+	 * @param fieldModel   field model affected by the operation
 	 * @return the capture field result
 	 */
 	default CopiedField captureField(final String ownerClassId, final FieldModel fieldModel) {
@@ -94,6 +97,7 @@ public interface CaptureManager extends DiagramCanvasExt {
 
 	/**
 	 * Captures the link into a portable snapshot.
+	 *
 	 * @param linkModel link model affected by the operation
 	 * @return the capture link result
 	 */
@@ -118,6 +122,7 @@ public interface CaptureManager extends DiagramCanvasExt {
 
 	/**
 	 * Captures the link layout into a portable snapshot.
+	 *
 	 * @param linkId id of the link to look up or modify
 	 * @return the capture link layout result
 	 */
@@ -137,7 +142,8 @@ public interface CaptureManager extends DiagramCanvasExt {
 
 	/**
 	 * Captures the node layout into a portable snapshot.
-	 * @param type type value that selects the operation mode
+	 *
+	 * @param type     type value that selects the operation mode
 	 * @param objectId id of the element to read or modify
 	 * @return the capture node layout result
 	 */

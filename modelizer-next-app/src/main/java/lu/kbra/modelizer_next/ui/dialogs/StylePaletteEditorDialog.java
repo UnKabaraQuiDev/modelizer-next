@@ -67,6 +67,7 @@ public final class StylePaletteEditorDialog {
 
 		/**
 		 * Sets the palette.
+		 *
 		 * @param palette palette value used by the operation
 		 */
 		private void setPalette(final StylePalette palette) {
@@ -76,6 +77,7 @@ public final class StylePaletteEditorDialog {
 
 		/**
 		 * Paints the component.
+		 *
 		 * @param graphics graphics context used for drawing
 		 */
 		@Override
@@ -147,6 +149,7 @@ public final class StylePaletteEditorDialog {
 
 	/**
 	 * Shows the dialog.
+	 *
 	 * @param parent parent component used for dialog ownership
 	 * @return the show dialog result
 	 */
@@ -156,7 +159,8 @@ public final class StylePaletteEditorDialog {
 
 	/**
 	 * Shows the dialog.
-	 * @param parent parent component used for dialog ownership
+	 *
+	 * @param parent         parent component used for dialog ownership
 	 * @param initialPalette initial palette value used by the operation
 	 * @return the show dialog result
 	 */
@@ -319,16 +323,17 @@ public final class StylePaletteEditorDialog {
 
 	/**
 	 * Builds a palette.
-	 * @param name name value to read, write, or display
-	 * @param classTextColorButton button to configure
-	 * @param classBackgroundColorButton button to configure
-	 * @param classBorderColorButton button to configure
-	 * @param fieldTextColorButton button to configure
-	 * @param fieldBackgroundColorButton button to configure
-	 * @param commentTextColorButton button to configure
+	 *
+	 * @param name                         name value to read, write, or display
+	 * @param classTextColorButton         button to configure
+	 * @param classBackgroundColorButton   button to configure
+	 * @param classBorderColorButton       button to configure
+	 * @param fieldTextColorButton         button to configure
+	 * @param fieldBackgroundColorButton   button to configure
+	 * @param commentTextColorButton       button to configure
 	 * @param commentBackgroundColorButton button to configure
-	 * @param commentBorderColorButton button to configure
-	 * @param linkColorButton button to configure
+	 * @param commentBorderColorButton     button to configure
+	 * @param linkColorButton              button to configure
 	 * @return the built palette
 	 */
 	private static StylePalette buildPalette(
@@ -358,6 +363,7 @@ public final class StylePaletteEditorDialog {
 
 	/**
 	 * Creates a flow layout with consistent spacing.
+	 *
 	 * @param components values for components
 	 * @return the flow result
 	 */
@@ -371,7 +377,8 @@ public final class StylePaletteEditorDialog {
 
 	/**
 	 * Creates one labeled row for a dialog form.
-	 * @param label text value for label
+	 *
+	 * @param label     text value for label
 	 * @param component Swing component to configure
 	 * @return the row result
 	 */

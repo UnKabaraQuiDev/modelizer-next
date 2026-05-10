@@ -24,10 +24,11 @@ final class DockableDiagramPanel extends JPanel implements Dockable {
 
 	/**
 	 * Creates a dockable diagram panel instance.
+	 *
 	 * @param persistentID id of the element to read or modify
-	 * @param tabText text value for tab text
-	 * @param canvas canvas instance that owns the operation
-	 * @param activate activate value used by the operation
+	 * @param tabText      text value for tab text
+	 * @param canvas       canvas instance that owns the operation
+	 * @param activate     activate value used by the operation
 	 */
 	DockableDiagramPanel(final String persistentID, final String tabText, final DiagramCanvas canvas, final Runnable activate) {
 		super(new BorderLayout());
@@ -60,6 +61,7 @@ final class DockableDiagramPanel extends JPanel implements Dockable {
 
 	/**
 	 * Returns the persistent ID.
+	 *
 	 * @return the persistent ID
 	 */
 	@Override
@@ -69,6 +71,7 @@ final class DockableDiagramPanel extends JPanel implements Dockable {
 
 	/**
 	 * Returns the tab text.
+	 *
 	 * @return the tab text
 	 */
 	@Override
@@ -78,6 +81,7 @@ final class DockableDiagramPanel extends JPanel implements Dockable {
 
 	/**
 	 * Checks whether closable is enabled or applies.
+	 *
 	 * @return {@code true} if closable is enabled or applies; otherwise {@code false}
 	 */
 	@Override
@@ -87,6 +91,7 @@ final class DockableDiagramPanel extends JPanel implements Dockable {
 
 	/**
 	 * Checks whether wrappable in scrollpane is enabled or applies.
+	 *
 	 * @return {@code true} if wrappable in scrollpane is enabled or applies; otherwise {@code false}
 	 */
 	@Override

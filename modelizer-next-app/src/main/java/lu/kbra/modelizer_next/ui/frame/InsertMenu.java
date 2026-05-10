@@ -18,6 +18,7 @@ final class InsertMenu extends JMenu {
 
 	/**
 	 * Creates an insert menu instance.
+	 *
 	 * @param frame frame that owns the created UI component
 	 */
 	InsertMenu(final MainFrame frame) {
@@ -30,8 +31,9 @@ final class InsertMenu extends JMenu {
 
 	/**
 	 * Creates a canvas menu item.
-	 * @param frame frame that owns the created UI component
-	 * @param text text to display or edit
+	 *
+	 * @param frame     frame that owns the created UI component
+	 * @param text      text to display or edit
 	 * @param actionKey key under which the action is registered
 	 * @param keyStroke keyboard shortcut to register
 	 * @return the created canvas menu item

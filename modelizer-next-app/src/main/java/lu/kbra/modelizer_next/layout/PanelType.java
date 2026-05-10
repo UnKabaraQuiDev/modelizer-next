@@ -11,6 +11,7 @@ public enum PanelType {
 
 	/**
 	 * Checks whether technical is enabled or applies.
+	 *
 	 * @return {@code true} if technical is enabled or applies; otherwise {@code false}
 	 */
 	public boolean isTechnical() {

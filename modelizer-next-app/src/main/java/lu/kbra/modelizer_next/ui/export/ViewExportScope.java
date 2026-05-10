@@ -13,6 +13,7 @@ public enum ViewExportScope {
 
 	/**
 	 * Creates a view export scope instance.
+	 *
 	 * @param displayName name value to use
 	 */
 	ViewExportScope(final String displayName) {
@@ -21,6 +22,7 @@ public enum ViewExportScope {
 
 	/**
 	 * Returns the display name.
+	 *
 	 * @return the display name
 	 */
 	public String getDisplayName() {
@@ -29,6 +31,7 @@ public enum ViewExportScope {
 
 	/**
 	 * Builds a debug string for this view export scope.
+	 *
 	 * @return a debug string for this object
 	 */
 	@Override

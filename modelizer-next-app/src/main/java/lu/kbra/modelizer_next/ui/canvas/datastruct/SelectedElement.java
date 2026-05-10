@@ -7,11 +7,12 @@ import lu.kbra.modelizer_next.ui.canvas.datastruct.LiveEditElement.LiveEditType;
 
 /**
  * Identifier of the currently selected model element and its kind.
- * @param type type value that selects the operation mode
- * @param classId id of the class to look up or modify
- * @param fieldId id of the field to look up or modify
+ *
+ * @param type      type value that selects the operation mode
+ * @param classId   id of the class to look up or modify
+ * @param fieldId   id of the field to look up or modify
  * @param commentId id of the comment to look up or modify
- * @param linkId id of the link to look up or modify
+ * @param linkId    id of the link to look up or modify
  */
 public record SelectedElement(SelectedType type, String classId, String fieldId, String commentId, String linkId) {
 
@@ -28,6 +29,7 @@ public record SelectedElement(SelectedType type, String classId, String fieldId,
 
 		/**
 		 * Converts this selected type to the matching live edit type.
+		 *
 		 * @return the as live edit type result
 		 */
 		public LiveEditType asLiveEditType() {
@@ -42,6 +44,7 @@ public record SelectedElement(SelectedType type, String classId, String fieldId,
 
 		/**
 		 * Converts this selected type to the matching style scope.
+		 *
 		 * @return the as style scope result
 		 */
 		public StyleScope asStyleScope() {
@@ -58,6 +61,7 @@ public record SelectedElement(SelectedType type, String classId, String fieldId,
 
 	/**
 	 * Creates the default style for class elements.
+	 *
 	 * @param classId id of the class to look up or modify
 	 * @return the for class result
 	 */
@@ -67,6 +71,7 @@ public record SelectedElement(SelectedType type, String classId, String fieldId,
 
 	/**
 	 * Creates the default style for field elements.
+	 *
 	 * @param classId id of the class to look up or modify
 	 * @param fieldId id of the field to look up or modify
 	 * @return the for field result
@@ -77,6 +82,7 @@ public record SelectedElement(SelectedType type, String classId, String fieldId,
 
 	/**
 	 * Creates the default style for comment elements.
+	 *
 	 * @param commentId id of the comment to look up or modify
 	 * @return the for comment result
 	 */
@@ -86,6 +92,7 @@ public record SelectedElement(SelectedType type, String classId, String fieldId,
 
 	/**
 	 * Creates the default style for link elements.
+	 *
 	 * @param linkId id of the link to look up or modify
 	 * @return the for link result
 	 */
@@ -95,6 +102,7 @@ public record SelectedElement(SelectedType type, String classId, String fieldId,
 
 	/**
 	 * Returns the actual ID on the active canvas.
+	 *
 	 * @return the actual ID
 	 */
 	public String getActualId() {
@@ -109,6 +117,7 @@ public record SelectedElement(SelectedType type, String classId, String fieldId,
 
 	/**
 	 * Computes the hash code that matches this object's equality rules on the active canvas.
+	 *
 	 * @return the hash code for this object
 	 */
 	@Override
@@ -118,6 +127,7 @@ public record SelectedElement(SelectedType type, String classId, String fieldId,
 
 	/**
 	 * Converts this selected element into a live edit element.
+	 *
 	 * @param alternative whether alternative is enabled
 	 * @return the as live edit element result
 	 */
@@ -127,8 +137,9 @@ public record SelectedElement(SelectedType type, String classId, String fieldId,
 
 	/**
 	 * Converts this selected element into a live edit element.
+	 *
 	 * @param alternative whether alternative is enabled
-	 * @param style whether style is enabled
+	 * @param style       whether style is enabled
 	 * @return the as live edit element result
 	 */
 	public LiveEditElement asLiveEditElement(boolean alternative, boolean style) {
@@ -138,7 +149,8 @@ public record SelectedElement(SelectedType type, String classId, String fieldId,
 
 	/**
 	 * Converts this selected element into a style edit target.
-	 * @param alternative whether alternative is enabled
+	 *
+	 * @param alternative  whether alternative is enabled
 	 * @param currentStyle current style value used by the operation
 	 * @return the as style edit element result
 	 */
@@ -149,6 +161,7 @@ public record SelectedElement(SelectedType type, String classId, String fieldId,
 
 	/**
 	 * Compares this selected element with another object for value equality on the active canvas.
+	 *
 	 * @param other other value used by the operation
 	 * @return {@code true} when the condition is met; otherwise {@code false}
 	 */

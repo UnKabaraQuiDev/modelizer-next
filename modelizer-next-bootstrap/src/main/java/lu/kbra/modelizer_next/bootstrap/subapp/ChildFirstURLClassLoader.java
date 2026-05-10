@@ -13,8 +13,9 @@ public final class ChildFirstURLClassLoader extends URLClassLoader {
 
 	/**
 	 * Creates a child first URL class loader instance during bootstrap/update processing.
-	 * @param urls values for urls
-	 * @param parent parent component used for dialog ownership
+	 *
+	 * @param urls                values for urls
+	 * @param parent              parent component used for dialog ownership
 	 * @param parentFirstPackages values for parent first packages
 	 */
 	public ChildFirstURLClassLoader(URL[] urls, ClassLoader parent, List<String> parentFirstPackages) {
@@ -24,7 +25,8 @@ public final class ChildFirstURLClassLoader extends URLClassLoader {
 
 	/**
 	 * Loads the class during bootstrap/update processing.
-	 * @param name name value to read, write, or display
+	 *
+	 * @param name    name value to read, write, or display
 	 * @param resolve whether resolve is enabled
 	 * @return the load class result
 	 * @throws ClassNotFoundException if the operation cannot be completed
@@ -52,6 +54,7 @@ public final class ChildFirstURLClassLoader extends URLClassLoader {
 
 	/**
 	 * Loads the child first during bootstrap/update processing.
+	 *
 	 * @param name name value to read, write, or display
 	 * @return the load child first result
 	 * @throws ClassNotFoundException if the operation cannot be completed
@@ -66,6 +69,7 @@ public final class ChildFirstURLClassLoader extends URLClassLoader {
 
 	/**
 	 * Loads the parent first during bootstrap/update processing.
+	 *
 	 * @param name name value to read, write, or display
 	 * @return the load parent first result
 	 * @throws ClassNotFoundException if the operation cannot be completed
@@ -80,6 +84,7 @@ public final class ChildFirstURLClassLoader extends URLClassLoader {
 
 	/**
 	 * Checks whether parent first is enabled or applies during bootstrap/update processing.
+	 *
 	 * @param className name value to use
 	 * @return {@code true} if parent first is enabled or applies; otherwise {@code false}
 	 */
@@ -90,6 +95,7 @@ public final class ChildFirstURLClassLoader extends URLClassLoader {
 
 	/**
 	 * Returns the resource during bootstrap/update processing.
+	 *
 	 * @param name name value to read, write, or display
 	 * @return the resource
 	 */

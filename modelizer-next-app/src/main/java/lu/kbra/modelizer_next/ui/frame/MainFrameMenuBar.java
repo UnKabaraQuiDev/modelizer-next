@@ -20,6 +20,7 @@ final class MainFrameMenuBar extends JMenuBar {
 
 	/**
 	 * Creates a keyboard shortcut with the Control modifier.
+	 *
 	 * @param keyCode numeric key code value
 	 * @return the ctrl result
 	 */
@@ -29,6 +30,7 @@ final class MainFrameMenuBar extends JMenuBar {
 
 	/**
 	 * Creates a keyboard shortcut with Control and Shift modifiers.
+	 *
 	 * @param keyCode numeric key code value
 	 * @return the ctrl shift result
 	 */
@@ -38,6 +40,7 @@ final class MainFrameMenuBar extends JMenuBar {
 
 	/**
 	 * Creates a main frame menu bar instance.
+	 *
 	 * @param frame frame that owns the created UI component
 	 */
 	MainFrameMenuBar(final MainFrame frame) {
@@ -53,6 +56,7 @@ final class MainFrameMenuBar extends JMenuBar {
 
 	/**
 	 * Creates an appearance menu.
+	 *
 	 * @param frame frame that owns the created UI component
 	 * @return the created appearance menu
 	 */
@@ -67,6 +71,7 @@ final class MainFrameMenuBar extends JMenuBar {
 
 	/**
 	 * Creates a styles menu.
+	 *
 	 * @param frame frame that owns the created UI component
 	 * @return the created styles menu
 	 */
@@ -78,9 +83,10 @@ final class MainFrameMenuBar extends JMenuBar {
 
 	/**
 	 * Creates a theme item.
+	 *
 	 * @param frame frame that owns the created UI component
-	 * @param text text to display or edit
-	 * @param mode mode value used by the operation
+	 * @param text  text to display or edit
+	 * @param mode  mode value used by the operation
 	 * @param group group value used by the operation
 	 * @return the created theme item
 	 */

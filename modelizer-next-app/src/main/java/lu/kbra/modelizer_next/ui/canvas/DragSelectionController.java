@@ -21,9 +21,10 @@ interface DragSelectionController extends DiagramCanvasExt {
 
 	/**
 	 * Adds the dragged layout.
-	 * @param layouts layout objects to read or modify
-	 * @param seen seen value used by the operation
-	 * @param element element value used by the operation
+	 *
+	 * @param layouts        layout objects to read or modify
+	 * @param seen           seen value used by the operation
+	 * @param element        element value used by the operation
 	 * @param fallbackLayout layout object to read or modify
 	 */
 	default void addDraggedLayout(
@@ -46,6 +47,7 @@ interface DragSelectionController extends DiagramCanvasExt {
 
 	/**
 	 * Builds a drag render layers.
+	 *
 	 * @param selection selection state to read or update
 	 */
 	default void buildDragRenderLayers(final DraggedSelection selection) {
@@ -54,10 +56,11 @@ interface DragSelectionController extends DiagramCanvasExt {
 
 	/**
 	 * Creates a dragged selection.
+	 *
 	 * @param hitSelection hit selection value used by the operation
-	 * @param hitLayout layout object to read or modify
-	 * @param worldPoint point in canvas coordinates
-	 * @param hitBounds bounds used for layout or hit testing
+	 * @param hitLayout    layout object to read or modify
+	 * @param worldPoint   point in canvas coordinates
+	 * @param hitBounds    bounds used for layout or hit testing
 	 * @return the created dragged selection
 	 */
 	default DraggedSelection createDraggedSelection(
@@ -92,6 +95,7 @@ interface DragSelectionController extends DiagramCanvasExt {
 
 	/**
 	 * Checks whether drag rendering active is enabled or applies.
+	 *
 	 * @return {@code true} if drag rendering active is enabled or applies; otherwise {@code false}
 	 */
 	default boolean isDragRenderingActive() {
@@ -100,7 +104,8 @@ interface DragSelectionController extends DiagramCanvasExt {
 
 	/**
 	 * Resolves the node layout for selection from the current model and layout state.
-	 * @param element element value used by the operation
+	 *
+	 * @param element        element value used by the operation
 	 * @param fallbackLayout layout object to read or modify
 	 * @return the resolved node layout for selection
 	 */

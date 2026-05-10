@@ -26,6 +26,7 @@ public class NodeLayout {
 
 	/**
 	 * Returns the object ID.
+	 *
 	 * @return the object ID
 	 */
 	public String getObjectId() {
@@ -34,6 +35,7 @@ public class NodeLayout {
 
 	/**
 	 * Returns the object type.
+	 *
 	 * @return the object type
 	 */
 	public LayoutObjectType getObjectType() {
@@ -42,6 +44,7 @@ public class NodeLayout {
 
 	/**
 	 * Returns the position.
+	 *
 	 * @return the position
 	 */
 	public Point2D.Double getPosition() {
@@ -50,6 +53,7 @@ public class NodeLayout {
 
 	/**
 	 * Returns the size.
+	 *
 	 * @return the size
 	 */
 	public Size2D getSize() {
@@ -58,6 +62,7 @@ public class NodeLayout {
 
 	/**
 	 * Sets the object ID.
+	 *
 	 * @param objectId id of the element to read or modify
 	 */
 	public void setObjectId(final String objectId) {
@@ -66,6 +71,7 @@ public class NodeLayout {
 
 	/**
 	 * Sets the object type.
+	 *
 	 * @param objectType type value to use
 	 */
 	public void setObjectType(final LayoutObjectType objectType) {
@@ -74,6 +80,7 @@ public class NodeLayout {
 
 	/**
 	 * Sets the position.
+	 *
 	 * @param position position value used by the operation
 	 */
 	public void setPosition(final Point2D.Double position) {
@@ -82,6 +89,7 @@ public class NodeLayout {
 
 	/**
 	 * Sets the size.
+	 *
 	 * @param size size value used by the operation
 	 */
 	public void setSize(final Size2D size) {
@@ -90,6 +98,7 @@ public class NodeLayout {
 
 	/**
 	 * Builds a debug string for this node layout.
+	 *
 	 * @return a debug string for this object
 	 */
 	@Override

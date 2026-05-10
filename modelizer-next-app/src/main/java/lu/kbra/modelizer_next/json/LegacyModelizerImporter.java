@@ -32,6 +32,7 @@ public class LegacyModelizerImporter {
 
 	/**
 	 * Immutable value object for legacy ref data.
+	 *
 	 * @param tableName name value to use
 	 * @param fieldName name value to use
 	 */
@@ -40,6 +41,7 @@ public class LegacyModelizerImporter {
 
 	/**
 	 * Imports the file.
+	 *
 	 * @param file file to read or write
 	 * @return the import file result
 	 * @throws IOException if the operation cannot be completed
@@ -55,6 +57,7 @@ public class LegacyModelizerImporter {
 
 	/**
 	 * Checks whether legacy file is enabled or applies while converting JSON data.
+	 *
 	 * @param file file to read or write
 	 * @return {@code true} if legacy file is enabled or applies; otherwise {@code false}
 	 * @throws IOException if the operation cannot be completed
@@ -74,10 +77,11 @@ public class LegacyModelizerImporter {
 
 	/**
 	 * Adds the class layout while converting JSON data.
+	 *
 	 * @param panelState panel state value used by the operation
-	 * @param classId id of the class to look up or modify
-	 * @param x x coordinate
-	 * @param y y coordinate
+	 * @param classId    id of the class to look up or modify
+	 * @param x          x coordinate
+	 * @param y          y coordinate
 	 */
 	private static void addClassLayout(final PanelState panelState, final String classId, final double x, final double y) {
 		final NodeLayout layout = new NodeLayout();
@@ -90,10 +94,11 @@ public class LegacyModelizerImporter {
 
 	/**
 	 * Adds the comment layout while converting JSON data.
+	 *
 	 * @param panelState panel state value used by the operation
-	 * @param commentId id of the comment to look up or modify
-	 * @param x x coordinate
-	 * @param y y coordinate
+	 * @param commentId  id of the comment to look up or modify
+	 * @param x          x coordinate
+	 * @param y          y coordinate
 	 */
 	private static void addCommentLayout(final PanelState panelState, final String commentId, final double x, final double y) {
 		final NodeLayout layout = new NodeLayout();
@@ -106,7 +111,8 @@ public class LegacyModelizerImporter {
 
 	/**
 	 * Creates a conceptual link while converting JSON data.
-	 * @param linkNode link node value used by the operation
+	 *
+	 * @param linkNode       link node value used by the operation
 	 * @param classIdsByName name value to use
 	 * @return the created conceptual link
 	 */
@@ -148,6 +154,7 @@ public class LegacyModelizerImporter {
 
 	/**
 	 * Creates a standalone comment while converting JSON data.
+	 *
 	 * @param commentNode comment node value used by the operation
 	 * @return the created standalone comment
 	 */
@@ -171,8 +178,9 @@ public class LegacyModelizerImporter {
 
 	/**
 	 * Creates a technical link while converting JSON data.
-	 * @param linkNode link node value used by the operation
-	 * @param classIdsByName name value to use
+	 *
+	 * @param linkNode                link node value used by the operation
+	 * @param classIdsByName          name value to use
 	 * @param fieldIdsByQualifiedName name value to use
 	 * @return the created technical link
 	 */
@@ -209,6 +217,7 @@ public class LegacyModelizerImporter {
 
 	/**
 	 * Imports the root.
+	 *
 	 * @param root root value used by the operation
 	 * @return the import root result
 	 */
@@ -330,6 +339,7 @@ public class LegacyModelizerImporter {
 
 	/**
 	 * Checks whether legacy root is enabled or applies while converting JSON data.
+	 *
 	 * @param root root value used by the operation
 	 * @return {@code true} if legacy root is enabled or applies; otherwise {@code false}
 	 */
@@ -339,6 +349,7 @@ public class LegacyModelizerImporter {
 
 	/**
 	 * Parses the cardinality from the supplied input while converting JSON data.
+	 *
 	 * @param rawCardinality text value for raw cardinality
 	 * @return the parsed cardinality
 	 */
@@ -354,8 +365,9 @@ public class LegacyModelizerImporter {
 
 	/**
 	 * Parses the color from the supplied input while converting JSON data.
+	 *
 	 * @param colorNode color node value used by the operation
-	 * @param fallback fallback value used by the operation
+	 * @param fallback  fallback value used by the operation
 	 * @return the parsed color
 	 */
 	private static Color parseColor(final JsonNode colorNode, final Color fallback) {
@@ -377,6 +389,7 @@ public class LegacyModelizerImporter {
 
 	/**
 	 * Parses the ref from the supplied input while converting JSON data.
+	 *
 	 * @param rawRef text value for raw ref
 	 * @return the parsed ref
 	 */
@@ -394,10 +407,11 @@ public class LegacyModelizerImporter {
 
 	/**
 	 * Stores the mapping between a source class id and the imported class model.
+	 *
 	 * @param classIdsByName name value to use
 	 * @param conceptualName name value to use
-	 * @param technicalName name value to use
-	 * @param classId id of the class to look up or modify
+	 * @param technicalName  name value to use
+	 * @param classId        id of the class to look up or modify
 	 */
 	private static void putClassMapping(
 			final Map<String, String> classIdsByName,
@@ -414,10 +428,11 @@ public class LegacyModelizerImporter {
 
 	/**
 	 * Stores an alternate field id that points to the imported field model.
+	 *
 	 * @param fieldIdsByQualifiedName name value to use
-	 * @param className name value to use
-	 * @param fieldName name value to use
-	 * @param fieldId id of the field to look up or modify
+	 * @param className               name value to use
+	 * @param fieldName               name value to use
+	 * @param fieldId                 id of the field to look up or modify
 	 */
 	private static void putFieldAlias(
 			final Map<String, String> fieldIdsByQualifiedName,
@@ -432,12 +447,13 @@ public class LegacyModelizerImporter {
 
 	/**
 	 * Stores the mapping between a source field id and the imported field model.
+	 *
 	 * @param fieldIdsByQualifiedName name value to use
-	 * @param conceptualClassName name value to use
-	 * @param technicalClassName name value to use
-	 * @param conceptualFieldName name value to use
-	 * @param technicalFieldName name value to use
-	 * @param fieldId id of the field to look up or modify
+	 * @param conceptualClassName     name value to use
+	 * @param technicalClassName      name value to use
+	 * @param conceptualFieldName     name value to use
+	 * @param technicalFieldName      name value to use
+	 * @param fieldId                 id of the field to look up or modify
 	 */
 	private static void putFieldMapping(
 			final Map<String, String> fieldIdsByQualifiedName,
@@ -454,9 +470,10 @@ public class LegacyModelizerImporter {
 
 	/**
 	 * Reads the text while converting JSON data.
-	 * @param node JSON node to read
+	 *
+	 * @param node      JSON node to read
 	 * @param fieldName name value to use
-	 * @param fallback text value for fallback
+	 * @param fallback  text value for fallback
 	 * @return the read text result
 	 */
 	private static String readText(final JsonNode node, final String fieldName, final String fallback) {

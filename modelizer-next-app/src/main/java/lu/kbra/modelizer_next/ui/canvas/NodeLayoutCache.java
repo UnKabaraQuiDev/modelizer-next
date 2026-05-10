@@ -16,8 +16,9 @@ public interface NodeLayoutCache extends DiagramCanvasExt {
 
 	/**
 	 * Finds the node layout that matches the supplied input.
+	 *
 	 * @param objectType type value to use
-	 * @param objectId id of the element to read or modify
+	 * @param objectId   id of the element to read or modify
 	 * @return the matching node layout, or {@code null} when no match exists
 	 */
 	default Optional<NodeLayout> findNodeLayout(final LayoutObjectType objectType, final String objectId) {
@@ -36,6 +37,7 @@ public interface NodeLayoutCache extends DiagramCanvasExt {
 
 	/**
 	 * Finds the existing link layout, or creates one when none exists.
+	 *
 	 * @param linkId id of the link to look up or modify
 	 * @return the matching or create link layout, or {@code null} when no match exists
 	 */
@@ -54,8 +56,9 @@ public interface NodeLayoutCache extends DiagramCanvasExt {
 
 	/**
 	 * Finds the existing node layout, or creates one when none exists.
+	 *
 	 * @param objectType type value to use
-	 * @param objectId id of the element to read or modify
+	 * @param objectId   id of the element to read or modify
 	 * @return the matching or create node layout, or {@code null} when no match exists
 	 */
 	default NodeLayout findOrCreateNodeLayout(final LayoutObjectType objectType, final String objectId) {
@@ -77,6 +80,7 @@ public interface NodeLayoutCache extends DiagramCanvasExt {
 
 	/**
 	 * Returns the panel state on the active canvas.
+	 *
 	 * @return the panel state
 	 */
 	default PanelState getPanelState() {

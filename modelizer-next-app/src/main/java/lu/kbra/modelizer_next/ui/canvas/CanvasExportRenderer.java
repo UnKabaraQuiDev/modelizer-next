@@ -17,6 +17,7 @@ interface CanvasExportRenderer extends DiagramCanvasExt {
 
 	/**
 	 * Creates an export image on the active canvas.
+	 *
 	 * @param scope export scope to use
 	 * @return the created export image
 	 */
@@ -35,8 +36,9 @@ interface CanvasExportRenderer extends DiagramCanvasExt {
 
 	/**
 	 * Creates an export preview image on the active canvas.
-	 * @param scope export scope to use
-	 * @param maxWidth width value
+	 *
+	 * @param scope     export scope to use
+	 * @param maxWidth  width value
 	 * @param maxHeight height value
 	 * @return the created export preview image
 	 */
@@ -61,6 +63,7 @@ interface CanvasExportRenderer extends DiagramCanvasExt {
 
 	/**
 	 * Returns the export size on the active canvas.
+	 *
 	 * @param scope export scope to use
 	 * @return the export size
 	 */
@@ -75,6 +78,7 @@ interface CanvasExportRenderer extends DiagramCanvasExt {
 
 	/**
 	 * Paints the export.
+	 *
 	 * @param graphics graphics context used for drawing
 	 * @param rawScope raw scope value used by the operation
 	 */

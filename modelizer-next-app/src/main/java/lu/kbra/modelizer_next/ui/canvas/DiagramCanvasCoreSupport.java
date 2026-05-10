@@ -30,6 +30,7 @@ import lu.kbra.modelizer_next.ui.canvas.datastruct.FieldAnchor;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.LinkGeometry;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectedElement;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectedElement.SelectedType;
+import lu.kbra.modelizer_next.ui.export.ViewExportScope;
 
 /**
  * Contains shared canvas helpers that do not own one specific feature area. It groups small
@@ -38,9 +39,67 @@ import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectedElement.SelectedType;
  */
 interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 
+	default void focusSelection() {
+		if (!this.getCanvas().hasSelection()) {
+			return;
+		}
+
+		final Graphics2D g2 = this.getCanvas().createGraphicsContext();
+		try {
+			this.getCanvas().focusBounds(this.getCanvas().computeExportContentBounds(g2, ViewExportScope.SELECTION));
+		} finally {
+			g2.dispose();
+		}
+	}
+
+	default void focusAll() {
+		final Graphics2D g2 = this.getCanvas().createGraphicsContext();
+		try {
+			this.getCanvas().focusBounds(this.getCanvas().computeExportContentBounds(g2, ViewExportScope.VIEW));
+		} finally {
+			g2.dispose();
+		}
+	}
+
+	/**
+	 * Moves and zooms the current canvas view so the supplied world-space bounds fit inside the
+	 * viewport.
+	 *
+	 * @param bounds bounds to focus
+	 */
+	default void focusBounds(final Rectangle2D bounds) {
+		if (bounds == null || bounds.isEmpty()) {
+			return;
+		}
+
+		final Dimension viewportSize = this.getCanvas().getViewportExportSize();
+		final double viewportWidth = Math.max(1.0, viewportSize.getWidth());
+		final double viewportHeight = Math.max(1.0, viewportSize.getHeight());
+
+		final double margin = DiagramCanvas.EXPORT_MARGIN;
+		final double usableWidth = Math.max(1.0, viewportWidth - margin * 2.0);
+		final double usableHeight = Math.max(1.0, viewportHeight - margin * 2.0);
+
+		final double zoomX = usableWidth / Math.max(1.0, bounds.getWidth());
+		final double zoomY = usableHeight / Math.max(1.0, bounds.getHeight());
+		final double newZoom = this.getCanvas().clamp(Math.min(zoomX, zoomY), 0.2, 4.0);
+
+		final PanelState state = this.getCanvas().getPanelState();
+		state.setZoom(newZoom);
+		state.setPanX(viewportWidth / 2.0 - bounds.getCenterX() * newZoom);
+		state.setPanY(viewportHeight / 2.0 - bounds.getCenterY() * newZoom);
+
+		if (this.getCanvas().isLiveEditingElement()) {
+			this.getCanvas().updateLiveEditLayout();
+		}
+
+		this.getCanvas().repaint();
+	}
+
 	/**
 	 * Appends the suffix on the active canvas.
-	 * @param value value to process
+	 *
+	 * @param value  value to process
 	 * @param suffix suffix to append when needed
 	 * @return the append suffix result
 	 */
@@ -53,9 +112,10 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 
 	/**
 	 * Constrains a numeric value to the supplied range.
+	 *
 	 * @param value value to process
-	 * @param min numeric min value
-	 * @param max numeric max value
+	 * @param min   numeric min value
+	 * @param max   numeric max value
 	 * @return the clamp result
 	 */
 	default double clamp(final double value, final double min, final double max) {
@@ -63,21 +123,8 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 	}
 
 	/**
-	 * Returns the next anchor side in clockwise order.
-	 * @param side node side to inspect
-	 * @return the clockwise result
-	 */
-	default AnchorSide clockwise(final AnchorSide side) {
-		return switch (side) {
-		case TOP -> AnchorSide.RIGHT;
-		case RIGHT -> AnchorSide.BOTTOM;
-		case BOTTOM -> AnchorSide.LEFT;
-		case LEFT -> AnchorSide.TOP;
-		};
-	}
-
-	/**
 	 * Configures the graphics on the active canvas.
+	 *
 	 * @param g2 graphics context used for drawing
 	 */
 	default void configureGraphics(final Graphics2D g2) {
@@ -87,6 +134,7 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 
 	/**
 	 * Creates a graphics context on the active canvas.
+	 *
 	 * @return the created graphics context
 	 */
 	default Graphics2D createGraphicsContext() {
@@ -116,6 +164,7 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 
 	/**
 	 * Ensures that the technical source field exists or is up to date.
+	 *
 	 * @param sourceClass source class value used by the operation
 	 * @param targetClass target class value used by the operation
 	 * @param targetField target field value used by the operation
@@ -174,7 +223,8 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 
 	/**
 	 * Finds the bound target anchor that matches the supplied input.
-	 * @param g2 graphics context used for drawing
+	 *
+	 * @param g2           graphics context used for drawing
 	 * @param commentModel comment model affected by the operation
 	 * @return the matching bound target anchor, or {@code null} when no match exists
 	 */
@@ -202,6 +252,7 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 
 	/**
 	 * Returns the active links.
+	 *
 	 * @return the active links
 	 */
 	default List<LinkModel> getActiveLinks() {
@@ -211,6 +262,7 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 
 	/**
 	 * Returns the link creation source.
+	 *
 	 * @return the link creation source
 	 */
 	default SelectedElement getLinkCreationSource() {
@@ -219,8 +271,9 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 
 	/**
 	 * Returns the technical side link count.
-	 * @param classId id of the class to look up or modify
-	 * @param side node side to inspect
+	 *
+	 * @param classId       id of the class to look up or modify
+	 * @param side          node side to inspect
 	 * @param ignoredLinkId id of the element to read or modify
 	 * @return the technical side link count
 	 */
@@ -262,6 +315,7 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 
 	/**
 	 * Returns the visible fields.
+	 *
 	 * @param classModel class model affected by the operation
 	 * @return the visible fields
 	 */
@@ -281,6 +335,7 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 
 	/**
 	 * Checks whether this object has an association class.
+	 *
 	 * @param linkModel link model affected by the operation
 	 * @return {@code true} if association class exists; otherwise {@code false}
 	 */
@@ -290,6 +345,7 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 
 	/**
 	 * Checks whether this object has an outgoing technical link.
+	 *
 	 * @param classId id of the class to look up or modify
 	 * @param fieldId id of the field to look up or modify
 	 * @return {@code true} if outgoing technical link exists; otherwise {@code false}
@@ -332,13 +388,16 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 						this.getCanvas().documentEventListener::undo,
 						this.getCanvas().documentEventListener::redo,
 						() -> this.getCanvas().editSelectionStyle(false),
-						() -> this.getCanvas().editSelectionStyle(true)));
+						() -> this.getCanvas().editSelectionStyle(true),
+						this.getCanvas()::focusSelection,
+						this.getCanvas()::focusAll));
 	}
 
 	/**
 	 * Checks whether link connected to is enabled or applies.
+	 *
 	 * @param linkModel link model affected by the operation
-	 * @param classId id of the class to look up or modify
+	 * @param classId   id of the class to look up or modify
 	 * @return {@code true} if link connected to is enabled or applies; otherwise {@code false}
 	 */
 	default boolean isLinkConnectedTo(final LinkModel linkModel, final String classId) {
@@ -351,6 +410,7 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 
 	/**
 	 * Checks whether valid preview target is enabled or applies on the active canvas.
+	 *
 	 * @param target target value used by the operation
 	 * @return {@code true} if valid preview target is enabled or applies; otherwise {@code false}
 	 */
@@ -396,6 +456,7 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 
 	/**
 	 * Maps the ID on the active canvas.
+	 *
 	 * @param idMap map to read or update
 	 * @param oldId id of the element to read or modify
 	 * @return the map ID result
@@ -409,6 +470,7 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 
 	/**
 	 * Returns the mouse world pos on the active canvas.
+	 *
 	 * @return the mouse world pos
 	 */
 	default Point2D.Double getMouseWorldPos() {
@@ -423,6 +485,7 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 
 	/**
 	 * Returns the mouse viewport pos on the active canvas.
+	 *
 	 * @return the mouse viewport pos
 	 */
 	default Point2D.Double getMouseViewportPos() {
@@ -437,6 +500,7 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 
 	/**
 	 * Normalizes the connection source selection.
+	 *
 	 * @param selection selection state to read or update
 	 * @return the normalize connection source selection result
 	 */
@@ -455,6 +519,7 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 
 	/**
 	 * Normalizes the connection target selection.
+	 *
 	 * @param selection selection state to read or update
 	 * @return the normalize connection target selection result
 	 */
@@ -531,7 +596,8 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 
 	/**
 	 * Resolves the conceptual preview anchor from the current model and layout state.
-	 * @param classId id of the class to look up or modify
+	 *
+	 * @param classId   id of the class to look up or modify
 	 * @param reference reference value used by the operation
 	 * @return the resolved conceptual preview anchor
 	 */
@@ -568,6 +634,7 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 
 	/**
 	 * Resolves the opposite reference point from the current model and layout state.
+	 *
 	 * @param classId id of the class to look up or modify
 	 * @param fieldId id of the field to look up or modify
 	 * @return the resolved opposite reference point
@@ -600,6 +667,7 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 
 	/**
 	 * Resolves the preview source anchor reference from the current model and layout state.
+	 *
 	 * @return the resolved preview source anchor reference
 	 */
 	default Point2D resolvePreviewSourceAnchorReference() {
@@ -633,11 +701,12 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 
 	/**
 	 * Resolves the technical endpoint side from the current model and layout state.
-	 * @param classId id of the class to look up or modify
-	 * @param fieldId id of the field to look up or modify
+	 *
+	 * @param classId         id of the class to look up or modify
+	 * @param fieldId         id of the field to look up or modify
 	 * @param oppositeClassId id of the element to read or modify
 	 * @param oppositeFieldId id of the element to read or modify
-	 * @param selfLink whether self link is enabled
+	 * @param selfLink        whether self link is enabled
 	 * @return the resolved technical endpoint side
 	 */
 	default AnchorSide resolveTechnicalEndpointSide(
@@ -683,8 +752,9 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 
 	/**
 	 * Resolves the technical field anchor from the current model and layout state.
-	 * @param classId id of the class to look up or modify
-	 * @param fieldId id of the field to look up or modify
+	 *
+	 * @param classId           id of the class to look up or modify
+	 * @param fieldId           id of the field to look up or modify
 	 * @param oppositeReference opposite reference value used by the operation
 	 * @return the resolved technical field anchor
 	 */
@@ -721,8 +791,9 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 
 	/**
 	 * Resolves the technical field anchor from the current model and layout state.
-	 * @param classId id of the class to look up or modify
-	 * @param fieldId id of the field to look up or modify
+	 *
+	 * @param classId         id of the class to look up or modify
+	 * @param fieldId         id of the field to look up or modify
 	 * @param oppositeClassId id of the element to read or modify
 	 * @param oppositeFieldId id of the element to read or modify
 	 * @return the resolved technical field anchor
@@ -777,9 +848,10 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 
 	/**
 	 * Resolves the technical self link anchor from the current model and layout state.
+	 *
 	 * @param classId id of the class to look up or modify
 	 * @param fieldId id of the field to look up or modify
-	 * @param side node side to inspect
+	 * @param side    node side to inspect
 	 * @return the resolved technical self link anchor
 	 */
 	default Point2D resolveTechnicalSelfLinkAnchor(final String classId, final String fieldId, final AnchorSide side) {
@@ -813,6 +885,7 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 
 	/**
 	 * Resolves the technical source endpoint from the current model and layout state.
+	 *
 	 * @param source source object used by the operation
 	 * @param target target value used by the operation
 	 * @return the resolved technical source endpoint
@@ -844,6 +917,7 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 
 	/**
 	 * Resolves the technical target endpoint from the current model and layout state.
+	 *
 	 * @param target target value used by the operation
 	 * @return the resolved technical target endpoint
 	 */
@@ -867,6 +941,7 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 
 	/**
 	 * Converts screen coordinates into world coordinates.
+	 *
 	 * @param point point in canvas coordinates
 	 * @return the screen to world result
 	 */
@@ -877,8 +952,9 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 
 	/**
 	 * Sets the association class for link.
+	 *
 	 * @param classId id of the class to look up or modify
-	 * @param linkId id of the link to look up or modify
+	 * @param linkId  id of the link to look up or modify
 	 */
 	default void setAssociationClassForLink(final String classId, final String linkId) {
 		final LinkModel linkModel = this.getCanvas().findLinkById(linkId);
@@ -898,6 +974,7 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 
 	/**
 	 * Decides whether the canvas should export class.
+	 *
 	 * @param classModel class model affected by the operation
 	 * @return {@code true} if the operation should happen; otherwise {@code false}
 	 */
@@ -921,6 +998,7 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 
 	/**
 	 * Decides whether the canvas should export comment.
+	 *
 	 * @param commentModel comment model affected by the operation
 	 * @return {@code true} if the operation should happen; otherwise {@code false}
 	 */
@@ -931,6 +1009,7 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 
 	/**
 	 * Decides whether the canvas should export link.
+	 *
 	 * @param linkModel link model affected by the operation
 	 * @return {@code true} if the operation should happen; otherwise {@code false}
 	 */
@@ -941,6 +1020,7 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 
 	/**
 	 * Returns the viewport center world on the active canvas.
+	 *
 	 * @return the viewport center world
 	 */
 	default Point2D.Double getViewportCenterWorld() {
@@ -949,6 +1029,7 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 
 	/**
 	 * Returns the viewport center on the active canvas.
+	 *
 	 * @return the viewport center
 	 */
 	default Point2D.Double getViewportCenter() {
@@ -957,6 +1038,7 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 
 	/**
 	 * Converts world coordinates into viewport coordinates.
+	 *
 	 * @param world world value used by the operation
 	 * @return the world to viewport result
 	 */
@@ -967,6 +1049,7 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 
 	/**
 	 * Converts a world-space size into a zoomed viewport size.
+	 *
 	 * @param world world value used by the operation
 	 * @return the world toviewport zoom result
 	 */
@@ -977,6 +1060,7 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 
 	/**
 	 * Converts a world-space size into a zoomed viewport size.
+	 *
 	 * @param world world value used by the operation
 	 * @return the world to viewport zoom result
 	 */
@@ -987,11 +1071,13 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 
 	/**
 	 * Wraps text into lines that fit within the requested width.
-	 * @param text text to display or edit
-	 * @param font font used for measurement or drawing
+	 *
+	 * @param text     text to display or edit
+	 * @param font     font used for measurement or drawing
 	 * @param maxWidth width value
 	 * @return the matching values
 	 */
+	@Deprecated
 	default List<String> wrapText(final String text, final Font font, final int maxWidth) {
 		if (text == null || text.isEmpty()) {
 			return Collections.emptyList();
@@ -1028,6 +1114,20 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 			lines.add(current.toString());
 		}
 		return lines;
+	}
+
+	/**
+	 * Measures the width of text with the supplied font.
+	 *
+	 * @param titleFont  font used for measurement or drawing
+	 * @param classTitle text value for class title
+	 * @return the string width result
+	 */
+	default double stringWidth(final Font titleFont, final String classTitle) {
+		if (classTitle == null || classTitle.isBlank()) {
+			return 0;
+		}
+		return titleFont.getStringBounds(classTitle, getCanvas().fontRenderContext).getWidth();
 	}
 
 }

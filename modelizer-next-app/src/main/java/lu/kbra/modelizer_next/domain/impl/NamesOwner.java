@@ -10,6 +10,7 @@ public interface NamesOwner {
 
 	/**
 	 * Returns the conceptual name.
+	 *
 	 * @return the conceptual name
 	 */
 	default String getConceptualName() {
@@ -18,6 +19,7 @@ public interface NamesOwner {
 
 	/**
 	 * Returns the name.
+	 *
 	 * @param panelType diagram panel type whose model or layout should be used
 	 * @return the name
 	 */
@@ -27,12 +29,14 @@ public interface NamesOwner {
 
 	/**
 	 * Returns the names.
+	 *
 	 * @return the names
 	 */
 	ElementNames getNames();
 
 	/**
 	 * Returns the technical name.
+	 *
 	 * @return the technical name
 	 */
 	default String getTechnicalName() {
@@ -41,6 +45,7 @@ public interface NamesOwner {
 
 	/**
 	 * Checks whether this object has a technical name.
+	 *
 	 * @return {@code true} if technical name exists; otherwise {@code false}
 	 */
 	default boolean hasTechnicalName() {
@@ -49,6 +54,7 @@ public interface NamesOwner {
 
 	/**
 	 * Sets the conceptual name.
+	 *
 	 * @param name name value to read, write, or display
 	 */
 	default void setConceptualName(final String name) {
@@ -57,8 +63,9 @@ public interface NamesOwner {
 
 	/**
 	 * Sets the name.
+	 *
 	 * @param forceTechnical whether force technical is enabled
-	 * @param name name value to read, write, or display
+	 * @param name           name value to read, write, or display
 	 */
 	default void setName(final boolean forceTechnical, final String name) {
 		this.getNames().set(forceTechnical, name);
@@ -66,8 +73,9 @@ public interface NamesOwner {
 
 	/**
 	 * Sets the name.
+	 *
 	 * @param panelType diagram panel type whose model or layout should be used
-	 * @param name name value to read, write, or display
+	 * @param name      name value to read, write, or display
 	 */
 	default void setName(final PanelType panelType, final String name) {
 		this.getNames().set(panelType, name);
@@ -75,9 +83,10 @@ public interface NamesOwner {
 
 	/**
 	 * Sets the name.
-	 * @param panelType diagram panel type whose model or layout should be used
+	 *
+	 * @param panelType      diagram panel type whose model or layout should be used
 	 * @param maybeTechnical whether maybe technical is enabled
-	 * @param name name value to read, write, or display
+	 * @param name           name value to read, write, or display
 	 */
 	default void setName(final PanelType panelType, final boolean maybeTechnical, final String name) {
 		this.getNames().set(panelType, maybeTechnical, name);
@@ -85,12 +94,14 @@ public interface NamesOwner {
 
 	/**
 	 * Sets the names.
+	 *
 	 * @param e event object supplied by Swing
 	 */
 	void setNames(ElementNames e);
 
 	/**
 	 * Sets the technical name.
+	 *
 	 * @param name name value to read, write, or display
 	 */
 	default void setTechnicalName(final String name) {

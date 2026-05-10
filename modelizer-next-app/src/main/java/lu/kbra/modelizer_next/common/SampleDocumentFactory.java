@@ -8,7 +8,8 @@ import lu.kbra.modelizer_next.json.ModernModelizerImporter;
 import lu.kbra.pclib.PCUtils;
 
 /**
- * Factory for the built-in sample document shown when the user creates or opens an example document.
+ * Factory for the built-in sample document shown when the user creates or opens an example
+ * document.
  */
 public final class SampleDocumentFactory {
 
@@ -16,6 +17,7 @@ public final class SampleDocumentFactory {
 
 	/**
 	 * Creates a new default instance for this factory.
+	 *
 	 * @return the created value
 	 */
 	public static ModelDocument create() {

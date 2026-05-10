@@ -41,8 +41,9 @@ public final class CommandLineExporter {
 
 	/**
 	 * Immutable value object for loaded document data.
+	 *
 	 * @param sourceFile file to read or write
-	 * @param document document to read or modify
+	 * @param document   document to read or modify
 	 */
 	private record LoadedDocument(File sourceFile, ModelDocument document) {
 	}
@@ -55,6 +56,7 @@ public final class CommandLineExporter {
 
 		/**
 		 * Returns the next value from this producer or iterator.
+		 *
 		 * @return an optional result when a matching value is available
 		 * @throws IOException if the operation cannot be completed
 		 */
@@ -72,8 +74,9 @@ public final class CommandLineExporter {
 
 		/**
 		 * Creates an input file document producer instance.
+		 *
 		 * @param inputFiles values for input files
-		 * @param force whether force is enabled
+		 * @param force      whether force is enabled
 		 */
 		private InputFileDocumentProducer(final List<File> inputFiles, final boolean force) {
 			this.inputFiles = inputFiles.iterator();
@@ -82,6 +85,7 @@ public final class CommandLineExporter {
 
 		/**
 		 * Returns the next value from this producer or iterator.
+		 *
 		 * @return an optional result when a matching value is available
 		 * @throws IOException if the operation cannot be completed
 		 */
@@ -112,6 +116,7 @@ public final class CommandLineExporter {
 
 		/**
 		 * Creates an export aborted exception instance.
+		 *
 		 * @param inputFile file to read or write
 		 */
 		private ExportAbortedException(final File inputFile) {
@@ -122,6 +127,7 @@ public final class CommandLineExporter {
 
 	/**
 	 * Runs the full operation represented by this class.
+	 *
 	 * @param args command-line arguments supplied by the launcher
 	 * @return the run result
 	 */
@@ -200,9 +206,10 @@ public final class CommandLineExporter {
 
 	/**
 	 * Resolves the input files from the current model and layout state.
+	 *
 	 * @param rawInputFile file to read or write
-	 * @param multiple whether multiple input files are allowed
-	 * @param wildcard whether wildcard path matching is enabled
+	 * @param multiple     whether multiple input files are allowed
+	 * @param wildcard     whether wildcard path matching is enabled
 	 * @return the resolved input files
 	 * @throws IOException if the operation cannot be completed
 	 */
@@ -250,9 +257,10 @@ public final class CommandLineExporter {
 
 	/**
 	 * Adds the input file.
+	 *
 	 * @param inputFiles values for input files
-	 * @param usedPaths used paths value used by the operation
-	 * @param inputFile file to read or write
+	 * @param usedPaths  used paths value used by the operation
+	 * @param inputFile  file to read or write
 	 */
 	private static void addInputFile(final List<File> inputFiles, final Set<Path> usedPaths, final File inputFile) {
 		final Path inputPath = CommandLineExporter.toNormalizedAbsolutePath(inputFile);
@@ -272,6 +280,7 @@ public final class CommandLineExporter {
 
 	/**
 	 * Resolves the wildcard input files from the current model and layout state.
+	 *
 	 * @param rawPattern text value for raw pattern
 	 * @return the resolved wildcard input files
 	 * @throws IOException if the operation cannot be completed
@@ -298,10 +307,11 @@ public final class CommandLineExporter {
 
 	/**
 	 * Checks whether the wildcard matches the expected pattern.
-	 * @param path file system path to read or write
+	 *
+	 * @param path            file system path to read or write
 	 * @param absolutePattern whether absolute pattern is enabled
-	 * @param baseDirectory base directory value used by the operation
-	 * @param matchers values for matchers
+	 * @param baseDirectory   base directory value used by the operation
+	 * @param matchers        values for matchers
 	 * @return {@code true} when the condition is met; otherwise {@code false}
 	 */
 	private static boolean matchesWildcard(
@@ -324,6 +334,7 @@ public final class CommandLineExporter {
 
 	/**
 	 * Creates a wildcard matchers.
+	 *
 	 * @param pattern pattern used for matching or formatting
 	 * @return the created wildcard matchers
 	 */
@@ -336,6 +347,7 @@ public final class CommandLineExporter {
 
 	/**
 	 * Expands the double star zero directory variants.
+	 *
 	 * @param pattern pattern used for matching or formatting
 	 * @return the matching values
 	 */
@@ -347,7 +359,8 @@ public final class CommandLineExporter {
 
 	/**
 	 * Expands the double star zero directory variants.
-	 * @param pattern pattern used for matching or formatting
+	 *
+	 * @param pattern  pattern used for matching or formatting
 	 * @param variants variants value used by the operation
 	 */
 	private static void expandDoubleStarZeroDirectoryVariants(final String pattern, final Set<String> variants) {
@@ -376,6 +389,7 @@ public final class CommandLineExporter {
 
 	/**
 	 * Finds the wildcard search root that matches the supplied input.
+	 *
 	 * @param pattern pattern used for matching or formatting
 	 * @return the matching wildcard search root, or {@code null} when no match exists
 	 */
@@ -402,6 +416,7 @@ public final class CommandLineExporter {
 
 	/**
 	 * Returns the first wildcard index.
+	 *
 	 * @param value value to process
 	 * @return the first wildcard index result
 	 */
@@ -421,6 +436,7 @@ public final class CommandLineExporter {
 
 	/**
 	 * Checks whether the wildcard is present.
+	 *
 	 * @param value value to process
 	 * @return {@code true} when the condition is met; otherwise {@code false}
 	 */
@@ -430,6 +446,7 @@ public final class CommandLineExporter {
 
 	/**
 	 * Normalizes the wildcard separators.
+	 *
 	 * @param value value to process
 	 * @return the normalize wildcard separators result
 	 */
@@ -439,6 +456,7 @@ public final class CommandLineExporter {
 
 	/**
 	 * Converts the input to a normalized absolute path.
+	 *
 	 * @param file file to read or write
 	 * @return the to normalized absolute path result
 	 */
@@ -452,7 +470,8 @@ public final class CommandLineExporter {
 
 	/**
 	 * Creates a canvases.
-	 * @param document document to read or modify
+	 *
+	 * @param document            document to read or modify
 	 * @param requestedPanelTypes values for requested panel types
 	 * @return the created canvases
 	 */

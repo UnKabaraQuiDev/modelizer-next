@@ -21,9 +21,10 @@ public enum Platform {
 
 	/**
 	 * Creates a platform instance.
-	 * @param displayName name value to use
-	 * @param manifestKey text value for manifest key
-	 * @param installerExtension text value for installer extension
+	 *
+	 * @param displayName         name value to use
+	 * @param manifestKey         text value for manifest key
+	 * @param installerExtension  text value for installer extension
 	 * @param adminRightsExpected whether admin rights expected is enabled
 	 */
 	Platform(final String displayName, final String manifestKey, final String installerExtension, final boolean adminRightsExpected) {
@@ -35,6 +36,7 @@ public enum Platform {
 
 	/**
 	 * Returns the value for the requested panel or key.
+	 *
 	 * @return the value
 	 */
 	public static Platform get() {
@@ -43,6 +45,7 @@ public enum Platform {
 
 	/**
 	 * Detects the current platform.
+	 *
 	 * @param osName name value to use
 	 * @return the detect result
 	 */
@@ -62,6 +65,7 @@ public enum Platform {
 
 	/**
 	 * Checks whether supported is enabled or applies.
+	 *
 	 * @return {@code true} if supported is enabled or applies; otherwise {@code false}
 	 */
 	public boolean isSupported() {
@@ -70,6 +74,7 @@ public enum Platform {
 
 	/**
 	 * Returns the user-facing display name.
+	 *
 	 * @return the display name result
 	 */
 	public String displayName() {
@@ -78,6 +83,7 @@ public enum Platform {
 
 	/**
 	 * Returns the string key used in update manifests.
+	 *
 	 * @return the manifest key result
 	 */
 	public String manifestKey() {
@@ -86,6 +92,7 @@ public enum Platform {
 
 	/**
 	 * Installs the er extension.
+	 *
 	 * @return the installer extension result
 	 */
 	public String installerExtension() {
@@ -94,6 +101,7 @@ public enum Platform {
 
 	/**
 	 * Checks whether installer actions usually require administrator rights on this platform.
+	 *
 	 * @return {@code true} when the condition is met; otherwise {@code false}
 	 */
 	public boolean adminRightsExpected() {

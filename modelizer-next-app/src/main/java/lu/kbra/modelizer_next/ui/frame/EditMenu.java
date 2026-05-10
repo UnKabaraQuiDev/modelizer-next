@@ -16,6 +16,7 @@ final class EditMenu extends JMenu {
 
 	/**
 	 * Creates an edit menu instance.
+	 *
 	 * @param frame frame that owns the created UI component
 	 */
 	EditMenu(final MainFrame frame) {

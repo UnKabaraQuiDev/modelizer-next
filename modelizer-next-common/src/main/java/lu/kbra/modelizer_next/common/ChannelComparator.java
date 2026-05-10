@@ -15,7 +15,8 @@ public class ChannelComparator implements Comparator<String> {
 
 	/**
 	 * Compares two values using this comparator's ordering rules.
-	 * @param left text value for left
+	 *
+	 * @param left  text value for left
 	 * @param right text value for right
 	 * @return a negative value, zero, or a positive value according to the ordering rules
 	 */

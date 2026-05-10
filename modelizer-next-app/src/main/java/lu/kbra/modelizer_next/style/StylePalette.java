@@ -26,6 +26,7 @@ public class StylePalette implements DisplayValueOwner {
 
 	/**
 	 * Returns the display value.
+	 *
 	 * @return the display value
 	 */
 	@Override
@@ -35,6 +36,7 @@ public class StylePalette implements DisplayValueOwner {
 
 	/**
 	 * Returns the class background color.
+	 *
 	 * @return the class background color
 	 */
 	public Color getClassBackgroundColor() {
@@ -43,6 +45,7 @@ public class StylePalette implements DisplayValueOwner {
 
 	/**
 	 * Returns the class border color.
+	 *
 	 * @return the class border color
 	 */
 	public Color getClassBorderColor() {
@@ -51,6 +54,7 @@ public class StylePalette implements DisplayValueOwner {
 
 	/**
 	 * Returns the class text color.
+	 *
 	 * @return the class text color
 	 */
 	public Color getClassTextColor() {
@@ -59,6 +63,7 @@ public class StylePalette implements DisplayValueOwner {
 
 	/**
 	 * Returns the comment background color.
+	 *
 	 * @return the comment background color
 	 */
 	public Color getCommentBackgroundColor() {
@@ -67,6 +72,7 @@ public class StylePalette implements DisplayValueOwner {
 
 	/**
 	 * Returns the comment border color.
+	 *
 	 * @return the comment border color
 	 */
 	public Color getCommentBorderColor() {
@@ -75,6 +81,7 @@ public class StylePalette implements DisplayValueOwner {
 
 	/**
 	 * Returns the comment text color.
+	 *
 	 * @return the comment text color
 	 */
 	public Color getCommentTextColor() {
@@ -83,6 +90,7 @@ public class StylePalette implements DisplayValueOwner {
 
 	/**
 	 * Returns the field background color.
+	 *
 	 * @return the field background color
 	 */
 	public Color getFieldBackgroundColor() {
@@ -91,6 +99,7 @@ public class StylePalette implements DisplayValueOwner {
 
 	/**
 	 * Returns the field text color.
+	 *
 	 * @return the field text color
 	 */
 	public Color getFieldTextColor() {
@@ -99,6 +108,7 @@ public class StylePalette implements DisplayValueOwner {
 
 	/**
 	 * Returns the link color.
+	 *
 	 * @return the link color
 	 */
 	public Color getLinkColor() {
@@ -107,6 +117,7 @@ public class StylePalette implements DisplayValueOwner {
 
 	/**
 	 * Returns the name.
+	 *
 	 * @return the name
 	 */
 	public String getName() {
@@ -115,6 +126,7 @@ public class StylePalette implements DisplayValueOwner {
 
 	/**
 	 * Sets the class background color.
+	 *
 	 * @param classBackgroundColor color value to use
 	 */
 	public void setClassBackgroundColor(final Color classBackgroundColor) {
@@ -123,6 +135,7 @@ public class StylePalette implements DisplayValueOwner {
 
 	/**
 	 * Sets the class border color.
+	 *
 	 * @param classBorderColor color value to use
 	 */
 	public void setClassBorderColor(final Color classBorderColor) {
@@ -131,6 +144,7 @@ public class StylePalette implements DisplayValueOwner {
 
 	/**
 	 * Sets the class text color.
+	 *
 	 * @param classTextColor color value to use
 	 */
 	public void setClassTextColor(final Color classTextColor) {
@@ -139,6 +153,7 @@ public class StylePalette implements DisplayValueOwner {
 
 	/**
 	 * Sets the comment background color.
+	 *
 	 * @param commentBackgroundColor color value to use
 	 */
 	public void setCommentBackgroundColor(final Color commentBackgroundColor) {
@@ -147,6 +162,7 @@ public class StylePalette implements DisplayValueOwner {
 
 	/**
 	 * Sets the comment border color.
+	 *
 	 * @param commentBorderColor color value to use
 	 */
 	public void setCommentBorderColor(final Color commentBorderColor) {
@@ -155,6 +171,7 @@ public class StylePalette implements DisplayValueOwner {
 
 	/**
 	 * Sets the comment text color.
+	 *
 	 * @param commentTextColor color value to use
 	 */
 	public void setCommentTextColor(final Color commentTextColor) {
@@ -163,6 +180,7 @@ public class StylePalette implements DisplayValueOwner {
 
 	/**
 	 * Sets the field background color.
+	 *
 	 * @param fieldBackgroundColor color value to use
 	 */
 	public void setFieldBackgroundColor(final Color fieldBackgroundColor) {
@@ -171,6 +189,7 @@ public class StylePalette implements DisplayValueOwner {
 
 	/**
 	 * Sets the field text color.
+	 *
 	 * @param fieldTextColor color value to use
 	 */
 	public void setFieldTextColor(final Color fieldTextColor) {
@@ -179,6 +198,7 @@ public class StylePalette implements DisplayValueOwner {
 
 	/**
 	 * Sets the link color.
+	 *
 	 * @param linkColor color value to use
 	 */
 	public void setLinkColor(final Color linkColor) {
@@ -187,6 +207,7 @@ public class StylePalette implements DisplayValueOwner {
 
 	/**
 	 * Sets the name.
+	 *
 	 * @param name name value to read, write, or display
 	 */
 	public void setName(final String name) {
@@ -195,6 +216,7 @@ public class StylePalette implements DisplayValueOwner {
 
 	/**
 	 * Builds a debug string for this style palette.
+	 *
 	 * @return a debug string for this object
 	 */
 	@Override

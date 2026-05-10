@@ -17,6 +17,7 @@ interface SelectionController extends DiagramCanvasExt {
 
 	/**
 	 * Adds the to selection.
+	 *
 	 * @param element element value used by the operation
 	 */
 	default void addToSelection(final SelectedElement element) {
@@ -43,6 +44,7 @@ interface SelectionController extends DiagramCanvasExt {
 
 	/**
 	 * Returns the selection info.
+	 *
 	 * @return the selection info
 	 */
 	default SelectionInfo getSelectionInfo() {
@@ -51,6 +53,7 @@ interface SelectionController extends DiagramCanvasExt {
 
 	/**
 	 * Returns the style scope on the active canvas.
+	 *
 	 * @return the style scope
 	 */
 	default StyleScope getStyleScope() {
@@ -69,6 +72,7 @@ interface SelectionController extends DiagramCanvasExt {
 
 	/**
 	 * Checks whether this object has a selection.
+	 *
 	 * @return {@code true} if selection exists; otherwise {@code false}
 	 */
 	default boolean hasSelection() {
@@ -77,6 +81,7 @@ interface SelectionController extends DiagramCanvasExt {
 
 	/**
 	 * Checks whether class selected is enabled or applies.
+	 *
 	 * @param classId id of the class to look up or modify
 	 * @return {@code true} if class selected is enabled or applies; otherwise {@code false}
 	 */
@@ -87,6 +92,7 @@ interface SelectionController extends DiagramCanvasExt {
 
 	/**
 	 * Checks whether comment selected is enabled or applies.
+	 *
 	 * @param commentId id of the comment to look up or modify
 	 * @return {@code true} if comment selected is enabled or applies; otherwise {@code false}
 	 */
@@ -97,6 +103,7 @@ interface SelectionController extends DiagramCanvasExt {
 
 	/**
 	 * Checks whether element selected is enabled or applies on the active canvas.
+	 *
 	 * @param element element value used by the operation
 	 * @return {@code true} if element selected is enabled or applies; otherwise {@code false}
 	 */
@@ -106,6 +113,7 @@ interface SelectionController extends DiagramCanvasExt {
 
 	/**
 	 * Checks whether field selected is enabled or applies.
+	 *
 	 * @param classId id of the class to look up or modify
 	 * @param fieldId id of the field to look up or modify
 	 * @return {@code true} if field selected is enabled or applies; otherwise {@code false}
@@ -117,6 +125,7 @@ interface SelectionController extends DiagramCanvasExt {
 
 	/**
 	 * Checks whether link selected is enabled or applies.
+	 *
 	 * @param linkId id of the link to look up or modify
 	 * @return {@code true} if link selected is enabled or applies; otherwise {@code false}
 	 */
@@ -127,6 +136,7 @@ interface SelectionController extends DiagramCanvasExt {
 
 	/**
 	 * Removes the from selection.
+	 *
 	 * @param element element value used by the operation
 	 */
 	default void removeFromSelection(final SelectedElement element) {
@@ -147,6 +157,7 @@ interface SelectionController extends DiagramCanvasExt {
 
 	/**
 	 * Selects an element and updates dependent UI state.
+	 *
 	 * @param element element value used by the operation
 	 */
 	default void select(final SelectedElement element) {
@@ -189,8 +200,9 @@ interface SelectionController extends DiagramCanvasExt {
 
 	/**
 	 * Updates the selection from mouse.
+	 *
 	 * @param element element value used by the operation
-	 * @param event event object supplied by Swing
+	 * @param event   event object supplied by Swing
 	 */
 	default void updateSelectionFromMouse(final SelectedElement element, final MouseEvent event) {
 		if (element == null) {

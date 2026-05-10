@@ -19,7 +19,8 @@ public class ColorButton extends JButton {
 
 	/**
 	 * Creates a color button instance.
-	 * @param text text to display or edit
+	 *
+	 * @param text         text to display or edit
 	 * @param initialColor color value to use
 	 */
 	public ColorButton(final String text, final Color initialColor) {
@@ -43,9 +44,10 @@ public class ColorButton extends JButton {
 
 	/**
 	 * Creates a color button instance.
-	 * @param text text to display or edit
+	 *
+	 * @param text         text to display or edit
 	 * @param initialColor color value to use
-	 * @param cb cb value used by the operation
+	 * @param cb           cb value used by the operation
 	 */
 	public ColorButton(final String text, final Color initialColor, final Consumer<Color> cb) {
 		super(text);
@@ -69,6 +71,7 @@ public class ColorButton extends JButton {
 
 	/**
 	 * Returns the selected color.
+	 *
 	 * @return the selected color
 	 */
 	public Color getSelectedColor() {
@@ -77,6 +80,7 @@ public class ColorButton extends JButton {
 
 	/**
 	 * Sets the selected color.
+	 *
 	 * @param selectedColor color value to use
 	 */
 	public void setSelectedColor(final Color selectedColor) {
@@ -86,6 +90,7 @@ public class ColorButton extends JButton {
 
 	/**
 	 * Builds a debug string for this color button.
+	 *
 	 * @return a debug string for this object
 	 */
 	@Override

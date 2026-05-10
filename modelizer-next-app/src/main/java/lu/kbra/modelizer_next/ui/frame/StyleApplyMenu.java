@@ -16,6 +16,7 @@ final class StyleApplyMenu extends JMenu {
 
 	/**
 	 * Creates a style apply menu instance.
+	 *
 	 * @param frame frame that owns the created UI component
 	 */
 	StyleApplyMenu(final MainFrame frame) {

@@ -15,6 +15,7 @@ interface DiagramModelLookup extends DiagramCanvasExt {
 
 	/**
 	 * Finds the class by ID that matches the supplied input.
+	 *
 	 * @param id stable id of the model element
 	 * @return the matching class by ID, or {@code null} when no match exists
 	 */
@@ -29,6 +30,7 @@ interface DiagramModelLookup extends DiagramCanvasExt {
 
 	/**
 	 * Finds the comment by ID that matches the supplied input.
+	 *
 	 * @param commentId id of the comment to look up or modify
 	 * @return the matching comment by ID, or {@code null} when no match exists
 	 */
@@ -43,8 +45,9 @@ interface DiagramModelLookup extends DiagramCanvasExt {
 
 	/**
 	 * Finds the field by ID that matches the supplied input.
+	 *
 	 * @param classModel class model affected by the operation
-	 * @param fieldId id of the field to look up or modify
+	 * @param fieldId    id of the field to look up or modify
 	 * @return the matching field by ID, or {@code null} when no match exists
 	 */
 	default FieldModel findFieldById(final ClassModel classModel, final String fieldId) {
@@ -63,6 +66,7 @@ interface DiagramModelLookup extends DiagramCanvasExt {
 
 	/**
 	 * Finds the field by ID that matches the supplied input.
+	 *
 	 * @param classId id of the class to look up or modify
 	 * @param fieldId id of the field to look up or modify
 	 * @return the matching field by ID, or {@code null} when no match exists
@@ -84,6 +88,7 @@ interface DiagramModelLookup extends DiagramCanvasExt {
 
 	/**
 	 * Finds the link by association class ID that matches the supplied input.
+	 *
 	 * @param classId id of the class to look up or modify
 	 * @return the matching link by association class ID, or {@code null} when no match exists
 	 */
@@ -99,6 +104,7 @@ interface DiagramModelLookup extends DiagramCanvasExt {
 
 	/**
 	 * Finds the link by ID that matches the supplied input.
+	 *
 	 * @param id stable id of the model element
 	 * @return the matching link by ID, or {@code null} when no match exists
 	 */
@@ -118,6 +124,7 @@ interface DiagramModelLookup extends DiagramCanvasExt {
 
 	/**
 	 * Finds the owner class of field that matches the supplied input.
+	 *
 	 * @param fieldId id of the field to look up or modify
 	 * @return the matching owner class of field, or {@code null} when no match exists
 	 */
@@ -134,6 +141,7 @@ interface DiagramModelLookup extends DiagramCanvasExt {
 
 	/**
 	 * Finds the primary key field that matches the supplied input.
+	 *
 	 * @param classId id of the class to look up or modify
 	 * @return the matching primary key field, or {@code null} when no match exists
 	 */
@@ -154,6 +162,7 @@ interface DiagramModelLookup extends DiagramCanvasExt {
 
 	/**
 	 * Finds the type that matches the supplied input.
+	 *
 	 * @param selectedElement selected element to read or update
 	 * @return the matching type, or {@code null} when no match exists
 	 */
@@ -169,6 +178,7 @@ interface DiagramModelLookup extends DiagramCanvasExt {
 
 	/**
 	 * Checks whether the link endpoint exists.
+	 *
 	 * @param classId id of the class to look up or modify
 	 * @param fieldId id of the field to look up or modify
 	 * @return {@code true} when the condition is met; otherwise {@code false}

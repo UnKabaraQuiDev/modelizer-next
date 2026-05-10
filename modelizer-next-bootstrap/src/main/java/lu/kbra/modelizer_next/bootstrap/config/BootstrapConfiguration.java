@@ -12,6 +12,7 @@ public class BootstrapConfiguration {
 
 	/**
 	 * Returns the update channel.
+	 *
 	 * @return the update channel
 	 */
 	public UpdateChannel getUpdateChannel() {
@@ -20,6 +21,7 @@ public class BootstrapConfiguration {
 
 	/**
 	 * Checks whether auto check updates is enabled or applies.
+	 *
 	 * @return {@code true} if auto check updates is enabled or applies; otherwise {@code false}
 	 */
 	public boolean isAutoCheckUpdates() {
@@ -28,6 +30,7 @@ public class BootstrapConfiguration {
 
 	/**
 	 * Sets the auto check updates.
+	 *
 	 * @param autoCheckUpdates whether auto check updates is enabled
 	 */
 	public void setAutoCheckUpdates(final boolean autoCheckUpdates) {
@@ -36,6 +39,7 @@ public class BootstrapConfiguration {
 
 	/**
 	 * Sets the update channel.
+	 *
 	 * @param updateChannel update channel value used by the operation
 	 */
 	public void setUpdateChannel(final UpdateChannel updateChannel) {

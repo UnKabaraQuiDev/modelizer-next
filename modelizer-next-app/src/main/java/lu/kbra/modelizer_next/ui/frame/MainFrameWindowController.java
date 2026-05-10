@@ -20,6 +20,7 @@ public interface MainFrameWindowController {
 
 	/**
 	 * Creates a pinned styles panel.
+	 *
 	 * @return the created pinned styles panel
 	 */
 	default JPanel createPinnedStylesPanel() {
@@ -41,6 +42,7 @@ public interface MainFrameWindowController {
 
 	/**
 	 * Creates a selection path label.
+	 *
 	 * @return the created selection path label
 	 */
 	default JLabel createSelectionPathLabel() {
@@ -49,6 +51,7 @@ public interface MainFrameWindowController {
 
 	/**
 	 * Creates a status label.
+	 *
 	 * @return the created status label
 	 */
 	default JLabel createStatusLabel() {
@@ -58,6 +61,7 @@ public interface MainFrameWindowController {
 
 	/**
 	 * Creates a status panel.
+	 *
 	 * @return the created status panel
 	 */
 	default JPanel createStatusPanel() {

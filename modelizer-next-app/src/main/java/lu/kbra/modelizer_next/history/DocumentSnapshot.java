@@ -7,13 +7,16 @@ import lu.kbra.modelizer_next.MNMain;
 import lu.kbra.modelizer_next.document.ModelDocument;
 
 /**
- * Immutable undo/redo snapshot containing a serialized document state and a user-facing description.
+ * Immutable undo/redo snapshot containing a serialized document state and a user-facing
+ * description.
+ *
  * @param json JSON text or node to read
  */
 public record DocumentSnapshot(String json) {
 
 	/**
 	 * Creates a value from the supplied input.
+	 *
 	 * @param document document to read or modify
 	 * @return the from result
 	 */
@@ -27,6 +30,7 @@ public record DocumentSnapshot(String json) {
 
 	/**
 	 * Checks whether the document state is the same.
+	 *
 	 * @param document document to read or modify
 	 * @return {@code true} when the condition is met; otherwise {@code false}
 	 */
@@ -36,6 +40,7 @@ public record DocumentSnapshot(String json) {
 
 	/**
 	 * Restores the into.
+	 *
 	 * @param target target value used by the operation
 	 */
 	public void restoreInto(final ModelDocument target) {

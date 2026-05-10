@@ -41,9 +41,10 @@ public final class BootstrapLoadingFrame extends JFrame {
 
 	/**
 	 * Updates the loading frame progress display.
+	 *
 	 * @param message message shown to the caller or user
-	 * @param value value to process
-	 * @param max numeric max value
+	 * @param value   value to process
+	 * @param max     numeric max value
 	 */
 	public void update(final String message, final int value, final int max) {
 		SwingUtilities.invokeLater(() -> {

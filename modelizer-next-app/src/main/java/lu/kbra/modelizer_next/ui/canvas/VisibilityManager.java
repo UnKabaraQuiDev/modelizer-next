@@ -15,6 +15,7 @@ public interface VisibilityManager extends DiagramCanvasExt {
 
 	/**
 	 * Checks whether comment visible is enabled or applies.
+	 *
 	 * @param commentModel comment model affected by the operation
 	 * @return {@code true} if comment visible is enabled or applies; otherwise {@code false}
 	 */

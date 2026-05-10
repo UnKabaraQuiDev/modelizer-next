@@ -6,7 +6,8 @@ import java.util.UUID;
 import lu.kbra.modelizer_next.common.App;
 
 /**
- * Metadata attached to a Modelizer document, such as version information and document-level attributes.
+ * Metadata attached to a Modelizer document, such as version information and document-level
+ * attributes.
  */
 public class DocumentMeta {
 
@@ -30,6 +31,7 @@ public class DocumentMeta {
 
 	/**
 	 * Returns the application version.
+	 *
 	 * @return the application version
 	 */
 	public String getApplicationVersion() {
@@ -38,6 +40,7 @@ public class DocumentMeta {
 
 	/**
 	 * Returns the created at.
+	 *
 	 * @return the created at
 	 */
 	public Instant getCreatedAt() {
@@ -46,6 +49,7 @@ public class DocumentMeta {
 
 	/**
 	 * Returns the ID.
+	 *
 	 * @return the ID
 	 */
 	public String getId() {
@@ -54,6 +58,7 @@ public class DocumentMeta {
 
 	/**
 	 * Returns the name.
+	 *
 	 * @return the name
 	 */
 	@Deprecated
@@ -63,6 +68,7 @@ public class DocumentMeta {
 
 	/**
 	 * Returns the updated at.
+	 *
 	 * @return the updated at
 	 */
 	public Instant getUpdatedAt() {
@@ -71,6 +77,7 @@ public class DocumentMeta {
 
 	/**
 	 * Sets the application version.
+	 *
 	 * @param applicationVersion text value for application version
 	 */
 	public void setApplicationVersion(final String applicationVersion) {
@@ -79,6 +86,7 @@ public class DocumentMeta {
 
 	/**
 	 * Sets the created at.
+	 *
 	 * @param createdAt created at value used by the operation
 	 */
 	public void setCreatedAt(final Instant createdAt) {
@@ -87,6 +95,7 @@ public class DocumentMeta {
 
 	/**
 	 * Sets the ID.
+	 *
 	 * @param id stable id of the model element
 	 */
 	public void setId(final String id) {
@@ -95,6 +104,7 @@ public class DocumentMeta {
 
 	/**
 	 * Sets the name.
+	 *
 	 * @param name name value to read, write, or display
 	 */
 	@Deprecated
@@ -104,6 +114,7 @@ public class DocumentMeta {
 
 	/**
 	 * Sets the updated at.
+	 *
 	 * @param updatedAt updated at value used by the operation
 	 */
 	public void setUpdatedAt(final Instant updatedAt) {
@@ -112,6 +123,7 @@ public class DocumentMeta {
 
 	/**
 	 * Builds a debug string for this document meta.
+	 *
 	 * @return a debug string for this object
 	 */
 	@Override

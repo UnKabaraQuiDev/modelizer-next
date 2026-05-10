@@ -10,6 +10,7 @@ public final class SystemThemeDetector {
 
 	/**
 	 * Checks whether dark is enabled or applies.
+	 *
 	 * @return {@code true} if dark is enabled or applies; otherwise {@code false}
 	 */
 	public static boolean isDark() {
@@ -31,6 +32,7 @@ public final class SystemThemeDetector {
 
 	/**
 	 * Checks whether mac dark is enabled or applies.
+	 *
 	 * @return {@code true} if mac dark is enabled or applies; otherwise {@code false}
 	 * @throws Exception if the operation cannot be completed
 	 */
@@ -44,6 +46,7 @@ public final class SystemThemeDetector {
 
 	/**
 	 * Checks whether windows dark is enabled or applies.
+	 *
 	 * @return {@code true} if windows dark is enabled or applies; otherwise {@code false}
 	 * @throws Exception if the operation cannot be completed
 	 */

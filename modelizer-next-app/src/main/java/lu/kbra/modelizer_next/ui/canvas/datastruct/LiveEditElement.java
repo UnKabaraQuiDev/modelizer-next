@@ -8,13 +8,14 @@ import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectedElement.SelectedType;
 
 /**
  * Model element currently being edited inline on the canvas.
- * @param type type value that selects the operation mode
- * @param classId id of the class to look up or modify
- * @param fieldId id of the field to look up or modify
- * @param commentId id of the comment to look up or modify
- * @param linkId id of the link to look up or modify
+ *
+ * @param type             type value that selects the operation mode
+ * @param classId          id of the class to look up or modify
+ * @param fieldId          id of the field to look up or modify
+ * @param commentId        id of the comment to look up or modify
+ * @param linkId           id of the link to look up or modify
  * @param forceAlternative whether force alternative is enabled
- * @param snapshotValue snapshot value value used by the operation
+ * @param snapshotValue    snapshot value value used by the operation
  */
 public record LiveEditElement(LiveEditType type, String classId, String fieldId, String commentId, String linkId, boolean forceAlternative,
 		Object snapshotValue) {
@@ -45,6 +46,7 @@ public record LiveEditElement(LiveEditType type, String classId, String fieldId,
 
 		/**
 		 * Converts this live edit type to the matching selection type.
+		 *
 		 * @return the as selected type result
 		 */
 		public SelectedType asSelectedType() {
@@ -61,6 +63,7 @@ public record LiveEditElement(LiveEditType type, String classId, String fieldId,
 
 		/**
 		 * Converts this live edit type to the matching style scope.
+		 *
 		 * @return the as style result
 		 */
 		public LiveEditType asStyle() {
@@ -76,6 +79,7 @@ public record LiveEditElement(LiveEditType type, String classId, String fieldId,
 
 		/**
 		 * Checks whether class is enabled or applies.
+		 *
 		 * @return {@code true} if class is enabled or applies; otherwise {@code false}
 		 */
 		public boolean isClass() {
@@ -87,6 +91,7 @@ public record LiveEditElement(LiveEditType type, String classId, String fieldId,
 
 		/**
 		 * Checks whether comment is enabled or applies.
+		 *
 		 * @return {@code true} if comment is enabled or applies; otherwise {@code false}
 		 */
 		public boolean isComment() {
@@ -95,6 +100,7 @@ public record LiveEditElement(LiveEditType type, String classId, String fieldId,
 
 		/**
 		 * Checks whether link is enabled or applies.
+		 *
 		 * @return {@code true} if link is enabled or applies; otherwise {@code false}
 		 */
 		public boolean isLink() {
@@ -108,6 +114,7 @@ public record LiveEditElement(LiveEditType type, String classId, String fieldId,
 
 		/**
 		 * Checks whether style is enabled or applies on the active canvas.
+		 *
 		 * @return {@code true} if style is enabled or applies; otherwise {@code false}
 		 */
 		public boolean isStyle() {
@@ -119,6 +126,7 @@ public record LiveEditElement(LiveEditType type, String classId, String fieldId,
 
 		/**
 		 * Returns the next value from this producer or iterator on the active canvas.
+		 *
 		 * @return the next result
 		 */
 		public LiveEditType next() {
@@ -134,6 +142,7 @@ public record LiveEditElement(LiveEditType type, String classId, String fieldId,
 
 		/**
 		 * Returns the previous live edit type in the cycling order.
+		 *
 		 * @return the previous result
 		 */
 		public LiveEditType previous() {
@@ -151,11 +160,12 @@ public record LiveEditElement(LiveEditType type, String classId, String fieldId,
 
 	/**
 	 * Creates a live edit element instance on the active canvas.
-	 * @param type type value that selects the operation mode
-	 * @param classId id of the class to look up or modify
-	 * @param fieldId id of the field to look up or modify
+	 *
+	 * @param type      type value that selects the operation mode
+	 * @param classId   id of the class to look up or modify
+	 * @param fieldId   id of the field to look up or modify
 	 * @param commentId id of the comment to look up or modify
-	 * @param linkId id of the link to look up or modify
+	 * @param linkId    id of the link to look up or modify
 	 */
 	public LiveEditElement(LiveEditType type, String classId, String fieldId, String commentId, String linkId) {
 		this(type, classId, fieldId, commentId, linkId, false, null);
@@ -163,11 +173,12 @@ public record LiveEditElement(LiveEditType type, String classId, String fieldId,
 
 	/**
 	 * Creates a live edit element instance on the active canvas.
-	 * @param type type value that selects the operation mode
-	 * @param classId id of the class to look up or modify
-	 * @param fieldId id of the field to look up or modify
-	 * @param commentId id of the comment to look up or modify
-	 * @param linkId id of the link to look up or modify
+	 *
+	 * @param type             type value that selects the operation mode
+	 * @param classId          id of the class to look up or modify
+	 * @param fieldId          id of the field to look up or modify
+	 * @param commentId        id of the comment to look up or modify
+	 * @param linkId           id of the link to look up or modify
 	 * @param forceAlternative whether force alternative is enabled
 	 */
 	public LiveEditElement(LiveEditType type, String classId, String fieldId, String commentId, String linkId, boolean forceAlternative) {
@@ -176,6 +187,7 @@ public record LiveEditElement(LiveEditType type, String classId, String fieldId,
 
 	/**
 	 * Creates the default style for class elements.
+	 *
 	 * @param classId id of the class to look up or modify
 	 * @return the for class result
 	 */
@@ -185,6 +197,7 @@ public record LiveEditElement(LiveEditType type, String classId, String fieldId,
 
 	/**
 	 * Creates the default style for field elements.
+	 *
 	 * @param classId id of the class to look up or modify
 	 * @param fieldId id of the field to look up or modify
 	 * @return the for field result
@@ -195,7 +208,8 @@ public record LiveEditElement(LiveEditType type, String classId, String fieldId,
 
 	/**
 	 * Creates the default style for class elements.
-	 * @param classId id of the class to look up or modify
+	 *
+	 * @param classId     id of the class to look up or modify
 	 * @param alternative whether alternative is enabled
 	 * @return the for class result
 	 */
@@ -205,8 +219,9 @@ public record LiveEditElement(LiveEditType type, String classId, String fieldId,
 
 	/**
 	 * Creates the default style for field elements.
-	 * @param classId id of the class to look up or modify
-	 * @param fieldId id of the field to look up or modify
+	 *
+	 * @param classId     id of the class to look up or modify
+	 * @param fieldId     id of the field to look up or modify
 	 * @param alternative whether alternative is enabled
 	 * @return the for field result
 	 */
@@ -216,6 +231,7 @@ public record LiveEditElement(LiveEditType type, String classId, String fieldId,
 
 	/**
 	 * Creates the default style for comment elements.
+	 *
 	 * @param commentId id of the comment to look up or modify
 	 * @return the for comment result
 	 */
@@ -225,6 +241,7 @@ public record LiveEditElement(LiveEditType type, String classId, String fieldId,
 
 	/**
 	 * Creates the default style for link elements.
+	 *
 	 * @param linkId id of the link to look up or modify
 	 * @return the for link result
 	 */
@@ -234,8 +251,9 @@ public record LiveEditElement(LiveEditType type, String classId, String fieldId,
 
 	/**
 	 * Creates the default style for link elements.
+	 *
 	 * @param linkId id of the link to look up or modify
-	 * @param type type value that selects the operation mode
+	 * @param type   type value that selects the operation mode
 	 * @return the for link result
 	 */
 	public static LiveEditElement forLink(final String linkId, final LiveEditType type) {
@@ -247,6 +265,7 @@ public record LiveEditElement(LiveEditType type, String classId, String fieldId,
 
 	/**
 	 * Returns the actual ID on the active canvas.
+	 *
 	 * @return the actual ID
 	 */
 	public String getActualId() {
@@ -261,6 +280,7 @@ public record LiveEditElement(LiveEditType type, String classId, String fieldId,
 
 	/**
 	 * Computes the hash code that matches this object's equality rules on the active canvas.
+	 *
 	 * @return the hash code for this object
 	 */
 	@Override
@@ -270,6 +290,7 @@ public record LiveEditElement(LiveEditType type, String classId, String fieldId,
 
 	/**
 	 * Converts this live edit element into a selected element.
+	 *
 	 * @return the as selected element result
 	 */
 	public SelectedElement asSelectedElement() {
@@ -278,6 +299,7 @@ public record LiveEditElement(LiveEditType type, String classId, String fieldId,
 
 	/**
 	 * Compares this live edit element with another object for value equality on the active canvas.
+	 *
 	 * @param other other value used by the operation
 	 * @return {@code true} when the condition is met; otherwise {@code false}
 	 */
@@ -292,6 +314,7 @@ public record LiveEditElement(LiveEditType type, String classId, String fieldId,
 
 	/**
 	 * Returns the renaming component on the active canvas.
+	 *
 	 * @param component Swing component to configure
 	 * @return the renaming component
 	 */

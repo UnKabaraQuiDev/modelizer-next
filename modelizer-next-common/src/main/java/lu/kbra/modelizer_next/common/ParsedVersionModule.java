@@ -29,10 +29,11 @@ public class ParsedVersionModule extends SimpleModule {
 
 		/**
 		 * Reads the value from JSON.
-		 * @param p p value used by the operation
+		 *
+		 * @param p    p value used by the operation
 		 * @param ctxt ctxt value used by the operation
 		 * @return the deserialize result
-		 * @throws IOException if the operation cannot be completed
+		 * @throws IOException      if the operation cannot be completed
 		 * @throws JacksonException if the operation cannot be completed
 		 */
 		@Override

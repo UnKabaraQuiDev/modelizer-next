@@ -9,7 +9,8 @@ import com.fasterxml.jackson.annotation.JsonAlias;
 import lu.kbra.modelizer_next.domain.data.Cardinality;
 
 /**
- * Persistent model of a relationship between two link ends, optionally connected to an association class.
+ * Persistent model of a relationship between two link ends, optionally connected to an association
+ * class.
  */
 public class LinkModel {
 
@@ -43,6 +44,7 @@ public class LinkModel {
 
 	/**
 	 * Returns the association class ID.
+	 *
 	 * @return the association class ID
 	 */
 	public String getAssociationClassId() {
@@ -51,6 +53,7 @@ public class LinkModel {
 
 	/**
 	 * Returns the cardinality from.
+	 *
 	 * @return the cardinality from
 	 */
 	public Cardinality getCardinalityFrom() {
@@ -59,6 +62,7 @@ public class LinkModel {
 
 	/**
 	 * Returns the cardinality to.
+	 *
 	 * @return the cardinality to
 	 */
 	public Cardinality getCardinalityTo() {
@@ -67,6 +71,7 @@ public class LinkModel {
 
 	/**
 	 * Returns the from.
+	 *
 	 * @return the from
 	 */
 	public LinkEnd getFrom() {
@@ -75,6 +80,7 @@ public class LinkModel {
 
 	/**
 	 * Returns the ID.
+	 *
 	 * @return the ID
 	 */
 	public String getId() {
@@ -83,6 +89,7 @@ public class LinkModel {
 
 	/**
 	 * Returns the label.
+	 *
 	 * @return the label
 	 */
 	public String getLabel() {
@@ -91,6 +98,7 @@ public class LinkModel {
 
 	/**
 	 * Returns the label from.
+	 *
 	 * @return the label from
 	 */
 	public String getLabelFrom() {
@@ -99,6 +107,7 @@ public class LinkModel {
 
 	/**
 	 * Returns the label to.
+	 *
 	 * @return the label to
 	 */
 	public String getLabelTo() {
@@ -107,6 +116,7 @@ public class LinkModel {
 
 	/**
 	 * Returns the line color.
+	 *
 	 * @return the line color
 	 */
 	public Color getLineColor() {
@@ -115,6 +125,7 @@ public class LinkModel {
 
 	/**
 	 * Returns the to.
+	 *
 	 * @return the to
 	 */
 	public LinkEnd getTo() {
@@ -123,6 +134,7 @@ public class LinkModel {
 
 	/**
 	 * Checks whether this object has a label.
+	 *
 	 * @return {@code true} if label exists; otherwise {@code false}
 	 */
 	public boolean hasLabel() {
@@ -131,6 +143,7 @@ public class LinkModel {
 
 	/**
 	 * Checks whether this object has a label from.
+	 *
 	 * @return {@code true} if label from exists; otherwise {@code false}
 	 */
 	public boolean hasLabelFrom() {
@@ -139,6 +152,7 @@ public class LinkModel {
 
 	/**
 	 * Checks whether this object has a label to.
+	 *
 	 * @return {@code true} if label to exists; otherwise {@code false}
 	 */
 	public boolean hasLabelTo() {
@@ -147,6 +161,7 @@ public class LinkModel {
 
 	/**
 	 * Checks whether this object has a target label.
+	 *
 	 * @return {@code true} if target label exists; otherwise {@code false}
 	 */
 	public boolean hasTargetLabel() {
@@ -155,6 +170,7 @@ public class LinkModel {
 
 	/**
 	 * Checks whether self linking is enabled or applies.
+	 *
 	 * @return {@code true} if self linking is enabled or applies; otherwise {@code false}
 	 */
 	public boolean isSelfLinking() {
@@ -163,6 +179,7 @@ public class LinkModel {
 
 	/**
 	 * Sets the association class ID.
+	 *
 	 * @param associationClassId id of the element to read or modify
 	 */
 	public void setAssociationClassId(final String associationClassId) {
@@ -171,6 +188,7 @@ public class LinkModel {
 
 	/**
 	 * Sets the cardinality from.
+	 *
 	 * @param cardinalityFrom cardinality from value used by the operation
 	 */
 	public void setCardinalityFrom(final Cardinality cardinalityFrom) {
@@ -179,6 +197,7 @@ public class LinkModel {
 
 	/**
 	 * Sets the cardinality to.
+	 *
 	 * @param cardinalityTo cardinality to value used by the operation
 	 */
 	public void setCardinalityTo(final Cardinality cardinalityTo) {
@@ -187,6 +206,7 @@ public class LinkModel {
 
 	/**
 	 * Sets the from.
+	 *
 	 * @param from start point or source value
 	 */
 	public void setFrom(final LinkEnd from) {
@@ -195,6 +215,7 @@ public class LinkModel {
 
 	/**
 	 * Sets the ID.
+	 *
 	 * @param id stable id of the model element
 	 */
 	public void setId(final String id) {
@@ -203,6 +224,7 @@ public class LinkModel {
 
 	/**
 	 * Sets the label.
+	 *
 	 * @param name name value to read, write, or display
 	 */
 	public void setLabel(final String name) {
@@ -215,6 +237,7 @@ public class LinkModel {
 
 	/**
 	 * Sets the label from.
+	 *
 	 * @param labelFrom text value for label from
 	 */
 	public void setLabelFrom(final String labelFrom) {
@@ -226,6 +249,7 @@ public class LinkModel {
 
 	/**
 	 * Sets the label to.
+	 *
 	 * @param labelTo text value for label to
 	 */
 	public void setLabelTo(final String labelTo) {
@@ -237,6 +261,7 @@ public class LinkModel {
 
 	/**
 	 * Sets the line color.
+	 *
 	 * @param lineColor color value to use
 	 */
 	public void setLineColor(final Color lineColor) {
@@ -245,6 +270,7 @@ public class LinkModel {
 
 	/**
 	 * Sets the to.
+	 *
 	 * @param to target point or destination value
 	 */
 	public void setTo(final LinkEnd to) {
@@ -253,6 +279,7 @@ public class LinkModel {
 
 	/**
 	 * Builds a debug string for this link model.
+	 *
 	 * @return a debug string for this object
 	 */
 	@Override

@@ -1,8 +1,5 @@
 package lu.kbra.modelizer_next.ui.canvas.data;
 
-/**
- * Sides of a rectangular node that can receive link anchors.
- */
 public enum AnchorSide {
 
 	TOP,
@@ -12,6 +9,7 @@ public enum AnchorSide {
 
 	/**
 	 * Returns the next anchor side in clockwise order.
+	 *
 	 * @return the clockwise result
 	 */
 	public AnchorSide clockwise() {
@@ -25,6 +23,7 @@ public enum AnchorSide {
 
 	/**
 	 * Returns the next anchor side in counter-clockwise order.
+	 *
 	 * @return the counter clockwise result
 	 */
 	public AnchorSide counterClockwise() {
@@ -37,16 +36,16 @@ public enum AnchorSide {
 	}
 
 	/**
-	 * Checks whether left right is enabled or applies on the active canvas.
-	 * @return {@code true} if left right is enabled or applies; otherwise {@code false}
+	 * @return {@code true} if current element represents {@link LEFT} or {@link RIGHT}; otherwise
+	 *         {@code false}
 	 */
 	public boolean isLeftRight() {
 		return this == LEFT || this == RIGHT;
 	}
 
 	/**
-	 * Checks whether top bottom is enabled or applies on the active canvas.
-	 * @return {@code true} if top bottom is enabled or applies; otherwise {@code false}
+	 * @return {@code true} if current element represents {@link TOP} or {@link BOTTOM}; otherwise
+	 *         {@code false}
 	 */
 	public boolean isTopBottom() {
 		return this == TOP || this == BOTTOM;

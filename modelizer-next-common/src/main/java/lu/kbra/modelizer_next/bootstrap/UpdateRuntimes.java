@@ -21,6 +21,7 @@ public final class UpdateRuntimes {
 
 		/**
 		 * Checks the for updates.
+		 *
 		 * @return the check for updates result
 		 * @throws IOException if the operation cannot be completed
 		 */
@@ -31,6 +32,7 @@ public final class UpdateRuntimes {
 
 		/**
 		 * Returns the installed updates disk usage bytes.
+		 *
 		 * @return the installed updates disk usage bytes
 		 * @throws IOException if the operation cannot be completed
 		 */
@@ -41,6 +43,7 @@ public final class UpdateRuntimes {
 
 		/**
 		 * Returns the installed updates file count.
+		 *
 		 * @return the installed updates file count
 		 * @throws IOException if the operation cannot be completed
 		 */
@@ -51,6 +54,7 @@ public final class UpdateRuntimes {
 
 		/**
 		 * Returns the installed updates directory.
+		 *
 		 * @return the installed updates directory
 		 */
 		@Override
@@ -60,6 +64,7 @@ public final class UpdateRuntimes {
 
 		/**
 		 * Deletes installed update folders that are no longer needed.
+		 *
 		 * @return the free unused installed updates result
 		 * @throws IOException if the operation cannot be completed
 		 */
@@ -70,6 +75,7 @@ public final class UpdateRuntimes {
 
 		/**
 		 * Returns the bootstrap config.
+		 *
 		 * @return the bootstrap config
 		 */
 		@Override
@@ -79,6 +85,7 @@ public final class UpdateRuntimes {
 
 		/**
 		 * Returns the bootstrap JSON.
+		 *
 		 * @return the bootstrap JSON
 		 */
 		@Override
@@ -88,6 +95,7 @@ public final class UpdateRuntimes {
 
 		/**
 		 * Returns the current application version.
+		 *
 		 * @return the current application version
 		 */
 		@Override
@@ -97,6 +105,7 @@ public final class UpdateRuntimes {
 
 		/**
 		 * Returns the selected channel during bootstrap/update processing.
+		 *
 		 * @return the selected channel
 		 */
 		@Override
@@ -106,9 +115,10 @@ public final class UpdateRuntimes {
 
 		/**
 		 * Installs the update and restart.
+		 *
 		 * @param parentComponent parent component value used by the operation
-		 * @param update update metadata to download or install
-		 * @param preparation preparation value used by the operation
+		 * @param update          update metadata to download or install
+		 * @param preparation     preparation value used by the operation
 		 * @return {@code true} when the condition is met; otherwise {@code false}
 		 * @throws IOException if the operation cannot be completed
 		 */
@@ -122,6 +132,7 @@ public final class UpdateRuntimes {
 
 		/**
 		 * Checks whether auto check updates is enabled or applies.
+		 *
 		 * @return {@code true} if auto check updates is enabled or applies; otherwise {@code false}
 		 */
 		@Override
@@ -131,7 +142,9 @@ public final class UpdateRuntimes {
 
 		/**
 		 * Checks whether automatic update checks enabled by property is enabled or applies.
-		 * @return {@code true} if automatic update checks enabled by property is enabled or applies; otherwise {@code
+		 *
+		 * @return {@code true} if automatic update checks enabled by property is enabled or applies;
+		 *         otherwise {@code
 		 *         false}
 		 */
 		@Override
@@ -141,6 +154,7 @@ public final class UpdateRuntimes {
 
 		/**
 		 * Checks whether available is enabled or applies during bootstrap/update processing.
+		 *
 		 * @return {@code true} if available is enabled or applies; otherwise {@code false}
 		 */
 		@Override
@@ -150,6 +164,7 @@ public final class UpdateRuntimes {
 
 		/**
 		 * Sets the auto check updates.
+		 *
 		 * @param enabled whether enabled is enabled
 		 */
 		@Override
@@ -158,6 +173,7 @@ public final class UpdateRuntimes {
 
 		/**
 		 * Sets the selected channel during bootstrap/update processing.
+		 *
 		 * @param updateChannel update channel value used by the operation
 		 */
 		@Override
@@ -172,6 +188,7 @@ public final class UpdateRuntimes {
 
 	/**
 	 * Returns the instance during bootstrap/update processing.
+	 *
 	 * @return the instance
 	 */
 	public static UpdateRuntime getInstance() {
@@ -180,6 +197,7 @@ public final class UpdateRuntimes {
 
 	/**
 	 * Creates an InstalledApplication value from an installed jar path.
+	 *
 	 * @param updateRuntime update runtime value used by the operation
 	 */
 	public static void install(final UpdateRuntime updateRuntime) {
@@ -188,6 +206,7 @@ public final class UpdateRuntimes {
 
 	/**
 	 * Checks whether active is enabled or applies during bootstrap/update processing.
+	 *
 	 * @return {@code true} if active is enabled or applies; otherwise {@code false}
 	 */
 	public static boolean isActive() {
