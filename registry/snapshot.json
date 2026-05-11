@@ -1,16 +1,36 @@
 {
   "channel": "snapshot",
-  "version": "9-SNAPSHOT-259",
-  "tag": "9-SNAPSHOT-259",
-  "releaseUrl": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/tag/9-SNAPSHOT-259",
-  "assetUrl": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/9-SNAPSHOT-259/modelizer-next-app-9-SNAPSHOT-259.jar",
-  "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/9-SNAPSHOT-259/modelizer-next-app-9-SNAPSHOT-259.jar",
+  "version": "9-SNAPSHOT-260",
+  "tag": "9-SNAPSHOT-260",
+  "releaseUrl": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/tag/9-SNAPSHOT-260",
+  "assetUrl": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/9-SNAPSHOT-260/modelizer-next-app-9-SNAPSHOT-260.jar",
+  "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/9-SNAPSHOT-260/modelizer-next-app-9-SNAPSHOT-260.jar",
   "platforms": [
     "unknown"
   ],
   "notes": "Latest snapshot build.",
-  "updatedAt": "2026-05-11T17:12:34Z",
+  "updatedAt": "2026-05-11T17:22:16Z",
   "entries": [
+    {
+      "version": "9-SNAPSHOT-260",
+      "tag": "9-SNAPSHOT-260",
+      "releaseUrl": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/tag/9-SNAPSHOT-260",
+      "assetUrl": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/9-SNAPSHOT-260/modelizer-next-app-9-SNAPSHOT-260.jar",
+      "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/9-SNAPSHOT-260/modelizer-next-app-9-SNAPSHOT-260.jar",
+      "platforms": [
+        "unknown"
+      ],
+      "notes": "Latest snapshot build.",
+      "publishedAt": "2026-05-11T17:22:16Z",
+      "assets": [
+        {
+          "name": "modelizer-next-app-9-SNAPSHOT-260.jar",
+          "platform": "unknown",
+          "kind": "app-standalone-jar",
+          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/9-SNAPSHOT-260/modelizer-next-app-9-SNAPSHOT-260.jar"
+        }
+      ]
+    },
     {
       "version": "9-SNAPSHOT-259",
       "tag": "9-SNAPSHOT-259",
@@ -1288,58 +1308,6 @@
           "platform": "windows",
           "kind": "bootstrap-native",
           "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/0.2-SNAPSHOT-159562/modelizer-next-bootstrap-windows-0.2-SNAPSHOT-159562.exe"
-        }
-      ]
-    },
-    {
-      "version": "0.1-SNAPSHOT-159516",
-      "tag": "0.1-SNAPSHOT-159516",
-      "releaseUrl": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/tag/0.1-SNAPSHOT-159516",
-      "assetUrl": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/0.1-SNAPSHOT-159516/modelizer-next-app-0.1-SNAPSHOT-159516.jar",
-      "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/0.1-SNAPSHOT-159516/modelizer-next-app-0.1-SNAPSHOT-159516.jar",
-      "platforms": [
-        "portable",
-        "linux",
-        "windows"
-      ],
-      "notes": "Latest snapshot build.",
-      "publishedAt": "2026-04-21T16:41:52Z",
-      "assets": [
-        {
-          "name": "modelizer-next-app-0.1-SNAPSHOT-159516.jar",
-          "platform": "portable",
-          "kind": "app-portable-jar",
-          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/0.1-SNAPSHOT-159516/modelizer-next-app-0.1-SNAPSHOT-159516.jar"
-        },
-        {
-          "name": "modelizer-next-app-portable-linux-0.1-SNAPSHOT-159516.deb",
-          "platform": "linux",
-          "kind": "app-portable-native",
-          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/0.1-SNAPSHOT-159516/modelizer-next-app-portable-linux-0.1-SNAPSHOT-159516.deb"
-        },
-        {
-          "name": "modelizer-next-app-portable-windows-0.1-SNAPSHOT-159516.exe",
-          "platform": "windows",
-          "kind": "app-portable-native",
-          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/0.1-SNAPSHOT-159516/modelizer-next-app-portable-windows-0.1-SNAPSHOT-159516.exe"
-        },
-        {
-          "name": "modelizer-next-bootstrap-0.1-SNAPSHOT-159516.jar",
-          "platform": "portable",
-          "kind": "bootstrap-jar",
-          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/0.1-SNAPSHOT-159516/modelizer-next-bootstrap-0.1-SNAPSHOT-159516.jar"
-        },
-        {
-          "name": "modelizer-next-bootstrap-linux-0.1-SNAPSHOT-159516.deb",
-          "platform": "linux",
-          "kind": "bootstrap-native",
-          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/0.1-SNAPSHOT-159516/modelizer-next-bootstrap-linux-0.1-SNAPSHOT-159516.deb"
-        },
-        {
-          "name": "modelizer-next-bootstrap-windows-0.1-SNAPSHOT-159516.exe",
-          "platform": "windows",
-          "kind": "bootstrap-native",
-          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/0.1-SNAPSHOT-159516/modelizer-next-bootstrap-windows-0.1-SNAPSHOT-159516.exe"
         }
       ]
     }

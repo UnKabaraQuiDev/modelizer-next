@@ -33,7 +33,7 @@ for channel in ('release', 'snapshot', 'nightly'):
         'releaseUrl': data.get('releaseUrl', ''),
         'notes': data.get('notes', ''),
         'tag': data.get('tag', ''),
-        'updatedAt': publishedDate,
+        'updatedAt': data.get('updatedAt', ''),
     }
 
 output_file.write_text(json.dumps(channels, indent=2) + '\n', encoding='utf-8')
