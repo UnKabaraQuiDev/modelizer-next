@@ -84,7 +84,6 @@ final class MainFrameToolBar extends JToolBar {
 	private final Map<String, ImageIcon> toolbarIconCache = new HashMap<>();
 
 	JButton undoButton;
-
 	JButton redoButton;
 
 	/**
@@ -108,6 +107,8 @@ final class MainFrameToolBar extends JToolBar {
 		buttons.add(this.createToolbarButton(frame, "add-link.png", "New link", "addLink"));
 		buttons.add(this.createToolbarButton(frame, "delete.png", "Delete", "deleteSelection"));
 		buttons.add(this.createToolbarButton(frame, "duplicate.png", "Duplicate", "duplicateSelection"));
+		buttons.add(this.createToolbarButton(frame, "focus-selection.png", "Focus selection", "focusSelection"));
+		buttons.add(this.createToolbarButton(frame, "focus-all.png", "Focus all", "focusAll"));
 
 		this.add(buttons, BorderLayout.WEST);
 	}
