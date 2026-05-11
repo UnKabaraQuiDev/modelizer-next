@@ -151,21 +151,6 @@ function formatBuildDate(value) {
   }).format(date);
 }
 
-async function loadReleaseDate(tag) {
-  try {
-    const response = await fetch(`https://api.github.com/repos/UnKabaraQuiDev/modelizer-next/releases/tags/${tag}`, {
-      cache: 'no-store'
-    });
-
-    if (!response.ok) return null;
-
-    const data = await response.json();
-    return data.published_at || data.created_at || null;
-  } catch (error) {
-    return null;
-  }
-}
-
 function renderChannelRows(channels) {
   const container = document.getElementById('updateChannels');
   if (!container) return;
@@ -224,9 +209,10 @@ async function loadUpdateChannels() {
     if (!response.ok) throw new Error(`versions.json returned ${response.status}`);
 
     const versions = await response.json();
+
     const order = ['release', 'snapshot', 'nightly'];
 
-    const channels = await Promise.all(order.map(async key => {
+    const channels = order.map(key => {
       const version = versions[key];
       const info = channelInfo[key];
 
@@ -235,9 +221,9 @@ async function loadUpdateChannels() {
         ...info,
         version: version.version,
         releaseUrl: version.releaseUrl,
-        buildDate: await loadReleaseDate(version.tag)
+        buildDate: version.updatedAt
       };
-    }));
+    });
 
     renderChannelRows(channels);
   } catch (error) {
