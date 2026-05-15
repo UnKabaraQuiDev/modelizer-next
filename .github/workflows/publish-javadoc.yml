@@ -1,0 +1,59 @@
+
+name: Publish Javadoc
+
+on:
+  workflow_dispatch:
+  workflow_run:
+    workflows:
+      - "Nightly Build"
+    types:
+      - completed
+
+permissions:
+  contents: write
+
+jobs:
+  javadoc:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: [self-hosted, linux]
+
+    steps:
+      - name: Checkout main branch
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Set up Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Generate Javadoc
+        run: mvn -B clean javadoc:aggregate
+
+      - name: Publish Javadoc to pages branch
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+
+          mkdir -p /tmp/pages
+
+          git clone --branch pages \
+            "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" \
+            /tmp/pages
+
+          rm -rf /tmp/pages/javadoc
+          mkdir -p /tmp/pages/javadoc
+
+          cp -r target/site/apidocs/* /tmp/pages/javadoc/
+
+          cd /tmp/pages
+
+          git add javadoc
+
+          git diff --cached --quiet && exit 0
+
+          git commit -m "[bot] Update Javadoc"
+          git push origin pages
