@@ -38,11 +38,8 @@ jobs:
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
 
-          mkdir -p /tmp/pages
-
-          git clone --branch pages \
-            "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" \
-            /tmp/pages
+          rm -rf /tmp/pages
+          git worktree add /tmp/pages pages
 
           rm -rf /tmp/pages/javadoc
           mkdir -p /tmp/pages/javadoc
@@ -57,3 +54,6 @@ jobs:
 
           git commit -m "[bot] Update Javadoc"
           git push origin pages
+
+          cd -
+          git worktree remove /tmp/pages
