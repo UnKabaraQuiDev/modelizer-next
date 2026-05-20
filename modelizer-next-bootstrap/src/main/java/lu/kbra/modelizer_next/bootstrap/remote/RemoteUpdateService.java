@@ -9,6 +9,7 @@ import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.sql.Timestamp;
 import java.time.Duration;
 import java.util.Objects;
 
@@ -69,6 +70,7 @@ public final class RemoteUpdateService {
 		public String releaseUrl;
 		public String notes;
 		public String tag;
+		public Timestamp updatedAt;
 
 		/**
 		 * Returns the configured release URL or the default release page when none is set.

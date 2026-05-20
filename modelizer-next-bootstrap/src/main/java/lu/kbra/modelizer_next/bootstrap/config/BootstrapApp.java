@@ -3,6 +3,7 @@ package lu.kbra.modelizer_next.bootstrap.config;
 import java.io.File;
 import java.io.IOException;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -55,9 +56,8 @@ public final class BootstrapApp {
 	 */
 	private static ObjectMapper createMapper() {
 		final ObjectMapper mapper = new ObjectMapper();
-
+		mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 		mapper.registerModule(new ParsedVersionModule());
-
 		return mapper;
 	}
 
