@@ -29,7 +29,10 @@
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-databind</artifactId>
-			<version>2.21.0</version>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.datatype</groupId>
+			<artifactId>jackson-datatype-jsr310</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>lu.kbra</groupId>
@@ -42,7 +45,6 @@
 		<dependency>
 			<groupId>com.formdev</groupId>
 			<artifactId>flatlaf</artifactId>
-			<version>3.7.1</version>
 		</dependency>
 	</dependencies>
 
@@ -64,10 +66,13 @@
 								<configuration>
 									<target>
 										<exec executable="java">
-											<arg value="-DBootstrapApp.enableUpdate" />
-											<arg value="-DBootstrapApp.forceJarName=modelizer-next-app-${revision}.jar" />
+											<arg
+												value="-DBootstrapApp.enableUpdate" />
+											<arg
+												value="-DBootstrapApp.forceJarName=modelizer-next-app-${revision}.jar" />
 											<arg value="-jar" />
-											<arg value="${project.build.directory}/${project.build.finalName}-with-dependencies.jar" />
+											<arg
+												value="${project.build.directory}/${project.build.finalName}-with-dependencies.jar" />
 										</exec>
 									</target>
 								</configuration>
