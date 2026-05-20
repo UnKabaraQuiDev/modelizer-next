@@ -19,8 +19,8 @@ import lu.kbra.modelizer_next.style.StylePalette;
  * @param paletteList  list to read or update
  * @param enumList     list to read or update
  */
-public record LiveEditComponents(JTextField textField, JTextArea textArea, @Deprecated
-JComboBox<Enum<?>> enumComboBox, JList<StylePalette> paletteList, JList<Enum<?>> enumList) {
+public record LiveEditComponents(JTextField textField, JTextArea textArea, @Deprecated JComboBox<Enum<?>> enumComboBox,
+		JList<StylePalette> paletteList, JList<Enum<?>> enumList) {
 
 	/**
 	 * Applies the supplied consumer to each live edit Swing component.
