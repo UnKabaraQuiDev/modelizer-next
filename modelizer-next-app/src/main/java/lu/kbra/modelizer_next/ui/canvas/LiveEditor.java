@@ -389,7 +389,7 @@ public interface LiveEditor extends DiagramCanvasExt {
 		}
 		case LINK_TO_CARDINALITY -> {
 			pos = this.getCanvas().worldToViewport(geometry.toPoint());
-			value = linkModel.getCardinalityFrom();
+			value = linkModel.getCardinalityTo();
 		}
 		default -> throw new IllegalArgumentException("Unexpected type: " + e);
 		}
