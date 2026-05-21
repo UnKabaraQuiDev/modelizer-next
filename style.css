@@ -270,7 +270,8 @@ h3 {
     border: 1px solid var(--line);
     border-radius: 28px;
     background: var(--card2);
-    box-shadow: var(--shadow)
+    box-shadow: var(--shadow);
+    margin: 0
 }
 
 .screen-top {
@@ -1207,4 +1208,304 @@ div.title-button-container {
 
 .prompt {
     color: #93c5fd
+}
+
+.menu-toggle {
+    display: none;
+    width: 42px;
+    height: 42px;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    background: var(--card);
+    color: var(--text);
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.menu-toggle span {
+    display: block;
+    width: 18px;
+    height: 2px;
+    border-radius: 999px;
+    background: currentColor;
+}
+
+/* Fixed page timeline */
+.side-timeline {
+    position: fixed;
+    top: 100px;
+    right: 24px;
+    z-index: 8;
+    width: 292px;
+    display: grid;
+    gap: 0;
+    padding: 18px;
+    border: 1px solid var(--line);
+    border-radius: var(--r);
+    background: color-mix(in srgb, var(--card2) 86%, transparent);
+    backdrop-filter: blur(18px);
+    box-shadow: var(--shadow);
+}
+
+.side-timeline-title {
+    margin: 0 0 12px;
+    color: var(--muted);
+    font-size: .82rem;
+    font-weight: 850;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+}
+
+.side-timeline a {
+    position: relative;
+    display: grid;
+    grid-template-columns: 34px 1fr;
+    gap: 12px;
+    padding: 0 0 16px;
+    color: var(--muted);
+}
+
+.side-timeline a:not(:last-child)::after {
+    content: "";
+    position: absolute;
+    left: 16px;
+    top: 34px;
+    bottom: 0;
+    width: 2px;
+    background: var(--line);
+}
+
+.side-timeline a:last-child {
+    padding-bottom: 0;
+}
+
+.side-timeline a:hover,
+.side-timeline a:focus {
+    color: var(--text);
+    outline: 0;
+}
+
+.timeline-dot {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--a), var(--b));
+    color: white;
+    font-weight: 900;
+    font-size: .9rem;
+    box-shadow: 0 10px 30px color-mix(in srgb, var(--a) 26%, transparent);
+}
+
+.side-timeline strong {
+    display: block;
+    color: var(--text);
+    font-size: .94rem;
+    line-height: 1.2;
+}
+
+.side-timeline small {
+    display: block;
+    margin-top: 2px;
+    color: var(--muted);
+    font-size: .78rem;
+    line-height: 1.35;
+}
+
+@media(min-width:1250px) {
+    .has-side-timeline main .container {
+        width: min(1250px, calc(100% - 250px));
+        margin-left: max(32px, calc((100% - 1300px) / 2));
+        margin-right: auto;
+    }
+
+    .has-side-timeline .hero-grid {
+        grid-template-columns: minmax(360px, .95fr) minmax(360px, 1.05fr);
+        gap: 42px;
+    }
+}
+
+@media(max-width:1249px) {
+    .side-timeline {
+        display: none;
+    }
+}
+
+@media(max-width:760px) {
+    nav {
+        position: relative;
+    }
+
+    .menu-toggle {
+        display: inline-flex;
+        margin-left: auto;
+    }
+
+    .links {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: calc(100% + 10px);
+        display: none;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 6px;
+        padding: 12px;
+        border: 1px solid var(--line);
+        border-radius: 20px;
+        background: var(--card2);
+        box-shadow: var(--shadow);
+        z-index: 20;
+    }
+
+    nav.menu-open .links {
+        display: flex;
+    }
+
+    .links a {
+        display: block;
+        width: 100%;
+        padding: 11px 12px;
+    }
+
+    .links .theme-toggle {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+
+/* Responsive fixes */
+@media(max-width:900px) {
+    .card {
+        grid-template-columns: 1fr;
+        gap: 18px;
+    }
+
+    .card > div {
+        padding-right: 0;
+    }
+
+    .card img {
+        margin-top: 8px;
+    }
+}
+
+@media(max-width:760px) {
+    .links {
+        background: #fff;
+        backdrop-filter: none;
+    }
+
+    html[data-theme="dark"] .links {
+        background: #0f172a;
+    }
+
+    .links .theme-toggle {
+        justify-content: space-between;
+        padding: 8px 12px;
+    }
+
+    .links .theme-label {
+        display: inline;
+    }
+
+    .links .theme-label::before {
+        content: "Theme: ";
+    }
+
+    figure.screenshot {
+        width: calc(100% + 20px);
+        max-width: none;
+        margin-left: -10px;
+        margin-right: -10px;
+        border-radius: 20px;
+    }
+
+    figure.screenshot .screen-top {
+        padding: 10px 12px;
+    }
+}
+
+.side-timeline a[aria-current="page"] {
+    color: var(--text);
+}
+
+.side-timeline a[aria-current="page"] .timeline-dot {
+    outline: 3px solid color-mix(in srgb, var(--a) 26%, transparent);
+}
+
+.sponsor-modal[hidden] {
+    display: none;
+}
+
+.sponsor-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    display: grid;
+    place-items: center;
+    padding: 20px;
+}
+
+.sponsor-modal-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(15, 23, 42, .48);
+    backdrop-filter: blur(8px);
+}
+
+.sponsor-modal-card {
+    position: relative;
+    z-index: 1;
+    width: min(520px, 100%);
+    padding: 26px;
+    border: 1px solid var(--line);
+    border-radius: var(--r);
+    background: var(--card2);
+    box-shadow: var(--shadow);
+}
+
+.sponsor-modal-card h2 {
+    margin-bottom: 10px;
+    font-size: clamp(1.7rem, 5vw, 2.3rem);
+}
+
+.sponsor-modal-card p {
+    color: var(--muted);
+}
+
+.sponsor-modal-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.sponsor-modal-muted {
+    margin-top: 14px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: var(--muted);
+    font: inherit;
+    cursor: pointer;
+    text-decoration: underline;
+    text-underline-offset: 4px;
+}
+
+@media(max-width:760px) {
+    .sponsor-modal-card {
+        padding: 22px;
+    }
+
+    .sponsor-modal-actions {
+        flex-direction: column;
+    }
 }

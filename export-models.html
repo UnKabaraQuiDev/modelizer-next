@@ -4,20 +4,20 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#f8fafc" />
-    <title>Modelizer Next - Plan your databases smarter</title>
-    <meta name="description" content="Modelizer Next is a free, open-source database modeling tool for conceptual, logical, and physical database design. Download it for Windows, Linux, and macOS." />
-    <link rel="canonical" href="https://modelizer.kbra.lu/" />
+    <title>Export Modelizer Next models from the command line</title>
+    <meta name="description" content="Use the Modelizer Next CLI to export database models as PNG or SVG files, including batch export, wildcard export, and custom file patterns." />
+    <link rel="canonical" href="https://modelizer.kbra.lu/export-models.html" />
     <meta name="robots" content="index,follow" />
     <meta name="author" content="UnKabaraQuiDev" />
     <meta property="og:site_name" content="Modelizer Next" />
-    <meta property="og:title" content="Modelizer Next - Plan your databases smarter" />
-    <meta property="og:description" content="Modelizer Next is a free, open-source database modeling tool for conceptual, logical, and physical database design. Download it for Windows, Linux, and macOS." />
+    <meta property="og:title" content="Export Modelizer Next models from the command line" />
+    <meta property="og:description" content="Use the Modelizer Next CLI to export database models as PNG or SVG files, including batch export, wildcard export, and custom file patterns." />
     <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://modelizer.kbra.lu/" />
+    <meta property="og:url" content="https://modelizer.kbra.lu/export-models.html" />
     <meta property="og:image" content="https://modelizer.kbra.lu/img/og-image.png" />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Modelizer Next - Plan your databases smarter" />
-    <meta name="twitter:description" content="Modelizer Next is a free, open-source database modeling tool for conceptual, logical, and physical database design. Download it for Windows, Linux, and macOS." />
+    <meta name="twitter:title" content="Export Modelizer Next models from the command line" />
+    <meta name="twitter:description" content="Use the Modelizer Next CLI to export database models as PNG or SVG files, including batch export, wildcard export, and custom file patterns." />
     <meta name="twitter:image" content="https://modelizer.kbra.lu/img/og-image.png" />
     <link rel="icon" href="/favicon-96.ico" sizes="any" />
     <link rel="icon" type="image/png" sizes="128x128" href="/favicon-128.png" />
@@ -32,10 +32,10 @@
       "name": "Modelizer Next",
       "applicationCategory": "DeveloperApplication",
       "operatingSystem": "Windows, Linux, macOS",
-      "url": "https://modelizer.kbra.lu/",
+      "url": "https://modelizer.kbra.lu/export-models.html",
       "downloadUrl": "https://modelizer.kbra.lu/download.html",
       "license": "https://github.com/UnKabaraQuiDev/modelizer-next/blob/main/LICENSE",
-      "description": "Modelizer Next is a free, open-source database modeling tool for conceptual, logical, and physical database design. Download it for Windows, Linux, and macOS."
+      "description": "Use the Modelizer Next CLI to export database models as PNG or SVG files, including batch export, wildcard export, and custom file patterns."
     }
     </script>
     <script type="application/ld+json">
@@ -105,6 +105,26 @@
       ]
     }
     </script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "https://modelizer.kbra.lu/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Export models",
+          "item": "https://modelizer.kbra.lu/export-models.html"
+        }
+      ]
+    }
+    </script>
   </head>
   <body class="has-side-timeline">
     <a class="skip" href="#main">Skip to content</a>
@@ -166,149 +186,122 @@
 </aside>
 
 
-
-
     <main id="main">
-      <section class="hero" id="top">
-<div class="container hero-grid">
-<div>
-<h1>
-<span class="grad">A modern, easy-to-use database modelizing tool</span>
-</h1>
-<p class="lead"><strong>Modelizer Next</strong>, the database modelling tool made for you • Fast, clean &amp; intuitive.</p>
-<p class="eyebrow">
-<span aria-hidden="true" class="pulse"></span>By the community, for the community.
-            </p>
-<div class="actions">
-<a class="btn primary" href="#download">Download latest release</a>
-<a class="btn" href="#new-here">New here?</a>
-</div>
-</div>
-<figure aria-label="Modelizer Next screenshot" class="screenshot">
-<div class="screen-top">
-<div aria-hidden="true" class="dots">
-<span class="dot"></span>
-<span class="dot"></span>
-<span class="dot"></span>
-</div>
-</div>
-<img alt="Screenshot of the Modelizer Next interface" class="screen-img" src="img/screenshot.webp"/></figure>
-</div>
-</section><section id="new-here">
-<div class="container guide">
-<div class="guide-panel">
-<p class="eyebrow">
-<span aria-hidden="true" class="pulse"></span>New here?
-            </p>
-<h2>Plan your database visually</h2>
-<p>Modelizer Next helps you draw the structure of a database before you build it. Add tables, add fields, connect related data, and switch between conceptual, logical, and physical views as your model gets more precise.</p>
-<p>It is also built as a drop-in replacement for other Modelizer tools such as
-              <a class="link" href="http://modelizer.fisch.lu/" target="_BLANK">Modelizer</a> and
-              <a class="link" href="http://modelizer.lu/" target="_BLANK">modelizer.lu</a>. You can keep the workflow you know, open existing work, and use a cleaner, more modern interface.
-            </p>
-<div class="actions">
-<a class="btn primary" href="#download">Get started</a>
-<a class="btn" href="/shortcuts.html">See controls</a>
-</div>
-</div>
-<div class="quick-grid">
-<article class="quick-card">
-<strong>1. Create or open a model</strong>
-<p>Start a new file or import an existing
-                <code>.mn</code>,
-                <code>.mod</code>, or
-                <code>.mdlz</code>model.
-              </p>
-</article>
-<article class="quick-card">
-<strong>2. Build the structure</strong>
-<p>Add tables, fields, comments, and links. Use the toolbar, shortcuts, or direct mouse gestures.</p>
-</article>
-<article class="quick-card">
-<strong>3. Style your diagrams</strong>
-<p>Use Style Palettes to quickly style your elements and keep diagrams readable and consistent.</p>
-<div class="palette-grid">
-<img alt="Example Style Palette preview" src="img/palette-1.webp"/>
-<img alt="Second Style Palette preview" src="img/palette-2.webp"/></div>
-</article>
-<article class="quick-card">
-<strong>4. Switch without friction</strong>
-<p>Open existing Modelizer work, avoid the clunky UI feeling, and keep working in a clean desktop app.</p>
-</article>
-</div>
-</div>
-</section><section id="download">
+      <section class="cli-section" id="cli">
 <div class="container">
-<div class="download-heading">
+<div class="heading">
 <p class="eyebrow">
-<span aria-hidden="true" class="pulse"></span>Get Modelizer Next
-            </p>
-<h2>Choose the build that fits your setup.</h2>
-<p>Select your operating system and build type. The button updates to the exact file for your choice.</p>
+<span aria-hidden="true" class="pulse"></span>CLI usage
+              </p>
+<h2>Export models straight from the command line.</h2>
+<p>Use the CLI to export one model, run batch exports, or script diagram generation in your build process.</p>
 </div>
-<div class="download-layout">
-<div class="download">
-<div class="selector-group">
-<h3>Operating system</h3>
-<div class="choice-grid os-list" id="osChoices">
-<button aria-pressed="true" class="choice has-icon" data-key="windows" data-value="Windows" type="button">
-<img alt="" class="choice-icon" src="img/windows.svg">
-<span class="choice-content">
-<strong>Windows</strong>
-<span>Best for most classroom and desktop PCs</span>
-</span>
-</img></button>
-<button aria-pressed="false" class="choice has-icon" data-key="linux" data-value="Linux" type="button">
-<img alt="" class="choice-icon" src="img/debian.svg"/>
-<span class="choice-content">
-<strong>Linux</strong>
-<span>Debian-based installations</span>
-</span>
-</button>
-<button aria-pressed="false" class="choice has-icon" data-key="macos" data-value="MacOS" type="button">
-<img alt="" class="choice-icon" src="img/macos.svg"/>
-<span class="choice-content">
-<strong>MacOS</strong>
-<span>For MacOS devices</span>
-</span>
-</button>
+<div class="cli-list">
+<article class="card cli-card">
+<div class="header">
+<div aria-hidden="true" class="icon">?</div>
+<div>
+<h3>Check all options</h3>
+<p>Start with the help command when you want to see every export flag and the current app version.</p>
 </div>
 </div>
+<div aria-label="Modelizer Next CLI help example" class="terminal">
+<div aria-hidden="true" class="terminal-top">
+<span></span>
+<span></span>
+<span></span>
 </div>
-<div class="download-option">
-<div class="selector-group">
-<h3>Build type</h3>
-<div class="choice-grid build-list" id="buildChoices">
-<button aria-pressed="false" class="choice" data-key="portable" data-value="Portable" type="button">
-<strong>Portable</strong>
-<span>Run without a full install.</span>
-</button>
-<button aria-pressed="false" class="choice" data-key="standalone" data-value="Standalone installer" type="button">
-<strong>Standalone</strong>
-<span>Installs the app without updater support.</span>
-</button>
-<button aria-pressed="true" class="choice recommended" data-key="updater" data-value="Updater installer" type="button">
-<strong>Updater</strong>
-<span>Includes update support.</span>
-</button>
+<div class="code-container">
+<code>
+<span class="prompt">$</span> modelizer-next --help<br/>
+                    Modelizer Next &lt;modelizer.kbra.lu&gt; Copyright (C) 2026 UnKabaraQuiDev &lt;u.kbra.lu+mn@gmail.com&gt;<br/>
+                    This program comes with ABSOLUTELY NO WARRANTY.<br/>
+                    This is free software, and you are welcome to redistribute it under certain conditions.<br/><br/>
+                    Modelizer Next App / 8-NIGHTLY-230 [Automated nightly build 2026-05-09_14-28-58 (shared)]<br/>
+                    App dir: /home/pcy113/.modelizer-next<br/><br/>
+                    Usage:<br/>
+                     modelizer --export &lt;file&gt; --type &lt;svg|png&gt; [options]<br/><br/>
+                    Options:<br/>
+<div>
+<span class="left"> -t, --type &lt;svg|png&gt;</span>
+<span>Export format</span>
+</div>
+<div>
+<span class="left"> -o, --out &lt;directory&gt;</span>
+<span>Output directory, default: current directory</span>
+</div>
+<div>
+<span class="left"> -s, --scope &lt;scope&gt;</span>
+<span>selection|view|everything, default: everything</span>
+</div>
+<div>
+<span class="left"> -p, --panels &lt;list&gt;</span>
+<span>Comma-separated PanelType names: conceptual (c), logical (l), physical (p)</span>
+</div>
+<div>
+<span class="left"> -n, --pattern &lt;pattern&gt;</span>
+<span>File name pattern, default: '%FILENAME%-%TYPE%.%EXTENSION%', available: %FILENAME%, %TYPE%, %EXTENSION%, %DATE%, %TIME%</span>
+</div>
+<div>
+<span class="left"> -f, --force</span>
+<span>Continue on legacy/newer-version warnings</span>
+</div>
+<div>
+<span class="left"> -h, --help</span>
+<span>Print this help</span>
+</div>
+<div>
+<span class="left"> -m, --multiple</span>
+<span>Multiple input files, separated by commas "path1,path2,path3..."</span>
+</div>
+<div>
+<span class="left"> -w, --wildcard</span>
+<span>Enable wildcard support for input files, supports: *, **, ?</span>
+</div>
+<div>
+<span class="left"> -j, --jobs &lt;count&gt;</span>
+<span>Dispatch multiple threads to speed up the export process</span>
+</div>
+</code></div>
+</div>
+</article>
+<article class="card cli-card">
+<div class="header">
+<div aria-hidden="true" class="icon">1</div>
+<div>
+<h3>Export one model</h3>
+<p>Pick a model file, choose the panels you need, and export the result as PNG.</p>
 </div>
 </div>
-<div class="download-summary">
-<div class="summary-row">
-<span>Current version</span>
-<strong id="current-version">Loading...</strong>
+<div aria-label="Export one Modelizer Next file" class="terminal compact">
+<div aria-hidden="true" class="terminal-top">
+<span></span>
+<span></span>
+<span></span>
 </div>
-<div class="summary-row" id="errorMessage" style="display: none;">
+<div class="code-container"><code><span class="prompt">$</span> modelizer-next --export path/to/file.mn --panels conceptual,logical,technical --type png</code></div>
 </div>
-<div class="actions">
-<a class="btn primary" href="https://github.com/UnKabaraQuiDev/modelizer-next/releases" id="downloadButton" rel="noopener">Download selected build</a>
-<a class="btn" href="https://github.com/UnKabaraQuiDev/modelizer-next/issues" rel="noopener">Report an issue</a>
+</article>
+<article class="card cli-card">
+<div class="header">
+<div aria-hidden="true" class="icon">*</div>
+<div>
+<h3>Batch export with wildcards</h3>
+<p>Export many files at once, enable wildcard matching, send output to a folder, and use multiple jobs.</p>
 </div>
 </div>
+<div aria-label="Batch export Modelizer Next files with wildcards" class="terminal compact">
+<div aria-hidden="true" class="terminal-top">
+<span></span>
+<span></span>
+<span></span>
+</div>
+<div class="code-container"><code><span class="prompt">$</span> modelizer-next -e path/to/files/*.mn -w -p c,l,t -j 5 -o out/</code></div>
+</div>
+</article>
 </div>
 </div>
-</div></section>
-
+</section>
     </main>
     
 <footer>
