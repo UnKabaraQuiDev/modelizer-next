@@ -1,0 +1,40 @@
+name: Deploy Pages
+
+on:
+  workflow_dispatch: 
+  push:
+    branches:
+      - pages
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          port: ${{ secrets.PORT }}
+          script: |
+            set -e
+
+            mkdir -p /var/www
+            cd /var/www
+
+            if [ ! -d "modelizer-next/.git" ]; then
+              rm -rf "modelizer-next"
+
+              git clone \
+                --branch pages \
+                https://${{ secrets.GH_PAT }}@github.com/UnKabaraQuiDev/modelizer-next.git \
+                "modelizer-next"
+            fi
+
+            cd /var/www/modelizer-next
+
+            git fetch origin
+            git checkout pages
+            git reset --hard origin/pages
