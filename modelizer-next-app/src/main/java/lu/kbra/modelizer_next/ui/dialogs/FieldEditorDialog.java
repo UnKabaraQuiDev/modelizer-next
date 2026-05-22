@@ -46,8 +46,17 @@ public final class FieldEditorDialog {
 	 * @param type            type value that selects the operation mode
 	 * @param technicalOnly   whether technical only is enabled
 	 */
-	public record Result(String name, String technicalName, boolean primaryKey, boolean unique, boolean notNull, Color textColor,
-			Color backgroundColor, int moveDelta, String type, boolean technicalOnly) {
+	public record Result(
+			String name,
+			String technicalName,
+			boolean primaryKey,
+			boolean unique,
+			boolean notNull,
+			Color textColor,
+			Color backgroundColor,
+			int moveDelta,
+			String type,
+			boolean technicalOnly) {
 	}
 
 	/**

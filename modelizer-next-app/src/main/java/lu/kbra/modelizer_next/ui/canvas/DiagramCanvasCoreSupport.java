@@ -93,7 +93,6 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 			this.getCanvas().updateLiveEditLayout();
 		}
 
-		this.getCanvas().repaint();
 	}
 
 	/**
@@ -170,10 +169,8 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 	 * @param targetField target field value used by the operation
 	 * @return the ensure technical source field result
 	 */
-	default FieldModel ensureTechnicalSourceField(
-			final ClassModel sourceClass,
-			final ClassModel targetClass,
-			final FieldModel targetField) {
+	default FieldModel
+			ensureTechnicalSourceField(final ClassModel sourceClass, final ClassModel targetClass, final FieldModel targetField) {
 		if (sourceClass == null || targetClass == null || targetField == null) {
 			return null;
 		}
@@ -565,6 +562,7 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 		if (this.getCanvas().documentEventListener != null) {
 			this.getCanvas().documentEventListener.onDocumentChanged();
 		}
+		this.getFrame().getVisibleCanvases().forEach(DiagramCanvas::repaint);
 	}
 
 	/**
@@ -574,6 +572,7 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 		if (this.getCanvas().documentEventListener != null) {
 			this.getCanvas().documentEventListener.onSelectionChanged(this.getCanvas().getSelectionInfo());
 		}
+		this.getCanvas().repaint();
 	}
 
 	/**
@@ -1024,7 +1023,7 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 	 * @return the viewport center world
 	 */
 	default Point2D.Double getViewportCenterWorld() {
-		return worldToViewport(getViewportCenter());
+		return this.worldToViewport(this.getViewportCenter());
 	}
 
 	/**
@@ -1064,7 +1063,7 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 	 * @param world world value used by the operation
 	 * @return the world to viewport zoom result
 	 */
-	default Point2D.Double worldToViewportZoom(Dimension world) {
+	default Point2D.Double worldToViewportZoom(final Dimension world) {
 		final PanelState state = this.getCanvas().getPanelState();
 		return new Point2D.Double(world.getWidth() * state.getZoom(), world.getHeight() * state.getZoom());
 	}
@@ -1127,7 +1126,7 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 		if (classTitle == null || classTitle.isBlank()) {
 			return 0;
 		}
-		return titleFont.getStringBounds(classTitle, getCanvas().fontRenderContext).getWidth();
+		return titleFont.getStringBounds(classTitle, this.getCanvas().fontRenderContext).getWidth();
 	}
 
 }

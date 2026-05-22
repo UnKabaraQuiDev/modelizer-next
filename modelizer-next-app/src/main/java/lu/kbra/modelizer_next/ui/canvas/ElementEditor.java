@@ -69,7 +69,6 @@ public interface ElementEditor extends DiagramCanvasExt {
 
 		this.getCanvas().notifySelectionChanged();
 		this.getCanvas().notifyDocumentChanged();
-		this.getCanvas().repaint();
 	}
 
 	/**
@@ -99,7 +98,6 @@ public interface ElementEditor extends DiagramCanvasExt {
 
 		this.getCanvas().notifySelectionChanged();
 		this.getCanvas().notifyDocumentChanged();
-		this.getCanvas().repaint();
 	}
 
 	/**
@@ -132,7 +130,6 @@ public interface ElementEditor extends DiagramCanvasExt {
 
 		this.getCanvas().notifySelectionChanged();
 		this.getCanvas().notifyDocumentChanged();
-		this.getCanvas().repaint();
 	}
 
 	/**
@@ -169,7 +166,6 @@ public interface ElementEditor extends DiagramCanvasExt {
 		}
 
 		this.getCanvas().notifySelectionChanged();
-		this.getCanvas().repaint();
 	}
 
 }

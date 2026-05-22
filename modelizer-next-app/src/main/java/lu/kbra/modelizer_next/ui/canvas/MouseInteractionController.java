@@ -111,7 +111,6 @@ interface MouseInteractionController extends DiagramCanvasExt {
 
 		final double zoom = this.getCanvas().getPanelState().getZoom();
 		this.getCanvas().currentDragOffset = new Point2D.Double(deltaX * zoom, deltaY * zoom);
-
 		this.getCanvas().repaint();
 	}
 
@@ -180,7 +179,6 @@ interface MouseInteractionController extends DiagramCanvasExt {
 			this.getCanvas().linkPreviewTarget = null;
 			this.getCanvas().linkPreviewMousePoint = worldPoint;
 			this.getCanvas().setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
-			this.getCanvas().repaint();
 			return;
 		}
 
@@ -208,7 +206,6 @@ interface MouseInteractionController extends DiagramCanvasExt {
 				this.getCanvas().selectedElement = selectedDragAnchor;
 				this.getCanvas().document.getModel().getClasses().sort(this.getCanvas().comparator);
 				this.getCanvas().notifySelectionChanged();
-				this.getCanvas().repaint();
 			} else {
 				this.getCanvas().select(clickedElement);
 			}
@@ -342,10 +339,9 @@ interface MouseInteractionController extends DiagramCanvasExt {
 		state.setPanX(event.getX() - worldBefore.getX() * newZoom);
 		state.setPanY(event.getY() - worldBefore.getY() * newZoom);
 
-		if (getCanvas().isLiveEditingElement()) {
-			getCanvas().updateLiveEditLayout();
+		if (this.getCanvas().isLiveEditingElement()) {
+			this.getCanvas().updateLiveEditLayout();
 		}
-
 		this.getCanvas().repaint();
 	}
 

@@ -84,7 +84,6 @@ interface DiagramModelEditor extends DiagramCanvasExt {
 		this.getCanvas().select(SelectedElement.forComment(commentModel.getId()));
 		this.getCanvas().notifySelectionChanged();
 		this.getCanvas().notifyDocumentChanged();
-		this.getCanvas().repaint();
 	}
 
 	/**
@@ -117,7 +116,6 @@ interface DiagramModelEditor extends DiagramCanvasExt {
 		this.getCanvas().select(SelectedElement.forField(targetClass.getId(), fieldModel.getId()));
 		this.getCanvas().notifySelectionChanged();
 		this.getCanvas().notifyDocumentChanged();
-		this.getCanvas().repaint();
 		this.getCanvas().invokeRenamingElement(LiveEditElement.forField(targetClass.getId(), fieldModel.getId()));
 	}
 
@@ -172,7 +170,6 @@ interface DiagramModelEditor extends DiagramCanvasExt {
 		this.getCanvas().select(SelectedElement.forLink(createdLink.getId()));
 		this.getCanvas().notifySelectionChanged();
 		this.getCanvas().notifyDocumentChanged();
-		this.getCanvas().repaint();
 	}
 
 	/**
@@ -195,7 +192,6 @@ interface DiagramModelEditor extends DiagramCanvasExt {
 		this.getCanvas().select(SelectedElement.forClass(classModel.getId()));
 		this.getCanvas().notifySelectionChanged();
 		this.getCanvas().notifyDocumentChanged();
-		this.getCanvas().repaint();
 		this.getCanvas().invokeRenamingElement(LiveEditElement.forClass(classModel.getId()));
 	}
 
@@ -222,7 +218,6 @@ interface DiagramModelEditor extends DiagramCanvasExt {
 
 		this.getCanvas().clearSelection();
 		this.getCanvas().notifyDocumentChanged();
-		this.getCanvas().repaint();
 	}
 
 	/**
@@ -313,7 +308,6 @@ interface DiagramModelEditor extends DiagramCanvasExt {
 
 		this.getCanvas().select(SelectedElement.forField(classModel.getId(), moved.getId()));
 		this.getCanvas().notifyDocumentChanged();
-		this.getCanvas().repaint();
 	}
 
 }

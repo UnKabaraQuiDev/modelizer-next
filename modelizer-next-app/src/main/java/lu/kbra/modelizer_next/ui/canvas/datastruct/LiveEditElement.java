@@ -17,7 +17,13 @@ import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectedElement.SelectedType;
  * @param forceAlternative whether force alternative is enabled
  * @param snapshotValue    snapshot value value used by the operation
  */
-public record LiveEditElement(LiveEditType type, String classId, String fieldId, String commentId, String linkId, boolean forceAlternative,
+public record LiveEditElement(
+		LiveEditType type,
+		String classId,
+		String fieldId,
+		String commentId,
+		String linkId,
+		boolean forceAlternative,
 		Object snapshotValue) {
 
 	/**

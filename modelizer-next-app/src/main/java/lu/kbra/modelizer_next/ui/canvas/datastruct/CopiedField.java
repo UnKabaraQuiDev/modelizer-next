@@ -17,6 +17,16 @@ import java.awt.Color;
  * @param textColor       color value to use
  * @param backgroundColor color value to use
  */
-public record CopiedField(String ownerClassId, String sourceId, String name, String technicalName, boolean notConceptual,
-		boolean primaryKey, boolean unique, boolean notNull, String type, Color textColor, Color backgroundColor) {
+public record CopiedField(
+		String ownerClassId,
+		String sourceId,
+		String name,
+		String technicalName,
+		boolean notConceptual,
+		boolean primaryKey,
+		boolean unique,
+		boolean notNull,
+		String type,
+		Color textColor,
+		Color backgroundColor) {
 }

@@ -29,7 +29,6 @@ interface SelectionController extends DiagramCanvasExt {
 		this.getCanvas().selectedElements.add(element);
 		this.getCanvas().selectedElement = element;
 		this.getCanvas().notifySelectionChanged();
-		this.getCanvas().repaint();
 	}
 
 	/**
@@ -39,7 +38,6 @@ interface SelectionController extends DiagramCanvasExt {
 		this.getCanvas().selectedElements.clear();
 		this.getCanvas().selectedElement = null;
 		this.getCanvas().notifySelectionChanged();
-		this.getCanvas().repaint();
 	}
 
 	/**
@@ -152,7 +150,6 @@ interface SelectionController extends DiagramCanvasExt {
 		}
 
 		this.getCanvas().notifySelectionChanged();
-		this.getCanvas().repaint();
 	}
 
 	/**
@@ -168,7 +165,6 @@ interface SelectionController extends DiagramCanvasExt {
 		this.getDocument().getModel().getClasses().sort(this.getCanvas().comparator);
 		this.getCanvas().selectedElement = element;
 		this.getCanvas().notifySelectionChanged();
-		this.getCanvas().repaint();
 	}
 
 	/**
@@ -195,7 +191,6 @@ interface SelectionController extends DiagramCanvasExt {
 
 		this.getCanvas().selectedElement = this.getCanvas().selectedElements.isEmpty() ? null : this.getCanvas().selectedElements.getLast();
 		this.getCanvas().notifySelectionChanged();
-		this.getCanvas().repaint();
 	}
 
 	/**

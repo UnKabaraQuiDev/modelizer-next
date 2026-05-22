@@ -21,7 +21,17 @@ import lu.kbra.modelizer_next.domain.data.CommentKind;
  * @param bindingTargetId     id of the element to read or modify
  * @param layout              layout object to read or update
  */
-public record CopiedComment(String sourceId, CommentKind kind, String text, Color textColor, Color backgroundColor, Color borderColor,
-		boolean visibleInConceptual, boolean visibleInLogical, boolean visibleInPhysical, BoundTargetType bindingTargetType,
-		String bindingTargetId, CopiedNodeLayout layout) {
+public record CopiedComment(
+		String sourceId,
+		CommentKind kind,
+		String text,
+		Color textColor,
+		Color backgroundColor,
+		Color borderColor,
+		boolean visibleInConceptual,
+		boolean visibleInLogical,
+		boolean visibleInPhysical,
+		BoundTargetType bindingTargetType,
+		String bindingTargetId,
+		CopiedNodeLayout layout) {
 }

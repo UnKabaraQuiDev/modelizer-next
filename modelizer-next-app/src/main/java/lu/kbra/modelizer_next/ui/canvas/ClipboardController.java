@@ -368,7 +368,6 @@ interface ClipboardController extends DiagramCanvasExt {
 
 		this.getCanvas().notifySelectionChanged();
 		this.getCanvas().notifyDocumentChanged();
-		this.getCanvas().repaint();
 	}
 
 	/**
@@ -509,7 +508,6 @@ interface ClipboardController extends DiagramCanvasExt {
 
 		this.getCanvas().notifySelectionChanged();
 		this.getCanvas().notifyDocumentChanged();
-		this.getCanvas().repaint();
 	}
 
 }

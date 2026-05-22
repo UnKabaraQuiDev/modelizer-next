@@ -204,7 +204,6 @@ public interface LiveEditor extends DiagramCanvasExt {
 				(int) preferredSize.getHeight());
 
 		if (liveEditElement.type().isStyle()) {
-			this.getCanvas().repaint();
 			return;
 		}
 
@@ -221,7 +220,6 @@ public interface LiveEditor extends DiagramCanvasExt {
 		if (ctx.fixedSize()) {
 			comp.setSize((int) ctx.size().getX(), (int) ctx.size().getY());
 		}
-
 		this.getCanvas().repaint();
 	}
 
@@ -248,7 +246,6 @@ public interface LiveEditor extends DiagramCanvasExt {
 			this.applyStyle(palette, renamingElement);
 		}
 
-		this.getCanvas().repaint();
 	}
 
 	/**
@@ -475,7 +472,6 @@ public interface LiveEditor extends DiagramCanvasExt {
 		this.getCanvas().liveEditComponents.setVisible(false);
 		this.getCanvas().liveEditElement = null;
 		SwingUtilities.invokeLater(() -> {
-			this.getCanvas().repaint();
 			this.getCanvas().requestFocus();
 		});
 	}
@@ -523,7 +519,6 @@ public interface LiveEditor extends DiagramCanvasExt {
 	default void confirmRenamingElement(final int nextDir, final boolean alternative) {
 		if (!this.isLiveEditingElement()) {
 			this.getCanvas().liveEditComponents.setVisible(false);
-			this.getCanvas().repaint();
 			return;
 		}
 
@@ -634,7 +629,6 @@ public interface LiveEditor extends DiagramCanvasExt {
 			liveEditComponents.setVisible(false);
 			this.getCanvas().liveEditElement = null;
 			SwingUtilities.invokeLater(this.getCanvas()::requestFocusInWindow);
-			this.getCanvas().repaint();
 		}
 	}
 
@@ -689,7 +683,6 @@ public interface LiveEditor extends DiagramCanvasExt {
 			if (!e.getValueIsAdjusting() && this.isLiveEditingElement() && this.getCanvas().liveEditElement.type().isStyle()) {
 				this.applyStyle(stylePaletteList.getSelectedValue(), this.getCanvas().liveEditElement);
 
-				this.getCanvas().repaint();
 			}
 
 		});

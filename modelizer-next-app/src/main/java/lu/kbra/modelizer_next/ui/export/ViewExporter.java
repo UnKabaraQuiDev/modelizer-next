@@ -58,7 +58,8 @@ public final class ViewExporter {
 			final Map<PanelType, DiagramCanvas> canvases,
 			final ViewExportRequest request,
 			final Optional<File> sourceFileName,
-			final Consumer<Triplet<Optional<File>, PanelType, File>> callback) throws IOException {
+			final Consumer<Triplet<Optional<File>, PanelType, File>> callback)
+			throws IOException {
 
 		if (request == null || request.panelTypes() == null || request.panelTypes().isEmpty()) {
 			throw new InvalidArgumentException("No panel type selected.");
@@ -136,11 +137,8 @@ public final class ViewExporter {
 	 * @param format         export format to use
 	 * @return the built file name
 	 */
-	private static String buildFileName(
-			final String rawPattern,
-			final String sourceFileName,
-			final PanelType panelType,
-			final ViewExportFormat format) {
+	private static String
+			buildFileName(final String rawPattern, final String sourceFileName, final PanelType panelType, final ViewExportFormat format) {
 
 		String pattern = rawPattern == null || rawPattern.isBlank() ? ViewExporter.DEFAULT_FILE_PATTERN : rawPattern;
 		final LocalDateTime now = LocalDateTime.now();

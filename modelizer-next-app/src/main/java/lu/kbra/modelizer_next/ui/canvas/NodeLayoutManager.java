@@ -157,12 +157,8 @@ public interface NodeLayoutManager extends DiagramCanvasExt {
 	 * @param height height value
 	 * @return the expand bounds result
 	 */
-	default Rectangle2D.Double expandBounds(
-			final Rectangle2D.Double bounds,
-			final double x,
-			final double y,
-			final double width,
-			final double height) {
+	default Rectangle2D.Double
+			expandBounds(final Rectangle2D.Double bounds, final double x, final double y, final double width, final double height) {
 
 		final double safeWidth = Math.max(1.0, width);
 		final double safeHeight = Math.max(1.0, height);

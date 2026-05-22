@@ -9,6 +9,7 @@ import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.EventListener;
@@ -31,6 +32,9 @@ import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
+import io.github.andrewauclair.moderndocking.DockingRegion;
+import io.github.andrewauclair.moderndocking.app.Docking;
+import io.github.andrewauclair.moderndocking.app.RootDockingPanel;
 import lu.kbra.modelizer_next.MNMain;
 import lu.kbra.modelizer_next.bootstrap.AvailableUpdate;
 import lu.kbra.modelizer_next.bootstrap.UpdateRuntime;
@@ -51,10 +55,6 @@ import lu.kbra.modelizer_next.ui.impl.DocumentLoadHandler;
 import lu.kbra.pclib.PCUtils;
 import lu.kbra.pclib.datastructure.pair.Pair;
 import lu.kbra.pclib.datastructure.triplet.Triplet;
-
-import io.github.andrewauclair.moderndocking.DockingRegion;
-import io.github.andrewauclair.moderndocking.app.Docking;
-import io.github.andrewauclair.moderndocking.app.RootDockingPanel;
 
 /**
  * Main Swing window for editing Modelizer Next documents.
@@ -128,19 +128,20 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 
 	DocumentSession session;
 	ModelDocument document;
-	JLabel statusLabel;
-	JLabel selectionPathLabel;
+
 	RootDockingPanel rootDockingPanel;
+
 	DiagramCanvas activeCanvas;
 	DiagramCanvas conceptualCanvas;
-
 	DiagramCanvas logicalCanvas;
 	DiagramCanvas physicalCanvas;
-
-	MainFrameToolBar toolBar;
+	DiagramCanvas[] canvases;
 
 	List<StylePalette> palettes;
 
+	MainFrameToolBar toolBar;
+	JLabel statusLabel;
+	JLabel selectionPathLabel;
 	JMenuItem undoMenuItem;
 	JMenuItem redoMenuItem;
 
@@ -314,9 +315,10 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 
 		};
 
-		this.conceptualCanvas = new DiagramCanvas(this, document, PanelType.CONCEPTUAL, canvasListener);
-		this.logicalCanvas = new DiagramCanvas(this, document, PanelType.LOGICAL, canvasListener);
-		this.physicalCanvas = new DiagramCanvas(this, document, PanelType.PHYSICAL, canvasListener);
+		this.conceptualCanvas = new DiagramCanvas(this, this.document, PanelType.CONCEPTUAL, canvasListener);
+		this.logicalCanvas = new DiagramCanvas(this, this.document, PanelType.LOGICAL, canvasListener);
+		this.physicalCanvas = new DiagramCanvas(this, this.document, PanelType.PHYSICAL, canvasListener);
+		this.canvases = new DiagramCanvas[] { this.conceptualCanvas, this.logicalCanvas, this.physicalCanvas };
 		this.setDefaultPaletteToCanvases();
 
 		this.rootDockingPanel = new RootDockingPanel(this);
@@ -710,7 +712,17 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 	 * @return the palettes
 	 */
 	public List<StylePalette> getPalettes() {
-		return palettes;
+		return this.palettes;
+	}
+
+	public List<DiagramCanvas> getVisibleCanvases() {
+		final List<DiagramCanvas> dcs = new ArrayList<>(3);
+		for (final DiagramCanvas dc : this.canvases) {
+			if (dc.isVisible() && dc.isShowing() && dc.isDisplayable()) {
+				dcs.add(dc);
+			}
+		}
+		return dcs;
 	}
 
 }
