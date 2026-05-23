@@ -59,16 +59,8 @@ public final class CommentEditorDialog {
 	 * @param visibleInLogical    whether visible in logical is enabled
 	 * @param visibleInPhysical   whether visible in physical is enabled
 	 */
-	public record Result(
-			String text,
-			Color textColor,
-			Color backgroundColor,
-			Color borderColor,
-			CommentKind kind,
-			CommentBinding binding,
-			boolean visibleInConceptual,
-			boolean visibleInLogical,
-			boolean visibleInPhysical) {
+	public record Result(String text, Color textColor, Color backgroundColor, Color borderColor, CommentKind kind, CommentBinding binding,
+			boolean visibleInConceptual, boolean visibleInLogical, boolean visibleInPhysical) {
 	}
 
 	/**
@@ -162,8 +154,11 @@ public final class CommentEditorDialog {
 	 * @param panelType      diagram panel type whose model or layout should be used
 	 * @return the show dialog result
 	 */
-	public static Result
-			showDialog(final Component parent, final ModelDocument document, final CommentModel initialComment, final PanelType panelType) {
+	public static Result showDialog(
+			final Component parent,
+			final ModelDocument document,
+			final CommentModel initialComment,
+			final PanelType panelType) {
 		final Window owner = parent == null ? null : SwingUtilities.getWindowAncestor(parent);
 		final JDialog dialog = new JDialog(owner, "Edit comment", Dialog.ModalityType.APPLICATION_MODAL);
 

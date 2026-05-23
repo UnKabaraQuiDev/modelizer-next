@@ -28,28 +28,10 @@ import java.util.function.IntConsumer;
  * @param focusSelection          move the view to be centered around the selected element(s)
  * @param focusAll                move the view to contain all the elements in the current canvas
  */
-public record DiagramCanvasActions(
-		Runnable renameSelection,
-		Runnable renameSelectionAlt,
-		IntConsumer moveFieldSelection,
-		IntConsumer moveSelectedFieldInList,
-		Runnable addTable,
-		Runnable addField,
-		Runnable addComment,
-		Runnable deleteSelection,
-		Runnable duplicateSelection,
-		Runnable clearSelection,
-		Runnable addLink,
-		Runnable selectAll,
-		Runnable edit,
-		Runnable copySelection,
-		Runnable cutSelection,
-		Runnable pasteSelection,
-		Runnable undo,
-		Runnable redo,
-		Runnable editStyle,
-		Runnable editStyleAlt,
-		Runnable focusSelection,
-		Runnable focusAll) {
+public record DiagramCanvasActions(Runnable renameSelection, Runnable renameSelectionAlt, IntConsumer moveFieldSelection,
+		IntConsumer moveSelectedFieldInList, Runnable addTable, Runnable addField, Runnable addComment, Runnable deleteSelection,
+		Runnable duplicateSelection, Runnable clearSelection, Runnable addLink, Runnable selectAll, Runnable edit, Runnable copySelection,
+		Runnable cutSelection, Runnable pasteSelection, Runnable undo, Runnable redo, Runnable editStyle, Runnable editStyleAlt,
+		Runnable focusSelection, Runnable focusAll) {
 
 }

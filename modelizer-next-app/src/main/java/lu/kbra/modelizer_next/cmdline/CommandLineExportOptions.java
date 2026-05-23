@@ -22,16 +22,7 @@ import lu.kbra.modelizer_next.ui.export.ViewExportScope;
  * @param wildcard        whether wildcard path matching is enabled
  * @param jobCount        count value to use
  */
-public record CommandLineExportOptions(
-		String inputFile,
-		ViewExportFormat format,
-		ViewExportScope scope,
-		List<PanelType> panelTypes,
-		File outputDirectory,
-		String fileNamePattern,
-		boolean force,
-		boolean multiple,
-		boolean wildcard,
-		int jobCount) {
+public record CommandLineExportOptions(String inputFile, ViewExportFormat format, ViewExportScope scope, List<PanelType> panelTypes,
+		File outputDirectory, String fileNamePattern, boolean force, boolean multiple, boolean wildcard, int jobCount) {
 
 }

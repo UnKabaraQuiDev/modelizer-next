@@ -42,15 +42,8 @@ public final class ClassEditorDialog {
 	 * @param visibleInLogical    whether visible in logical is enabled
 	 * @param visibleInPhysical   whether visible in physical is enabled
 	 */
-	public record Result(
-			String conceptualName,
-			String technicalName,
-			Color textColor,
-			Color backgroundColor,
-			Color borderColor,
-			boolean visibleInConceptual,
-			boolean visibleInLogical,
-			boolean visibleInPhysical) {
+	public record Result(String conceptualName, String technicalName, Color textColor, Color backgroundColor, Color borderColor,
+			boolean visibleInConceptual, boolean visibleInLogical, boolean visibleInPhysical) {
 	}
 
 	/**

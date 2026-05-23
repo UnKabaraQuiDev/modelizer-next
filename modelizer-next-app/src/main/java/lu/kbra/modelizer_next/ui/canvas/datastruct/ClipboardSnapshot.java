@@ -13,11 +13,7 @@ import lu.kbra.modelizer_next.layout.PanelType;
  * @param comments  values for comments
  * @param links     values for links
  */
-public record ClipboardSnapshot(
-		PanelType panelType,
-		List<CopiedClass> classes,
-		List<CopiedField> fields,
-		List<CopiedComment> comments,
+public record ClipboardSnapshot(PanelType panelType, List<CopiedClass> classes, List<CopiedField> fields, List<CopiedComment> comments,
 		List<CopiedLink> links) {
 
 	/**
