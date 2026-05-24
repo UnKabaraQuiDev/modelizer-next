@@ -169,10 +169,8 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 	 * @param targetField target field value used by the operation
 	 * @return the ensure technical source field result
 	 */
-	default FieldModel ensureTechnicalSourceField(
-			final ClassModel sourceClass,
-			final ClassModel targetClass,
-			final FieldModel targetField) {
+	default FieldModel
+			ensureTechnicalSourceField(final ClassModel sourceClass, final ClassModel targetClass, final FieldModel targetField) {
 		if (sourceClass == null || targetClass == null || targetField == null) {
 			return null;
 		}

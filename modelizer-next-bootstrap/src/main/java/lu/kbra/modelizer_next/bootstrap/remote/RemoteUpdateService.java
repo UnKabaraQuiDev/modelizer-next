@@ -168,7 +168,8 @@ public final class RemoteUpdateService {
 	 * @throws InterruptedException if the operation cannot be completed
 	 */
 	public BootstrapInstallerUpdate findLatestBootstrapInstaller(final UpdateChannel channel, final ParsedVersion currentVersion)
-			throws IOException, InterruptedException {
+			throws IOException,
+				InterruptedException {
 		final JsonNode manifest = this.fetchReleaseManifestJson();
 		final JsonNode bootstrap = this.findBootstrapNode(manifest, channel);
 		if (bootstrap == null || bootstrap.isMissingNode() || bootstrap.isNull()) {
@@ -259,8 +260,8 @@ public final class RemoteUpdateService {
 	 * @throws IOException          if the operation cannot be completed
 	 * @throws InterruptedException if the operation cannot be completed
 	 */
-	public AvailableUpdate findLatest(final UpdateChannel channel, final ParsedVersion currentVersion)
-			throws IOException, InterruptedException {
+	public AvailableUpdate
+			findLatest(final UpdateChannel channel, final ParsedVersion currentVersion) throws IOException, InterruptedException {
 		final UpdateManifest manifest = this.fetchManifest();
 		System.out.println("Versions found: " + manifest);
 		System.out.println();

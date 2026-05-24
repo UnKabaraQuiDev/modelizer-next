@@ -16,7 +16,13 @@ import lu.kbra.modelizer_next.layout.PanelType;
  * @param multiple        whether multiple input files are allowed
  * @param wildcard        whether wildcard path matching is enabled
  */
-public record ViewExportRequest(ViewExportFormat format, ViewExportScope scope, List<PanelType> panelTypes, File outputDirectory,
-		String fileNamePattern, boolean multiple, boolean wildcard) {
+public record ViewExportRequest(
+		ViewExportFormat format,
+		ViewExportScope scope,
+		List<PanelType> panelTypes,
+		File outputDirectory,
+		String fileNamePattern,
+		boolean multiple,
+		boolean wildcard) {
 
 }

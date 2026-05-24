@@ -123,10 +123,9 @@ public final class UpdateRuntimes {
 		 * @throws IOException if the operation cannot be completed
 		 */
 		@Override
-		public boolean installUpdateAndRestart(
-				final Component parentComponent,
-				final AvailableUpdate update,
-				final UpdatePreparation preparation) throws IOException {
+		public boolean
+				installUpdateAndRestart(final Component parentComponent, final AvailableUpdate update, final UpdatePreparation preparation)
+						throws IOException {
 			return false;
 		}
 

@@ -16,8 +16,13 @@ import lu.kbra.modelizer_next.common.VersionComparator.ParsedVersion;
  * @param downloadUri    URI of the file to download
  * @param releasePageUri URI to use
  */
-public record AvailableUpdate(UpdateChannel channel, ParsedVersion currentVersion, ParsedVersion latestVersion, String notes,
-		URI downloadUri, URI releasePageUri) {
+public record AvailableUpdate(
+		UpdateChannel channel,
+		ParsedVersion currentVersion,
+		ParsedVersion latestVersion,
+		String notes,
+		URI downloadUri,
+		URI releasePageUri) {
 
 	/**
 	 * Checks whether update available is enabled or applies.

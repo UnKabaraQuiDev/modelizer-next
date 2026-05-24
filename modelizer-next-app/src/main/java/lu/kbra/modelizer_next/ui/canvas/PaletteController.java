@@ -110,11 +110,8 @@ interface PaletteController extends DiagramCanvasExt {
 	 * @param deep        whether deep is enabled
 	 * @param visibleOnly whether visible only is enabled
 	 */
-	default void applyPaletteToClass(
-			final StylePalette palette,
-			final ClassModel classModel,
-			final boolean deep,
-			final boolean visibleOnly) {
+	default void
+			applyPaletteToClass(final StylePalette palette, final ClassModel classModel, final boolean deep, final boolean visibleOnly) {
 		if (palette == null || classModel == null) {
 			return;
 		}

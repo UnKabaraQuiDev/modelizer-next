@@ -314,11 +314,8 @@ public final class CommandLineExporter {
 	 * @param matchers        values for matchers
 	 * @return {@code true} when the condition is met; otherwise {@code false}
 	 */
-	private static boolean matchesWildcard(
-			final Path path,
-			final boolean absolutePattern,
-			final Path baseDirectory,
-			final List<PathMatcher> matchers) {
+	private static boolean
+			matchesWildcard(final Path path, final boolean absolutePattern, final Path baseDirectory, final List<PathMatcher> matchers) {
 
 		final Path absolutePath = path.toAbsolutePath().normalize();
 		final Path pathToMatch = absolutePattern ? absolutePath : baseDirectory.relativize(absolutePath);

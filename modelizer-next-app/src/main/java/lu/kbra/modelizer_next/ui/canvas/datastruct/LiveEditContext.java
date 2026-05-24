@@ -14,6 +14,12 @@ import lu.kbra.modelizer_next.domain.shared.ElementStyle;
  * @param valueType type value to use
  * @param owner     parent window used for dialog ownership
  */
-public record LiveEditContext(Point2D pos, @Deprecated Point2D size, Object value, ElementStyle style, Class<?> valueType, Object owner,
+public record LiveEditContext(
+		Point2D pos,
+		@Deprecated Point2D size,
+		Object value,
+		ElementStyle style,
+		Class<?> valueType,
+		Object owner,
 		boolean fixedSize) {
 }
