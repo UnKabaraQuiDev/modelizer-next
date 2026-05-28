@@ -84,7 +84,8 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 	}
 
 	/**
-	 * Confirms whether the modern document version should continue.
+	 * Confirms whether the document should be loaded even if it has been written in a newer version of
+	 * the software.
 	 *
 	 * @param parent         parent component used for dialog ownership
 	 * @param loadedDocument loaded document value used by the operation
@@ -95,7 +96,8 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 	}
 
 	/**
-	 * Confirms whether the modern document version should continue.
+	 * Confirms whether the document should be loaded even if it has been written in a newer version of
+	 * the software, using the given {@link DocumentLoadHandler}.
 	 *
 	 * @param loadedDocument loaded document value used by the operation
 	 * @param handler        handler value used by the operation
@@ -106,7 +108,7 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 	}
 
 	/**
-	 * Creates a document.
+	 * Creates a document from a File.
 	 *
 	 * @param parent       parent component used for dialog ownership
 	 * @param selectedFile file to read or write
@@ -117,7 +119,7 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 	}
 
 	/**
-	 * Creates a document.
+	 * Creates a document from a File using the the given {@link DocumentLoadHandler}.
 	 *
 	 * @param selectedFile file to read or write
 	 * @param handler      handler value used by the operation
