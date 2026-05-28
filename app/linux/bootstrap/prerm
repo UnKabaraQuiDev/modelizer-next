@@ -1,10 +1,17 @@
 #!/bin/sh
 set -e
 
-LINK="/usr/bin/modelizer-next"
+BIN_LINK="/usr/bin/modelizer-next"
+DESKTOP_LINK="/usr/share/applications/modelizer-next.desktop"
 
-if [ -L "$LINK" ]; then
-    rm -f "$LINK"
+if [ -L "$BIN_LINK" ]; then
+    rm -f "$BIN_LINK"
 fi
+
+if [ -L "$DESKTOP_LINK" ]; then
+    rm -f "$DESKTOP_LINK"
+fi
+
+update-desktop-database /usr/share/applications || true
 
 exit 0

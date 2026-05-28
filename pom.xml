@@ -417,7 +417,7 @@
 			<id>native-module</id>
 			<activation>
 				<file>
-					<exists>${project.basedir}/native-module.flag</exists>
+					<exists>${basedir}/native-module.flag</exists>
 				</file>
 			</activation>
 			<build>

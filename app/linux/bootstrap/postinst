@@ -5,8 +5,18 @@ APP_BIN_DIR="/opt/modelizer-next/bin"
 TARGET="$APP_BIN_DIR/Modelizer Next"
 LINK="/usr/bin/modelizer-next"
 
+DESKTOP_SOURCE="/opt/modelizer-next/lib/modelizer-next-Modelizer_Next.desktop"
+DESKTOP_LINK="/usr/share/applications/modelizer-next.desktop"
+
 if [ -x "$TARGET" ]; then
     ln -sfn "$TARGET" "$LINK"
 fi
+
+if [ -f "$DESKTOP_SOURCE" ]; then
+    ln -sfn "$DESKTOP_SOURCE" "$DESKTOP_LINK"
+fi
+
+update-desktop-database /usr/share/applications || true
+gtk-update-icon-cache /usr/share/icons/hicolor || true
 
 exit 0
