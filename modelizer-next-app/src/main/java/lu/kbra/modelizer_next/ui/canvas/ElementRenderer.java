@@ -187,7 +187,7 @@ public interface ElementRenderer extends DiagramCanvasExt {
 	 * @param g2 graphics context used for drawing
 	 */
 	default void drawClasses(final Graphics2D g2) {
-		for (final ClassModel classModel : this.getCanvas().document.getModel().getClasses()) {
+		for (final ClassModel classModel : this.getDocument().getModel().getClasses()) {
 			if (!classModel.isVisible(this.getPanelType()) || !this.getCanvas().shouldExportClass(classModel)) {
 				continue;
 			}
@@ -444,7 +444,7 @@ public interface ElementRenderer extends DiagramCanvasExt {
 	 * @param g2 graphics context used for drawing
 	 */
 	default void drawComments(final Graphics2D g2) {
-		for (final CommentModel commentModel : this.getCanvas().document.getModel().getComments()) {
+		for (final CommentModel commentModel : this.getDocument().getModel().getComments()) {
 			if (commentModel == null || !this.getCanvas().isCommentVisible(commentModel)
 					|| !this.getCanvas().shouldExportComment(commentModel)) {
 				continue;

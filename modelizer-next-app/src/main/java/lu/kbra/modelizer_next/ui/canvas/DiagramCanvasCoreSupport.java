@@ -149,13 +149,13 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 	 * Ensures that the layouts exists or is up to date.
 	 */
 	default void ensureLayouts() {
-		for (final ClassModel classModel : this.getCanvas().document.getModel().getClasses()) {
+		for (final ClassModel classModel : this.getDocument().getModel().getClasses()) {
 			if (classModel.isVisible(this.getPanelType())) {
 				this.getCanvas().findOrCreateNodeLayout(LayoutObjectType.CLASS, classModel.getId());
 			}
 		}
 
-		for (final CommentModel commentModel : this.getCanvas().document.getModel().getComments()) {
+		for (final CommentModel commentModel : this.getDocument().getModel().getComments()) {
 			if (this.getCanvas().isCommentVisible(commentModel)) {
 				this.getCanvas().findOrCreateNodeLayout(LayoutObjectType.COMMENT, commentModel.getId());
 			}
@@ -212,7 +212,7 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 			fieldModel.setNotNull(false);
 			fieldModel.setType(targetField.getType());
 			this.getCanvas().applyDefaultPaletteToField(fieldModel);
-			sourceClass.getFields().add(fieldModel);
+			sourceClass.addField(fieldModel);
 			return fieldModel;
 		}
 
@@ -254,8 +254,8 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 	 * @return the active links
 	 */
 	default List<LinkModel> getActiveLinks() {
-		return this.getCanvas().panelType == PanelType.CONCEPTUAL ? this.getCanvas().document.getModel().getConceptualLinks()
-				: this.getCanvas().document.getModel().getTechnicalLinks();
+		return this.getCanvas().panelType == PanelType.CONCEPTUAL ? this.getDocument().getModel().getConceptualLinks()
+				: this.getDocument().getModel().getTechnicalLinks();
 	}
 
 	/**
@@ -349,7 +349,7 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 	 * @return {@code true} if outgoing technical link exists; otherwise {@code false}
 	 */
 	default boolean hasOutgoingTechnicalLink(final String classId, final String fieldId) {
-		for (final LinkModel linkModel : this.getCanvas().document.getModel().getTechnicalLinks()) {
+		for (final LinkModel linkModel : this.getDocument().getModel().getTechnicalLinks()) {
 			if (linkModel.getFrom() == null || linkModel.getTo() == null || linkModel.getFrom().getFieldId() == null
 					|| linkModel.getTo().getFieldId() == null) {
 				continue;

@@ -1,8 +1,15 @@
 package lu.kbra.modelizer_next.domain;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lu.kbra.modelizer_next.domain.impl.IdOwner;
 import lu.kbra.modelizer_next.domain.impl.NamesOwner;
@@ -24,6 +31,11 @@ public class ClassModel implements VisibilityOwner, IdOwner, StyleOwner, NamesOw
 	private LayerVisibility visibility;
 	private ElementStyle style;
 	private List<FieldModel> fields;
+
+	@JsonIgnore
+	private Map<String, FieldModel> fieldById = new HashMap<>();
+	@JsonIgnore
+	private Set<String> primaryKeyFieldIds = new HashSet<>();
 
 	/**
 	 * Creates a class model instance.
@@ -139,9 +151,7 @@ public class ClassModel implements VisibilityOwner, IdOwner, StyleOwner, NamesOw
 		final List<FieldModel> result = new ArrayList<>();
 
 		for (final FieldModel field : this.fields) {
-			final boolean visible = !field.isTechnicalOnly() || panelType.isTechnical();
-
-			if (visible) {
+			if (!field.isTechnicalOnly() || panelType.isTechnical()) {
 				result.add(field);
 			}
 		}
@@ -194,8 +204,57 @@ public class ClassModel implements VisibilityOwner, IdOwner, StyleOwner, NamesOw
 	 *
 	 * @param fields values for fields
 	 */
+	@JsonProperty("fields")
 	public void setFields(final List<FieldModel> fields) {
 		this.fields = fields;
+		this.buildFieldByIdIndex();
+		this.buildPrimaryKeyFieldIdsIndex();
+	}
+
+	public Set<String> buildPrimaryKeyFieldIdsIndex() {
+		this.primaryKeyFieldIds.clear();
+		this.fields.stream().filter(FieldModel::isPrimaryKey).map(FieldModel::getId).forEach(this.primaryKeyFieldIds::add);
+		return this.primaryKeyFieldIds;
+	}
+
+	public Set<String> validatePrimaryKeyFieldIdsIndex() {
+		if (this.primaryKeyFieldIds == null) {
+			this.primaryKeyFieldIds = new HashSet<>();
+		}
+		this.buildFieldByIdIndex();
+		return this.primaryKeyFieldIds;
+	}
+
+	public Set<String> getPrimaryKeyFieldIds() {
+		return this.primaryKeyFieldIds;
+	}
+
+	public void setPrimaryKeyFieldIds(final Set<String> primaryKeyFieldIds) {
+		this.primaryKeyFieldIds = primaryKeyFieldIds;
+	}
+
+	public Map<String, FieldModel> buildFieldByIdIndex() {
+		this.fieldById.clear();
+		this.fields.stream().forEach(f -> this.fieldById.put(f.getId(), f));
+		return this.fieldById;
+	}
+
+	public Map<String, FieldModel> validateFieldByIdIndex() {
+		if (this.fieldById == null) {
+			this.fieldById = new HashMap<>();
+		}
+		if (this.fieldById.size() != this.fields.size()) {
+			this.buildFieldByIdIndex();
+		}
+		return this.fieldById;
+	}
+
+	public Map<String, FieldModel> getFieldById() {
+		return this.fieldById;
+	}
+
+	public void setFieldById(final Map<String, FieldModel> fieldById) {
+		this.fieldById = fieldById;
 	}
 
 	/**
@@ -236,6 +295,21 @@ public class ClassModel implements VisibilityOwner, IdOwner, StyleOwner, NamesOw
 	@Override
 	public void setVisibility(final LayerVisibility visibility) {
 		this.visibility = visibility;
+	}
+
+	public void addField(final FieldModel fieldModel) {
+		this.fields.add(fieldModel);
+		this.fieldById.put(fieldModel.getId(), fieldModel);
+	}
+
+	public void addField(int index, FieldModel fieldModel) {
+		this.fields.add(index, fieldModel);
+		this.fieldById.put(fieldModel.getId(), fieldModel);
+	}
+
+	public void removeField(final FieldModel fieldModel) {
+		this.fields.remove(fieldModel);
+		this.fieldById.remove(fieldModel.getId());
 	}
 
 	/**

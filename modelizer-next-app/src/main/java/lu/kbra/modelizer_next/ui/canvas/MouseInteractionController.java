@@ -204,7 +204,7 @@ interface MouseInteractionController extends DiagramCanvasExt {
 		if (!this.getCanvas().pendingModifierSelection) {
 			if (clickedAlreadySelected) {
 				this.getCanvas().selectedElement = selectedDragAnchor;
-				this.getCanvas().document.getModel().getClasses().sort(this.getCanvas().comparator);
+				this.getDocument().getModel().getClasses().sort(this.getCanvas().comparator);
 				this.getCanvas().notifySelectionChanged();
 			} else {
 				this.getCanvas().select(clickedElement);

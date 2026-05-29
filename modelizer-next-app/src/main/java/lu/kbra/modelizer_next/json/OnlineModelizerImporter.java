@@ -220,7 +220,7 @@ public final class OnlineModelizerImporter {
 					continue;
 				}
 
-				document.getModel().getComments().add(commentModel);
+				document.getModel().addComment(commentModel);
 				OnlineModelizerImporter.addNodeLayouts(document, node, commentModel.getId(), true);
 				continue;
 			}
@@ -253,7 +253,7 @@ public final class OnlineModelizerImporter {
 				fieldModel.setTextColor(Color.BLACK);
 				fieldModel.setBackgroundColor(Color.WHITE);
 
-				classModel.getFields().add(fieldModel);
+				classModel.addField(fieldModel);
 
 				final String sourceAttributeId = attributeNode.path("id").asText("");
 				if (!sourceAttributeId.isBlank()) {
@@ -267,7 +267,7 @@ public final class OnlineModelizerImporter {
 						fieldModel.getId());
 			}
 
-			document.getModel().getClasses().add(classModel);
+			document.getModel().addClass(classModel);
 			final String sourceNodeId = node.path("id").asText("");
 			if (!sourceNodeId.isBlank()) {
 				classIdsBySourceId.put(sourceNodeId, classModel.getId());
@@ -286,9 +286,9 @@ public final class OnlineModelizerImporter {
 			if (linkModel.getFrom().getFieldId() != null || linkModel.getTo().getFieldId() != null) {
 				linkModel.setCardinalityFrom(null);
 				linkModel.setCardinalityTo(null);
-				document.getModel().getTechnicalLinks().add(linkModel);
+				document.getModel().addTechnicalLink(linkModel);
 			} else {
-				document.getModel().getConceptualLinks().add(linkModel);
+				document.getModel().addConceptualLink(linkModel);
 			}
 		}
 
