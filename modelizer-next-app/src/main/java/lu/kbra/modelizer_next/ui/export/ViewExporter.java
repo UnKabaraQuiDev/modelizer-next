@@ -1,11 +1,7 @@
 package lu.kbra.modelizer_next.ui.export;
 
-import java.awt.Dimension;
-import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.nio.file.Files;
 import java.text.Normalizer;
 import java.time.LocalDateTime;
@@ -17,13 +13,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
-
-import javax.imageio.ImageIO;
-
-import org.apache.batik.dom.GenericDOMImplementation;
-import org.apache.batik.svggen.SVGGraphics2D;
-import org.w3c.dom.DOMImplementation;
-import org.w3c.dom.Document;
 
 import lu.kbra.modelizer_next.cmdline.CommandLineExportParser.InvalidArgumentException;
 import lu.kbra.modelizer_next.layout.PanelType;
@@ -42,7 +31,7 @@ public final class ViewExporter {
 
 	private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 	private static final DateTimeFormatter TIME_FORMAT = DateTimeFormatter.ofPattern("HH-mm-ss");
-	private static final String SVG_NAMESPACE_URI = "http://www.w3.org/2000/svg";
+	public static final String SVG_NAMESPACE_URI = "http://www.w3.org/2000/svg";
 
 	/**
 	 * Returns an unused output path by adding a numeric suffix when needed.
@@ -150,10 +139,7 @@ public final class ViewExporter {
 			outputFile = ViewExporter.ensureExtension(outputFile, request.format().getExtension());
 			outputFile = ViewExporter.avoidDuplicatePath(outputFile, usedPaths);
 
-			switch (request.format()) {
-			case PNG -> ViewExporter.writePng(canvas, request.scope(), outputFile);
-			case SVG -> ViewExporter.writeSvg(canvas, request.scope(), outputFile);
-			}
+			request.format().export(canvas, request.scope(), outputFile);
 
 			final Triplet<Optional<File>, PanelType, File> data = Triplets.readOnly(sourceFileName, panelType, outputFile);
 			if (callback != null) {
@@ -204,44 +190,6 @@ public final class ViewExporter {
 		case LOGICAL -> "logical";
 		case PHYSICAL -> "physical";
 		};
-	}
-
-	/**
-	 * Writes the PNG.
-	 *
-	 * @param canvas     canvas instance that owns the operation
-	 * @param scope      export scope to use
-	 * @param outputFile file to read or write
-	 * @throws IOException if the operation cannot be completed
-	 */
-	private static void writePng(final DiagramCanvas canvas, final ViewExportScope scope, final File outputFile) throws IOException {
-		final BufferedImage image = canvas.createExportImage(scope);
-		try (OutputStream outputStream = Files.newOutputStream(outputFile.toPath())) {
-			if (!ImageIO.write(image, "png", outputStream)) {
-				throw new IOException("No PNG writer is available.");
-			}
-		}
-	}
-
-	/**
-	 * Writes the SVG.
-	 *
-	 * @param canvas     canvas instance that owns the operation
-	 * @param scope      export scope to use
-	 * @param outputFile file to read or write
-	 * @throws IOException if the operation cannot be completed
-	 */
-	private static void writeSvg(final DiagramCanvas canvas, final ViewExportScope scope, final File outputFile) throws IOException {
-		final DOMImplementation domImplementation = GenericDOMImplementation.getDOMImplementation();
-		final Document document = domImplementation.createDocument(ViewExporter.SVG_NAMESPACE_URI, "svg", null);
-		final SVGGraphics2D svgGraphics = new SVGGraphics2D(document);
-		final Dimension exportSize = canvas.getExportSize(scope);
-		svgGraphics.setSVGCanvasSize(exportSize);
-		canvas.paintExport(svgGraphics, scope);
-
-		try (FileWriter writer = new FileWriter(outputFile)) {
-			svgGraphics.stream(writer, true);
-		}
 	}
 
 	/**

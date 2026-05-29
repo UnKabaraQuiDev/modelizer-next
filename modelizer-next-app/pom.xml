@@ -75,7 +75,18 @@
 		<dependency>
 			<groupId>io.github.andrewauclair</groupId>
 			<artifactId>modern-docking-ui</artifactId>
-			<version>1.4.8</version>
+		</dependency>
+		<dependency>
+			<groupId>com.twelvemonkeys.imageio</groupId>
+			<artifactId>imageio-core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.twelvemonkeys.imageio</groupId>
+			<artifactId>imageio-jpeg</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.twelvemonkeys.imageio</groupId>
+			<artifactId>imageio-webp</artifactId>
 		</dependency>
 	</dependencies>
 

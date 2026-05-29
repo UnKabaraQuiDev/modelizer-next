@@ -309,8 +309,9 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 		try {
 			final List<Triplet<Optional<File>, PanelType, File>> exportedFiles = ViewExporter
 					.exportViews(this.getCanvasesByPanelType(), request, this.getExportSourceFile(), null);
+
 			if (exportedFiles.isEmpty()) {
-				JOptionPane.showMessageDialog(this, "No view was exported.", "Export", JOptionPane.WARNING_MESSAGE);
+				JOptionPane.showMessageDialog(this, "Nothing was exported.", "Export", JOptionPane.WARNING_MESSAGE);
 				return;
 			}
 

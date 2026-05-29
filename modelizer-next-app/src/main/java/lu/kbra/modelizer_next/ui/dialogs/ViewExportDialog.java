@@ -240,12 +240,11 @@ public class ViewExportDialog extends JDialog {
 
 	private final Map<PanelType, DiagramCanvas> canvases;
 	private final PanelType activePanelType;
+
 	private final JComboBox<ViewExportFormat> formatSelector;
 	private final JComboBox<ViewExportScope> scopeSelector;
 	private final Map<PanelType, JCheckBox> panelTypeBoxes;
-
 	private final JTextField outputDirectoryField;
-
 	private final PatternTextField filePatternField;
 
 	private final ExportPreviewPanel previewPanel;

@@ -23,7 +23,7 @@ interface CanvasExportRenderer extends DiagramCanvasExt {
 	 */
 	default BufferedImage createExportImage(final ViewExportScope scope) {
 		final Dimension exportSize = this.getCanvas().getExportSize(scope);
-		final BufferedImage image = new BufferedImage(exportSize.width, exportSize.height, BufferedImage.TYPE_INT_ARGB);
+		final BufferedImage image = new BufferedImage(exportSize.width, exportSize.height, BufferedImage.TYPE_INT_RGB);
 		final Graphics2D g2 = image.createGraphics();
 		try {
 			this.getCanvas().configureGraphics(g2);
