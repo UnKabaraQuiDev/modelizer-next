@@ -93,6 +93,7 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 			this.getCanvas().updateLiveEditLayout();
 		}
 
+		getCanvas().repaint();
 	}
 
 	/**
