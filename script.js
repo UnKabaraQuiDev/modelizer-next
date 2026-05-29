@@ -296,7 +296,7 @@ function ensureSponsorPrompt() {
         <a class="btn primary" href="https://github.com/sponsors/UnKabaraQuiDev" target="_blank" rel="noopener">Sponsor the project</a>
         <button class="btn" type="button" data-sponsor-close>Not now</button>
       </div>
-      <button class="sponsor-modal-muted" type="button" id="dismissSponsorPrompt">Do not show again</button>
+      <button class="sponsor-modal-muted" type="button" id="dismissSponsorPrompt" style="font-size: 12px;">Do not show again</button>
     </div>
   `;
   document.body.appendChild(modal);
