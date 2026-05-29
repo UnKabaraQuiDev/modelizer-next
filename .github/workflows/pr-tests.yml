@@ -17,14 +17,7 @@ jobs:
           distribution: temurin
           java-version: 21
       - name: Apply formatting
-        run: mvn -B -Pformat initialize spotless:apply
-      - name: Fail if formatting changes detected
-        run: |
-          if ! git diff --quiet; then
-            echo "Code is not properly formatted."
-            git --no-pager diff
-            exit 1
-          fi
+        run: mvn -B -Pformat initialize compile spotless:check
 
   test:
     runs-on: [self-hosted, linux]
