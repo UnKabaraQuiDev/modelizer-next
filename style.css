@@ -461,6 +461,10 @@ kbd {
     gap: 6px
 }
 
+.kbd-group > span {
+    width: 100%;
+}
+
 .modal-list {
     display: grid;
     gap: 12px;
@@ -1122,7 +1126,7 @@ div.title-button-container {
 }
 
 .cli-card > div:first-child {
-    max-width: 760px;
+/*    max-width: 760px;*/
     padding-left: 0;
     margin-bottom: 18px
 }
