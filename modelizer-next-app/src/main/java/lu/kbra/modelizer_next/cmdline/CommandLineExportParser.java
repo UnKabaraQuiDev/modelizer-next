@@ -146,7 +146,7 @@ public final class CommandLineExportParser {
 		}
 
 		if (format == null) {
-			throw new MissingArgumentException("Missing required argument: --type <svg|png>");
+			throw new MissingArgumentException("Missing required argument: --type <png|jpg|bmp|tiff|webp|pdf>");
 		}
 
 		if (!multiple && !wildcard && !CommandLineExportParser.resolveHome(inputFile).toFile().exists()) {
@@ -249,11 +249,11 @@ public final class CommandLineExportParser {
 	public static void printHelp() {
 		System.out.println("""
 				Usage:
-				  modelizer --export <file> --type <svg|png> [options]
+				  modelizer --export <file> --type <png|jpg|bmp|tiff|webp|pdf> [options]
 
 				Options:
 				  -e, --export <file>        File to load and export
-				  -t, --type <svg|png>       Export format
+				  -t, --type <png|jpg|bmp|tiff|webp|pdf>       Export format
 				  -o, --out <directory>      Output directory, default: current directory
 				  -s, --scope <scope>        selection (s), view (v), everything/all (a), default: everything
 				  -p, --panels <list>        Comma-separated PanelType names: conceptual (c), logical (l), physical (p)

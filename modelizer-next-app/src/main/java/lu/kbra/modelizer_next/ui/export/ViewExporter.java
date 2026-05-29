@@ -139,7 +139,8 @@ public final class ViewExporter {
 			outputFile = ViewExporter.ensureExtension(outputFile, request.format().getExtension());
 			outputFile = ViewExporter.avoidDuplicatePath(outputFile, usedPaths);
 
-			request.format().export(canvas, request.scope(), outputFile);
+			final ViewExportContext context = new ViewExportContext(sourceFileName, panelType, outputFile);
+			request.format().export(canvas, request, context, outputFile);
 
 			final Triplet<Optional<File>, PanelType, File> data = Triplets.readOnly(sourceFileName, panelType, outputFile);
 			if (callback != null) {
@@ -150,6 +151,33 @@ public final class ViewExporter {
 
 		return exportedFiles;
 
+	}
+
+	/**
+	 * Returns a file name without its last extension.
+	 *
+	 * @param fileName name value to process
+	 * @return the base name
+	 */
+	public static String baseName(final String fileName) {
+		return PCUtils.removeFileExtension(fileName == null ? "" : fileName);
+	}
+
+	/**
+	 * Replaces date and time fields in an export text.
+	 *
+	 * @param value text value to process
+	 * @return text with date and time tokens replaced
+	 */
+	public static String replaceDateTimeTokens(String value) {
+		if (value == null) {
+			return "";
+		}
+
+		final LocalDateTime now = LocalDateTime.now();
+		value = value.replace("%DATE%", ViewExporter.DATE_FORMAT.format(now));
+		value = value.replace("%TIME%", ViewExporter.TIME_FORMAT.format(now));
+		return value;
 	}
 
 	/**
@@ -184,7 +212,10 @@ public final class ViewExporter {
 	 * @param panelType diagram panel type whose model or layout should be used
 	 * @return the type token result
 	 */
-	private static String typeToken(final PanelType panelType) {
+	public static String typeToken(final PanelType panelType) {
+		if (panelType == null) {
+			return "view";
+		}
 		return switch (panelType) {
 		case CONCEPTUAL -> "conceptual";
 		case LOGICAL -> "logical";

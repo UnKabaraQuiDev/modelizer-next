@@ -1,6 +1,8 @@
 package lu.kbra.modelizer_next.ui.dialogs;
 
 import java.awt.BorderLayout;
+import java.awt.CardLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -31,6 +33,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
@@ -39,7 +42,14 @@ import javax.swing.event.DocumentListener;
 
 import lu.kbra.modelizer_next.layout.PanelType;
 import lu.kbra.modelizer_next.ui.canvas.DiagramCanvas;
+import lu.kbra.modelizer_next.ui.component.ColorButton;
+import lu.kbra.modelizer_next.ui.export.ImageViewExportOptions;
+import lu.kbra.modelizer_next.ui.export.PdfMargins;
+import lu.kbra.modelizer_next.ui.export.PdfPageFormat;
+import lu.kbra.modelizer_next.ui.export.PdfPageOrientation;
+import lu.kbra.modelizer_next.ui.export.PdfViewExportOptions;
 import lu.kbra.modelizer_next.ui.export.ViewExportFormat;
+import lu.kbra.modelizer_next.ui.export.ViewExportOptions;
 import lu.kbra.modelizer_next.ui.export.ViewExportRequest;
 import lu.kbra.modelizer_next.ui.export.ViewExportScope;
 import lu.kbra.modelizer_next.ui.export.ViewExporter;
@@ -50,28 +60,17 @@ import lu.kbra.modelizer_next.ui.frame.MainFrame;
  */
 public class ViewExportDialog extends JDialog {
 
-	/**
-	 * Represents an export preview panel in the dialog part of the application.
-	 */
 	private static final class ExportPreviewPanel extends JPanel {
 
 		private static final long serialVersionUID = 3338223416144336229L;
 
 		private BufferedImage previewImage;
 
-		/**
-		 * Creates an export preview panel instance.
-		 */
 		private ExportPreviewPanel() {
 			this.setPreferredSize(new Dimension(520, 420));
-			this.setBackground(java.awt.Color.WHITE);
+			this.setBackground(Color.WHITE);
 		}
 
-		/**
-		 * Paints the component.
-		 *
-		 * @param graphics graphics context used for drawing
-		 */
 		@Override
 		protected void paintComponent(final Graphics graphics) {
 			super.paintComponent(graphics);
@@ -92,12 +91,6 @@ public class ViewExportDialog extends JDialog {
 			graphics.drawImage(this.previewImage.getScaledInstance(imageWidth, imageHeight, Image.SCALE_SMOOTH), x, y, null);
 		}
 
-		/**
-		 * Sets the preview.
-		 *
-		 * @param canvas canvas instance that owns the operation
-		 * @param scope  export scope to use
-		 */
 		private void setPreview(final DiagramCanvas canvas, final ViewExportScope scope) {
 			if (canvas == null || scope == null) {
 				this.previewImage = null;
@@ -111,20 +104,16 @@ public class ViewExportDialog extends JDialog {
 
 	}
 
-	/**
-	 * Represents a pattern text field in the dialog part of the application.
-	 */
 	private static final class PatternTextField extends JTextField {
 
 		private static final long serialVersionUID = 7204067903603166607L;
 
-		/**
-		 * Creates a pattern text field instance.
-		 *
-		 * @param text text to display or edit
-		 */
-		private PatternTextField(final String text) {
-			super(text);
+		private final List<String> tokens;
+
+		private PatternTextField(final String text, final List<String> tokens) {
+			super();
+			this.setText(text);
+			this.tokens = tokens == null ? List.of() : List.copyOf(tokens);
 			this.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, MainFrame.CTRL_MODIFIER), "showTokenSuggestions");
 			this.getActionMap().put("showTokenSuggestions", new AbstractAction() {
 				private static final long serialVersionUID = 8970378556838542205L;
@@ -144,11 +133,10 @@ public class ViewExportDialog extends JDialog {
 			});
 		}
 
-		/**
-		 * Inserts the selected file-name token into the pattern field.
-		 *
-		 * @param token text value for token
-		 */
+		private PatternTextField(final String text) {
+			this(text, ViewExporter.FILE_PATTERN_TOKENS);
+		}
+
 		private void insertToken(final String token) {
 			final int caretPosition = this.getCaretPosition();
 			if (caretPosition > 0 && this.getText().charAt(caretPosition - 1) == '%') {
@@ -159,12 +147,9 @@ public class ViewExportDialog extends JDialog {
 			this.requestFocusInWindow();
 		}
 
-		/**
-		 * Shows the token suggestions.
-		 */
 		private void showTokenSuggestions() {
 			final JPopupMenu menu = new JPopupMenu();
-			for (final String token : ViewExporter.FILE_PATTERN_TOKENS) {
+			for (final String token : this.tokens) {
 				menu.add(new AbstractAction(token) {
 					private static final long serialVersionUID = 6950296399216736075L;
 
@@ -179,60 +164,54 @@ public class ViewExportDialog extends JDialog {
 
 	}
 
-	/**
-	 * Immutable value object for simple document listener data.
-	 *
-	 * @param delegate delegate value used by the operation
-	 */
 	private record SimpleDocumentListener(Runnable delegate) implements DocumentListener {
-		/**
-		 * Updates the preview after the pattern text changes.
-		 *
-		 * @param event event object supplied by Swing
-		 */
+
 		@Override
 		public void changedUpdate(final DocumentEvent event) {
 			this.delegate.run();
 		}
 
-		/**
-		 * Updates the preview after the pattern text changes.
-		 *
-		 * @param event event object supplied by Swing
-		 */
 		@Override
 		public void insertUpdate(final DocumentEvent event) {
 			this.delegate.run();
 		}
 
-		/**
-		 * Removes the update.
-		 *
-		 * @param event event object supplied by Swing
-		 */
 		@Override
 		public void removeUpdate(final DocumentEvent event) {
 			this.delegate.run();
 		}
 	}
 
-	private static final long serialVersionUID = -4894368238563345666L;
+	private static final class CurrentCardPanel extends JPanel {
 
-	/**
-	 * Shows the dialog.
-	 *
-	 * @param parent                 parent component used for dialog ownership
-	 * @param canvases               canvases value used by the operation
-	 * @param activePanelType        type value to use
-	 * @param defaultOutputDirectory default output directory value used by the operation
-	 * @return the show dialog result
-	 */
+		private static final long serialVersionUID = 1L;
+
+		private CurrentCardPanel(final CardLayout layout) {
+			super(layout);
+		}
+
+		@Override
+		public Dimension getPreferredSize() {
+			for (final Component component : this.getComponents()) {
+				if (component.isVisible()) {
+					return component.getPreferredSize();
+				}
+			}
+			return super.getPreferredSize();
+		}
+	}
+
+	private static final long serialVersionUID = -4894368238563345666L;
+	private static final String IMAGE_CARD = "image";
+	private static final String PDF_CARD = "pdf";
+	private static final List<String> PDF_TEXT_TOKENS = List
+			.of("%FILENAME%", "%TYPE%", "%PANEL%", "%EXTENSION%", "%DATE%", "%TIME%", "%PAGE%", "%PAGES%");
+
 	public static ViewExportRequest showDialog(
 			final Component parent,
 			final Map<PanelType, DiagramCanvas> canvases,
 			final PanelType activePanelType,
 			final File defaultOutputDirectory) {
-
 		final ViewExportDialog dialog = new ViewExportDialog(parent, canvases, activePanelType, defaultOutputDirectory);
 		dialog.setVisible(true);
 		return dialog.result;
@@ -247,26 +226,35 @@ public class ViewExportDialog extends JDialog {
 	private final JTextField outputDirectoryField;
 	private final PatternTextField filePatternField;
 
+	private final ColorButton backgroundColorButton;
+	private final JCheckBox transparentBackgroundBox;
+	private final CardLayout formatOptionsLayout;
+	private final JPanel formatOptionsCards;
+
+	private final JComboBox<PdfPageFormat> pdfPageFormatSelector;
+	private final JComboBox<PdfPageOrientation> pdfOrientationSelector;
+	private final JTextField pdfCustomWidthField;
+	private final JTextField pdfCustomHeightField;
+	private final JTextField pdfMarginTopField;
+	private final JTextField pdfMarginRightField;
+	private final JTextField pdfMarginBottomField;
+	private final JTextField pdfMarginLeftField;
+	private final JTextField pdfUnderTemplateField;
+	private final JTextField pdfOverTemplateField;
+	private final PatternTextField pdfHeaderField;
+	private final PatternTextField pdfFooterField;
+
 	private final ExportPreviewPanel previewPanel;
 
 	private final JButton exportButton;
 
 	private ViewExportRequest result;
 
-	/**
-	 * Creates a view export dialog instance.
-	 *
-	 * @param parent                 parent component used for dialog ownership
-	 * @param canvases               canvases value used by the operation
-	 * @param activePanelType        type value to use
-	 * @param defaultOutputDirectory default output directory value used by the operation
-	 */
 	private ViewExportDialog(
 			final Component parent,
 			final Map<PanelType, DiagramCanvas> canvases,
 			final PanelType activePanelType,
 			final File defaultOutputDirectory) {
-
 		super(SwingUtilities.getWindowAncestor(parent), "Export current view", ModalityType.APPLICATION_MODAL);
 		this.canvases = new LinkedHashMap<>(canvases);
 		this.activePanelType = activePanelType;
@@ -275,34 +263,55 @@ public class ViewExportDialog extends JDialog {
 		this.formatSelector = new JComboBox<>(ViewExportFormat.values());
 		this.scopeSelector = new JComboBox<>(ViewExportScope.values());
 		this.scopeSelector.setSelectedItem(ViewExportScope.VIEW);
-		this.outputDirectoryField = new JTextField(defaultOutputDirectory == null ? "" : defaultOutputDirectory.getAbsolutePath(), 24);
+		this.outputDirectoryField = new JTextField(defaultOutputDirectory == null ? "" : defaultOutputDirectory.getAbsolutePath());
 		this.filePatternField = new PatternTextField(ViewExporter.DEFAULT_FILE_PATTERN);
+		this.backgroundColorButton = new ColorButton("Background", Color.WHITE);
+		this.transparentBackgroundBox = new JCheckBox("Transparent background");
+		this.formatOptionsLayout = new CardLayout();
+		this.formatOptionsCards = new CurrentCardPanel(this.formatOptionsLayout);
+
+		this.pdfPageFormatSelector = new JComboBox<>(PdfPageFormat.values());
+		this.pdfPageFormatSelector.setSelectedItem(PdfPageFormat.A4);
+		this.pdfOrientationSelector = new JComboBox<>(PdfPageOrientation.values());
+		this.pdfCustomWidthField = new JTextField("595");
+		this.pdfCustomHeightField = new JTextField("842");
+		this.pdfMarginTopField = new JTextField("36");
+		this.pdfMarginRightField = new JTextField("36");
+		this.pdfMarginBottomField = new JTextField("36");
+		this.pdfMarginLeftField = new JTextField("36");
+		this.pdfUnderTemplateField = new JTextField();
+		this.pdfOverTemplateField = new JTextField();
+		this.pdfHeaderField = new PatternTextField("", ViewExportDialog.PDF_TEXT_TOKENS);
+		this.pdfFooterField = new PatternTextField("", ViewExportDialog.PDF_TEXT_TOKENS);
+
 		this.previewPanel = new ExportPreviewPanel();
 		this.exportButton = new JButton("Export");
 
 		this.setLayout(new BorderLayout(12, 12));
 		this.getRootPane().setBorder(BorderFactory.createEmptyBorder(12, 12, 12, 12));
-		this.add(this.createPreviewPane(), BorderLayout.CENTER);
-		this.add(this.createOptionsPane(), BorderLayout.EAST);
+
+		final JScrollPane previewPane = this.createPreviewPane();
+		final JScrollPane optionsPane = this.createOptionsPane();
+
+		final JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, previewPane, optionsPane);
+		splitPane.setResizeWeight(1.0);
+		splitPane.setContinuousLayout(true);
+		splitPane.setBorder(null);
+
+		this.add(splitPane, BorderLayout.CENTER);
 		this.add(this.createButtonPane(), BorderLayout.SOUTH);
 
 		this.installListeners();
+		this.updateFormatOptionsVisibility();
 		this.updateExportButtonState();
 		this.refreshPreview();
 
-		this.setPreferredSize(new Dimension(920, 620));
+		this.setPreferredSize(new Dimension(980, 660));
 		this.pack();
+		SwingUtilities.invokeLater(() -> splitPane.setDividerLocation(0.55));
 		this.setLocationRelativeTo(parent);
 	}
 
-	/**
-	 * Adds the row.
-	 *
-	 * @param panel     panel to configure or inspect
-	 * @param row       row index or row component to use
-	 * @param label     text value for label
-	 * @param component Swing component to configure
-	 */
 	private void addRow(final JPanel panel, final int row, final String label, final Component component) {
 		final GridBagConstraints labelGbc = new GridBagConstraints();
 		labelGbc.gridx = 0;
@@ -320,9 +329,35 @@ public class ViewExportDialog extends JDialog {
 		panel.add(component, componentGbc);
 	}
 
-	/**
-	 * Opens a directory chooser and stores the selected export directory.
-	 */
+	private void addFullRow(final JPanel panel, final int row, final Component component) {
+		final GridBagConstraints gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.gridy = row;
+		gbc.gridwidth = 2;
+		gbc.fill = GridBagConstraints.HORIZONTAL;
+		gbc.weightx = 1.0;
+		gbc.insets = new Insets(4, 4, 8, 4);
+		panel.add(component, gbc);
+	}
+
+	private ViewExportOptions buildExportOptions(final ViewExportFormat format) {
+		if (format == ViewExportFormat.PDF) {
+			return new PdfViewExportOptions((PdfPageFormat) this.pdfPageFormatSelector.getSelectedItem(),
+					(PdfPageOrientation) this.pdfOrientationSelector.getSelectedItem(),
+					this.parseDouble(this.pdfCustomWidthField, PdfPageFormat.A4.getWidth()),
+					this.parseDouble(this.pdfCustomHeightField, PdfPageFormat.A4.getHeight()),
+					new PdfMargins(this.parseDouble(this.pdfMarginTopField, 36.0),
+							this.parseDouble(this.pdfMarginRightField, 36.0),
+							this.parseDouble(this.pdfMarginBottomField, 36.0),
+							this.parseDouble(this.pdfMarginLeftField, 36.0)),
+					this.optionalFile(this.pdfUnderTemplateField),
+					this.optionalFile(this.pdfOverTemplateField),
+					this.pdfHeaderField.getText(),
+					this.pdfFooterField.getText());
+		}
+		return new ImageViewExportOptions(this.transparentBackgroundBox.isSelected() && format.supportsTransparency());
+	}
+
 	private void browseOutputDirectory() {
 		final JFileChooser chooser = new JFileChooser(this.outputDirectoryField.getText());
 		chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
@@ -333,11 +368,17 @@ public class ViewExportDialog extends JDialog {
 		}
 	}
 
-	/**
-	 * Creates a button pane.
-	 *
-	 * @return the created button pane
-	 */
+	private void browseTemplateFile(final JTextField targetField) {
+		final JFileChooser chooser = new JFileChooser(
+				targetField.getText().isBlank() ? this.outputDirectoryField.getText() : targetField.getText());
+		chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+		chooser.setDialogTitle("Select template image");
+
+		if (chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
+			targetField.setText(chooser.getSelectedFile().getAbsolutePath());
+		}
+	}
+
 	private JPanel createButtonPane() {
 		final JPanel buttons = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 		final JButton cancelButton = new JButton("Cancel");
@@ -351,15 +392,17 @@ public class ViewExportDialog extends JDialog {
 		return buttons;
 	}
 
-	/**
-	 * Creates an options pane.
-	 *
-	 * @return the created options pane
-	 */
-	private JPanel createOptionsPane() {
+	private JPanel createImageOptionsPane() {
+		final JPanel panel = new JPanel(new GridBagLayout());
+		panel.setBorder(BorderFactory.createTitledBorder("Image options"));
+		int row = 0;
+		this.addFullRow(panel, row++, this.transparentBackgroundBox);
+		return panel;
+	}
+
+	private JScrollPane createOptionsPane() {
 		final JPanel panel = new JPanel(new GridBagLayout());
 		panel.setBorder(BorderFactory.createTitledBorder("Export settings"));
-		panel.setPreferredSize(new Dimension(320, 420));
 
 		int row = 0;
 		this.addRow(panel, row++, "Type", this.formatSelector);
@@ -387,40 +430,70 @@ public class ViewExportDialog extends JDialog {
 		this.addRow(panel, row++, "Directory", directoryPanel);
 
 		this.addRow(panel, row++, "File pattern", this.filePatternField);
-//		final JLabel tokenHint = new JLabel("Use Ctrl+Space for tokens: %FILENAME%, %TYPE%, %EXTENSION%.");
-//		final GridBagConstraints hintGbc = new GridBagConstraints();
-//		hintGbc.gridx = 0;
-//		hintGbc.gridy = row++;
-//		hintGbc.gridwidth = 2;
-//		hintGbc.insets = new Insets(0, 4, 8, 4);
-//		hintGbc.anchor = GridBagConstraints.WEST;
-//		panel.add(tokenHint, hintGbc);
+		this.addRow(panel, row++, "Background", this.backgroundColorButton);
+
+		this.formatOptionsCards.add(this.createImageOptionsPane(), ViewExportDialog.IMAGE_CARD);
+		this.formatOptionsCards.add(this.createPdfOptionsPane(), ViewExportDialog.PDF_CARD);
+		this.addFullRow(panel, row++, this.formatOptionsCards);
 
 		final GridBagConstraints filler = new GridBagConstraints();
 		filler.gridx = 0;
 		filler.gridy = row;
 		filler.gridwidth = 2;
 		filler.weighty = 1.0;
+		filler.fill = GridBagConstraints.VERTICAL;
 		panel.add(new JPanel(), filler);
+
+		final JScrollPane scrollPane = new JScrollPane(panel);
+		scrollPane.setBorder(null);
+		scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+		return scrollPane;
+	}
+
+	private JPanel createPdfOptionsPane() {
+		final JPanel panel = new JPanel(new GridBagLayout());
+		panel.setBorder(BorderFactory.createTitledBorder("PDF options"));
+		int row = 0;
+		this.addRow(panel, row++, "Page", this.pdfPageFormatSelector);
+		this.addRow(panel, row++, "Orientation", this.pdfOrientationSelector);
+
+		final JPanel sizePanel = new JPanel(new GridBagLayout());
+		this.addRow(sizePanel, 0, "Width", this.pdfCustomWidthField);
+		this.addRow(sizePanel, 1, "Height", this.pdfCustomHeightField);
+		this.addRow(panel, row++, "Custom size", sizePanel);
+
+		final JPanel marginsPanel = new JPanel(new GridBagLayout());
+		this.addRow(marginsPanel, 0, "Top", this.pdfMarginTopField);
+		this.addRow(marginsPanel, 1, "Right", this.pdfMarginRightField);
+		this.addRow(marginsPanel, 2, "Bottom", this.pdfMarginBottomField);
+		this.addRow(marginsPanel, 3, "Left", this.pdfMarginLeftField);
+		this.addRow(panel, row++, "Margins", marginsPanel);
+
+		this.addRow(panel, row++, "Template under", this.createTemplateChooserPanel(this.pdfUnderTemplateField));
+		this.addRow(panel, row++, "Template over", this.createTemplateChooserPanel(this.pdfOverTemplateField));
+		this.addRow(panel, row++, "Header", this.pdfHeaderField);
+		this.addRow(panel, row++, "Footer", this.pdfFooterField);
+		final JLabel hint = new JLabel("Fields: " + String.join(", ", ViewExportDialog.PDF_TEXT_TOKENS));
+		this.addFullRow(panel, row++, hint);
 		return panel;
 	}
 
-	/**
-	 * Creates a preview pane.
-	 *
-	 * @return the created preview pane
-	 */
 	private JScrollPane createPreviewPane() {
 		final JScrollPane scrollPane = new JScrollPane(this.previewPanel);
 		scrollPane.setBorder(BorderFactory.createTitledBorder("Preview"));
 		return scrollPane;
 	}
 
-	/**
-	 * Finds the preview canvas that matches the supplied input.
-	 *
-	 * @return the matching preview canvas, or {@code null} when no match exists
-	 */
+	private JPanel createTemplateChooserPanel(final JTextField field) {
+		final JPanel panel = new JPanel(new BorderLayout(4, 0));
+		final JButton browseButton = new JButton("Browse...");
+		panel.add(field, BorderLayout.CENTER);
+		panel.add(browseButton, BorderLayout.EAST);
+		browseButton.addActionListener(event -> this.browseTemplateFile(field));
+		return panel;
+	}
+
 	private DiagramCanvas findPreviewCanvas() {
 		if (this.panelTypeBoxes.getOrDefault(this.activePanelType, new JCheckBox()).isSelected()) {
 			return this.canvases.get(this.activePanelType);
@@ -436,11 +509,6 @@ public class ViewExportDialog extends JDialog {
 		return this.canvases.get(this.activePanelType);
 	}
 
-	/**
-	 * Returns the selected panel types.
-	 *
-	 * @return the selected panel types
-	 */
 	private List<PanelType> getSelectedPanelTypes() {
 		final List<PanelType> panelTypes = new ArrayList<>();
 		for (final PanelType panelType : PanelType.values()) {
@@ -452,11 +520,12 @@ public class ViewExportDialog extends JDialog {
 		return panelTypes;
 	}
 
-	/**
-	 * Installs the listeners.
-	 */
 	private void installListeners() {
-		this.formatSelector.addActionListener(event -> this.refreshPreview());
+		this.formatSelector.addActionListener(event -> {
+			this.updateFormatOptionsVisibility();
+			this.updateExportButtonState();
+			this.refreshPreview();
+		});
 		this.scopeSelector.addActionListener(event -> this.refreshPreview());
 		for (final JCheckBox checkBox : this.panelTypeBoxes.values()) {
 			checkBox.addActionListener(event -> {
@@ -466,14 +535,23 @@ public class ViewExportDialog extends JDialog {
 		}
 		this.filePatternField.getDocument().addDocumentListener(new SimpleDocumentListener(this::updateExportButtonState));
 		this.outputDirectoryField.getDocument().addDocumentListener(new SimpleDocumentListener(this::updateExportButtonState));
+		this.installValidationListener(this.pdfCustomWidthField);
+		this.installValidationListener(this.pdfCustomHeightField);
+		this.installValidationListener(this.pdfMarginTopField);
+		this.installValidationListener(this.pdfMarginRightField);
+		this.installValidationListener(this.pdfMarginBottomField);
+		this.installValidationListener(this.pdfMarginLeftField);
 	}
 
-	/**
-	 * Returns the display label for a panel type.
-	 *
-	 * @param panelType diagram panel type whose model or layout should be used
-	 * @return the panel type label result
-	 */
+	private void installValidationListener(final JTextField textField) {
+		textField.getDocument().addDocumentListener(new SimpleDocumentListener(this::updateExportButtonState));
+	}
+
+	private File optionalFile(final JTextField textField) {
+		final String text = textField.getText() == null ? "" : textField.getText().trim();
+		return text.isBlank() ? null : new File(text);
+	}
+
 	private String panelTypeLabel(final PanelType panelType) {
 		return switch (panelType) {
 		case CONCEPTUAL -> "Conceptual";
@@ -482,34 +560,74 @@ public class ViewExportDialog extends JDialog {
 		};
 	}
 
-	/**
-	 * Refreshes the preview from the current state.
-	 */
+	private double parseDouble(final JTextField field, final double defaultValue) {
+		try {
+			return Math.max(0.0, Double.parseDouble(field.getText().trim()));
+		} catch (final NumberFormatException ex) {
+			return defaultValue;
+		}
+	}
+
+	private boolean nonNegativeNumberField(final JTextField field) {
+		try {
+			return Double.parseDouble(field.getText().trim()) >= 0.0;
+		} catch (final NumberFormatException ex) {
+			return false;
+		}
+	}
+
+	private boolean positiveNumberField(final JTextField field) {
+		try {
+			return Double.parseDouble(field.getText().trim()) > 0.0;
+		} catch (final NumberFormatException ex) {
+			return false;
+		}
+	}
+
 	private void refreshPreview() {
 		final DiagramCanvas canvas = this.findPreviewCanvas();
 		this.previewPanel.setPreview(canvas, (ViewExportScope) this.scopeSelector.getSelectedItem());
 	}
 
-	/**
-	 * Saves the result and close.
-	 */
 	private void saveResultAndClose() {
-		this.result = new ViewExportRequest((ViewExportFormat) this.formatSelector.getSelectedItem(),
+		final ViewExportFormat format = (ViewExportFormat) this.formatSelector.getSelectedItem();
+		this.result = new ViewExportRequest(format,
 				(ViewExportScope) this.scopeSelector.getSelectedItem(),
 				this.getSelectedPanelTypes(),
 				new File(this.outputDirectoryField.getText()),
 				this.filePatternField.getText(),
 				false,
-				false);
+				false,
+				this.backgroundColorButton.getSelectedColor(),
+				this.buildExportOptions(format));
 		this.dispose();
 	}
 
-	/**
-	 * Updates the export button state.
-	 */
+	private void updateFormatOptionsVisibility() {
+		final ViewExportFormat format = (ViewExportFormat) this.formatSelector.getSelectedItem();
+
+		if (format == ViewExportFormat.PDF) {
+			this.formatOptionsLayout.show(this.formatOptionsCards, ViewExportDialog.PDF_CARD);
+		} else {
+			this.formatOptionsLayout.show(this.formatOptionsCards, ViewExportDialog.IMAGE_CARD);
+		}
+
+		this.formatOptionsCards.revalidate();
+		this.formatOptionsCards.repaint();
+
+		this.transparentBackgroundBox.setEnabled(format != null && format.supportsTransparency());
+		if (format != null && !format.supportsTransparency()) {
+			this.transparentBackgroundBox.setSelected(false);
+		}
+	}
+
 	private void updateExportButtonState() {
+		final boolean pdfSettingsValid = this.formatSelector.getSelectedItem() != ViewExportFormat.PDF
+				|| this.positiveNumberField(this.pdfCustomWidthField) && this.positiveNumberField(this.pdfCustomHeightField)
+						&& this.nonNegativeNumberField(this.pdfMarginTopField) && this.nonNegativeNumberField(this.pdfMarginRightField)
+						&& this.nonNegativeNumberField(this.pdfMarginBottomField) && this.nonNegativeNumberField(this.pdfMarginLeftField);
 		this.exportButton.setEnabled(!this.getSelectedPanelTypes().isEmpty() && !this.outputDirectoryField.getText().isBlank()
-				&& !this.filePatternField.getText().isBlank());
+				&& !this.filePatternField.getText().isBlank() && pdfSettingsValid);
 	}
 
 }

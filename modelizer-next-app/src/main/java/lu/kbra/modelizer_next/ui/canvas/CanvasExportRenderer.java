@@ -23,7 +23,7 @@ interface CanvasExportRenderer extends DiagramCanvasExt {
 	 */
 	default BufferedImage createExportImage(final ViewExportScope scope) {
 		final Dimension exportSize = this.getCanvas().getExportSize(scope);
-		final BufferedImage image = new BufferedImage(exportSize.width, exportSize.height, BufferedImage.TYPE_INT_RGB);
+		final BufferedImage image = new BufferedImage(exportSize.width, exportSize.height, BufferedImage.TYPE_INT_ARGB);
 		final Graphics2D g2 = image.createGraphics();
 		try {
 			this.getCanvas().configureGraphics(g2);
@@ -99,10 +99,6 @@ interface CanvasExportRenderer extends DiagramCanvasExt {
 		try {
 			final Dimension exportSize = this.getCanvas().computeExportSize(graphics, scope);
 			final Rectangle2D.Double worldBounds = this.getCanvas().computeExportWorldBounds(graphics, scope);
-
-			graphics.setColor(DiagramCanvas.CANVAS_BACKGROUND_COLOR);
-			graphics.fillRect(0, 0, exportSize.width, exportSize.height);
-			this.getCanvas().drawExportGrid(graphics, exportSize);
 
 			final AffineTransform oldTransform = graphics.getTransform();
 			final double zoom = scope == ViewExportScope.VIEW ? this.getCanvas().getPanelState().getZoom() : 1.0;
