@@ -15,6 +15,7 @@ public class ModelDocument {
 	private DocumentMeta meta;
 	private DiagramModel model;
 	private WorkspaceState workspace;
+
 	@JsonIgnore
 	private String source;
 

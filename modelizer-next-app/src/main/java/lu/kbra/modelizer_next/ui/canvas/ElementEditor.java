@@ -83,7 +83,7 @@ public interface ElementEditor extends DiagramCanvasExt {
 		}
 
 		final CommentEditorDialog.Result result = CommentEditorDialog
-				.showDialog(this.getCanvas(), this.getCanvas().document, commentModel, this.getPanelType());
+				.showDialog(this.getCanvas(), this.getDocument(), commentModel, this.getPanelType());
 		if (result == null) {
 			return;
 		}
@@ -144,7 +144,7 @@ public interface ElementEditor extends DiagramCanvasExt {
 		}
 
 		final LinkEditorDialog.Result result = LinkEditorDialog
-				.showDialog(this.getCanvas(), this.getCanvas().document, linkModel, this.getPanelType());
+				.showDialog(this.getCanvas(), this.getDocument(), linkModel, this.getPanelType());
 		if (result == null || result.fromClassId() == null || result.toClassId() == null) {
 			return;
 		}

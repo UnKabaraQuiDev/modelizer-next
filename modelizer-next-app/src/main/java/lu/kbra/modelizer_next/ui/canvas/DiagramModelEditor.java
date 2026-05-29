@@ -73,7 +73,7 @@ interface DiagramModelEditor extends DiagramCanvasExt {
 			});
 		}
 
-		this.getCanvas().document.getModel().getComments().add(commentModel);
+		this.getDocument().getModel().addComment(commentModel);
 
 		final NodeLayout layout = this.getCanvas()
 				.resolveRenderLayout(this.getCanvas().findOrCreateNodeLayout(LayoutObjectType.COMMENT, commentModel.getId()));
@@ -106,7 +106,7 @@ interface DiagramModelEditor extends DiagramCanvasExt {
 		final FieldModel fieldModel = new FieldModel();
 		fieldModel.setConceptualName("New field");
 		this.getCanvas().applyDefaultPaletteToField(fieldModel);
-		targetClass.getFields().add(fieldModel);
+		targetClass.addField(fieldModel);
 		fieldModel.setTechnicalOnly(this.getPanelType().isTechnical());
 
 		if (this.getCanvas().isLiveEditingElement() && this.getCanvas().liveEditElement.type().isClass()
@@ -142,7 +142,7 @@ interface DiagramModelEditor extends DiagramCanvasExt {
 		}
 
 		final LinkEditorDialog.Result result = LinkEditorDialog
-				.showDialog(this.getCanvas(), this.getCanvas().document, linkModel, this.getPanelType());
+				.showDialog(this.getCanvas(), this.getDocument(), linkModel, this.getPanelType());
 		if (result == null || result.fromClassId() == null || result.toClassId() == null) {
 			return;
 		}
@@ -157,15 +157,14 @@ interface DiagramModelEditor extends DiagramCanvasExt {
 		if (this.getPanelType() == PanelType.CONCEPTUAL) {
 			createdLink.setCardinalityFrom(result.cardinalityFrom() == null ? Cardinality.ONE : result.cardinalityFrom());
 			createdLink.setCardinalityTo(result.cardinalityTo() == null ? Cardinality.ZERO_OR_MANY : result.cardinalityTo());
-			this.getCanvas().document.getModel().getConceptualLinks().add(createdLink);
+			this.getDocument().getModel().addConceptualLink(createdLink);
 		} else {
 			createdLink.setCardinalityFrom(null);
 			createdLink.setCardinalityTo(null);
-			this.getCanvas().document.getModel().getTechnicalLinks().add(createdLink);
+			this.getDocument().getModel().addTechnicalLink(createdLink);
 		}
 		this.getCanvas().applyDefaultPaletteToLink(createdLink);
 
-//		confirmRenamingElement(0);
 		this.getCanvas().findOrCreateLinkLayout(createdLink.getId());
 		this.getCanvas().select(SelectedElement.forLink(createdLink.getId()));
 		this.getCanvas().notifySelectionChanged();
@@ -180,7 +179,7 @@ interface DiagramModelEditor extends DiagramCanvasExt {
 		classModel.setConceptualName("New table");
 		this.getCanvas().applyDefaultPaletteToClass(classModel);
 
-		this.getDocument().getModel().getClasses().add(classModel);
+		this.getDocument().getModel().addClass(classModel);
 
 		final NodeLayout layout = this.getCanvas()
 				.resolveRenderLayout(this.getCanvas().findOrCreateNodeLayout(LayoutObjectType.CLASS, classModel.getId()));
@@ -188,7 +187,6 @@ interface DiagramModelEditor extends DiagramCanvasExt {
 		layout.setPosition(new Point2D.Double(center.getX() - 100, center.getY() - 40));
 		layout.setSize(new Size2D(DiagramCanvas.CLASS_MIN_WIDTH, DiagramCanvas.CLASS_HEADER_HEIGHT));
 
-//		confirmRenamingElement(0);
 		this.getCanvas().select(SelectedElement.forClass(classModel.getId()));
 		this.getCanvas().notifySelectionChanged();
 		this.getCanvas().notifyDocumentChanged();
@@ -304,7 +302,7 @@ interface DiagramModelEditor extends DiagramCanvasExt {
 		}
 
 		final FieldModel moved = classModel.getFields().remove(currentIndex);
-		classModel.getFields().add(newIndex, moved);
+		classModel.addField(newIndex, moved);
 
 		this.getCanvas().select(SelectedElement.forField(classModel.getId(), moved.getId()));
 		this.getCanvas().notifyDocumentChanged();

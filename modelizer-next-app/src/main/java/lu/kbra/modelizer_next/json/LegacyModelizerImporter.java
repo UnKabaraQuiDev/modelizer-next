@@ -256,7 +256,7 @@ public class LegacyModelizerImporter {
 				fieldModel.setTextColor(LegacyModelizerImporter.parseColor(fieldNode.get("foreground"), Color.BLACK));
 				fieldModel.setBackgroundColor(LegacyModelizerImporter.parseColor(fieldNode.get("background"), Color.WHITE));
 
-				classModel.getFields().add(fieldModel);
+				classModel.addField(fieldModel);
 				LegacyModelizerImporter.putFieldMapping(fieldIdsByQualifiedName,
 						className,
 						technicalName,
@@ -265,7 +265,7 @@ public class LegacyModelizerImporter {
 						fieldModel.getId());
 			}
 
-			document.getModel().getClasses().add(classModel);
+			document.getModel().addClass(classModel);
 			LegacyModelizerImporter.putClassMapping(classIdsByName, className, technicalName, classModel.getId());
 
 			LegacyModelizerImporter.addClassLayout(document.getWorkspace().getPanels().get(PanelType.CONCEPTUAL),
@@ -291,7 +291,7 @@ public class LegacyModelizerImporter {
 
 				final LinkModel linkModel = LegacyModelizerImporter.createConceptualLink(linkNode, classIdsByName);
 				if (linkModel != null) {
-					document.getModel().getConceptualLinks().add(linkModel);
+					document.getModel().addConceptualLink(linkModel);
 				}
 			}
 
@@ -307,7 +307,7 @@ public class LegacyModelizerImporter {
 					if (linkModel != null) {
 						linkModel.setCardinalityFrom(null);
 						linkModel.setCardinalityTo(null);
-						document.getModel().getTechnicalLinks().add(linkModel);
+						document.getModel().addTechnicalLink(linkModel);
 					}
 				}
 			}
@@ -319,7 +319,7 @@ public class LegacyModelizerImporter {
 				continue;
 			}
 
-			document.getModel().getComments().add(commentModel);
+			document.getModel().addComment(commentModel);
 			LegacyModelizerImporter.addCommentLayout(document.getWorkspace().getPanels().get(PanelType.CONCEPTUAL),
 					commentModel.getId(),
 					commentNode.path("x0").asDouble(80.0),

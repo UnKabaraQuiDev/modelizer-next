@@ -51,6 +51,10 @@ public class LinkModel {
 		return this.associationClassId;
 	}
 
+	public boolean hasAssociationClass() {
+		return associationClassId == null || associationClassId.isBlank();
+	}
+
 	/**
 	 * Returns the cardinality from.
 	 *

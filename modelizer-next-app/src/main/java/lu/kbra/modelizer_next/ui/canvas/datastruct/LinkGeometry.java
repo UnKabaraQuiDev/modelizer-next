@@ -17,13 +17,6 @@ import lu.kbra.modelizer_next.ui.canvas.data.AnchorSide;
  * @param labelAngle  numeric label angle value
  * @param points      points in canvas coordinates
  */
-public record LinkGeometry(
-		Point2D fromPoint,
-		Point2D toPoint,
-		AnchorSide fromSide,
-		AnchorSide toSide,
-		Point2D labelPoint,
-		Point2D middlePoint,
-		double labelAngle,
-		List<Point2D> points) {
+public record LinkGeometry(Point2D fromPoint, Point2D toPoint, AnchorSide fromSide, AnchorSide toSide, Point2D labelPoint,
+		Point2D middlePoint, double labelAngle, List<Point2D> points) {
 }

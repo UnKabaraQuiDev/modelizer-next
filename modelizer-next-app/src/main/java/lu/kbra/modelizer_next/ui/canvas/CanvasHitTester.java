@@ -73,8 +73,8 @@ interface CanvasHitTester extends DiagramCanvasExt {
 				}
 			}
 
-			for (int i = this.getCanvas().document.getModel().getComments().size() - 1; i >= 0; i--) {
-				final CommentModel commentModel = this.getCanvas().document.getModel().getComments().get(i);
+			for (int i = this.getDocument().getModel().getComments().size() - 1; i >= 0; i--) {
+				final CommentModel commentModel = this.getDocument().getModel().getComments().get(i);
 				if (commentModel == null || !this.getCanvas().isCommentVisible(commentModel)) {
 					continue;
 				}
@@ -87,8 +87,8 @@ interface CanvasHitTester extends DiagramCanvasExt {
 				}
 			}
 
-			for (int i = this.getCanvas().document.getModel().getClasses().size() - 1; i >= 0; i--) {
-				final ClassModel classModel = this.getCanvas().document.getModel().getClasses().get(i);
+			for (int i = this.getDocument().getModel().getClasses().size() - 1; i >= 0; i--) {
+				final ClassModel classModel = this.getDocument().getModel().getClasses().get(i);
 				if (!classModel.isVisible(this.getPanelType())) {
 					continue;
 				}

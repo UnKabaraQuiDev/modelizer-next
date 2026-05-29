@@ -35,7 +35,7 @@ public interface ElementCreator extends DiagramCanvasExt {
 		linkModel.setCardinalityFrom(Cardinality.ONE);
 		linkModel.setCardinalityTo(Cardinality.ZERO_OR_MANY);
 		this.getCanvas().applyDefaultPaletteToLink(linkModel);
-		this.getCanvas().document.getModel().getConceptualLinks().add(linkModel);
+		this.getDocument().getModel().addConceptualLink(linkModel);
 
 		this.getCanvas().findOrCreateLinkLayout(linkModel.getId());
 		this.getCanvas().select(SelectedElement.forLink(linkModel.getId()));
@@ -154,7 +154,7 @@ public interface ElementCreator extends DiagramCanvasExt {
 		linkModel.setCardinalityFrom(null);
 		linkModel.setCardinalityTo(null);
 		this.getCanvas().applyDefaultPaletteToLink(linkModel);
-		this.getCanvas().document.getModel().getTechnicalLinks().add(linkModel);
+		this.getDocument().getModel().addTechnicalLink(linkModel);
 
 		this.getCanvas().findOrCreateLinkLayout(linkModel.getId());
 		this.getCanvas().select(SelectedElement.forLink(linkModel.getId()));

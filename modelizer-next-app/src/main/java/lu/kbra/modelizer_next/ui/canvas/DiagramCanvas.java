@@ -43,34 +43,11 @@ import lu.kbra.pclib.PCUtils;
 /**
  * Swing component that displays and edits one diagram panel.
  */
-public class DiagramCanvas extends JPanel
-		implements
-			DiagramModelLookup,
-			NodeLayoutCache,
-			SelectionController,
-			NameResolver,
-			PaletteController,
-			ClipboardController,
-			LinkGeometryResolver,
-			ConceptualAnchorCache,
-			CanvasHitTester,
-			CanvasExportRenderer,
-			DiagramModelEditor,
-			DragSelectionController,
-			DiagramPathBuilder,
-			MouseInteractionController,
-			ElementEditor,
-			ElementRenderer,
-			ElementDeleter,
-			ElementCreator,
-			VisibilityManager,
-			CaptureManager,
-			LinkLayoutManager,
-			ExportManager,
-			NodeLayoutManager,
-			DiagramCanvasCoreSupport,
-			DiagramCanvasActionRegistrar,
-			LiveEditor {
+public class DiagramCanvas extends JPanel implements DiagramModelLookup, NodeLayoutCache, SelectionController, NameResolver,
+		PaletteController, ClipboardController, LinkGeometryResolver, ConceptualAnchorCache, CanvasHitTester, CanvasExportRenderer,
+		DiagramModelEditor, DragSelectionController, DiagramPathBuilder, MouseInteractionController, ElementEditor, ElementRenderer,
+		ElementDeleter, ElementCreator, VisibilityManager, CaptureManager, LinkLayoutManager, ExportManager, NodeLayoutManager,
+		DiagramCanvasCoreSupport, DiagramCanvasActionRegistrar, LiveEditor {
 
 	private static final long serialVersionUID = -768210073584363710L;
 

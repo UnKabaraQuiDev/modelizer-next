@@ -222,12 +222,12 @@ interface ClipboardController extends DiagramCanvasExt {
 				fieldCopy.setNotNull(sourceField.isNotNull());
 				fieldCopy.setTextColor(sourceField.getTextColor());
 				fieldCopy.setBackgroundColor(sourceField.getBackgroundColor());
-				copy.getFields().add(fieldCopy);
+				copy.addField(fieldCopy);
 
 				duplicatedFieldIds.put(sourceField.getId(), fieldCopy.getId());
 			}
 
-			this.getCanvas().document.getModel().getClasses().add(copy);
+			this.getDocument().getModel().addClass(copy);
 			duplicatedClassIds.put(source.getId(), copy.getId());
 
 			final NodeLayout sourceLayout = this.getCanvas().findOrCreateNodeLayout(LayoutObjectType.CLASS, source.getId());
@@ -262,9 +262,9 @@ interface ClipboardController extends DiagramCanvasExt {
 
 			final int insertIndex = owner.getFields().indexOf(source);
 			if (insertIndex < 0) {
-				owner.getFields().add(copy);
+				owner.addField(copy);
 			} else {
-				owner.getFields().add(insertIndex + 1, copy);
+				owner.addField(insertIndex + 1, copy);
 			}
 
 			duplicatedFieldIds.put(source.getId(), copy.getId());
@@ -296,7 +296,7 @@ interface ClipboardController extends DiagramCanvasExt {
 				copy.setBinding(new CommentBinding(source.getBinding().getTargetType(), targetId));
 			}
 
-			this.getCanvas().document.getModel().getComments().add(copy);
+			this.getDocument().getModel().addComment(copy);
 			duplicatedCommentIds.put(source.getId(), copy.getId());
 
 			final NodeLayout sourceLayout = this.getCanvas().findOrCreateNodeLayout(LayoutObjectType.COMMENT, source.getId());
@@ -408,11 +408,11 @@ interface ClipboardController extends DiagramCanvasExt {
 
 			for (final CopiedField copiedField : copiedClass.fields()) {
 				final FieldModel fieldCopy = this.getCanvas().createFieldFromClipboard(copiedField, false);
-				classCopy.getFields().add(fieldCopy);
+				classCopy.addField(fieldCopy);
 				pastedFieldIds.put(copiedField.sourceId(), fieldCopy.getId());
 			}
 
-			this.getCanvas().document.getModel().getClasses().add(classCopy);
+			this.getDocument().getModel().addClass(classCopy);
 			pastedClassIds.put(copiedClass.sourceId(), classCopy.getId());
 
 			this.getCanvas().applyNodeLayout(LayoutObjectType.CLASS, classCopy.getId(), copiedClass.layout(), deltaX, deltaY);
@@ -445,9 +445,9 @@ interface ClipboardController extends DiagramCanvasExt {
 //			}
 
 //			if (insertIndex < 0) {
-			owner.getFields().add(fieldCopy);
+			owner.addField(fieldCopy);
 //			} else {
-//				owner.getFields().add(insertIndex + 1, fieldCopy);
+//				owner.addField(insertIndex + 1, fieldCopy);
 //			}
 
 			pastedFieldIds.put(copiedField.sourceId(), fieldCopy.getId());
@@ -490,7 +490,7 @@ interface ClipboardController extends DiagramCanvasExt {
 				commentCopy.setKind(CommentKind.STANDALONE);
 			}
 
-			this.getCanvas().document.getModel().getComments().add(commentCopy);
+			this.getDocument().getModel().addComment(commentCopy);
 			this.getCanvas().applyNodeLayout(LayoutObjectType.COMMENT, commentCopy.getId(), copiedComment.layout(), deltaX, deltaY);
 
 			newSelection.add(SelectedElement.forComment(commentCopy.getId()));
@@ -504,7 +504,7 @@ interface ClipboardController extends DiagramCanvasExt {
 		this.getCanvas().selectedElements.addAll(newSelection);
 		this.getCanvas().selectedElement = this.getCanvas().selectedElements.getLast();
 
-		this.getCanvas().document.getModel().getClasses().sort(this.getCanvas().comparator);
+		this.getDocument().getModel().getClasses().sort(this.getCanvas().comparator);
 
 		this.getCanvas().notifySelectionChanged();
 		this.getCanvas().notifyDocumentChanged();

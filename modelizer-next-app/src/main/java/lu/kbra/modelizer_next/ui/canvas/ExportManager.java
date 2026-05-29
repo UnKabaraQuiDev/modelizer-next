@@ -51,7 +51,7 @@ public interface ExportManager extends DiagramCanvasExt {
 			Rectangle2D.Double bounds = null;
 			final boolean onlySelection = scope == ViewExportScope.SELECTION;
 
-			for (final ClassModel classModel : this.getCanvas().document.getModel().getClasses()) {
+			for (final ClassModel classModel : this.getDocument().getModel().getClasses()) {
 				if (!classModel.isVisible(this.getPanelType()) || onlySelection && !this.getCanvas().shouldExportClass(classModel)) {
 					continue;
 				}
@@ -63,7 +63,7 @@ public interface ExportManager extends DiagramCanvasExt {
 						.expandBounds(bounds, classBounds.getX(), classBounds.getY(), classBounds.getWidth(), classBounds.getHeight());
 			}
 
-			for (final CommentModel commentModel : this.getCanvas().document.getModel().getComments()) {
+			for (final CommentModel commentModel : this.getDocument().getModel().getComments()) {
 				if (commentModel == null || !this.getCanvas().isCommentVisible(commentModel)
 						|| onlySelection && !this.getCanvas().shouldExportComment(commentModel)) {
 					continue;

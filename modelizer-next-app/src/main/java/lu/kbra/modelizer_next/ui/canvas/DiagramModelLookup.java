@@ -1,10 +1,9 @@
 package lu.kbra.modelizer_next.ui.canvas;
 
-import java.util.Objects;
-
 import lu.kbra.modelizer_next.domain.ClassModel;
 import lu.kbra.modelizer_next.domain.CommentModel;
 import lu.kbra.modelizer_next.domain.FieldModel;
+import lu.kbra.modelizer_next.domain.LinkEnd;
 import lu.kbra.modelizer_next.domain.LinkModel;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectedElement;
 
@@ -20,12 +19,7 @@ interface DiagramModelLookup extends DiagramCanvasExt {
 	 * @return the matching class by ID, or {@code null} when no match exists
 	 */
 	default ClassModel findClassById(final String id) {
-		for (final ClassModel classModel : this.getDocument().getModel().getClasses()) {
-			if (classModel.getId().equals(id)) {
-				return classModel;
-			}
-		}
-		return null;
+		return getDocument().getModel().validateClassByIdIndex().get(id);
 	}
 
 	/**
@@ -35,12 +29,7 @@ interface DiagramModelLookup extends DiagramCanvasExt {
 	 * @return the matching comment by ID, or {@code null} when no match exists
 	 */
 	default CommentModel findCommentById(final String commentId) {
-		for (final CommentModel commentModel : this.getDocument().getModel().getComments()) {
-			if (commentModel.getId().equals(commentId)) {
-				return commentModel;
-			}
-		}
-		return null;
+		return getDocument().getModel().validateCommentsByIdIndex().get(commentId);
 	}
 
 	/**
@@ -54,14 +43,7 @@ interface DiagramModelLookup extends DiagramCanvasExt {
 		if (classModel == null) {
 			return null;
 		}
-
-		for (final FieldModel fieldModel : classModel.getFields()) {
-			if (fieldModel.getId().equals(fieldId)) {
-				return fieldModel;
-			}
-		}
-
-		return null;
+		return classModel.validateFieldByIdIndex().get(fieldId);
 	}
 
 	/**
@@ -72,18 +54,7 @@ interface DiagramModelLookup extends DiagramCanvasExt {
 	 * @return the matching field by ID, or {@code null} when no match exists
 	 */
 	default FieldModel findFieldById(final String classId, final String fieldId) {
-		final ClassModel classModel = this.findClassById(classId);
-		if (classModel == null) {
-			return null;
-		}
-
-		for (final FieldModel fieldModel : classModel.getFields()) {
-			if (fieldModel.getId().equals(fieldId)) {
-				return fieldModel;
-			}
-		}
-
-		return null;
+		return findFieldById(this.findClassById(classId), fieldId);
 	}
 
 	/**
@@ -93,33 +64,17 @@ interface DiagramModelLookup extends DiagramCanvasExt {
 	 * @return the matching link by association class ID, or {@code null} when no match exists
 	 */
 	default LinkModel findLinkByAssociationClassId(final String classId) {
-		return this.getDocument()
-				.getModel()
-				.getConceptualLinks()
-				.stream()
-				.filter(link -> Objects.equals(link.getAssociationClassId(), classId))
-				.findFirst()
-				.orElse(null);
+		return this.getDocument().getModel().validateLinkByAssociationClassIdIndex().get(classId);
 	}
 
 	/**
 	 * Finds the link by ID that matches the supplied input.
 	 *
-	 * @param id stable id of the model element
+	 * @param linkId stable id of the model element
 	 * @return the matching link by ID, or {@code null} when no match exists
 	 */
-	default LinkModel findLinkById(final String id) {
-		for (final LinkModel linkModel : this.getDocument().getModel().getConceptualLinks()) {
-			if (linkModel.getId().equals(id)) {
-				return linkModel;
-			}
-		}
-		for (final LinkModel linkModel : this.getDocument().getModel().getTechnicalLinks()) {
-			if (linkModel.getId().equals(id)) {
-				return linkModel;
-			}
-		}
-		return null;
+	default LinkModel findLinkById(final String linkId) {
+		return getDocument().getModel().validateLinkByIdIndex().get(linkId);
 	}
 
 	/**
@@ -151,13 +106,7 @@ interface DiagramModelLookup extends DiagramCanvasExt {
 			return null;
 		}
 
-		for (final FieldModel fieldModel : classModel.getFields()) {
-			if (fieldModel.isPrimaryKey()) {
-				return fieldModel;
-			}
-		}
-
-		return null;
+		return findFieldById(classModel, classModel.validatePrimaryKeyFieldIdsIndex().iterator().next());
 	}
 
 	/**
@@ -190,4 +139,14 @@ interface DiagramModelLookup extends DiagramCanvasExt {
 
 		return fieldId == null || this.findFieldById(classId, fieldId) != null;
 	}
+
+	default boolean linkEndpointExists(LinkEnd linkEnd) {
+		if (!linkEnd.hasField()) {
+			return findClassById(linkEnd.getClassId()) != null;
+		} else {
+			final ClassModel classModel = findClassById(linkEnd.getClassId());
+			return classModel != null && findFieldById(classModel, linkEnd.getFieldId()) != null;
+		}
+	}
+
 }

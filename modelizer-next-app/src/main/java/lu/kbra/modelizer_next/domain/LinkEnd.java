@@ -63,6 +63,10 @@ public class LinkEnd {
 		this.fieldId = fieldId;
 	}
 
+	public boolean hasField() {
+		return fieldId == null || fieldId.isBlank();
+	}
+
 	/**
 	 * Builds a debug string for this link end.
 	 *
