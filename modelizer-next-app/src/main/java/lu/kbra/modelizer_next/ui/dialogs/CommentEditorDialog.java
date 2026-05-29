@@ -47,6 +47,13 @@ import lu.kbra.modelizer_next.ui.component.ColorButton;
 public final class CommentEditorDialog {
 
 	/**
+	 * Represents a holder in the dialog part of the application.
+	 */
+	private static final class Holder {
+		private Result result;
+	}
+
+	/**
 	 * Immutable value object for result data.
 	 *
 	 * @param text                text to display or edit
@@ -59,15 +66,16 @@ public final class CommentEditorDialog {
 	 * @param visibleInLogical    whether visible in logical is enabled
 	 * @param visibleInPhysical   whether visible in physical is enabled
 	 */
-	public record Result(String text, Color textColor, Color backgroundColor, Color borderColor, CommentKind kind, CommentBinding binding,
-			boolean visibleInConceptual, boolean visibleInLogical, boolean visibleInPhysical) {
-	}
-
-	/**
-	 * Represents a holder in the dialog part of the application.
-	 */
-	private static final class Holder {
-		private Result result;
+	public record Result(
+			String text,
+			Color textColor,
+			Color backgroundColor,
+			Color borderColor,
+			CommentKind kind,
+			CommentBinding binding,
+			boolean visibleInConceptual,
+			boolean visibleInLogical,
+			boolean visibleInPhysical) {
 	}
 
 	/**
@@ -146,6 +154,65 @@ public final class CommentEditorDialog {
 	}
 
 	/**
+	 * Resolves the initial association from the current model and layout state.
+	 *
+	 * @param document       document to read or modify
+	 * @param initialComment initial comment value used by the operation
+	 * @return the resolved initial association
+	 */
+	private static AssociationTarget resolveInitialAssociation(final ModelDocument document, final CommentModel initialComment) {
+		if (initialComment == null || initialComment.getKind() == CommentKind.STANDALONE || initialComment.getBinding() == null) {
+			return AssociationTarget.standalone();
+		}
+
+		if (initialComment.getBinding().getTargetType() == BoundTargetType.CLASS) {
+			for (final ClassModel classModel : document.getModel().getClasses()) {
+				if (classModel.getId().equals(initialComment.getBinding().getTargetId())) {
+					return AssociationTarget.forClass(classModel);
+				}
+			}
+		}
+
+		for (final LinkModel linkModel : document.getModel().getConceptualLinks()) {
+			if (linkModel.getId().equals(initialComment.getBinding().getTargetId())) {
+				return AssociationTarget.forLink(linkModel, true);
+			}
+		}
+		for (final LinkModel linkModel : document.getModel().getTechnicalLinks()) {
+			if (linkModel.getId().equals(initialComment.getBinding().getTargetId())) {
+				return AssociationTarget.forLink(linkModel, false);
+			}
+		}
+
+		return AssociationTarget.standalone();
+	}
+
+	/**
+	 * Creates one labeled row for a dialog form.
+	 *
+	 * @param labelText text value for label text
+	 * @param component Swing component to configure
+	 * @return the row result
+	 */
+	private static JPanel row(final String labelText, final Component component) {
+		final JPanel row = new JPanel(new BorderLayout(6, 6));
+		row.setBorder(BorderFactory.createEmptyBorder(4, 0, 4, 0));
+		row.add(new JLabel(labelText), BorderLayout.NORTH);
+		row.add(component, BorderLayout.CENTER);
+		return row;
+	}
+
+	/**
+	 * Returns safe text for displaying possibly null values.
+	 *
+	 * @param value value to process
+	 * @return the safe result
+	 */
+	private static String safe(final String value) {
+		return value == null ? "" : value;
+	}
+
+	/**
 	 * Shows the dialog.
 	 *
 	 * @param parent         parent component used for dialog ownership
@@ -154,11 +221,8 @@ public final class CommentEditorDialog {
 	 * @param panelType      diagram panel type whose model or layout should be used
 	 * @return the show dialog result
 	 */
-	public static Result showDialog(
-			final Component parent,
-			final ModelDocument document,
-			final CommentModel initialComment,
-			final PanelType panelType) {
+	public static Result
+			showDialog(final Component parent, final ModelDocument document, final CommentModel initialComment, final PanelType panelType) {
 		final Window owner = parent == null ? null : SwingUtilities.getWindowAncestor(parent);
 		final JDialog dialog = new JDialog(owner, "Edit comment", Dialog.ModalityType.APPLICATION_MODAL);
 
@@ -328,65 +392,6 @@ public final class CommentEditorDialog {
 		dialog.setVisible(true);
 
 		return holder.result;
-	}
-
-	/**
-	 * Resolves the initial association from the current model and layout state.
-	 *
-	 * @param document       document to read or modify
-	 * @param initialComment initial comment value used by the operation
-	 * @return the resolved initial association
-	 */
-	private static AssociationTarget resolveInitialAssociation(final ModelDocument document, final CommentModel initialComment) {
-		if (initialComment == null || initialComment.getKind() == CommentKind.STANDALONE || initialComment.getBinding() == null) {
-			return AssociationTarget.standalone();
-		}
-
-		if (initialComment.getBinding().getTargetType() == BoundTargetType.CLASS) {
-			for (final ClassModel classModel : document.getModel().getClasses()) {
-				if (classModel.getId().equals(initialComment.getBinding().getTargetId())) {
-					return AssociationTarget.forClass(classModel);
-				}
-			}
-		}
-
-		for (final LinkModel linkModel : document.getModel().getConceptualLinks()) {
-			if (linkModel.getId().equals(initialComment.getBinding().getTargetId())) {
-				return AssociationTarget.forLink(linkModel, true);
-			}
-		}
-		for (final LinkModel linkModel : document.getModel().getTechnicalLinks()) {
-			if (linkModel.getId().equals(initialComment.getBinding().getTargetId())) {
-				return AssociationTarget.forLink(linkModel, false);
-			}
-		}
-
-		return AssociationTarget.standalone();
-	}
-
-	/**
-	 * Creates one labeled row for a dialog form.
-	 *
-	 * @param labelText text value for label text
-	 * @param component Swing component to configure
-	 * @return the row result
-	 */
-	private static JPanel row(final String labelText, final Component component) {
-		final JPanel row = new JPanel(new BorderLayout(6, 6));
-		row.setBorder(BorderFactory.createEmptyBorder(4, 0, 4, 0));
-		row.add(new JLabel(labelText), BorderLayout.NORTH);
-		row.add(component, BorderLayout.CENTER);
-		return row;
-	}
-
-	/**
-	 * Returns safe text for displaying possibly null values.
-	 *
-	 * @param value value to process
-	 * @return the safe result
-	 */
-	private static String safe(final String value) {
-		return value == null ? "" : value;
 	}
 
 	/**

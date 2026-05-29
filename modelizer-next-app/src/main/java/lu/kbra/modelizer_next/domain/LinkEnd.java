@@ -45,6 +45,10 @@ public class LinkEnd {
 		return this.fieldId;
 	}
 
+	public boolean hasField() {
+		return this.fieldId == null || this.fieldId.isBlank();
+	}
+
 	/**
 	 * Sets the class ID.
 	 *
@@ -61,10 +65,6 @@ public class LinkEnd {
 	 */
 	public void setFieldId(final String fieldId) {
 		this.fieldId = fieldId;
-	}
-
-	public boolean hasField() {
-		return fieldId == null || fieldId.isBlank();
 	}
 
 	/**

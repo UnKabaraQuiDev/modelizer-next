@@ -74,22 +74,22 @@ public interface NamesOwner {
 	/**
 	 * Sets the name.
 	 *
-	 * @param panelType diagram panel type whose model or layout should be used
-	 * @param name      name value to read, write, or display
-	 */
-	default void setName(final PanelType panelType, final String name) {
-		this.getNames().set(panelType, name);
-	}
-
-	/**
-	 * Sets the name.
-	 *
 	 * @param panelType      diagram panel type whose model or layout should be used
 	 * @param maybeTechnical whether maybe technical is enabled
 	 * @param name           name value to read, write, or display
 	 */
 	default void setName(final PanelType panelType, final boolean maybeTechnical, final String name) {
 		this.getNames().set(panelType, maybeTechnical, name);
+	}
+
+	/**
+	 * Sets the name.
+	 *
+	 * @param panelType diagram panel type whose model or layout should be used
+	 * @param name      name value to read, write, or display
+	 */
+	default void setName(final PanelType panelType, final String name) {
+		this.getNames().set(panelType, name);
 	}
 
 	/**

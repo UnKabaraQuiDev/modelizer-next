@@ -15,7 +15,11 @@ import lu.kbra.modelizer_next.common.VersionComparator.ParsedVersion;
  * @param releasePageUri URI to use
  * @param platform       target platform to match
  */
-public record BootstrapInstallerUpdate(ParsedVersion currentVersion, ParsedVersion latestVersion, URI installerUri, URI releasePageUri,
+public record BootstrapInstallerUpdate(
+		ParsedVersion currentVersion,
+		ParsedVersion latestVersion,
+		URI installerUri,
+		URI releasePageUri,
 		Platform platform) {
 
 	/**

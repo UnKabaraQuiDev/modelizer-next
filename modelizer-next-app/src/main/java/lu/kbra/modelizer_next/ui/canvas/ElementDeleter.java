@@ -56,7 +56,7 @@ public interface ElementDeleter extends DiagramCanvasExt {
 	 * @param commentId id of the comment to look up or modify
 	 */
 	default void deleteComment(final String commentId) {
-		final CommentModel commentModel = getCanvas().findCommentById(commentId);
+		final CommentModel commentModel = this.getCanvas().findCommentById(commentId);
 		this.getDocument().getModel().removeComment(commentModel);
 		this.getCanvas()
 				.getPanelState()
@@ -71,8 +71,8 @@ public interface ElementDeleter extends DiagramCanvasExt {
 	 * @param fieldId id of the field to look up or modify
 	 */
 	default void deleteField(final String classId, final String fieldId) {
-		final ClassModel classModel = getCanvas().findClassById(classId);
-		final FieldModel fieldModel = getCanvas().findFieldById(classModel, fieldId);
+		final ClassModel classModel = this.getCanvas().findClassById(classId);
+		final FieldModel fieldModel = this.getCanvas().findFieldById(classModel, fieldId);
 
 		classModel.removeField(fieldModel);
 		this.getDocument()
@@ -91,7 +91,7 @@ public interface ElementDeleter extends DiagramCanvasExt {
 	 * @param linkId id of the link to look up or modify
 	 */
 	default void deleteLink(final String linkId) {
-		final LinkModel linkModel = getCanvas().findLinkById(linkId);
+		final LinkModel linkModel = this.getCanvas().findLinkById(linkId);
 		this.getCanvas().getActiveLinks().removeIf(link -> link.getId().equals(linkId));
 		this.getDocument().getModel().removeConceptualLink(linkModel);
 		this.getDocument().getModel().removeTechnicalLink(linkModel);

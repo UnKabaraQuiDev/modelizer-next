@@ -61,14 +61,22 @@ public class FieldModel implements NamesOwner, IdOwner, StyleOwner {
 	}
 
 	/**
-	 * Sets the border color.
+	 * Returns the flags.
 	 *
-	 * @param c c value used by the operation
+	 * @return the flags
 	 */
-	@Deprecated
-	@Override
-	public void setBorderColor(Color c) {
-		StyleOwner.super.setBorderColor(c);
+	public List<String> getFlags() {
+		final List<String> ll = new ArrayList<>();
+		if (this.primaryKey) {
+			ll.add(FieldModel.PRIMARY_KEY_FLAG);
+		}
+		if (this.notNull) {
+			ll.add(FieldModel.NOT_NULL_FLAG);
+		}
+		if (this.unique) {
+			ll.add(FieldModel.UNIQUE_FLAG);
+		}
+		return ll;
 	}
 
 	/**
@@ -111,6 +119,15 @@ public class FieldModel implements NamesOwner, IdOwner, StyleOwner {
 	}
 
 	/**
+	 * Checks whether this object has a flags.
+	 *
+	 * @return {@code true} if flags exists; otherwise {@code false}
+	 */
+	public boolean hasFlags() {
+		return this.primaryKey || this.notNull || this.unique;
+	}
+
+	/**
 	 * Checks whether not null is enabled or applies.
 	 *
 	 * @return {@code true} if not null is enabled or applies; otherwise {@code false}
@@ -144,6 +161,17 @@ public class FieldModel implements NamesOwner, IdOwner, StyleOwner {
 	 */
 	public boolean isUnique() {
 		return this.unique;
+	}
+
+	/**
+	 * Sets the border color.
+	 *
+	 * @param c c value used by the operation
+	 */
+	@Deprecated
+	@Override
+	public void setBorderColor(final Color c) {
+		StyleOwner.super.setBorderColor(c);
 	}
 
 	/**
@@ -219,34 +247,6 @@ public class FieldModel implements NamesOwner, IdOwner, StyleOwner {
 	 */
 	public void setUnique(final boolean unique) {
 		this.unique = unique;
-	}
-
-	/**
-	 * Returns the flags.
-	 *
-	 * @return the flags
-	 */
-	public List<String> getFlags() {
-		final List<String> ll = new ArrayList<>();
-		if (primaryKey) {
-			ll.add(PRIMARY_KEY_FLAG);
-		}
-		if (notNull) {
-			ll.add(NOT_NULL_FLAG);
-		}
-		if (unique) {
-			ll.add(UNIQUE_FLAG);
-		}
-		return ll;
-	}
-
-	/**
-	 * Checks whether this object has a flags.
-	 *
-	 * @return {@code true} if flags exists; otherwise {@code false}
-	 */
-	public boolean hasFlags() {
-		return primaryKey || notNull || unique;
 	}
 
 	/**

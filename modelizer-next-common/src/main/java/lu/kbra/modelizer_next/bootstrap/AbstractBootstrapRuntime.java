@@ -60,6 +60,34 @@ public class AbstractBootstrapRuntime {
 	}
 
 	/**
+	 * Deletes installed update folders that are no longer needed.
+	 *
+	 * @return the free unused installed updates result
+	 * @throws IOException if the operation cannot be completed
+	 */
+	public long freeUnusedInstalledUpdates() throws IOException {
+		return 0L;
+	}
+
+	/**
+	 * Returns the current application version.
+	 *
+	 * @return the current application version
+	 */
+	public String getCurrentApplicationVersion() {
+		return null;
+	}
+
+	/**
+	 * Returns the installed updates directory.
+	 *
+	 * @return the installed updates directory
+	 */
+	public Path getInstalledUpdatesDirectory() {
+		return null;
+	}
+
+	/**
 	 * Returns the installed updates disk usage bytes.
 	 *
 	 * @return the installed updates disk usage bytes
@@ -77,34 +105,6 @@ public class AbstractBootstrapRuntime {
 	 */
 	public int getInstalledUpdatesFileCount() throws IOException {
 		return 0;
-	}
-
-	/**
-	 * Returns the installed updates directory.
-	 *
-	 * @return the installed updates directory
-	 */
-	public Path getInstalledUpdatesDirectory() {
-		return null;
-	}
-
-	/**
-	 * Deletes installed update folders that are no longer needed.
-	 *
-	 * @return the free unused installed updates result
-	 * @throws IOException if the operation cannot be completed
-	 */
-	public long freeUnusedInstalledUpdates() throws IOException {
-		return 0L;
-	}
-
-	/**
-	 * Returns the current application version.
-	 *
-	 * @return the current application version
-	 */
-	public String getCurrentApplicationVersion() {
-		return null;
 	}
 
 	/**

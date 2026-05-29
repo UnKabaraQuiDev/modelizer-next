@@ -29,8 +29,8 @@ public class VersionComparator implements Comparator<String> {
 		 */
 		@Override
 		public final String toString() {
-			return numbers.stream().map(v -> Integer.toString(v)).collect(Collectors.joining(".")) + "-" + updateChannel.name() + "-"
-					+ buildNumber;
+			return this.numbers.stream().map(v -> Integer.toString(v)).collect(Collectors.joining(".")) + "-" + this.updateChannel.name()
+					+ "-" + this.buildNumber;
 		}
 
 	}
@@ -52,22 +52,6 @@ public class VersionComparator implements Comparator<String> {
 
 		return Long.compare(a.buildNumber(), b.buildNumber());
 	};
-
-	/**
-	 * Compares two values using this comparator's ordering rules.
-	 *
-	 * @param left  text value for left
-	 * @param right text value for right
-	 * @return a negative value, zero, or a positive value according to the ordering rules
-	 */
-	@Override
-	public int compare(final String left, final String right) {
-		final ParsedVersion a = VersionComparator.parse(left);
-		final ParsedVersion b = VersionComparator.parse(right);
-
-		return PARSED_COMPARATOR.compare(a, b);
-
-	}
 
 	/**
 	 * Parses the supplied text into the value type used by this class.
@@ -135,6 +119,22 @@ public class VersionComparator implements Comparator<String> {
 		case "RELEASE" -> UpdateChannel.CHANNEL_RELEASE;
 		default -> -1;
 		};
+	}
+
+	/**
+	 * Compares two values using this comparator's ordering rules.
+	 *
+	 * @param left  text value for left
+	 * @param right text value for right
+	 * @return a negative value, zero, or a positive value according to the ordering rules
+	 */
+	@Override
+	public int compare(final String left, final String right) {
+		final ParsedVersion a = VersionComparator.parse(left);
+		final ParsedVersion b = VersionComparator.parse(right);
+
+		return VersionComparator.PARSED_COMPARATOR.compare(a, b);
+
 	}
 
 }

@@ -126,7 +126,8 @@ public final class CommandLineExportParser {
 			case "-t", "--type" -> format = CommandLineExportParser.parseFormat(CommandLineExportParser.requireValue(args, ++i, arg));
 			case "-s", "--scope" -> scope = CommandLineExportParser.parseScope(CommandLineExportParser.requireValue(args, ++i, arg));
 			case "-p", "--panels" -> panelTypes = CommandLineExportParser.parsePanels(CommandLineExportParser.requireValue(args, ++i, arg));
-			case "-o", "--out" -> outputDirectory = resolveHome(CommandLineExportParser.requireValue(args, ++i, arg)).toFile();
+			case "-o", "--out" ->
+				outputDirectory = CommandLineExportParser.resolveHome(CommandLineExportParser.requireValue(args, ++i, arg)).toFile();
 			case "-n", "--pattern" -> fileNamePattern = CommandLineExportParser.requireValue(args, ++i, arg);
 			case "-f", "--force" -> force = true;
 			case "-m", "--multiple" -> multiple = true;
@@ -174,43 +175,6 @@ public final class CommandLineExportParser {
 				multiple,
 				wildcard,
 				jobCount);
-	}
-
-	/**
-	 * Resolves the home from the current model and layout state.
-	 *
-	 * @param path file system path to read or write
-	 * @return the resolved home
-	 */
-	public static Path resolveHome(String path) {
-		if (path.startsWith("~")) {
-			path = System.getProperty("user.home") + path.substring(1);
-		}
-		return Paths.get(path).normalize();
-	}
-
-	/**
-	 * Prints the help.
-	 */
-	public static void printHelp() {
-		System.out.println("""
-				Usage:
-				  modelizer --export <file> --type <svg|png> [options]
-
-				Options:
-				  -e, --export <file>        File to load and export
-				  -t, --type <svg|png>       Export format
-				  -o, --out <directory>      Output directory, default: current directory
-				  -s, --scope <scope>        selection (s), view (v), everything/all (a), default: everything
-				  -p, --panels <list>        Comma-separated PanelType names: conceptual (c), logical (l), physical (p)
-				  -n, --pattern <pattern>    File name pattern, default: '%DEFAULT_FILE_PATTER%', available: %FILE_PATTERN_TOKENS%
-				  -f, --force                Continue on legacy/newer-version warnings
-				  -h, --help                 Print this help
-				  -m, --multiple             Multiple input files, separated by commas "path1,path2,path3..."
-				  -w, --wildcard             Enable wildcard support for input files, supports: *, **, ?
-				  -j, --jobs <count>         Dispatch multiple threads to speed up the export process
-				""".replace("%DEFAULT_FILE_PATTER%", ViewExporter.DEFAULT_FILE_PATTERN)
-				.replace("%FILE_PATTERN_TOKENS%", ViewExporter.FILE_PATTERN_TOKENS.stream().collect(Collectors.joining(", "))));
 	}
 
 	/**
@@ -280,6 +244,30 @@ public final class CommandLineExportParser {
 	}
 
 	/**
+	 * Prints the help.
+	 */
+	public static void printHelp() {
+		System.out.println("""
+				Usage:
+				  modelizer --export <file> --type <svg|png> [options]
+
+				Options:
+				  -e, --export <file>        File to load and export
+				  -t, --type <svg|png>       Export format
+				  -o, --out <directory>      Output directory, default: current directory
+				  -s, --scope <scope>        selection (s), view (v), everything/all (a), default: everything
+				  -p, --panels <list>        Comma-separated PanelType names: conceptual (c), logical (l), physical (p)
+				  -n, --pattern <pattern>    File name pattern, default: '%DEFAULT_FILE_PATTER%', available: %FILE_PATTERN_TOKENS%
+				  -f, --force                Continue on legacy/newer-version warnings
+				  -h, --help                 Print this help
+				  -m, --multiple             Multiple input files, separated by commas "path1,path2,path3..."
+				  -w, --wildcard             Enable wildcard support for input files, supports: *, **, ?
+				  -j, --jobs <count>         Dispatch multiple threads to speed up the export process
+				""".replace("%DEFAULT_FILE_PATTER%", ViewExporter.DEFAULT_FILE_PATTERN)
+				.replace("%FILE_PATTERN_TOKENS%", ViewExporter.FILE_PATTERN_TOKENS.stream().collect(Collectors.joining(", "))));
+	}
+
+	/**
 	 * Reads and validates the required value.
 	 *
 	 * @param args   command-line arguments supplied by the launcher
@@ -294,6 +282,19 @@ public final class CommandLineExportParser {
 		}
 
 		return args[index];
+	}
+
+	/**
+	 * Resolves the home from the current model and layout state.
+	 *
+	 * @param path file system path to read or write
+	 * @return the resolved home
+	 */
+	public static Path resolveHome(String path) {
+		if (path.startsWith("~")) {
+			path = System.getProperty("user.home") + path.substring(1);
+		}
+		return Paths.get(path).normalize();
 	}
 
 	/**

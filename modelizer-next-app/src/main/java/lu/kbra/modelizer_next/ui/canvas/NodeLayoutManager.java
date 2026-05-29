@@ -57,19 +57,19 @@ public interface NodeLayoutManager extends DiagramCanvasExt {
 				this.getCanvas().stringWidth(DiagramCanvas.TITLE_FONT, this.getCanvas().resolveClassTitle(classModel))
 						+ DiagramCanvas.TEXT_PADDING * 2);
 
-		if (getPanelType() == PanelType.CONCEPTUAL || getPanelType() == PanelType.LOGICAL) {
-			for (final FieldModel fieldModel : classModel.getFields(getPanelType())) {
+		if (this.getPanelType() == PanelType.CONCEPTUAL || this.getPanelType() == PanelType.LOGICAL) {
+			for (final FieldModel fieldModel : classModel.getFields(this.getPanelType())) {
 				width = (int) Math.max(width,
 						this.getCanvas().stringWidth(DiagramCanvas.BODY_FONT, this.getCanvas().resolveFieldName(fieldModel))
 								+ DiagramCanvas.TEXT_PADDING * 2);
 			}
 		} else {
 			width = (int) Math.max(width,
-					(double) getCanvas().resolveClassColumWidths(classModel.getFields(getPanelType())).map((a, b, c) -> a + b + c)
+					this.getCanvas().resolveClassColumWidths(classModel.getFields(this.getPanelType())).map((a, b, c) -> a + b + c)
 							+ 3 * DiagramCanvas.TEXT_PADDING);
 		}
 
-		final int visibleFieldCount = classModel.getFieldCount(getPanelType());
+		final int visibleFieldCount = classModel.getFieldCount(this.getPanelType());
 		final int height = DiagramCanvas.CLASS_HEADER_HEIGHT + visibleFieldCount * DiagramCanvas.CLASS_ROW_HEIGHT;
 
 		layout.getSize().setWidth(width);
@@ -157,12 +157,8 @@ public interface NodeLayoutManager extends DiagramCanvasExt {
 	 * @param height height value
 	 * @return the expand bounds result
 	 */
-	default Rectangle2D.Double expandBounds(
-			final Rectangle2D.Double bounds,
-			final double x,
-			final double y,
-			final double width,
-			final double height) {
+	default Rectangle2D.Double
+			expandBounds(final Rectangle2D.Double bounds, final double x, final double y, final double width, final double height) {
 
 		final double safeWidth = Math.max(1.0, width);
 		final double safeHeight = Math.max(1.0, height);

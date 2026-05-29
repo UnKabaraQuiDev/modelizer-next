@@ -31,38 +31,6 @@ public final class UpdateRuntimes {
 		}
 
 		/**
-		 * Returns the installed updates disk usage bytes.
-		 *
-		 * @return the installed updates disk usage bytes
-		 * @throws IOException if the operation cannot be completed
-		 */
-		@Override
-		public long getInstalledUpdatesDiskUsageBytes() throws IOException {
-			return 0L;
-		}
-
-		/**
-		 * Returns the installed updates file count.
-		 *
-		 * @return the installed updates file count
-		 * @throws IOException if the operation cannot be completed
-		 */
-		@Override
-		public int getInstalledUpdatesFileCount() throws IOException {
-			return 0;
-		}
-
-		/**
-		 * Returns the installed updates directory.
-		 *
-		 * @return the installed updates directory
-		 */
-		@Override
-		public Path getInstalledUpdatesDirectory() {
-			return null;
-		}
-
-		/**
 		 * Deletes installed update folders that are no longer needed.
 		 *
 		 * @return the free unused installed updates result
@@ -104,6 +72,38 @@ public final class UpdateRuntimes {
 		}
 
 		/**
+		 * Returns the installed updates directory.
+		 *
+		 * @return the installed updates directory
+		 */
+		@Override
+		public Path getInstalledUpdatesDirectory() {
+			return null;
+		}
+
+		/**
+		 * Returns the installed updates disk usage bytes.
+		 *
+		 * @return the installed updates disk usage bytes
+		 * @throws IOException if the operation cannot be completed
+		 */
+		@Override
+		public long getInstalledUpdatesDiskUsageBytes() throws IOException {
+			return 0L;
+		}
+
+		/**
+		 * Returns the installed updates file count.
+		 *
+		 * @return the installed updates file count
+		 * @throws IOException if the operation cannot be completed
+		 */
+		@Override
+		public int getInstalledUpdatesFileCount() throws IOException {
+			return 0;
+		}
+
+		/**
 		 * Returns the selected channel during bootstrap/update processing.
 		 *
 		 * @return the selected channel
@@ -123,10 +123,9 @@ public final class UpdateRuntimes {
 		 * @throws IOException if the operation cannot be completed
 		 */
 		@Override
-		public boolean installUpdateAndRestart(
-				final Component parentComponent,
-				final AvailableUpdate update,
-				final UpdatePreparation preparation) throws IOException {
+		public boolean
+				installUpdateAndRestart(final Component parentComponent, final AvailableUpdate update, final UpdatePreparation preparation)
+						throws IOException {
 			return false;
 		}
 

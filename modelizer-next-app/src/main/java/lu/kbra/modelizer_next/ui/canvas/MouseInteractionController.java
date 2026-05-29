@@ -54,6 +54,32 @@ interface MouseInteractionController extends DiagramCanvasExt {
 	}
 
 	/**
+	 * Returns the selected drag anchor on the active canvas.
+	 *
+	 * @param element element value used by the operation
+	 * @return the selected drag anchor
+	 */
+	default SelectedElement getSelectedDragAnchor(final SelectedElement element) {
+		if (element == null) {
+			return null;
+		}
+
+		if (this.getCanvas().isElementSelected(element)) {
+			return element;
+		}
+
+		if (element.type() == SelectedElement.SelectedType.FIELD) {
+			final SelectedElement parentClass = SelectedElement.forClass(element.classId());
+
+			if (this.getCanvas().isElementSelected(parentClass)) {
+				return parentClass;
+			}
+		}
+
+		return null;
+	}
+
+	/**
 	 * Handles the mouse dragged on the active canvas.
 	 *
 	 * @param event event object supplied by Swing
@@ -112,32 +138,6 @@ interface MouseInteractionController extends DiagramCanvasExt {
 		final double zoom = this.getCanvas().getPanelState().getZoom();
 		this.getCanvas().currentDragOffset = new Point2D.Double(deltaX * zoom, deltaY * zoom);
 		this.getCanvas().repaint();
-	}
-
-	/**
-	 * Returns the selected drag anchor on the active canvas.
-	 *
-	 * @param element element value used by the operation
-	 * @return the selected drag anchor
-	 */
-	default SelectedElement getSelectedDragAnchor(final SelectedElement element) {
-		if (element == null) {
-			return null;
-		}
-
-		if (this.getCanvas().isElementSelected(element)) {
-			return element;
-		}
-
-		if (element.type() == SelectedElement.SelectedType.FIELD) {
-			final SelectedElement parentClass = SelectedElement.forClass(element.classId());
-
-			if (this.getCanvas().isElementSelected(parentClass)) {
-				return parentClass;
-			}
-		}
-
-		return null;
 	}
 
 	/**

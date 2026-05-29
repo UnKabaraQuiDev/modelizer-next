@@ -19,7 +19,7 @@ interface DiagramModelLookup extends DiagramCanvasExt {
 	 * @return the matching class by ID, or {@code null} when no match exists
 	 */
 	default ClassModel findClassById(final String id) {
-		return getDocument().getModel().validateClassByIdIndex().get(id);
+		return this.getDocument().getModel().validateClassByIdIndex().get(id);
 	}
 
 	/**
@@ -29,7 +29,7 @@ interface DiagramModelLookup extends DiagramCanvasExt {
 	 * @return the matching comment by ID, or {@code null} when no match exists
 	 */
 	default CommentModel findCommentById(final String commentId) {
-		return getDocument().getModel().validateCommentsByIdIndex().get(commentId);
+		return this.getDocument().getModel().validateCommentsByIdIndex().get(commentId);
 	}
 
 	/**
@@ -54,7 +54,7 @@ interface DiagramModelLookup extends DiagramCanvasExt {
 	 * @return the matching field by ID, or {@code null} when no match exists
 	 */
 	default FieldModel findFieldById(final String classId, final String fieldId) {
-		return findFieldById(this.findClassById(classId), fieldId);
+		return this.findFieldById(this.findClassById(classId), fieldId);
 	}
 
 	/**
@@ -74,7 +74,7 @@ interface DiagramModelLookup extends DiagramCanvasExt {
 	 * @return the matching link by ID, or {@code null} when no match exists
 	 */
 	default LinkModel findLinkById(final String linkId) {
-		return getDocument().getModel().validateLinkByIdIndex().get(linkId);
+		return this.getDocument().getModel().validateLinkByIdIndex().get(linkId);
 	}
 
 	/**
@@ -106,7 +106,7 @@ interface DiagramModelLookup extends DiagramCanvasExt {
 			return null;
 		}
 
-		return findFieldById(classModel, classModel.validatePrimaryKeyFieldIdsIndex().iterator().next());
+		return this.findFieldById(classModel, classModel.validatePrimaryKeyFieldIdsIndex().iterator().next());
 	}
 
 	/**
@@ -125,6 +125,15 @@ interface DiagramModelLookup extends DiagramCanvasExt {
 		};
 	}
 
+	default boolean linkEndpointExists(final LinkEnd linkEnd) {
+		if (!linkEnd.hasField()) {
+			return this.findClassById(linkEnd.getClassId()) != null;
+		} else {
+			final ClassModel classModel = this.findClassById(linkEnd.getClassId());
+			return classModel != null && this.findFieldById(classModel, linkEnd.getFieldId()) != null;
+		}
+	}
+
 	/**
 	 * Checks whether the link endpoint exists.
 	 *
@@ -138,15 +147,6 @@ interface DiagramModelLookup extends DiagramCanvasExt {
 		}
 
 		return fieldId == null || this.findFieldById(classId, fieldId) != null;
-	}
-
-	default boolean linkEndpointExists(LinkEnd linkEnd) {
-		if (!linkEnd.hasField()) {
-			return findClassById(linkEnd.getClassId()) != null;
-		} else {
-			final ClassModel classModel = findClassById(linkEnd.getClassId());
-			return classModel != null && findFieldById(classModel, linkEnd.getFieldId()) != null;
-		}
 	}
 
 }

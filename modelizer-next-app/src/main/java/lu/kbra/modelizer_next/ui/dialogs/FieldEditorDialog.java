@@ -33,6 +33,13 @@ import lu.kbra.modelizer_next.ui.component.ColorButton;
 public final class FieldEditorDialog {
 
 	/**
+	 * Represents a holder in the dialog part of the application.
+	 */
+	private static final class Holder {
+		private Result result;
+	}
+
+	/**
 	 * Immutable value object for result data.
 	 *
 	 * @param name            name value to read, write, or display
@@ -46,15 +53,68 @@ public final class FieldEditorDialog {
 	 * @param type            type value that selects the operation mode
 	 * @param technicalOnly   whether technical only is enabled
 	 */
-	public record Result(String name, String technicalName, boolean primaryKey, boolean unique, boolean notNull, Color textColor,
-			Color backgroundColor, int moveDelta, String type, boolean technicalOnly) {
+	public record Result(
+			String name,
+			String technicalName,
+			boolean primaryKey,
+			boolean unique,
+			boolean notNull,
+			Color textColor,
+			Color backgroundColor,
+			int moveDelta,
+			String type,
+			boolean technicalOnly) {
 	}
 
 	/**
-	 * Represents a holder in the dialog part of the application.
+	 * Applies the field values.
+	 *
+	 * @param fieldModel            field model affected by the operation
+	 * @param nameField             name field value used by the operation
+	 * @param technicalNameField    technical name field value used by the operation
+	 * @param primaryKeyBox         primary key box value used by the operation
+	 * @param uniqueBox             unique box value used by the operation
+	 * @param notNullBox            not null box value used by the operation
+	 * @param textColorButton       button to configure
+	 * @param backgroundColorButton button to configure
+	 * @param typeField             type field value used by the operation
+	 * @param technicalOnly         technical only value used by the operation
 	 */
-	private static final class Holder {
-		private Result result;
+	private static void applyFieldValues(
+			final FieldModel fieldModel,
+			final JTextField nameField,
+			final JTextField technicalNameField,
+			final JCheckBox primaryKeyBox,
+			final JCheckBox uniqueBox,
+			final JCheckBox notNullBox,
+			final ColorButton textColorButton,
+			final ColorButton backgroundColorButton,
+			final JComboBox<String> typeField,
+			final JCheckBox technicalOnly) {
+		fieldModel.setConceptualName(nameField.getText());
+		fieldModel.setTechnicalName(technicalNameField.getText());
+		fieldModel.setPrimaryKey(primaryKeyBox.isSelected());
+		fieldModel.setUnique(uniqueBox.isSelected());
+		fieldModel.setNotNull(notNullBox.isSelected());
+		fieldModel.setTextColor(textColorButton.getSelectedColor());
+		fieldModel.setBackgroundColor(backgroundColorButton.getSelectedColor());
+		fieldModel.setType(typeField.getSelectedItem() == null ? null : typeField.getSelectedItem().toString().trim());
+		fieldModel.setTechnicalOnly(technicalOnly.isSelected());
+	}
+
+	/**
+	 * Creates one labeled row for a dialog form.
+	 *
+	 * @param labelText text value for label text
+	 * @param component Swing component to configure
+	 * @return the row result
+	 */
+	private static JPanel row(final String labelText, final Component component) {
+		final JPanel row = new JPanel(new BorderLayout(6, 6));
+		row.setBorder(BorderFactory.createEmptyBorder(4, 0, 4, 0));
+		row.add(new JLabel(labelText), BorderLayout.NORTH);
+		row.add(component, BorderLayout.CENTER);
+		return row;
 	}
 
 	/**
@@ -179,57 +239,6 @@ public final class FieldEditorDialog {
 		dialog.setVisible(true);
 
 		return holder.result;
-	}
-
-	/**
-	 * Applies the field values.
-	 *
-	 * @param fieldModel            field model affected by the operation
-	 * @param nameField             name field value used by the operation
-	 * @param technicalNameField    technical name field value used by the operation
-	 * @param primaryKeyBox         primary key box value used by the operation
-	 * @param uniqueBox             unique box value used by the operation
-	 * @param notNullBox            not null box value used by the operation
-	 * @param textColorButton       button to configure
-	 * @param backgroundColorButton button to configure
-	 * @param typeField             type field value used by the operation
-	 * @param technicalOnly         technical only value used by the operation
-	 */
-	private static void applyFieldValues(
-			final FieldModel fieldModel,
-			final JTextField nameField,
-			final JTextField technicalNameField,
-			final JCheckBox primaryKeyBox,
-			final JCheckBox uniqueBox,
-			final JCheckBox notNullBox,
-			final ColorButton textColorButton,
-			final ColorButton backgroundColorButton,
-			final JComboBox<String> typeField,
-			final JCheckBox technicalOnly) {
-		fieldModel.setConceptualName(nameField.getText());
-		fieldModel.setTechnicalName(technicalNameField.getText());
-		fieldModel.setPrimaryKey(primaryKeyBox.isSelected());
-		fieldModel.setUnique(uniqueBox.isSelected());
-		fieldModel.setNotNull(notNullBox.isSelected());
-		fieldModel.setTextColor(textColorButton.getSelectedColor());
-		fieldModel.setBackgroundColor(backgroundColorButton.getSelectedColor());
-		fieldModel.setType(typeField.getSelectedItem() == null ? null : typeField.getSelectedItem().toString().trim());
-		fieldModel.setTechnicalOnly(technicalOnly.isSelected());
-	}
-
-	/**
-	 * Creates one labeled row for a dialog form.
-	 *
-	 * @param labelText text value for label text
-	 * @param component Swing component to configure
-	 * @return the row result
-	 */
-	private static JPanel row(final String labelText, final Component component) {
-		final JPanel row = new JPanel(new BorderLayout(6, 6));
-		row.setBorder(BorderFactory.createEmptyBorder(4, 0, 4, 0));
-		row.add(new JLabel(labelText), BorderLayout.NORTH);
-		row.add(component, BorderLayout.CENTER);
-		return row;
 	}
 
 	/**

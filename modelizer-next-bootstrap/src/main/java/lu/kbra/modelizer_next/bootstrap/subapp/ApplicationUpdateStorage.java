@@ -37,12 +37,19 @@ public final class ApplicationUpdateStorage {
 	}
 
 	/**
-	 * Returns the updates directory.
+	 * Calculates the disk usage bytes during bootstrap/update processing.
 	 *
-	 * @return the updates directory
+	 * @return the calculate disk usage bytes result
+	 * @throws IOException if the operation cannot be completed
 	 */
-	public Path getUpdatesDirectory() {
-		return BootstrapApp.getApplicationsDirectory().toPath();
+	public long calculateDiskUsageBytes() throws IOException {
+		final Path directory = this.getUpdatesDirectory();
+		if (!Files.isDirectory(directory)) {
+			return 0L;
+		}
+		try (var stream = Files.walk(directory)) {
+			return stream.filter(Files::isRegularFile).mapToLong(this::sizeOf).sum();
+		}
 	}
 
 	/**
@@ -62,19 +69,15 @@ public final class ApplicationUpdateStorage {
 	}
 
 	/**
-	 * Calculates the disk usage bytes during bootstrap/update processing.
+	 * Deletes the if exists during bootstrap/update processing.
 	 *
-	 * @return the calculate disk usage bytes result
+	 * @param path file system path to read or write
+	 * @return the delete if exists result
 	 * @throws IOException if the operation cannot be completed
 	 */
-	public long calculateDiskUsageBytes() throws IOException {
-		final Path directory = this.getUpdatesDirectory();
-		if (!Files.isDirectory(directory)) {
-			return 0L;
-		}
-		try (var stream = Files.walk(directory)) {
-			return stream.filter(Files::isRegularFile).mapToLong(this::sizeOf).sum();
-		}
+	private long deleteIfExists(final Path path) throws IOException {
+		final long size = this.sizeOf(path);
+		return Files.deleteIfExists(path) ? size : 0L;
 	}
 
 	/**
@@ -108,7 +111,7 @@ public final class ApplicationUpdateStorage {
 		}
 		installed.stream()
 				.filter(app -> app.version().updateChannel() == activeChannel)
-				.limit(MAX_RETAINED_UPDATES_PER_CHANNEL)
+				.limit(ApplicationUpdateStorage.MAX_RETAINED_UPDATES_PER_CHANNEL)
 				.map(app -> app.jarFile().toAbsolutePath().normalize())
 				.forEach(keep::add);
 
@@ -118,15 +121,24 @@ public final class ApplicationUpdateStorage {
 			if (keep.contains(path)) {
 				continue;
 			}
-			freed += deleteIfExists(path);
+			freed += this.deleteIfExists(path);
 		}
 
 		try (var stream = Files.list(directory)) {
 			for (final Path path : stream.filter(Files::isRegularFile).filter(this::isTemporaryUpdateFile).toList()) {
-				freed += deleteIfExists(path);
+				freed += this.deleteIfExists(path);
 			}
 		}
 		return freed;
+	}
+
+	/**
+	 * Returns the updates directory.
+	 *
+	 * @return the updates directory
+	 */
+	public Path getUpdatesDirectory() {
+		return BootstrapApp.getApplicationsDirectory().toPath();
 	}
 
 	/**
@@ -138,18 +150,6 @@ public final class ApplicationUpdateStorage {
 	private boolean isTemporaryUpdateFile(final Path path) {
 		final String name = path.getFileName().toString();
 		return name.endsWith(".part") || name.endsWith(".tmp");
-	}
-
-	/**
-	 * Deletes the if exists during bootstrap/update processing.
-	 *
-	 * @param path file system path to read or write
-	 * @return the delete if exists result
-	 * @throws IOException if the operation cannot be completed
-	 */
-	private long deleteIfExists(final Path path) throws IOException {
-		final long size = sizeOf(path);
-		return Files.deleteIfExists(path) ? size : 0L;
 	}
 
 	/**

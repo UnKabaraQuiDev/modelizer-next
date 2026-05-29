@@ -25,16 +25,6 @@ public class StylePalette implements DisplayValueOwner {
 	private Color linkColor = new Color(0x555555);
 
 	/**
-	 * Returns the display value.
-	 *
-	 * @return the display value
-	 */
-	@Override
-	public String getDisplayValue() {
-		return name;
-	}
-
-	/**
 	 * Returns the class background color.
 	 *
 	 * @return the class background color
@@ -86,6 +76,16 @@ public class StylePalette implements DisplayValueOwner {
 	 */
 	public Color getCommentTextColor() {
 		return this.commentTextColor;
+	}
+
+	/**
+	 * Returns the display value.
+	 *
+	 * @return the display value
+	 */
+	@Override
+	public String getDisplayValue() {
+		return this.name;
 	}
 
 	/**

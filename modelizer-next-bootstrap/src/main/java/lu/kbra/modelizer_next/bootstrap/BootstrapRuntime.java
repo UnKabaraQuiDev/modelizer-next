@@ -218,44 +218,12 @@ public class BootstrapRuntime implements UpdateRuntime {
 	public AvailableUpdate checkForUpdates() throws IOException {
 		try {
 			final ParsedVersion currentVersion = this.currentApplication == null ? null : this.currentApplication.version();
-			System.out.println("Comparing " + currentVersion + " on " + configuration.getUpdateChannel());
+			System.out.println("Comparing " + currentVersion + " on " + this.configuration.getUpdateChannel());
 			return this.remoteUpdateService.findLatest(this.configuration.getUpdateChannel(), currentVersion);
 		} catch (final InterruptedException ex) {
 			Thread.currentThread().interrupt();
 			throw new IOException("Interrupted while checking for updates.", ex);
 		}
-	}
-
-	/**
-	 * Returns the installed updates disk usage bytes.
-	 *
-	 * @return the installed updates disk usage bytes
-	 * @throws IOException if the operation cannot be completed
-	 */
-	@Override
-	public long getInstalledUpdatesDiskUsageBytes() throws IOException {
-		return this.updateStorage.calculateDiskUsageBytes();
-	}
-
-	/**
-	 * Returns the installed updates file count.
-	 *
-	 * @return the installed updates file count
-	 * @throws IOException if the operation cannot be completed
-	 */
-	@Override
-	public int getInstalledUpdatesFileCount() throws IOException {
-		return this.updateStorage.countFiles();
-	}
-
-	/**
-	 * Returns the installed updates directory.
-	 *
-	 * @return the installed updates directory
-	 */
-	@Override
-	public Path getInstalledUpdatesDirectory() {
-		return this.updateStorage.getUpdatesDirectory();
 	}
 
 	/**
@@ -300,6 +268,47 @@ public class BootstrapRuntime implements UpdateRuntime {
 	}
 
 	/**
+	 * Returns the force jar name during bootstrap/update processing.
+	 *
+	 * @return the force jar name
+	 */
+	public String getForceJarName() {
+		return this.forceJarName;
+	}
+
+	/**
+	 * Returns the installed updates directory.
+	 *
+	 * @return the installed updates directory
+	 */
+	@Override
+	public Path getInstalledUpdatesDirectory() {
+		return this.updateStorage.getUpdatesDirectory();
+	}
+
+	/**
+	 * Returns the installed updates disk usage bytes.
+	 *
+	 * @return the installed updates disk usage bytes
+	 * @throws IOException if the operation cannot be completed
+	 */
+	@Override
+	public long getInstalledUpdatesDiskUsageBytes() throws IOException {
+		return this.updateStorage.calculateDiskUsageBytes();
+	}
+
+	/**
+	 * Returns the installed updates file count.
+	 *
+	 * @return the installed updates file count
+	 * @throws IOException if the operation cannot be completed
+	 */
+	@Override
+	public int getInstalledUpdatesFileCount() throws IOException {
+		return this.updateStorage.countFiles();
+	}
+
+	/**
 	 * Returns the selected channel during bootstrap/update processing.
 	 *
 	 * @return the selected channel
@@ -307,6 +316,52 @@ public class BootstrapRuntime implements UpdateRuntime {
 	@Override
 	public UpdateChannel getSelectedChannel() {
 		return this.configuration.getUpdateChannel();
+	}
+
+	/**
+	 * Handles the outdated bootstrap launcher.
+	 *
+	 * @param launchException launch exception value used by the operation
+	 * @param forced          whether forced is enabled
+	 * @throws Exception if the operation cannot be completed
+	 */
+	private void handleOutdatedBootstrapLauncher(final AppLaunchException launchException, final boolean forced) throws Exception {
+		final ParsedVersion currentBootstrapVersion = VersionComparator.parse(BootstrapApp.VERSION);
+		final BootstrapLoadingFrame loadingFrame = new BootstrapLoadingFrame();
+		loadingFrame.setVisible(true);
+		try {
+			loadingFrame.update("Checking bootstrap launcher update...", 0, 0);
+			final BootstrapInstallerUpdate update = this.remoteUpdateService
+					.findLatestBootstrapInstaller(this.configuration.getUpdateChannel(), currentBootstrapVersion);
+			if (!update.isUpdateAvailable() && !forced) {
+				throw new AppLaunchException("The application needs a newer bootstrap launcher, but no bootstrap update is available.",
+						launchException);
+			}
+			if (update.platform() == Platform.UNSUPPORTED) {
+				throw new AppLaunchException("The application needs a newer bootstrap launcher, but this platform is not supported.",
+						launchException);
+			}
+
+			final String safeVersion = update.latestVersion().toString().replaceAll("[^A-Za-z0-9._-]", "_");
+			final Path installerPath = BootstrapApp.getTempDirectory()
+					.toPath()
+					.resolve("modelizer-next-bootstrap-" + safeVersion + update.platform().installerExtension());
+			this.remoteUpdateService
+					.download(update.installerUri(), installerPath, update.latestVersion().toString(), loadingFrame::update);
+			loadingFrame.dispose();
+
+			if (BootstrapInstallerLauncher.promptAndStartInstaller(update, installerPath)) {
+				System.exit(0);
+			}
+			throw new AppLaunchException(
+					"The application needs a newer bootstrap launcher. Install the downloaded installer to continue: " + installerPath,
+					launchException);
+		} catch (final InterruptedException ex) {
+			Thread.currentThread().interrupt();
+			throw new AppLaunchException("Interrupted while checking for a bootstrap launcher update.", ex);
+		} finally {
+			loadingFrame.dispose();
+		}
 	}
 
 	/**
@@ -319,10 +374,9 @@ public class BootstrapRuntime implements UpdateRuntime {
 	 * @throws IOException if the operation cannot be completed
 	 */
 	@Override
-	public boolean installUpdateAndRestart(
-			final Component parentComponent,
-			final AvailableUpdate update,
-			final UpdatePreparation preparation) throws IOException {
+	public boolean
+			installUpdateAndRestart(final Component parentComponent, final AvailableUpdate update, final UpdatePreparation preparation)
+					throws IOException {
 		if (update == null || !update.isUpdateAvailable()) {
 			JOptionPane.showMessageDialog(parentComponent,
 					"You are already using the latest version for the selected channel.",
@@ -395,15 +449,6 @@ public class BootstrapRuntime implements UpdateRuntime {
 	}
 
 	/**
-	 * Returns the force jar name during bootstrap/update processing.
-	 *
-	 * @return the force jar name
-	 */
-	public String getForceJarName() {
-		return forceJarName;
-	}
-
-	/**
 	 * Launches the installed application.
 	 *
 	 * @param args       command-line arguments supplied by the launcher
@@ -416,12 +461,14 @@ public class BootstrapRuntime implements UpdateRuntime {
 		try {
 			loadingFrame.update("Checking installed application...", 0, 0);
 
-			if (getForceJarName() != null && Files.exists(BootstrapApp.getApplicationsDirectory().toPath().resolve(getForceJarName()))) {
-				final Path path = BootstrapApp.getApplicationsDirectory().toPath().resolve(getForceJarName());
-				this.currentApplication = inventory.readInstalledApplication(path)
-						.orElseThrow(() -> new IllegalArgumentException("File: '" + getForceJarName() + "' not found, resolved: " + path));
+			if (this.getForceJarName() != null
+					&& Files.exists(BootstrapApp.getApplicationsDirectory().toPath().resolve(this.getForceJarName()))) {
+				final Path path = BootstrapApp.getApplicationsDirectory().toPath().resolve(this.getForceJarName());
+				this.currentApplication = this.inventory.readInstalledApplication(path)
+						.orElseThrow(
+								() -> new IllegalArgumentException("File: '" + this.getForceJarName() + "' not found, resolved: " + path));
 			} else {
-				this.currentApplication = this.inventory.findLatestInstalled(configuration.getUpdateChannel()).orElse(null);
+				this.currentApplication = this.inventory.findLatestInstalled(this.configuration.getUpdateChannel()).orElse(null);
 			}
 
 			if (this.currentApplication == null) {
@@ -459,6 +506,22 @@ public class BootstrapRuntime implements UpdateRuntime {
 	}
 
 	/**
+	 * Checks whether the bootstrapper needs an update.
+	 *
+	 * @param throwable throwable value used by the operation
+	 * @return {@code true} when the condition is met; otherwise {@code false}
+	 */
+	private boolean needsBootstrappUpdate(final Throwable throwable) {
+		for (Throwable current = throwable; current != null; current = current.getCause()) {
+			if (current instanceof ClassNotFoundException || current instanceof NoClassDefFoundError
+					|| current instanceof UnsupportedBootstrapVersionException) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
 	 * Prompts the user to reinstall the bootstrapper when a newer bootstrap installer is available.
 	 *
 	 * @throws Exception if the operation cannot be completed
@@ -482,68 +545,6 @@ public class BootstrapRuntime implements UpdateRuntime {
 		if (choice == JOptionPane.YES_OPTION) {
 			this.handleOutdatedBootstrapLauncher(null, false);
 		}
-	}
-
-	/**
-	 * Handles the outdated bootstrap launcher.
-	 *
-	 * @param launchException launch exception value used by the operation
-	 * @param forced          whether forced is enabled
-	 * @throws Exception if the operation cannot be completed
-	 */
-	private void handleOutdatedBootstrapLauncher(final AppLaunchException launchException, final boolean forced) throws Exception {
-		final ParsedVersion currentBootstrapVersion = VersionComparator.parse(BootstrapApp.VERSION);
-		final BootstrapLoadingFrame loadingFrame = new BootstrapLoadingFrame();
-		loadingFrame.setVisible(true);
-		try {
-			loadingFrame.update("Checking bootstrap launcher update...", 0, 0);
-			final BootstrapInstallerUpdate update = this.remoteUpdateService
-					.findLatestBootstrapInstaller(this.configuration.getUpdateChannel(), currentBootstrapVersion);
-			if (!update.isUpdateAvailable() && !forced) {
-				throw new AppLaunchException("The application needs a newer bootstrap launcher, but no bootstrap update is available.",
-						launchException);
-			}
-			if (update.platform() == Platform.UNSUPPORTED) {
-				throw new AppLaunchException("The application needs a newer bootstrap launcher, but this platform is not supported.",
-						launchException);
-			}
-
-			final String safeVersion = update.latestVersion().toString().replaceAll("[^A-Za-z0-9._-]", "_");
-			final Path installerPath = BootstrapApp.getTempDirectory()
-					.toPath()
-					.resolve("modelizer-next-bootstrap-" + safeVersion + update.platform().installerExtension());
-			this.remoteUpdateService
-					.download(update.installerUri(), installerPath, update.latestVersion().toString(), loadingFrame::update);
-			loadingFrame.dispose();
-
-			if (BootstrapInstallerLauncher.promptAndStartInstaller(update, installerPath)) {
-				System.exit(0);
-			}
-			throw new AppLaunchException(
-					"The application needs a newer bootstrap launcher. Install the downloaded installer to continue: " + installerPath,
-					launchException);
-		} catch (final InterruptedException ex) {
-			Thread.currentThread().interrupt();
-			throw new AppLaunchException("Interrupted while checking for a bootstrap launcher update.", ex);
-		} finally {
-			loadingFrame.dispose();
-		}
-	}
-
-	/**
-	 * Checks whether the bootstrapper needs an update.
-	 *
-	 * @param throwable throwable value used by the operation
-	 * @return {@code true} when the condition is met; otherwise {@code false}
-	 */
-	private boolean needsBootstrappUpdate(final Throwable throwable) {
-		for (Throwable current = throwable; current != null; current = current.getCause()) {
-			if (current instanceof ClassNotFoundException || current instanceof NoClassDefFoundError
-					|| current instanceof UnsupportedBootstrapVersionException) {
-				return true;
-			}
-		}
-		return false;
 	}
 
 	/**

@@ -10,7 +10,12 @@ package lu.kbra.modelizer_next.bootstrap;
  * @param updatedManifestUrl URL to use
  * @param distributor        text value for distributor
  */
-public record BootstrapConfig(String name, String version, String repositoryUrl, String releasesUrl, String updatedManifestUrl,
+public record BootstrapConfig(
+		String name,
+		String version,
+		String repositoryUrl,
+		String releasesUrl,
+		String updatedManifestUrl,
 		String distributor) {
 
 }

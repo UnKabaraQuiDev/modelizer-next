@@ -16,13 +16,10 @@ public class UnsupportedBootstrapVersionException extends RuntimeException {
 	/**
 	 * Creates an unsupported bootstrap version exception instance.
 	 *
-	 * @param message            message shown to the caller or user
-	 * @param cause              cause to attach to the created exception
-	 * @param enableSuppression  whether enable suppression is enabled
-	 * @param writableStackTrace whether writable stack trace is enabled
+	 * @param message message shown to the caller or user
 	 */
-	public UnsupportedBootstrapVersionException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
-		super(message, cause, enableSuppression, writableStackTrace);
+	public UnsupportedBootstrapVersionException(final String message) {
+		super(message);
 	}
 
 	/**
@@ -31,17 +28,24 @@ public class UnsupportedBootstrapVersionException extends RuntimeException {
 	 * @param message message shown to the caller or user
 	 * @param cause   cause to attach to the created exception
 	 */
-	public UnsupportedBootstrapVersionException(String message, Throwable cause) {
+	public UnsupportedBootstrapVersionException(final String message, final Throwable cause) {
 		super(message, cause);
 	}
 
 	/**
 	 * Creates an unsupported bootstrap version exception instance.
 	 *
-	 * @param message message shown to the caller or user
+	 * @param message            message shown to the caller or user
+	 * @param cause              cause to attach to the created exception
+	 * @param enableSuppression  whether enable suppression is enabled
+	 * @param writableStackTrace whether writable stack trace is enabled
 	 */
-	public UnsupportedBootstrapVersionException(String message) {
-		super(message);
+	public UnsupportedBootstrapVersionException(
+			final String message,
+			final Throwable cause,
+			final boolean enableSuppression,
+			final boolean writableStackTrace) {
+		super(message, cause, enableSuppression, writableStackTrace);
 	}
 
 	/**
@@ -49,7 +53,7 @@ public class UnsupportedBootstrapVersionException extends RuntimeException {
 	 *
 	 * @param cause cause to attach to the created exception
 	 */
-	public UnsupportedBootstrapVersionException(Throwable cause) {
+	public UnsupportedBootstrapVersionException(final Throwable cause) {
 		super(cause);
 	}
 

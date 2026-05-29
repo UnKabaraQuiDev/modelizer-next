@@ -29,23 +29,6 @@ import lu.kbra.modelizer_next.ui.dialogs.LinkEditorDialog;
 interface DiagramModelEditor extends DiagramCanvasExt {
 
 	/**
-	 * Opens or applies editing for the selected on the active canvas.
-	 */
-	@SuppressWarnings("incomplete-switch")
-	default void editSelected() {
-		if (this.getCanvas().selectedElement == null || this.getCanvas().selectedElement.type() == SelectedType.NONE) {
-			return;
-		}
-
-		switch (this.getCanvas().selectedElement.type()) {
-		case CLASS -> this.getCanvas().editClass(this.getCanvas().selectedElement.classId());
-		case FIELD -> this.getCanvas().editField(this.getCanvas().selectedElement.classId(), this.getCanvas().selectedElement.fieldId());
-		case COMMENT -> this.getCanvas().editComment(this.getCanvas().selectedElement.commentId());
-		case LINK -> this.getCanvas().editLink(this.getCanvas().selectedElement.linkId());
-		}
-	}
-
-	/**
 	 * Adds the comment.
 	 */
 	default void addComment() {
@@ -216,6 +199,23 @@ interface DiagramModelEditor extends DiagramCanvasExt {
 
 		this.getCanvas().clearSelection();
 		this.getCanvas().notifyDocumentChanged();
+	}
+
+	/**
+	 * Opens or applies editing for the selected on the active canvas.
+	 */
+	@SuppressWarnings("incomplete-switch")
+	default void editSelected() {
+		if (this.getCanvas().selectedElement == null || this.getCanvas().selectedElement.type() == SelectedType.NONE) {
+			return;
+		}
+
+		switch (this.getCanvas().selectedElement.type()) {
+		case CLASS -> this.getCanvas().editClass(this.getCanvas().selectedElement.classId());
+		case FIELD -> this.getCanvas().editField(this.getCanvas().selectedElement.classId(), this.getCanvas().selectedElement.fieldId());
+		case COMMENT -> this.getCanvas().editComment(this.getCanvas().selectedElement.commentId());
+		case LINK -> this.getCanvas().editLink(this.getCanvas().selectedElement.linkId());
+		}
 	}
 
 	/**

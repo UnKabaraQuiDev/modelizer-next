@@ -57,198 +57,6 @@ import lu.kbra.pclib.datastructure.pair.Pairs;
 public interface LiveEditor extends DiagramCanvasExt {
 
 	/**
-	 * Opens or applies editing for the selection style.
-	 *
-	 * @param alternative whether alternative is enabled
-	 */
-	default void editSelectionStyle(final boolean alternative) {
-		if (this.getCanvas().selectedElement == null || this.getCanvas().selectedElement.type() == SelectedType.NONE) {
-			return;
-		}
-
-		this.invokeStyleEditingElement(this.getCanvas().selectedElement.asStyleEditElement(alternative,
-				this.getStyleObject(this.getCanvas().selectedElement, alternative)));
-	}
-
-	/**
-	 * Returns the style object on the active canvas.
-	 *
-	 * @param selectedElement selected element to read or update
-	 * @param alternative     whether alternative is enabled
-	 * @return the style object
-	 */
-	default Object getStyleObject(final SelectedElement selectedElement, final boolean alternative) {
-		return switch (selectedElement.type()) {
-		case CLASS -> alternative ? Pairs.readOnly(this.getCanvas().findClassById(selectedElement.classId()).getStyle().clone(),
-				this.getCanvas()
-						.findClassById(selectedElement.classId())
-						.getFields()
-						.stream()
-						.map(FieldModel::getStyle)
-						.map(ElementStyle::clone)
-						.toList())
-				: this.getCanvas().findClassById(selectedElement.classId()).getStyle().clone();
-		case FIELD -> this.getCanvas().findFieldById(selectedElement.classId(), selectedElement.fieldId()).getStyle().clone();
-		case COMMENT -> this.getCanvas().findCommentById(selectedElement.commentId()).getStyle().clone();
-		case LINK -> this.getCanvas().findLinkById(selectedElement.linkId()).getLineColor();
-		default -> throw new IllegalArgumentException("Unexpected value: " + selectedElement.type());
-		};
-	}
-
-	/**
-	 * Renames the selection.
-	 *
-	 * @param alternative whether alternative is enabled
-	 */
-	default void renameSelection(final boolean alternative) {
-		if (this.getCanvas().selectedElement == null || this.getCanvas().selectedElement.type() == SelectedType.NONE) {
-			return;
-		}
-
-		switch (this.getCanvas().selectedElement.type()) {
-		case CLASS, FIELD, COMMENT, LINK -> {
-			this.getCanvas().invokeRenamingElement(this.getCanvas().selectedElement.asLiveEditElement(alternative));
-		}
-		default -> throw new IllegalArgumentException("Unexpected type: " + this.getCanvas().selectedElement);
-		}
-	}
-
-	/**
-	 * Starts inline style editing for the selected element.
-	 *
-	 * @param element element value used by the operation
-	 */
-	default void invokeStyleEditingElement(final LiveEditElement element) {
-		if (this.isLiveEditingElement()) {
-			this.cancelLiveEditElement();
-		}
-
-		final DiagramCanvas canvas = this.getCanvas();
-
-		canvas.liveEditElement = element;
-		canvas.select(canvas.selectedElement);
-
-		final JList<StylePalette> list = canvas.liveEditComponents.paletteList();
-		final List<StylePalette> palettes = this.getFrame().getPalettes();
-
-		SwingUtilities.invokeLater(() -> {
-			((StylePaletteCellRenderer) list.getCellRenderer()).setScope(element.type().asSelectedType().asStyleScope());
-
-			list.setListData(palettes.toArray(StylePalette[]::new));
-			list.setSelectedValue(canvas.defaultPalette, true);
-			list.setFont(DiagramCanvas.BODY_FONT
-					.deriveFont(DiagramCanvas.BODY_FONT.getSize() * (float) this.getCanvas().getPanelState().getZoom()));
-
-			list.setFixedCellHeight(-1);
-			final Dimension preferredSize = list.getPreferredSize();
-			final Point2D.Double point = this.getCanvas().getMouseViewportPos();
-
-			list.setBounds((int) point.getX() + 5,
-					(int) point.getY(),
-					(int) preferredSize.getWidth() + DiagramCanvas.TEXT_PADDING,
-					(int) preferredSize.getHeight());
-
-			list.setVisible(true);
-			list.requestFocus();
-			canvas.repaint();
-		});
-	}
-
-	/**
-	 * Starts inline renaming for the selected element.
-	 *
-	 * @param element element value used by the operation
-	 */
-	default void invokeRenamingElement(final LiveEditElement element) {
-		if (this.isLiveEditingElement()) {
-			this.cancelLiveEditElement();
-		}
-
-		final DiagramCanvas canvas = this.getCanvas();
-
-		canvas.liveEditElement = element;
-		canvas.select(element.asSelectedElement());
-
-		final LiveEditContext ctx = switch (element.type()) {
-		case CLASS -> this.buildClassContext(element);
-		case CLASS_FIELD -> this.buildClassFieldContext(element);
-		case COMMENT -> this.buildCommentContext(element);
-		case LINK_LABEL, LINK_TO_LABEL, LINK_FROM_LABEL -> this.buildLinkLabelContext(element);
-		case LINK_TO_CARDINALITY, LINK_FROM_CARDINALITY -> this.buildLinkCardinalityContext(element);
-		default -> throw new IllegalArgumentException("Unexpected value: " + element.type());
-		};
-
-		this.applyLiveEditContext(ctx);
-	}
-
-	/**
-	 * Updates the live edit layout.
-	 */
-	default void updateLiveEditLayout() {
-		if (!this.isLiveEditingElement()) {
-			return;
-		}
-
-		final DiagramCanvas canvas = this.getCanvas();
-
-		final LiveEditElement liveEditElement = canvas.liveEditElement;
-		final LiveEditComponents liveEditComponents = canvas.liveEditComponents;
-
-		final JComponent comp = liveEditElement.getRenamingComponent(liveEditComponents);
-
-		comp.setFont(
-				DiagramCanvas.BODY_FONT.deriveFont(DiagramCanvas.BODY_FONT.getSize() * (float) this.getCanvas().getPanelState().getZoom()));
-
-		final Dimension preferredSize = comp.getPreferredSize();
-		comp.setSize((int) (preferredSize.getWidth() + DiagramCanvas.TEXT_PADDING * this.getCanvas().getPanelState().getZoom()),
-				(int) preferredSize.getHeight());
-
-		if (liveEditElement.type().isStyle()) {
-			return;
-		}
-
-		final LiveEditContext ctx = switch (liveEditElement.type()) {
-		case CLASS -> this.buildClassContext(liveEditElement);
-		case CLASS_FIELD -> this.buildClassFieldContext(liveEditElement);
-		case COMMENT -> this.buildCommentContext(liveEditElement);
-		case LINK_LABEL, LINK_TO_LABEL, LINK_FROM_LABEL -> this.buildLinkLabelContext(liveEditElement);
-		case LINK_TO_CARDINALITY, LINK_FROM_CARDINALITY -> this.buildLinkCardinalityContext(liveEditElement);
-		default -> throw new IllegalArgumentException("Unexpected value: " + liveEditElement.type());
-		};
-
-		comp.setLocation((int) ctx.pos().getX(), (int) ctx.pos().getY());
-		if (ctx.fixedSize()) {
-			comp.setSize((int) ctx.size().getX(), (int) ctx.size().getY());
-		}
-		this.getCanvas().repaint();
-	}
-
-	/**
-	 * Updates the live edit preview on the active canvas.
-	 */
-	default void updateLiveEditPreview() {
-		if (!this.isLiveEditingElement()) {
-			return;
-		}
-
-		final DiagramCanvas canvas = this.getCanvas();
-
-		final LiveEditElement renamingElement = canvas.liveEditElement;
-		final LiveEditComponents renamingComponents = canvas.liveEditComponents;
-
-		if (!renamingElement.type().isStyle()) {
-			return;
-		}
-
-		final StylePalette palette = renamingComponents.paletteList().getSelectedValue();
-
-		if (palette != null) {
-			this.applyStyle(palette, renamingElement);
-		}
-
-	}
-
-	/**
 	 * Applies the live edit context on the active canvas.
 	 *
 	 * @param ctx ctx value used by the operation
@@ -300,6 +108,34 @@ public interface LiveEditor extends DiagramCanvasExt {
 			}
 			canvas.repaint();
 		});
+	}
+
+	/**
+	 * Applies the style on the active canvas.
+	 *
+	 * @param palette         palette value used by the operation
+	 * @param liveEditElement live edit element value used by the operation
+	 */
+	default void applyStyle(final StylePalette palette, final LiveEditElement liveEditElement) {
+		switch (liveEditElement.type()) {
+		case CLASS_STYLE -> {
+			final ClassModel classModel = this.getCanvas().findClassById(liveEditElement.classId());
+			this.getCanvas().applyPaletteToClass(palette, classModel, liveEditElement.forceAlternative(), false);
+		}
+		case CLASS_FIELD_STYLE -> {
+			final FieldModel fieldModel = this.getCanvas().findFieldById(liveEditElement.classId(), liveEditElement.fieldId());
+			this.getCanvas().applyPaletteToField(palette, fieldModel);
+		}
+		case COMMENT_STYLE -> {
+			final CommentModel commentModel = this.getCanvas().findCommentById(liveEditElement.commentId());
+			this.getCanvas().applyPaletteToComment(palette, commentModel);
+		}
+		case LINK_STYLE -> {
+			final LinkModel linkModel = this.getCanvas().findLinkById(liveEditElement.linkId());
+			this.getCanvas().applyPaletteToLink(palette, linkModel);
+		}
+		default -> new IllegalArgumentException("Unexpected type: " + liveEditElement);
+		}
 	}
 
 	/**
@@ -449,15 +285,6 @@ public interface LiveEditor extends DiagramCanvasExt {
 	}
 
 	/**
-	 * Checks whether live editing element is enabled or applies on the active canvas.
-	 *
-	 * @return {@code true} if live editing element is enabled or applies; otherwise {@code false}
-	 */
-	default boolean isLiveEditingElement() {
-		return this.getCanvas().liveEditElement != null;
-	}
-
-	/**
 	 * Checks whether this object can cel live edit element on the active canvas.
 	 */
 	default void cancelLiveEditElement() {
@@ -474,40 +301,6 @@ public interface LiveEditor extends DiagramCanvasExt {
 		SwingUtilities.invokeLater(() -> {
 			this.getCanvas().requestFocus();
 		});
-	}
-
-	/**
-	 * Restores the edited element style from a previously captured style object.
-	 *
-	 * @param liveEditElement live edit element value used by the operation
-	 */
-	default void revertStyleObject(final LiveEditElement liveEditElement) {
-		final Object snapshotValue = liveEditElement.snapshotValue();
-		final SelectedElement selectedElement = liveEditElement.asSelectedElement();
-
-		switch (selectedElement.type()) {
-		case CLASS -> {
-			if (liveEditElement.forceAlternative()) {
-				final Pair<ElementStyle, List<ElementStyle>> styles = (Pair<ElementStyle, List<ElementStyle>>) snapshotValue;
-				final ClassModel classModel = this.getCanvas().findClassById(selectedElement.classId());
-				classModel.setStyle(styles.getKey());
-				for (int i = 0; i < classModel.getFields().size(); i++) {
-					classModel.getFields().get(i).setStyle(styles.getValue().get(i));
-				}
-			} else {
-				this.getCanvas().findClassById(selectedElement.classId()).setStyle((ElementStyle) snapshotValue);
-			}
-		}
-		case FIELD -> {
-			this.getCanvas().findFieldById(selectedElement.classId(), selectedElement.fieldId()).setStyle((ElementStyle) snapshotValue);
-		}
-		case COMMENT -> {
-			this.getCanvas().findCommentById(selectedElement.commentId()).setStyle((ElementStyle) snapshotValue);
-		}
-		case LINK -> {
-			this.getCanvas().findLinkById(selectedElement.linkId()).setLineColor((Color) snapshotValue);
-		}
-		}
 	}
 
 	/**
@@ -629,34 +422,6 @@ public interface LiveEditor extends DiagramCanvasExt {
 			liveEditComponents.setVisible(false);
 			this.getCanvas().liveEditElement = null;
 			SwingUtilities.invokeLater(this.getCanvas()::requestFocusInWindow);
-		}
-	}
-
-	/**
-	 * Applies the style on the active canvas.
-	 *
-	 * @param palette         palette value used by the operation
-	 * @param liveEditElement live edit element value used by the operation
-	 */
-	default void applyStyle(final StylePalette palette, final LiveEditElement liveEditElement) {
-		switch (liveEditElement.type()) {
-		case CLASS_STYLE -> {
-			final ClassModel classModel = this.getCanvas().findClassById(liveEditElement.classId());
-			this.getCanvas().applyPaletteToClass(palette, classModel, liveEditElement.forceAlternative(), false);
-		}
-		case CLASS_FIELD_STYLE -> {
-			final FieldModel fieldModel = this.getCanvas().findFieldById(liveEditElement.classId(), liveEditElement.fieldId());
-			this.getCanvas().applyPaletteToField(palette, fieldModel);
-		}
-		case COMMENT_STYLE -> {
-			final CommentModel commentModel = this.getCanvas().findCommentById(liveEditElement.commentId());
-			this.getCanvas().applyPaletteToComment(palette, commentModel);
-		}
-		case LINK_STYLE -> {
-			final LinkModel linkModel = this.getCanvas().findLinkById(liveEditElement.linkId());
-			this.getCanvas().applyPaletteToLink(palette, linkModel);
-		}
-		default -> new IllegalArgumentException("Unexpected type: " + liveEditElement);
 		}
 	}
 
@@ -805,6 +570,241 @@ public interface LiveEditor extends DiagramCanvasExt {
 		}
 
 		return new LiveEditComponents(textField, textArea, enumComboBox, stylePaletteList, enumList);
+	}
+
+	/**
+	 * Opens or applies editing for the selection style.
+	 *
+	 * @param alternative whether alternative is enabled
+	 */
+	default void editSelectionStyle(final boolean alternative) {
+		if (this.getCanvas().selectedElement == null || this.getCanvas().selectedElement.type() == SelectedType.NONE) {
+			return;
+		}
+
+		this.invokeStyleEditingElement(this.getCanvas().selectedElement.asStyleEditElement(alternative,
+				this.getStyleObject(this.getCanvas().selectedElement, alternative)));
+	}
+
+	/**
+	 * Returns the style object on the active canvas.
+	 *
+	 * @param selectedElement selected element to read or update
+	 * @param alternative     whether alternative is enabled
+	 * @return the style object
+	 */
+	default Object getStyleObject(final SelectedElement selectedElement, final boolean alternative) {
+		return switch (selectedElement.type()) {
+		case CLASS -> alternative ? Pairs.readOnly(this.getCanvas().findClassById(selectedElement.classId()).getStyle().clone(),
+				this.getCanvas()
+						.findClassById(selectedElement.classId())
+						.getFields()
+						.stream()
+						.map(FieldModel::getStyle)
+						.map(ElementStyle::clone)
+						.toList())
+				: this.getCanvas().findClassById(selectedElement.classId()).getStyle().clone();
+		case FIELD -> this.getCanvas().findFieldById(selectedElement.classId(), selectedElement.fieldId()).getStyle().clone();
+		case COMMENT -> this.getCanvas().findCommentById(selectedElement.commentId()).getStyle().clone();
+		case LINK -> this.getCanvas().findLinkById(selectedElement.linkId()).getLineColor();
+		default -> throw new IllegalArgumentException("Unexpected value: " + selectedElement.type());
+		};
+	}
+
+	/**
+	 * Starts inline renaming for the selected element.
+	 *
+	 * @param element element value used by the operation
+	 */
+	default void invokeRenamingElement(final LiveEditElement element) {
+		if (this.isLiveEditingElement()) {
+			this.cancelLiveEditElement();
+		}
+
+		final DiagramCanvas canvas = this.getCanvas();
+
+		canvas.liveEditElement = element;
+		canvas.select(element.asSelectedElement());
+
+		final LiveEditContext ctx = switch (element.type()) {
+		case CLASS -> this.buildClassContext(element);
+		case CLASS_FIELD -> this.buildClassFieldContext(element);
+		case COMMENT -> this.buildCommentContext(element);
+		case LINK_LABEL, LINK_TO_LABEL, LINK_FROM_LABEL -> this.buildLinkLabelContext(element);
+		case LINK_TO_CARDINALITY, LINK_FROM_CARDINALITY -> this.buildLinkCardinalityContext(element);
+		default -> throw new IllegalArgumentException("Unexpected value: " + element.type());
+		};
+
+		this.applyLiveEditContext(ctx);
+	}
+
+	/**
+	 * Starts inline style editing for the selected element.
+	 *
+	 * @param element element value used by the operation
+	 */
+	default void invokeStyleEditingElement(final LiveEditElement element) {
+		if (this.isLiveEditingElement()) {
+			this.cancelLiveEditElement();
+		}
+
+		final DiagramCanvas canvas = this.getCanvas();
+
+		canvas.liveEditElement = element;
+		canvas.select(canvas.selectedElement);
+
+		final JList<StylePalette> list = canvas.liveEditComponents.paletteList();
+		final List<StylePalette> palettes = this.getFrame().getPalettes();
+
+		SwingUtilities.invokeLater(() -> {
+			((StylePaletteCellRenderer) list.getCellRenderer()).setScope(element.type().asSelectedType().asStyleScope());
+
+			list.setListData(palettes.toArray(StylePalette[]::new));
+			list.setSelectedValue(canvas.defaultPalette, true);
+			list.setFont(DiagramCanvas.BODY_FONT
+					.deriveFont(DiagramCanvas.BODY_FONT.getSize() * (float) this.getCanvas().getPanelState().getZoom()));
+
+			list.setFixedCellHeight(-1);
+			final Dimension preferredSize = list.getPreferredSize();
+			final Point2D.Double point = this.getCanvas().getMouseViewportPos();
+
+			list.setBounds((int) point.getX() + 5,
+					(int) point.getY(),
+					(int) preferredSize.getWidth() + DiagramCanvas.TEXT_PADDING,
+					(int) preferredSize.getHeight());
+
+			list.setVisible(true);
+			list.requestFocus();
+			canvas.repaint();
+		});
+	}
+
+	/**
+	 * Checks whether live editing element is enabled or applies on the active canvas.
+	 *
+	 * @return {@code true} if live editing element is enabled or applies; otherwise {@code false}
+	 */
+	default boolean isLiveEditingElement() {
+		return this.getCanvas().liveEditElement != null;
+	}
+
+	/**
+	 * Renames the selection.
+	 *
+	 * @param alternative whether alternative is enabled
+	 */
+	default void renameSelection(final boolean alternative) {
+		if (this.getCanvas().selectedElement == null || this.getCanvas().selectedElement.type() == SelectedType.NONE) {
+			return;
+		}
+
+		switch (this.getCanvas().selectedElement.type()) {
+		case CLASS, FIELD, COMMENT, LINK -> {
+			this.getCanvas().invokeRenamingElement(this.getCanvas().selectedElement.asLiveEditElement(alternative));
+		}
+		default -> throw new IllegalArgumentException("Unexpected type: " + this.getCanvas().selectedElement);
+		}
+	}
+
+	/**
+	 * Restores the edited element style from a previously captured style object.
+	 *
+	 * @param liveEditElement live edit element value used by the operation
+	 */
+	default void revertStyleObject(final LiveEditElement liveEditElement) {
+		final Object snapshotValue = liveEditElement.snapshotValue();
+		final SelectedElement selectedElement = liveEditElement.asSelectedElement();
+
+		switch (selectedElement.type()) {
+		case CLASS -> {
+			if (liveEditElement.forceAlternative()) {
+				final Pair<ElementStyle, List<ElementStyle>> styles = (Pair<ElementStyle, List<ElementStyle>>) snapshotValue;
+				final ClassModel classModel = this.getCanvas().findClassById(selectedElement.classId());
+				classModel.setStyle(styles.getKey());
+				for (int i = 0; i < classModel.getFields().size(); i++) {
+					classModel.getFields().get(i).setStyle(styles.getValue().get(i));
+				}
+			} else {
+				this.getCanvas().findClassById(selectedElement.classId()).setStyle((ElementStyle) snapshotValue);
+			}
+		}
+		case FIELD -> {
+			this.getCanvas().findFieldById(selectedElement.classId(), selectedElement.fieldId()).setStyle((ElementStyle) snapshotValue);
+		}
+		case COMMENT -> {
+			this.getCanvas().findCommentById(selectedElement.commentId()).setStyle((ElementStyle) snapshotValue);
+		}
+		case LINK -> {
+			this.getCanvas().findLinkById(selectedElement.linkId()).setLineColor((Color) snapshotValue);
+		}
+		}
+	}
+
+	/**
+	 * Updates the live edit layout.
+	 */
+	default void updateLiveEditLayout() {
+		if (!this.isLiveEditingElement()) {
+			return;
+		}
+
+		final DiagramCanvas canvas = this.getCanvas();
+
+		final LiveEditElement liveEditElement = canvas.liveEditElement;
+		final LiveEditComponents liveEditComponents = canvas.liveEditComponents;
+
+		final JComponent comp = liveEditElement.getRenamingComponent(liveEditComponents);
+
+		comp.setFont(
+				DiagramCanvas.BODY_FONT.deriveFont(DiagramCanvas.BODY_FONT.getSize() * (float) this.getCanvas().getPanelState().getZoom()));
+
+		final Dimension preferredSize = comp.getPreferredSize();
+		comp.setSize((int) (preferredSize.getWidth() + DiagramCanvas.TEXT_PADDING * this.getCanvas().getPanelState().getZoom()),
+				(int) preferredSize.getHeight());
+
+		if (liveEditElement.type().isStyle()) {
+			return;
+		}
+
+		final LiveEditContext ctx = switch (liveEditElement.type()) {
+		case CLASS -> this.buildClassContext(liveEditElement);
+		case CLASS_FIELD -> this.buildClassFieldContext(liveEditElement);
+		case COMMENT -> this.buildCommentContext(liveEditElement);
+		case LINK_LABEL, LINK_TO_LABEL, LINK_FROM_LABEL -> this.buildLinkLabelContext(liveEditElement);
+		case LINK_TO_CARDINALITY, LINK_FROM_CARDINALITY -> this.buildLinkCardinalityContext(liveEditElement);
+		default -> throw new IllegalArgumentException("Unexpected value: " + liveEditElement.type());
+		};
+
+		comp.setLocation((int) ctx.pos().getX(), (int) ctx.pos().getY());
+		if (ctx.fixedSize()) {
+			comp.setSize((int) ctx.size().getX(), (int) ctx.size().getY());
+		}
+		this.getCanvas().repaint();
+	}
+
+	/**
+	 * Updates the live edit preview on the active canvas.
+	 */
+	default void updateLiveEditPreview() {
+		if (!this.isLiveEditingElement()) {
+			return;
+		}
+
+		final DiagramCanvas canvas = this.getCanvas();
+
+		final LiveEditElement renamingElement = canvas.liveEditElement;
+		final LiveEditComponents renamingComponents = canvas.liveEditComponents;
+
+		if (!renamingElement.type().isStyle()) {
+			return;
+		}
+
+		final StylePalette palette = renamingComponents.paletteList().getSelectedValue();
+
+		if (palette != null) {
+			this.applyStyle(palette, renamingElement);
+		}
+
 	}
 
 }

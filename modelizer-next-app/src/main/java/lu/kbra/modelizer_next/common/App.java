@@ -129,16 +129,16 @@ public class App {
 		final File file = App.getConfigFile();
 		if (!file.isFile()) {
 			final AppConfig config = new AppConfig();
-			CONFIG = config;
+			App.CONFIG = config;
 			App.saveConfig();
 			return;
 		}
 
 		try {
-			CONFIG = MNMain.OBJECT_MAPPER.readValue(file, AppConfig.class);
+			App.CONFIG = MNMain.OBJECT_MAPPER.readValue(file, AppConfig.class);
 		} catch (final IOException e) {
 			e.printStackTrace();
-			CONFIG = new AppConfig();
+			App.CONFIG = new AppConfig();
 		}
 	}
 
@@ -149,7 +149,7 @@ public class App {
 		App.ensureDirsExists();
 
 		try {
-			MNMain.OBJECT_MAPPER.writeValue(App.getConfigFile(), CONFIG);
+			MNMain.OBJECT_MAPPER.writeValue(App.getConfigFile(), App.CONFIG);
 		} catch (final IOException e) {
 			e.printStackTrace();
 		}

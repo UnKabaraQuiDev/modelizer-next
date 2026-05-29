@@ -39,63 +39,6 @@ import lu.kbra.modelizer_next.ui.export.ViewExportScope;
  */
 interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 
-	default void focusSelection() {
-		if (!this.getCanvas().hasSelection()) {
-			return;
-		}
-
-		final Graphics2D g2 = this.getCanvas().createGraphicsContext();
-		try {
-			this.getCanvas().focusBounds(this.getCanvas().computeExportContentBounds(g2, ViewExportScope.SELECTION));
-		} finally {
-			g2.dispose();
-		}
-	}
-
-	default void focusAll() {
-		final Graphics2D g2 = this.getCanvas().createGraphicsContext();
-		try {
-			this.getCanvas().focusBounds(this.getCanvas().computeExportContentBounds(g2, ViewExportScope.VIEW));
-		} finally {
-			g2.dispose();
-		}
-	}
-
-	/**
-	 * Moves and zooms the current canvas view so the supplied world-space bounds fit inside the
-	 * viewport.
-	 *
-	 * @param bounds bounds to focus
-	 */
-	default void focusBounds(final Rectangle2D bounds) {
-		if (bounds == null || bounds.isEmpty()) {
-			return;
-		}
-
-		final Dimension viewportSize = this.getCanvas().getViewportExportSize();
-		final double viewportWidth = Math.max(1.0, viewportSize.getWidth());
-		final double viewportHeight = Math.max(1.0, viewportSize.getHeight());
-
-		final double margin = DiagramCanvas.EXPORT_MARGIN;
-		final double usableWidth = Math.max(1.0, viewportWidth - margin * 2.0);
-		final double usableHeight = Math.max(1.0, viewportHeight - margin * 2.0);
-
-		final double zoomX = usableWidth / Math.max(1.0, bounds.getWidth());
-		final double zoomY = usableHeight / Math.max(1.0, bounds.getHeight());
-		final double newZoom = this.getCanvas().clamp(Math.min(zoomX, zoomY), 0.2, 4.0);
-
-		final PanelState state = this.getCanvas().getPanelState();
-		state.setZoom(newZoom);
-		state.setPanX(viewportWidth / 2.0 - bounds.getCenterX() * newZoom);
-		state.setPanY(viewportHeight / 2.0 - bounds.getCenterY() * newZoom);
-
-		if (this.getCanvas().isLiveEditingElement()) {
-			this.getCanvas().updateLiveEditLayout();
-		}
-
-		getCanvas().repaint();
-	}
-
 	/**
 	 * Appends the suffix on the active canvas.
 	 *
@@ -170,10 +113,8 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 	 * @param targetField target field value used by the operation
 	 * @return the ensure technical source field result
 	 */
-	default FieldModel ensureTechnicalSourceField(
-			final ClassModel sourceClass,
-			final ClassModel targetClass,
-			final FieldModel targetField) {
+	default FieldModel
+			ensureTechnicalSourceField(final ClassModel sourceClass, final ClassModel targetClass, final FieldModel targetField) {
 		if (sourceClass == null || targetClass == null || targetField == null) {
 			return null;
 		}
@@ -250,6 +191,63 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 		return geometry == null ? null : geometry.middlePoint();
 	}
 
+	default void focusAll() {
+		final Graphics2D g2 = this.getCanvas().createGraphicsContext();
+		try {
+			this.getCanvas().focusBounds(this.getCanvas().computeExportContentBounds(g2, ViewExportScope.VIEW));
+		} finally {
+			g2.dispose();
+		}
+	}
+
+	/**
+	 * Moves and zooms the current canvas view so the supplied world-space bounds fit inside the
+	 * viewport.
+	 *
+	 * @param bounds bounds to focus
+	 */
+	default void focusBounds(final Rectangle2D bounds) {
+		if (bounds == null || bounds.isEmpty()) {
+			return;
+		}
+
+		final Dimension viewportSize = this.getCanvas().getViewportExportSize();
+		final double viewportWidth = Math.max(1.0, viewportSize.getWidth());
+		final double viewportHeight = Math.max(1.0, viewportSize.getHeight());
+
+		final double margin = DiagramCanvas.EXPORT_MARGIN;
+		final double usableWidth = Math.max(1.0, viewportWidth - margin * 2.0);
+		final double usableHeight = Math.max(1.0, viewportHeight - margin * 2.0);
+
+		final double zoomX = usableWidth / Math.max(1.0, bounds.getWidth());
+		final double zoomY = usableHeight / Math.max(1.0, bounds.getHeight());
+		final double newZoom = this.getCanvas().clamp(Math.min(zoomX, zoomY), 0.2, 4.0);
+
+		final PanelState state = this.getCanvas().getPanelState();
+		state.setZoom(newZoom);
+		state.setPanX(viewportWidth / 2.0 - bounds.getCenterX() * newZoom);
+		state.setPanY(viewportHeight / 2.0 - bounds.getCenterY() * newZoom);
+
+		if (this.getCanvas().isLiveEditingElement()) {
+			this.getCanvas().updateLiveEditLayout();
+		}
+
+		this.getCanvas().repaint();
+	}
+
+	default void focusSelection() {
+		if (!this.getCanvas().hasSelection()) {
+			return;
+		}
+
+		final Graphics2D g2 = this.getCanvas().createGraphicsContext();
+		try {
+			this.getCanvas().focusBounds(this.getCanvas().computeExportContentBounds(g2, ViewExportScope.SELECTION));
+		} finally {
+			g2.dispose();
+		}
+	}
+
 	/**
 	 * Returns the active links.
 	 *
@@ -267,6 +265,36 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 	 */
 	default SelectedElement getLinkCreationSource() {
 		return this.getCanvas().linkCreationState == null ? null : this.getCanvas().linkCreationState.toSelectedElement();
+	}
+
+	/**
+	 * Returns the mouse viewport pos on the active canvas.
+	 *
+	 * @return the mouse viewport pos
+	 */
+	default Point2D.Double getMouseViewportPos() {
+		final Point mousePoint = this.getCanvas().getMousePosition();
+
+		if (mousePoint != null) {
+			return new Point2D.Double(mousePoint.x, mousePoint.y);
+		}
+
+		return this.getCanvas().getViewportCenter();
+	}
+
+	/**
+	 * Returns the mouse world pos on the active canvas.
+	 *
+	 * @return the mouse world pos
+	 */
+	default Point2D.Double getMouseWorldPos() {
+		final Point mousePoint = this.getCanvas().getMousePosition();
+
+		if (mousePoint == null) {
+			return this.getCanvas().getViewportCenterWorld();
+		}
+
+		return this.getCanvas().screenToWorld(mousePoint);
 	}
 
 	/**
@@ -311,6 +339,24 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 			}
 		}
 		return count;
+	}
+
+	/**
+	 * Returns the viewport center on the active canvas.
+	 *
+	 * @return the viewport center
+	 */
+	default Point2D.Double getViewportCenter() {
+		return new Point2D.Double(this.getCanvas().getWidth() / 2.0, this.getCanvas().getHeight() / 2.0);
+	}
+
+	/**
+	 * Returns the viewport center world on the active canvas.
+	 *
+	 * @return the viewport center world
+	 */
+	default Point2D.Double getViewportCenterWorld() {
+		return this.worldToViewport(this.getViewportCenter());
 	}
 
 	/**
@@ -466,36 +512,6 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 			return null;
 		}
 		return idMap.getOrDefault(oldId, oldId);
-	}
-
-	/**
-	 * Returns the mouse world pos on the active canvas.
-	 *
-	 * @return the mouse world pos
-	 */
-	default Point2D.Double getMouseWorldPos() {
-		final Point mousePoint = this.getCanvas().getMousePosition();
-
-		if (mousePoint == null) {
-			return this.getCanvas().getViewportCenterWorld();
-		}
-
-		return this.getCanvas().screenToWorld(mousePoint);
-	}
-
-	/**
-	 * Returns the mouse viewport pos on the active canvas.
-	 *
-	 * @return the mouse viewport pos
-	 */
-	default Point2D.Double getMouseViewportPos() {
-		final Point mousePoint = this.getCanvas().getMousePosition();
-
-		if (mousePoint != null) {
-			return new Point2D.Double(mousePoint.x, mousePoint.y);
-		}
-
-		return this.getCanvas().getViewportCenter();
 	}
 
 	/**
@@ -1021,21 +1037,17 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 	}
 
 	/**
-	 * Returns the viewport center world on the active canvas.
+	 * Measures the width of text with the supplied font.
 	 *
-	 * @return the viewport center world
+	 * @param titleFont  font used for measurement or drawing
+	 * @param classTitle text value for class title
+	 * @return the string width result
 	 */
-	default Point2D.Double getViewportCenterWorld() {
-		return this.worldToViewport(this.getViewportCenter());
-	}
-
-	/**
-	 * Returns the viewport center on the active canvas.
-	 *
-	 * @return the viewport center
-	 */
-	default Point2D.Double getViewportCenter() {
-		return new Point2D.Double(this.getCanvas().getWidth() / 2.0, this.getCanvas().getHeight() / 2.0);
+	default double stringWidth(final Font titleFont, final String classTitle) {
+		if (classTitle == null || classTitle.isBlank()) {
+			return 0;
+		}
+		return titleFont.getStringBounds(classTitle, this.getCanvas().fontRenderContext).getWidth();
 	}
 
 	/**
@@ -1116,20 +1128,6 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 			lines.add(current.toString());
 		}
 		return lines;
-	}
-
-	/**
-	 * Measures the width of text with the supplied font.
-	 *
-	 * @param titleFont  font used for measurement or drawing
-	 * @param classTitle text value for class title
-	 * @return the string width result
-	 */
-	default double stringWidth(final Font titleFont, final String classTitle) {
-		if (classTitle == null || classTitle.isBlank()) {
-			return 0;
-		}
-		return titleFont.getStringBounds(classTitle, this.getCanvas().fontRenderContext).getWidth();
 	}
 
 }

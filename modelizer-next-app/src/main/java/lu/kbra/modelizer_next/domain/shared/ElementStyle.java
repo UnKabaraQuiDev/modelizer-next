@@ -58,6 +58,20 @@ public class ElementStyle implements ModelElement {
 	}
 
 	/**
+	 * Creates a copy of this object so callers can modify it without changing the original.
+	 *
+	 * @return the clone result
+	 */
+	@Override
+	public ElementStyle clone() {
+		try {
+			return (ElementStyle) super.clone();
+		} catch (final CloneNotSupportedException e) {
+			return new ElementStyle(this.textColor, this.backgroundColor, this.borderColor);
+		}
+	}
+
+	/**
 	 * Returns the background color.
 	 *
 	 * @return the background color
@@ -109,20 +123,6 @@ public class ElementStyle implements ModelElement {
 	 */
 	public void setTextColor(final Color textColor) {
 		this.textColor = textColor;
-	}
-
-	/**
-	 * Creates a copy of this object so callers can modify it without changing the original.
-	 *
-	 * @return the clone result
-	 */
-	@Override
-	public ElementStyle clone() {
-		try {
-			return (ElementStyle) super.clone();
-		} catch (CloneNotSupportedException e) {
-			return new ElementStyle(textColor, backgroundColor, borderColor);
-		}
 	}
 
 	/**

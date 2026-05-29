@@ -42,6 +42,26 @@ public final class BootstrapInstallerLauncher {
 	}
 
 	/**
+	 * Quotes an argument for use in a PowerShell command.
+	 *
+	 * @param value value to process
+	 * @return the quote power shell result
+	 */
+	private static String quotePowerShell(final String value) {
+		return "'" + value.replace("'", "''") + "'";
+	}
+
+	/**
+	 * Quotes an argument for use in a POSIX shell command.
+	 *
+	 * @param value value to process
+	 * @return the quote shell result
+	 */
+	private static String quoteShell(final String value) {
+		return "'" + value.replace("'", "'\"'\"'") + "'";
+	}
+
+	/**
 	 * Starts the installer during bootstrap/update processing.
 	 *
 	 * @param platform      target platform to match
@@ -86,26 +106,6 @@ public final class BootstrapInstallerLauncher {
 				e.printStackTrace();
 			}
 		}
-	}
-
-	/**
-	 * Quotes an argument for use in a POSIX shell command.
-	 *
-	 * @param value value to process
-	 * @return the quote shell result
-	 */
-	private static String quoteShell(final String value) {
-		return "'" + value.replace("'", "'\"'\"'") + "'";
-	}
-
-	/**
-	 * Quotes an argument for use in a PowerShell command.
-	 *
-	 * @param value value to process
-	 * @return the quote power shell result
-	 */
-	private static String quotePowerShell(final String value) {
-		return "'" + value.replace("'", "''") + "'";
 	}
 
 }

@@ -81,11 +81,11 @@ public class ElementNames {
 	/**
 	 * Sets the value for the requested panel or key.
 	 *
-	 * @param panelType diagram panel type whose model or layout should be used
-	 * @param name      name value to read, write, or display
+	 * @param forceTechnicalName name value to use
+	 * @param name               name value to read, write, or display
 	 */
-	public void set(final PanelType panelType, final String name) {
-		if (panelType.isTechnical() && this.hasTechnicalName()) {
+	public void set(final boolean forceTechnicalName, final String name) {
+		if (forceTechnicalName) {
 			this.setTechnicalName(name);
 		} else {
 			this.setConceptualName(name);
@@ -110,11 +110,11 @@ public class ElementNames {
 	/**
 	 * Sets the value for the requested panel or key.
 	 *
-	 * @param forceTechnicalName name value to use
-	 * @param name               name value to read, write, or display
+	 * @param panelType diagram panel type whose model or layout should be used
+	 * @param name      name value to read, write, or display
 	 */
-	public void set(boolean forceTechnicalName, String name) {
-		if (forceTechnicalName) {
+	public void set(final PanelType panelType, final String name) {
+		if (panelType.isTechnical() && this.hasTechnicalName()) {
 			this.setTechnicalName(name);
 		} else {
 			this.setConceptualName(name);

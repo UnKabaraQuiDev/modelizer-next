@@ -41,15 +41,6 @@ public class StylePaletteCellRenderer extends JPanel implements ListCellRenderer
 	}
 
 	/**
-	 * Sets the scope on the active canvas.
-	 *
-	 * @param scope export scope to use
-	 */
-	public void setScope(final StyleScope scope) {
-		this.scope = scope;
-	}
-
-	/**
 	 * Returns the list cell renderer component.
 	 *
 	 * @param list         list to read or update
@@ -112,6 +103,15 @@ public class StylePaletteCellRenderer extends JPanel implements ListCellRenderer
 		}
 
 		return this;
+	}
+
+	/**
+	 * Sets the scope on the active canvas.
+	 *
+	 * @param scope export scope to use
+	 */
+	public void setScope(final StyleScope scope) {
+		this.scope = scope;
 	}
 
 }

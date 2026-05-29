@@ -79,6 +79,15 @@ public class ColorButton extends JButton {
 	}
 
 	/**
+	 * Refreshes the style from the current state.
+	 */
+	private void refreshStyle() {
+		this.setBackground(this.selectedColor);
+		final int brightness = (this.selectedColor.getRed() + this.selectedColor.getGreen() + this.selectedColor.getBlue()) / 3;
+		this.setForeground(brightness < 128 ? Color.WHITE : Color.BLACK);
+	}
+
+	/**
 	 * Sets the selected color.
 	 *
 	 * @param selectedColor color value to use
@@ -96,15 +105,6 @@ public class ColorButton extends JButton {
 	@Override
 	public String toString() {
 		return "ColorButton@" + System.identityHashCode(this) + " [selectedColor=" + this.selectedColor + "]";
-	}
-
-	/**
-	 * Refreshes the style from the current state.
-	 */
-	private void refreshStyle() {
-		this.setBackground(this.selectedColor);
-		final int brightness = (this.selectedColor.getRed() + this.selectedColor.getGreen() + this.selectedColor.getBlue()) / 3;
-		this.setForeground(brightness < 128 ? Color.WHITE : Color.BLACK);
 	}
 
 }

@@ -29,21 +29,21 @@ public interface DiagramCanvasExt {
 	}
 
 	/**
-	 * Returns the panel type on the active canvas.
-	 *
-	 * @return the panel type
-	 */
-	default PanelType getPanelType() {
-		return ((DiagramCanvas) this).panelType;
-	}
-
-	/**
 	 * Returns the frame on the active canvas.
 	 *
 	 * @return the frame
 	 */
 	default MainFrame getFrame() {
 		return ((DiagramCanvas) this).mainFrame;
+	}
+
+	/**
+	 * Returns the panel type on the active canvas.
+	 *
+	 * @return the panel type
+	 */
+	default PanelType getPanelType() {
+		return ((DiagramCanvas) this).panelType;
 	}
 
 }

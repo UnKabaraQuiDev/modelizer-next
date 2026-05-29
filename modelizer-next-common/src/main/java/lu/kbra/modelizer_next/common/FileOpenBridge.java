@@ -15,20 +15,10 @@ public final class FileOpenBridge {
 	protected static Runnable PING;
 
 	/**
-	 * Sets the callback.
-	 *
-	 * @param ping ping value used by the operation
-	 */
-	public static void setCallback(Runnable ping) {
-		PING = ping;
-		ping.run();
-	}
-
-	/**
 	 * Clears the callback.
 	 */
 	public static void clearCallback() {
-		PING = null;
+		FileOpenBridge.PING = null;
 	}
 
 	/**
@@ -46,10 +36,20 @@ public final class FileOpenBridge {
 
 		desktop.setOpenFileHandler(e -> {
 			FileOpenBridge.TO_BE_OPENED.addAll(e.getFiles());
-			if (PING != null) {
-				PING.run();
+			if (FileOpenBridge.PING != null) {
+				FileOpenBridge.PING.run();
 			}
 		});
+	}
+
+	/**
+	 * Sets the callback.
+	 *
+	 * @param ping ping value used by the operation
+	 */
+	public static void setCallback(final Runnable ping) {
+		FileOpenBridge.PING = ping;
+		ping.run();
 	}
 
 }

@@ -14,6 +14,21 @@ public enum UpdateChannel {
 	public static final int CHANNEL_RELEASE = 3;
 
 	/**
+	 * Returns the update channel with the supplied numeric id.
+	 *
+	 * @param channelRank numeric channel rank value
+	 * @return the by ID result
+	 */
+	public static UpdateChannel byId(final int channelRank) {
+		return switch (channelRank) {
+		case CHANNEL_NIGHTLY -> NIGHTLY;
+		case CHANNEL_SNAPSHOT -> SNAPSHOT;
+		case CHANNEL_RELEASE -> RELEASE;
+		default -> null;
+		};
+	}
+
+	/**
 	 * Returns the human-readable display name.
 	 *
 	 * @return the display name result
@@ -33,21 +48,6 @@ public enum UpdateChannel {
 	 */
 	public String manifestKey() {
 		return this.name().toLowerCase();
-	}
-
-	/**
-	 * Returns the update channel with the supplied numeric id.
-	 *
-	 * @param channelRank numeric channel rank value
-	 * @return the by ID result
-	 */
-	public static UpdateChannel byId(int channelRank) {
-		return switch (channelRank) {
-		case CHANNEL_NIGHTLY -> NIGHTLY;
-		case CHANNEL_SNAPSHOT -> SNAPSHOT;
-		case CHANNEL_RELEASE -> RELEASE;
-		default -> null;
-		};
 	}
 
 }

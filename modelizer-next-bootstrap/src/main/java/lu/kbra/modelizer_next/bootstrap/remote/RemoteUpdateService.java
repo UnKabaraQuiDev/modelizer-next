@@ -55,8 +55,8 @@ public final class RemoteUpdateService {
 
 		@Override
 		public String toString() {
-			return "UpdateManifest@" + System.identityHashCode(this) + " [release=" + release + ", snapshot=" + snapshot + ", nightly="
-					+ nightly + ", bootstrapVersion=" + bootstrapVersion + "]";
+			return "UpdateManifest@" + System.identityHashCode(this) + " [release=" + this.release + ", snapshot=" + this.snapshot
+					+ ", nightly=" + this.nightly + ", bootstrapVersion=" + this.bootstrapVersion + "]";
 		}
 
 	}
@@ -83,8 +83,8 @@ public final class RemoteUpdateService {
 
 		@Override
 		public String toString() {
-			return "UpdateRelease@" + System.identityHashCode(this) + " [version=" + version + ", url=" + url + ", releaseUrl=" + releaseUrl
-					+ ", notes=" + notes + ", tag=" + tag + "]";
+			return "UpdateRelease@" + System.identityHashCode(this) + " [version=" + this.version + ", url=" + this.url + ", releaseUrl="
+					+ this.releaseUrl + ", notes=" + this.notes + ", tag=" + this.tag + "]";
 		}
 
 	}
@@ -93,6 +93,15 @@ public final class RemoteUpdateService {
 			.connectTimeout(Duration.ofSeconds(15))
 			.followRedirects(HttpClient.Redirect.NORMAL)
 			.build();
+
+	/**
+	 * Detects the current value from the runtime environment.
+	 *
+	 * @return the detect platform result
+	 */
+	private Platform detectPlatform() {
+		return Platform.get();
+	}
 
 	/**
 	 * Downloads an update artifact.
@@ -159,43 +168,6 @@ public final class RemoteUpdateService {
 	}
 
 	/**
-	 * Finds the latest bootstrap installer that matches the supplied input.
-	 *
-	 * @param channel        update channel to query
-	 * @param currentVersion currently installed version
-	 * @return the matching latest bootstrap installer, or {@code null} when no match exists
-	 * @throws IOException          if the operation cannot be completed
-	 * @throws InterruptedException if the operation cannot be completed
-	 */
-	public BootstrapInstallerUpdate findLatestBootstrapInstaller(final UpdateChannel channel, final ParsedVersion currentVersion)
-			throws IOException, InterruptedException {
-		final JsonNode manifest = this.fetchReleaseManifestJson();
-		final JsonNode bootstrap = this.findBootstrapNode(manifest, channel);
-		if (bootstrap == null || bootstrap.isMissingNode() || bootstrap.isNull()) {
-			return new BootstrapInstallerUpdate(currentVersion,
-					currentVersion,
-					null,
-					URI.create(BootstrapApp.RELEASES_URL),
-					Platform.UNSUPPORTED);
-		}
-
-		final String versionText = bootstrap.path("version").asText();
-		final Platform platform = this.detectPlatform();
-		final URI installerUri = this.findInstallerUri(bootstrap, platform);
-		URI releasePageUri;
-		try {
-			releasePageUri = URI.create(bootstrap.path("releaseUrl").asText());
-		} catch (IllegalArgumentException e) {
-			releasePageUri = null;
-		}
-		return new BootstrapInstallerUpdate(currentVersion,
-				VersionComparator.parse(versionText),
-				installerUri,
-				releasePageUri == null ? URI.create(BootstrapApp.RELEASES_URL) : releasePageUri,
-				platform);
-	}
-
-	/**
 	 * Fetches the manifest.
 	 *
 	 * @return the fetch manifest result
@@ -204,28 +176,6 @@ public final class RemoteUpdateService {
 	 */
 	public UpdateManifest fetchManifest() throws IOException, InterruptedException {
 		return BootstrapApp.MAPPER.treeToValue(this.fetchManifestJson(), UpdateManifest.class);
-	}
-
-	/**
-	 * Fetches the release manifest JSON.
-	 *
-	 * @return the fetch release manifest JSON result
-	 * @throws IOException          if the operation cannot be completed
-	 * @throws InterruptedException if the operation cannot be completed
-	 */
-	public JsonNode fetchReleaseManifestJson() throws IOException, InterruptedException {
-		final HttpRequest request = HttpRequest.newBuilder(URI.create(BootstrapApp.RELEASES_MANIFEST_URL))
-				.header("Accept", "application/json")
-				.header("User-Agent", BootstrapApp.NAME + "/" + BootstrapApp.VERSION)
-				.timeout(Duration.ofSeconds(20))
-				.GET()
-				.build();
-
-		final HttpResponse<String> response = this.httpClient.send(request, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
-		if (response.statusCode() < 200 || response.statusCode() >= 300) {
-			throw new IOException("Failed to fetch versions manifest: HTTP " + response.statusCode());
-		}
-		return BootstrapApp.MAPPER.readTree(response.body());
 	}
 
 	/**
@@ -251,49 +201,25 @@ public final class RemoteUpdateService {
 	}
 
 	/**
-	 * Finds the latest that matches the supplied input.
+	 * Fetches the release manifest JSON.
 	 *
-	 * @param channel        update channel to query
-	 * @param currentVersion currently installed version
-	 * @return the matching latest, or {@code null} when no match exists
+	 * @return the fetch release manifest JSON result
 	 * @throws IOException          if the operation cannot be completed
 	 * @throws InterruptedException if the operation cannot be completed
 	 */
-	public AvailableUpdate findLatest(final UpdateChannel channel, final ParsedVersion currentVersion)
-			throws IOException, InterruptedException {
-		final UpdateManifest manifest = this.fetchManifest();
-		System.out.println("Versions found: " + manifest);
-		System.out.println();
-		final UpdateRelease release = manifest.channel(channel);
-		if (release == null || release.version == null || release.url == null || release.url.isBlank()) {
-			throw new IOException("No release configured for channel '" + channel.manifestKey() + "'.");
-		}
-		final ParsedVersion normalizedCurrent = currentVersion == null ? VersionComparator.parse("0.0.0") : currentVersion;
-		if (ChannelComparator.PARSED_COMPARATOR.compare(release.version, normalizedCurrent) == 0
-				&& VersionComparator.PARSED_COMPARATOR.compare(release.version, normalizedCurrent) <= 0) {
-			return new AvailableUpdate(channel,
-					normalizedCurrent,
-					normalizedCurrent,
-					release.notes,
-					null,
-					URI.create(release.releaseUrlOrDefault()));
-		}
+	public JsonNode fetchReleaseManifestJson() throws IOException, InterruptedException {
+		final HttpRequest request = HttpRequest.newBuilder(URI.create(BootstrapApp.RELEASES_MANIFEST_URL))
+				.header("Accept", "application/json")
+				.header("User-Agent", BootstrapApp.NAME + "/" + BootstrapApp.VERSION)
+				.timeout(Duration.ofSeconds(20))
+				.GET()
+				.build();
 
-		return new AvailableUpdate(channel,
-				normalizedCurrent,
-				release.version,
-				release.notes,
-				URI.create(release.url),
-				URI.create(release.releaseUrlOrDefault()));
-	}
-
-	/**
-	 * Detects the current value from the runtime environment.
-	 *
-	 * @return the detect platform result
-	 */
-	private Platform detectPlatform() {
-		return Platform.get();
+		final HttpResponse<String> response = this.httpClient.send(request, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
+		if (response.statusCode() < 200 || response.statusCode() >= 300) {
+			throw new IOException("Failed to fetch versions manifest: HTTP " + response.statusCode());
+		}
+		return BootstrapApp.MAPPER.readTree(response.body());
 	}
 
 	/**
@@ -339,6 +265,81 @@ public final class RemoteUpdateService {
 			}
 		}
 		return null;
+	}
+
+	/**
+	 * Finds the latest that matches the supplied input.
+	 *
+	 * @param channel        update channel to query
+	 * @param currentVersion currently installed version
+	 * @return the matching latest, or {@code null} when no match exists
+	 * @throws IOException          if the operation cannot be completed
+	 * @throws InterruptedException if the operation cannot be completed
+	 */
+	public AvailableUpdate
+			findLatest(final UpdateChannel channel, final ParsedVersion currentVersion) throws IOException, InterruptedException {
+		final UpdateManifest manifest = this.fetchManifest();
+		System.out.println("Versions found: " + manifest);
+		System.out.println();
+		final UpdateRelease release = manifest.channel(channel);
+		if (release == null || release.version == null || release.url == null || release.url.isBlank()) {
+			throw new IOException("No release configured for channel '" + channel.manifestKey() + "'.");
+		}
+		final ParsedVersion normalizedCurrent = currentVersion == null ? VersionComparator.parse("0.0.0") : currentVersion;
+		if (ChannelComparator.PARSED_COMPARATOR.compare(release.version, normalizedCurrent) == 0
+				&& VersionComparator.PARSED_COMPARATOR.compare(release.version, normalizedCurrent) <= 0) {
+			return new AvailableUpdate(channel,
+					normalizedCurrent,
+					normalizedCurrent,
+					release.notes,
+					null,
+					URI.create(release.releaseUrlOrDefault()));
+		}
+
+		return new AvailableUpdate(channel,
+				normalizedCurrent,
+				release.version,
+				release.notes,
+				URI.create(release.url),
+				URI.create(release.releaseUrlOrDefault()));
+	}
+
+	/**
+	 * Finds the latest bootstrap installer that matches the supplied input.
+	 *
+	 * @param channel        update channel to query
+	 * @param currentVersion currently installed version
+	 * @return the matching latest bootstrap installer, or {@code null} when no match exists
+	 * @throws IOException          if the operation cannot be completed
+	 * @throws InterruptedException if the operation cannot be completed
+	 */
+	public BootstrapInstallerUpdate findLatestBootstrapInstaller(final UpdateChannel channel, final ParsedVersion currentVersion)
+			throws IOException,
+				InterruptedException {
+		final JsonNode manifest = this.fetchReleaseManifestJson();
+		final JsonNode bootstrap = this.findBootstrapNode(manifest, channel);
+		if (bootstrap == null || bootstrap.isMissingNode() || bootstrap.isNull()) {
+			return new BootstrapInstallerUpdate(currentVersion,
+					currentVersion,
+					null,
+					URI.create(BootstrapApp.RELEASES_URL),
+					Platform.UNSUPPORTED);
+		}
+
+		final String versionText = bootstrap.path("version").asText();
+		final Platform platform = this.detectPlatform();
+		final URI installerUri = this.findInstallerUri(bootstrap, platform);
+		URI releasePageUri;
+		try {
+			releasePageUri = URI.create(bootstrap.path("releaseUrl").asText());
+		} catch (IllegalArgumentException e) {
+			releasePageUri = null;
+		}
+		return new BootstrapInstallerUpdate(currentVersion,
+				VersionComparator.parse(versionText),
+				installerUri,
+				releasePageUri == null ? URI.create(BootstrapApp.RELEASES_URL) : releasePageUri,
+				platform);
 	}
 
 }

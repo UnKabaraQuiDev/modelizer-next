@@ -36,29 +36,6 @@ public interface UpdateRuntime {
 	AvailableUpdate checkForUpdates() throws IOException;
 
 	/**
-	 * Returns the installed updates disk usage bytes.
-	 *
-	 * @return the installed updates disk usage bytes
-	 * @throws IOException if the operation cannot be completed
-	 */
-	long getInstalledUpdatesDiskUsageBytes() throws IOException;
-
-	/**
-	 * Returns the installed updates file count.
-	 *
-	 * @return the installed updates file count
-	 * @throws IOException if the operation cannot be completed
-	 */
-	int getInstalledUpdatesFileCount() throws IOException;
-
-	/**
-	 * Returns the installed updates directory.
-	 *
-	 * @return the installed updates directory
-	 */
-	Path getInstalledUpdatesDirectory();
-
-	/**
 	 * Deletes installed update folders that are no longer needed.
 	 *
 	 * @return the free unused installed updates result
@@ -86,6 +63,29 @@ public interface UpdateRuntime {
 	 * @return the current application version
 	 */
 	ParsedVersion getCurrentApplicationVersion();
+
+	/**
+	 * Returns the installed updates directory.
+	 *
+	 * @return the installed updates directory
+	 */
+	Path getInstalledUpdatesDirectory();
+
+	/**
+	 * Returns the installed updates disk usage bytes.
+	 *
+	 * @return the installed updates disk usage bytes
+	 * @throws IOException if the operation cannot be completed
+	 */
+	long getInstalledUpdatesDiskUsageBytes() throws IOException;
+
+	/**
+	 * Returns the installed updates file count.
+	 *
+	 * @return the installed updates file count
+	 * @throws IOException if the operation cannot be completed
+	 */
+	int getInstalledUpdatesFileCount() throws IOException;
 
 	/**
 	 * Returns the selected channel during bootstrap/update processing.

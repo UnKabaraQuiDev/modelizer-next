@@ -131,7 +131,7 @@ public record SelectedElement(SelectedType type, String classId, String fieldId,
 	 * @param alternative whether alternative is enabled
 	 * @return the as live edit element result
 	 */
-	public LiveEditElement asLiveEditElement(boolean alternative) {
+	public LiveEditElement asLiveEditElement(final boolean alternative) {
 		return new LiveEditElement(this.type.asLiveEditType(), this.classId, this.fieldId, this.commentId, this.linkId, alternative);
 	}
 
@@ -142,7 +142,7 @@ public record SelectedElement(SelectedType type, String classId, String fieldId,
 	 * @param style       whether style is enabled
 	 * @return the as live edit element result
 	 */
-	public LiveEditElement asLiveEditElement(boolean alternative, boolean style) {
+	public LiveEditElement asLiveEditElement(final boolean alternative, final boolean style) {
 		return new LiveEditElement(style ? this.type.asLiveEditType().asStyle()
 				: this.type.asLiveEditType(), this.classId, this.fieldId, this.commentId, this.linkId, alternative);
 	}
@@ -154,7 +154,7 @@ public record SelectedElement(SelectedType type, String classId, String fieldId,
 	 * @param currentStyle current style value used by the operation
 	 * @return the as style edit element result
 	 */
-	public LiveEditElement asStyleEditElement(boolean alternative, Object currentStyle) {
+	public LiveEditElement asStyleEditElement(final boolean alternative, final Object currentStyle) {
 		return new LiveEditElement(this.type.asLiveEditType()
 				.asStyle(), this.classId, this.fieldId, this.commentId, this.linkId, alternative, currentStyle);
 	}

@@ -17,7 +17,13 @@ import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectedElement.SelectedType;
  * @param forceAlternative whether force alternative is enabled
  * @param snapshotValue    snapshot value value used by the operation
  */
-public record LiveEditElement(LiveEditType type, String classId, String fieldId, String commentId, String linkId, boolean forceAlternative,
+public record LiveEditElement(
+		LiveEditType type,
+		String classId,
+		String fieldId,
+		String commentId,
+		String linkId,
+		boolean forceAlternative,
 		Object snapshotValue) {
 
 	/**
@@ -167,7 +173,12 @@ public record LiveEditElement(LiveEditType type, String classId, String fieldId,
 	 * @param commentId id of the comment to look up or modify
 	 * @param linkId    id of the link to look up or modify
 	 */
-	public LiveEditElement(LiveEditType type, String classId, String fieldId, String commentId, String linkId) {
+	public LiveEditElement(
+			final LiveEditType type,
+			final String classId,
+			final String fieldId,
+			final String commentId,
+			final String linkId) {
 		this(type, classId, fieldId, commentId, linkId, false, null);
 	}
 
@@ -181,7 +192,13 @@ public record LiveEditElement(LiveEditType type, String classId, String fieldId,
 	 * @param linkId           id of the link to look up or modify
 	 * @param forceAlternative whether force alternative is enabled
 	 */
-	public LiveEditElement(LiveEditType type, String classId, String fieldId, String commentId, String linkId, boolean forceAlternative) {
+	public LiveEditElement(
+			final LiveEditType type,
+			final String classId,
+			final String fieldId,
+			final String commentId,
+			final String linkId,
+			final boolean forceAlternative) {
 		this(type, classId, fieldId, commentId, linkId, forceAlternative, null);
 	}
 

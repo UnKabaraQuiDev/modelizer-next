@@ -68,23 +68,6 @@ public class ViewExportDialog extends JDialog {
 		}
 
 		/**
-		 * Sets the preview.
-		 *
-		 * @param canvas canvas instance that owns the operation
-		 * @param scope  export scope to use
-		 */
-		private void setPreview(final DiagramCanvas canvas, final ViewExportScope scope) {
-			if (canvas == null || scope == null) {
-				this.previewImage = null;
-				this.repaint();
-				return;
-			}
-
-			this.previewImage = canvas.createExportPreviewImage(scope, 900, 700);
-			this.repaint();
-		}
-
-		/**
 		 * Paints the component.
 		 *
 		 * @param graphics graphics context used for drawing
@@ -107,6 +90,23 @@ public class ViewExportDialog extends JDialog {
 			final int y = (this.getHeight() - imageHeight) / 2;
 
 			graphics.drawImage(this.previewImage.getScaledInstance(imageWidth, imageHeight, Image.SCALE_SMOOTH), x, y, null);
+		}
+
+		/**
+		 * Sets the preview.
+		 *
+		 * @param canvas canvas instance that owns the operation
+		 * @param scope  export scope to use
+		 */
+		private void setPreview(final DiagramCanvas canvas, final ViewExportScope scope) {
+			if (canvas == null || scope == null) {
+				this.previewImage = null;
+				this.repaint();
+				return;
+			}
+
+			this.previewImage = canvas.createExportPreviewImage(scope, 900, 700);
+			this.repaint();
 		}
 
 	}

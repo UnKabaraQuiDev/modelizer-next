@@ -17,15 +17,15 @@ import lu.kbra.pclib.PCUtils;
  */
 public final class BootstrapApp {
 
-	public static final ObjectMapper MAPPER = createMapper();
+	public static final ObjectMapper MAPPER = BootstrapApp.createMapper();
 	public static final String APP_DIR_PROPERTY = "APP_DIR";
 	public static final String ENABLE_UPDATE_PROPERTY = BootstrapApp.class.getSimpleName() + ".enableUpdate";
 	public static boolean ENABLE_UPDATE = PCUtils.getBoolean(BootstrapApp.ENABLE_UPDATE_PROPERTY, true);
 	public static final String APP_FOLDER_NAME = "modelizer-next";
 	public static final String FORCE_JAR_NAME_PROPERTY = BootstrapApp.class.getSimpleName() + ".forceJarName";
-	public static String FORCE_JAR_NAME = System.getProperty(FORCE_JAR_NAME_PROPERTY);
+	public static String FORCE_JAR_NAME = System.getProperty(BootstrapApp.FORCE_JAR_NAME_PROPERTY);
 	public static final String FORCE_BOOTSTRAP_UPDATE_PROPERTY = BootstrapApp.class.getSimpleName() + ".forceBootstrapUpdate";
-	public static boolean FORCE_BOOTSTRAP_UPDATE = Boolean.getBoolean(FORCE_BOOTSTRAP_UPDATE_PROPERTY);
+	public static boolean FORCE_BOOTSTRAP_UPDATE = Boolean.getBoolean(BootstrapApp.FORCE_BOOTSTRAP_UPDATE_PROPERTY);
 
 	public static JsonNode JSON;
 
@@ -40,17 +40,6 @@ public final class BootstrapApp {
 	public static BootstrapConfig BOOTSTRAP_CONFIG;
 
 	/**
-	 * Ensures that the directories exists or is up to date during bootstrap/update processing.
-	 *
-	 * @throws IOException if the operation cannot be completed
-	 */
-	public static void ensureDirectories() throws IOException {
-		BootstrapApp.getHomeDirectory().mkdirs();
-		BootstrapApp.getApplicationsDirectory().mkdirs();
-		BootstrapApp.getTempDirectory().mkdirs();
-	}
-
-	/**
 	 * Creates a mapper during bootstrap/update processing.
 	 *
 	 * @return the created mapper
@@ -61,6 +50,17 @@ public final class BootstrapApp {
 		mapper.registerModule(new ParsedVersionModule());
 		mapper.registerModule(new JavaTimeModule());
 		return mapper;
+	}
+
+	/**
+	 * Ensures that the directories exists or is up to date during bootstrap/update processing.
+	 *
+	 * @throws IOException if the operation cannot be completed
+	 */
+	public static void ensureDirectories() throws IOException {
+		BootstrapApp.getHomeDirectory().mkdirs();
+		BootstrapApp.getApplicationsDirectory().mkdirs();
+		BootstrapApp.getTempDirectory().mkdirs();
 	}
 
 	/**
@@ -87,7 +87,7 @@ public final class BootstrapApp {
 	 * @return the home directory
 	 */
 	public static File getHomeDirectory() {
-		final String override = System.getProperty(APP_DIR_PROPERTY);
+		final String override = System.getProperty(BootstrapApp.APP_DIR_PROPERTY);
 		if (override != null && !override.isBlank()) {
 			return new File(override);
 		}
@@ -98,13 +98,13 @@ public final class BootstrapApp {
 		if (os.contains("win")) {
 			final String appData = System.getenv("APPDATA");
 			if (appData != null && !appData.isBlank()) {
-				return new File(appData, APP_FOLDER_NAME);
+				return new File(appData, BootstrapApp.APP_FOLDER_NAME);
 			}
 		} else if (os.contains("mac")) {
-			return new File(home, "Library/Application Support/" + APP_FOLDER_NAME);
+			return new File(home, "Library/Application Support/" + BootstrapApp.APP_FOLDER_NAME);
 		}
 
-		return new File(home, "." + APP_FOLDER_NAME);
+		return new File(home, "." + BootstrapApp.APP_FOLDER_NAME);
 	}
 
 	/**

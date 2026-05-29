@@ -104,3 +104,5 @@ dependency-reduced-pom.xml
 artifacts/
 
 # pom.xml
+pages/
+registry/

@@ -41,7 +41,7 @@ public final class JarApplicationLauncher {
 			final AppMain appMain = (AppMain) entryPointClass.getDeclaredConstructor().newInstance();
 			try {
 				final Method legacyStart = appMain.getClass().getMethod("start", String[].class, Queue.class);
-				legacyStart.invoke(appMain, new Object[] { new String[] { "" }, null });
+				legacyStart.invoke(appMain, new String[] { "" }, null);
 			} catch (NoSuchMethodException e) {
 				appMain.start(args);
 			}

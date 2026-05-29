@@ -25,7 +25,7 @@ public class ChannelComparator implements Comparator<String> {
 		final ParsedVersion a = VersionComparator.parse(left);
 		final ParsedVersion b = VersionComparator.parse(right);
 
-		return PARSED_COMPARATOR.compare(a, b);
+		return ChannelComparator.PARSED_COMPARATOR.compare(a, b);
 	}
 
 }

@@ -12,5 +12,5 @@ public interface ProgressListener {
 	 * @param value   value to process
 	 * @param max     numeric max value
 	 */
-	public void onProgress(String message, int value, int max);
+	void onProgress(String message, int value, int max);
 }

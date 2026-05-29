@@ -48,6 +48,28 @@ public class ClassModel implements VisibilityOwner, IdOwner, StyleOwner, NamesOw
 		this.fields = new ArrayList<>();
 	}
 
+	public void addField(final FieldModel fieldModel) {
+		this.fields.add(fieldModel);
+		this.fieldById.put(fieldModel.getId(), fieldModel);
+	}
+
+	public void addField(final int index, final FieldModel fieldModel) {
+		this.fields.add(index, fieldModel);
+		this.fieldById.put(fieldModel.getId(), fieldModel);
+	}
+
+	public Map<String, FieldModel> buildFieldByIdIndex() {
+		this.fieldById.clear();
+		this.fields.stream().forEach(f -> this.fieldById.put(f.getId(), f));
+		return this.fieldById;
+	}
+
+	public Set<String> buildPrimaryKeyFieldIdsIndex() {
+		this.primaryKeyFieldIds.clear();
+		this.fields.stream().filter(FieldModel::isPrimaryKey).map(FieldModel::getId).forEach(this.primaryKeyFieldIds::add);
+		return this.primaryKeyFieldIds;
+	}
+
 	/**
 	 * Returns the field.
 	 *
@@ -70,6 +92,10 @@ public class ClassModel implements VisibilityOwner, IdOwner, StyleOwner, NamesOw
 		}
 
 		return null;
+	}
+
+	public Map<String, FieldModel> getFieldById() {
+		return this.fieldById;
 	}
 
 	/**
@@ -179,6 +205,10 @@ public class ClassModel implements VisibilityOwner, IdOwner, StyleOwner, NamesOw
 		return this.names;
 	}
 
+	public Set<String> getPrimaryKeyFieldIds() {
+		return this.primaryKeyFieldIds;
+	}
+
 	/**
 	 * Returns the style.
 	 *
@@ -199,6 +229,15 @@ public class ClassModel implements VisibilityOwner, IdOwner, StyleOwner, NamesOw
 		return this.visibility;
 	}
 
+	public void removeField(final FieldModel fieldModel) {
+		this.fields.remove(fieldModel);
+		this.fieldById.remove(fieldModel.getId());
+	}
+
+	public void setFieldById(final Map<String, FieldModel> fieldById) {
+		this.fieldById = fieldById;
+	}
+
 	/**
 	 * Sets the fields.
 	 *
@@ -209,52 +248,6 @@ public class ClassModel implements VisibilityOwner, IdOwner, StyleOwner, NamesOw
 		this.fields = fields;
 		this.buildFieldByIdIndex();
 		this.buildPrimaryKeyFieldIdsIndex();
-	}
-
-	public Set<String> buildPrimaryKeyFieldIdsIndex() {
-		this.primaryKeyFieldIds.clear();
-		this.fields.stream().filter(FieldModel::isPrimaryKey).map(FieldModel::getId).forEach(this.primaryKeyFieldIds::add);
-		return this.primaryKeyFieldIds;
-	}
-
-	public Set<String> validatePrimaryKeyFieldIdsIndex() {
-		if (this.primaryKeyFieldIds == null) {
-			this.primaryKeyFieldIds = new HashSet<>();
-		}
-		this.buildFieldByIdIndex();
-		return this.primaryKeyFieldIds;
-	}
-
-	public Set<String> getPrimaryKeyFieldIds() {
-		return this.primaryKeyFieldIds;
-	}
-
-	public void setPrimaryKeyFieldIds(final Set<String> primaryKeyFieldIds) {
-		this.primaryKeyFieldIds = primaryKeyFieldIds;
-	}
-
-	public Map<String, FieldModel> buildFieldByIdIndex() {
-		this.fieldById.clear();
-		this.fields.stream().forEach(f -> this.fieldById.put(f.getId(), f));
-		return this.fieldById;
-	}
-
-	public Map<String, FieldModel> validateFieldByIdIndex() {
-		if (this.fieldById == null) {
-			this.fieldById = new HashMap<>();
-		}
-		if (this.fieldById.size() != this.fields.size()) {
-			this.buildFieldByIdIndex();
-		}
-		return this.fieldById;
-	}
-
-	public Map<String, FieldModel> getFieldById() {
-		return this.fieldById;
-	}
-
-	public void setFieldById(final Map<String, FieldModel> fieldById) {
-		this.fieldById = fieldById;
 	}
 
 	/**
@@ -277,6 +270,10 @@ public class ClassModel implements VisibilityOwner, IdOwner, StyleOwner, NamesOw
 		this.names = names;
 	}
 
+	public void setPrimaryKeyFieldIds(final Set<String> primaryKeyFieldIds) {
+		this.primaryKeyFieldIds = primaryKeyFieldIds;
+	}
+
 	/**
 	 * Sets the style.
 	 *
@@ -297,21 +294,6 @@ public class ClassModel implements VisibilityOwner, IdOwner, StyleOwner, NamesOw
 		this.visibility = visibility;
 	}
 
-	public void addField(final FieldModel fieldModel) {
-		this.fields.add(fieldModel);
-		this.fieldById.put(fieldModel.getId(), fieldModel);
-	}
-
-	public void addField(int index, FieldModel fieldModel) {
-		this.fields.add(index, fieldModel);
-		this.fieldById.put(fieldModel.getId(), fieldModel);
-	}
-
-	public void removeField(final FieldModel fieldModel) {
-		this.fields.remove(fieldModel);
-		this.fieldById.remove(fieldModel.getId());
-	}
-
 	/**
 	 * Builds a debug string for this class model.
 	 *
@@ -321,6 +303,24 @@ public class ClassModel implements VisibilityOwner, IdOwner, StyleOwner, NamesOw
 	public String toString() {
 		return "ClassModel@" + System.identityHashCode(this) + " [id=" + this.id + ", names=" + this.names + ", visibility="
 				+ this.visibility + ", style=" + this.style + ", fields=" + this.fields + "]";
+	}
+
+	public Map<String, FieldModel> validateFieldByIdIndex() {
+		if (this.fieldById == null) {
+			this.fieldById = new HashMap<>();
+		}
+		if (this.fieldById.size() != this.fields.size()) {
+			this.buildFieldByIdIndex();
+		}
+		return this.fieldById;
+	}
+
+	public Set<String> validatePrimaryKeyFieldIdsIndex() {
+		if (this.primaryKeyFieldIds == null) {
+			this.primaryKeyFieldIds = new HashSet<>();
+		}
+		this.buildFieldByIdIndex();
+		return this.primaryKeyFieldIds;
 	}
 
 }

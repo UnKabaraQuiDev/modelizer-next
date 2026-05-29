@@ -21,7 +21,18 @@ import lu.kbra.modelizer_next.domain.data.Cardinality;
  * @param labelTo            text value for label to
  * @param layout             layout object to read or update
  */
-public record CopiedLink(String sourceId, String name, Color lineColor, String associationClassId, String fromClassId, String fromFieldId,
-		String toClassId, String toFieldId, Cardinality cardinalityFrom, Cardinality cardinalityTo, String labelFrom, String labelTo,
+public record CopiedLink(
+		String sourceId,
+		String name,
+		Color lineColor,
+		String associationClassId,
+		String fromClassId,
+		String fromFieldId,
+		String toClassId,
+		String toFieldId,
+		Cardinality cardinalityFrom,
+		Cardinality cardinalityTo,
+		String labelFrom,
+		String labelTo,
 		CopiedLinkLayout layout) {
 }

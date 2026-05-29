@@ -32,6 +32,20 @@ public final class StylePaletteService {
 	}
 
 	/**
+	 * Ensures that the default palette exists or is up to date.
+	 */
+	private static void ensureDefaultPalette() {
+		final File[] files = App.getStylesDirectory().listFiles((dir, name) -> name.toLowerCase().endsWith(".json"));
+		if (files != null && files.length > 0) {
+			return;
+		}
+
+		final StylePalette palette = new StylePalette();
+		palette.setName("Default");
+		StylePaletteService.save(palette);
+	}
+
+	/**
 	 * Loads the all.
 	 *
 	 * @return the matching values
@@ -61,6 +75,19 @@ public final class StylePaletteService {
 	}
 
 	/**
+	 * Sanitizes the file name so it can be used safely.
+	 *
+	 * @param name name value to read, write, or display
+	 * @return the sanitize file name result
+	 */
+	private static String sanitizeFileName(final String name) {
+		if (name == null || name.isBlank()) {
+			return "unnamed";
+		}
+		return name.replaceAll("[^a-zA-Z0-9._-]", "_");
+	}
+
+	/**
 	 * Saves the current state to persistent storage.
 	 *
 	 * @param palette palette value used by the operation
@@ -76,33 +103,6 @@ public final class StylePaletteService {
 		} catch (final IOException e) {
 			e.printStackTrace();
 		}
-	}
-
-	/**
-	 * Ensures that the default palette exists or is up to date.
-	 */
-	private static void ensureDefaultPalette() {
-		final File[] files = App.getStylesDirectory().listFiles((dir, name) -> name.toLowerCase().endsWith(".json"));
-		if (files != null && files.length > 0) {
-			return;
-		}
-
-		final StylePalette palette = new StylePalette();
-		palette.setName("Default");
-		StylePaletteService.save(palette);
-	}
-
-	/**
-	 * Sanitizes the file name so it can be used safely.
-	 *
-	 * @param name name value to read, write, or display
-	 * @return the sanitize file name result
-	 */
-	private static String sanitizeFileName(final String name) {
-		if (name == null || name.isBlank()) {
-			return "unnamed";
-		}
-		return name.replaceAll("[^a-zA-Z0-9._-]", "_");
 	}
 
 	/**

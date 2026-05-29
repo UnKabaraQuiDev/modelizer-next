@@ -88,6 +88,15 @@ interface PaletteController extends DiagramCanvasExt {
 	}
 
 	/**
+	 * Applies the default palette to selection.
+	 *
+	 * @param palette palette value used by the operation
+	 */
+	default void applyDefaultPaletteToSelection(final StylePalette palette) {
+		this.applyPaletteToSelection(this.getCanvas().defaultPalette);
+	}
+
+	/**
 	 * Applies the palette to class.
 	 *
 	 * @param palette    palette value used by the operation
@@ -110,11 +119,8 @@ interface PaletteController extends DiagramCanvasExt {
 	 * @param deep        whether deep is enabled
 	 * @param visibleOnly whether visible only is enabled
 	 */
-	default void applyPaletteToClass(
-			final StylePalette palette,
-			final ClassModel classModel,
-			final boolean deep,
-			final boolean visibleOnly) {
+	default void
+			applyPaletteToClass(final StylePalette palette, final ClassModel classModel, final boolean deep, final boolean visibleOnly) {
 		if (palette == null || classModel == null) {
 			return;
 		}
@@ -168,15 +174,6 @@ interface PaletteController extends DiagramCanvasExt {
 			return;
 		}
 		linkModel.setLineColor(palette.getLinkColor());
-	}
-
-	/**
-	 * Applies the default palette to selection.
-	 *
-	 * @param palette palette value used by the operation
-	 */
-	default void applyDefaultPaletteToSelection(final StylePalette palette) {
-		this.applyPaletteToSelection(this.getCanvas().defaultPalette);
 	}
 
 	/**

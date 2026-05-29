@@ -24,22 +24,6 @@ import lu.kbra.modelizer_next.layout.PanelType;
 public final class OnlineModelizerImporter {
 
 	/**
-	 * Imports the file.
-	 *
-	 * @param file file to read or write
-	 * @return the import file result
-	 * @throws IOException if the operation cannot be completed
-	 */
-	public static ModelDocument importFile(final File file) throws IOException {
-		final JsonNode root = MNMain.OBJECT_MAPPER.readTree(file);
-		if (!OnlineModelizerImporter.isOnlineRoot(root)) {
-			throw new IOException("Unsupported Online Modelizer file format.");
-		}
-
-		return OnlineModelizerImporter.importRoot(root);
-	}
-
-	/**
 	 * Adds the node layouts while converting JSON data.
 	 *
 	 * @param document document to read or modify
@@ -197,6 +181,22 @@ public final class OnlineModelizerImporter {
 		}
 
 		return linkModel;
+	}
+
+	/**
+	 * Imports the file.
+	 *
+	 * @param file file to read or write
+	 * @return the import file result
+	 * @throws IOException if the operation cannot be completed
+	 */
+	public static ModelDocument importFile(final File file) throws IOException {
+		final JsonNode root = MNMain.OBJECT_MAPPER.readTree(file);
+		if (!OnlineModelizerImporter.isOnlineRoot(root)) {
+			throw new IOException("Unsupported Online Modelizer file format.");
+		}
+
+		return OnlineModelizerImporter.importRoot(root);
 	}
 
 	/**
