@@ -1,66 +1,66 @@
 {
   "version": 1,
   "repository": "UnKabaraQuiDev/modelizer-next",
-  "releaseTag": "8-RELEASE-257",
+  "releaseTag": "8-RELEASE-279",
   "assets": {
     "windows": {
       "portable": {
         "label": "Windows portable ZIP",
-        "tag": "8-RELEASE-257",
-        "file": "modelizer-next-app-portable-windows-8-RELEASE-257.zip",
-        "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/8-RELEASE-257/modelizer-next-app-portable-windows-8-RELEASE-257.zip"
+        "tag": "8-RELEASE-279",
+        "file": "modelizer-next-app-portable-windows-8-RELEASE-279.zip",
+        "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/8-RELEASE-279/modelizer-next-app-portable-windows-8-RELEASE-279.zip"
       },
       "standalone": {
         "label": "Windows standalone installer",
-        "tag": "8-RELEASE-257",
-        "file": "modelizer-next-app-standalone-windows-8-RELEASE-257.exe",
-        "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/8-RELEASE-257/modelizer-next-app-standalone-windows-8-RELEASE-257.exe"
+        "tag": "8-RELEASE-279",
+        "file": "modelizer-next-app-standalone-windows-8-RELEASE-279.exe",
+        "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/8-RELEASE-279/modelizer-next-app-standalone-windows-8-RELEASE-279.exe"
       },
       "updater": {
         "label": "Windows updater installer",
-        "tag": "8-RELEASE-257",
-        "file": "modelizer-next-bootstrap-windows-8-RELEASE-257.exe",
-        "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/8-RELEASE-257/modelizer-next-bootstrap-windows-8-RELEASE-257.exe"
+        "tag": "8-RELEASE-279",
+        "file": "modelizer-next-bootstrap-windows-8-RELEASE-279.exe",
+        "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/8-RELEASE-279/modelizer-next-bootstrap-windows-8-RELEASE-279.exe"
       }
     },
     "linux": {
       "portable": {
         "label": "Linux portable ZIP",
-        "tag": "8-RELEASE-257",
-        "file": "modelizer-next-app-portable-linux-8-RELEASE-257.zip",
-        "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/8-RELEASE-257/modelizer-next-app-portable-linux-8-RELEASE-257.zip"
+        "tag": "8-RELEASE-279",
+        "file": "modelizer-next-app-portable-linux-8-RELEASE-279.zip",
+        "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/8-RELEASE-279/modelizer-next-app-portable-linux-8-RELEASE-279.zip"
       },
       "standalone": {
         "label": "Linux standalone .deb",
-        "tag": "8-RELEASE-257",
-        "file": "modelizer-next-app-standalone-linux-8-RELEASE-257.deb",
-        "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/8-RELEASE-257/modelizer-next-app-standalone-linux-8-RELEASE-257.deb"
+        "tag": "8-RELEASE-279",
+        "file": "modelizer-next-app-standalone-linux-8-RELEASE-279.deb",
+        "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/8-RELEASE-279/modelizer-next-app-standalone-linux-8-RELEASE-279.deb"
       },
       "updater": {
         "label": "Linux updater .deb",
-        "tag": "8-RELEASE-257",
-        "file": "modelizer-next-bootstrap-linux-8-RELEASE-257.deb",
-        "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/8-RELEASE-257/modelizer-next-bootstrap-linux-8-RELEASE-257.deb"
+        "tag": "8-RELEASE-279",
+        "file": "modelizer-next-bootstrap-linux-8-RELEASE-279.deb",
+        "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/8-RELEASE-279/modelizer-next-bootstrap-linux-8-RELEASE-279.deb"
       }
     },
     "macos": {
       "portable": {
         "label": "MacOS portable ZIP",
-        "tag": "8-RELEASE-257",
-        "file": "modelizer-next-app-portable-macos-8-RELEASE-257.zip",
-        "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/8-RELEASE-257/modelizer-next-app-portable-macos-8-RELEASE-257.zip"
+        "tag": "8-RELEASE-279",
+        "file": "modelizer-next-app-portable-macos-8-RELEASE-279.zip",
+        "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/8-RELEASE-279/modelizer-next-app-portable-macos-8-RELEASE-279.zip"
       },
       "standalone": {
         "label": "MacOS standalone .dmg",
-        "tag": "8-RELEASE-257",
-        "file": "modelizer-next-app-standalone-macos-8-RELEASE-257.dmg",
-        "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/8-RELEASE-257/modelizer-next-app-standalone-macos-8-RELEASE-257.dmg"
+        "tag": "8-RELEASE-279",
+        "file": "modelizer-next-app-standalone-macos-8-RELEASE-279.dmg",
+        "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/8-RELEASE-279/modelizer-next-app-standalone-macos-8-RELEASE-279.dmg"
       },
       "updater": {
         "label": "MacOS updater .dmg",
-        "tag": "8-RELEASE-257",
-        "file": "modelizer-next-bootstrap-macos-8-RELEASE-257.dmg",
-        "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/8-RELEASE-257/modelizer-next-bootstrap-macos-8-RELEASE-257.dmg"
+        "tag": "8-RELEASE-279",
+        "file": "modelizer-next-bootstrap-macos-8-RELEASE-279.dmg",
+        "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/8-RELEASE-279/modelizer-next-bootstrap-macos-8-RELEASE-279.dmg"
       }
     }
   }
