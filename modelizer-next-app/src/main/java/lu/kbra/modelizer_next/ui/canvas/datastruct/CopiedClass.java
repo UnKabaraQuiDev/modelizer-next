@@ -18,16 +18,7 @@ import java.util.List;
  * @param fields              values for fields
  * @param layout              layout object to read or update
  */
-public record CopiedClass(
-		String sourceId,
-		String conceptualName,
-		String technicalName,
-		boolean visibleInConceptual,
-		boolean visibleInLogical,
-		boolean visibleInPhysical,
-		Color textColor,
-		Color backgroundColor,
-		Color borderColor,
-		List<CopiedField> fields,
-		CopiedNodeLayout layout) {
+public record CopiedClass(String sourceId, String conceptualName, String technicalName, boolean visibleInConceptual,
+		boolean visibleInLogical, boolean visibleInPhysical, Color textColor, Color backgroundColor, Color borderColor,
+		List<CopiedField> fields, CopiedNodeLayout layout) {
 }

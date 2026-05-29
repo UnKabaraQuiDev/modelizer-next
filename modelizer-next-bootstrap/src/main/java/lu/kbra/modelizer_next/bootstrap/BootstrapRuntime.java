@@ -319,9 +319,10 @@ public class BootstrapRuntime implements UpdateRuntime {
 	 * @throws IOException if the operation cannot be completed
 	 */
 	@Override
-	public boolean
-			installUpdateAndRestart(final Component parentComponent, final AvailableUpdate update, final UpdatePreparation preparation)
-					throws IOException {
+	public boolean installUpdateAndRestart(
+			final Component parentComponent,
+			final AvailableUpdate update,
+			final UpdatePreparation preparation) throws IOException {
 		if (update == null || !update.isUpdateAvailable()) {
 			JOptionPane.showMessageDialog(parentComponent,
 					"You are already using the latest version for the selected channel.",

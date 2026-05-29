@@ -53,18 +53,8 @@ public final class LinkEditorDialog {
 	 * @param labelFrom          text value for label from
 	 * @param labelTo            text value for label to
 	 */
-	public record Result(
-			String name,
-			Color lineColor,
-			String fromClassId,
-			String toClassId,
-			String fromFieldId,
-			String toFieldId,
-			Cardinality cardinalityFrom,
-			Cardinality cardinalityTo,
-			String associationClassId,
-			String labelFrom,
-			String labelTo) {
+	public record Result(String name, Color lineColor, String fromClassId, String toClassId, String fromFieldId, String toFieldId,
+			Cardinality cardinalityFrom, Cardinality cardinalityTo, String associationClassId, String labelFrom, String labelTo) {
 	}
 
 	/**
@@ -194,8 +184,11 @@ public final class LinkEditorDialog {
 	 * @param panelType diagram panel type whose model or layout should be used
 	 * @return the show dialog result
 	 */
-	public static Result
-			showDialog(final Component parent, final ModelDocument document, final LinkModel linkModel, final PanelType panelType) {
+	public static Result showDialog(
+			final Component parent,
+			final ModelDocument document,
+			final LinkModel linkModel,
+			final PanelType panelType) {
 		final Window owner = parent == null ? null : SwingUtilities.getWindowAncestor(parent);
 		final JDialog dialog = new JDialog(owner, "Edit relation", Dialog.ModalityType.APPLICATION_MODAL);
 
