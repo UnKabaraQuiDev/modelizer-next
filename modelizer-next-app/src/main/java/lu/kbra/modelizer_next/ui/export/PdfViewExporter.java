@@ -26,10 +26,10 @@ final class PdfViewExporter {
 	/**
 	 * Holds image object data for PDF output.
 	 *
-	 * @param name resource name
+	 * @param name     resource name
 	 * @param objectId PDF object id
-	 * @param width image width in pixels
-	 * @param height image height in pixels
+	 * @param width    image width in pixels
+	 * @param height   image height in pixels
 	 */
 	private record PdfImageResource(String name, int objectId, int width, int height) {
 	}
@@ -91,8 +91,8 @@ final class PdfViewExporter {
 			for (int i = 1; i < offsets.size(); i++) {
 				out.write(String.format(Locale.US, "%010d 00000 n \n", offsets.get(i)).getBytes(StandardCharsets.ISO_8859_1));
 			}
-			out.write(("trailer\n<< /Size " + (this.objects.size() + 1) + " /Root " + catalogObjectId
-					+ " 0 R >>\nstartxref\n" + xrefOffset + "\n%%EOF\n").getBytes(StandardCharsets.ISO_8859_1));
+			out.write(("trailer\n<< /Size " + (this.objects.size() + 1) + " /Root " + catalogObjectId + " 0 R >>\nstartxref\n" + xrefOffset
+					+ "\n%%EOF\n").getBytes(StandardCharsets.ISO_8859_1));
 
 			Files.write(file.toPath(), out.toByteArray());
 		}
@@ -106,17 +106,15 @@ final class PdfViewExporter {
 	/**
 	 * Exports the canvas as a PDF file.
 	 *
-	 * @param canvas canvas to export
-	 * @param request export request
-	 * @param context export context
+	 * @param canvas     canvas to export
+	 * @param request    export request
+	 * @param context    export context
 	 * @param outputFile target file
 	 * @throws IOException if the PDF cannot be written
 	 */
-	public static void export(
-			final DiagramCanvas canvas,
-			final ViewExportRequest request,
-			final ViewExportContext context,
-			final File outputFile) throws IOException {
+	public static void
+			export(final DiagramCanvas canvas, final ViewExportRequest request, final ViewExportContext context, final File outputFile)
+					throws IOException {
 
 		final PdfViewExportOptions options = request.pdfOptions();
 		final double pageWidth = Math.max(1.0, options.effectivePageWidth());
@@ -280,7 +278,10 @@ final class PdfViewExporter {
 			final int underOcgId,
 			final int overOcgId) {
 
-		final StringBuilder xObjects = new StringBuilder("<< /").append(diagram.name()).append(' ').append(diagram.objectId()).append(" 0 R ");
+		final StringBuilder xObjects = new StringBuilder("<< /").append(diagram.name())
+				.append(' ')
+				.append(diagram.objectId())
+				.append(" 0 R ");
 		if (underTemplate != null) {
 			xObjects.append('/').append(underTemplate.name()).append(' ').append(underTemplate.objectId()).append(" 0 R ");
 		}
@@ -319,10 +320,8 @@ final class PdfViewExporter {
 
 	private static String fillColorCommand(final Color color) {
 		final Color rgbColor = color == null ? Color.WHITE : color;
-		return PdfViewExporter.format("%.4f %.4f %.4f rg\n",
-				rgbColor.getRed() / 255.0,
-				rgbColor.getGreen() / 255.0,
-				rgbColor.getBlue() / 255.0);
+		return PdfViewExporter
+				.format("%.4f %.4f %.4f rg\n", rgbColor.getRed() / 255.0, rgbColor.getGreen() / 255.0, rgbColor.getBlue() / 255.0);
 	}
 
 	private static String format(final String format, final Object... args) {
@@ -339,12 +338,8 @@ final class PdfViewExporter {
 		builder.append(PdfViewExporter.format("q %.4f 0 0 %.4f %.4f %.4f cm /%s Do Q\n", width, height, x, y, image.name()));
 	}
 
-	private static void appendText(
-			final StringBuilder builder,
-			final String rawText,
-			final double x,
-			final double y,
-			final double maxWidth) {
+	private static void
+			appendText(final StringBuilder builder, final String rawText, final double x, final double y, final double maxWidth) {
 		final String text = PdfViewExporter.truncate(rawText, (int) Math.max(1, Math.floor(maxWidth / (PdfViewExporter.TEXT_SIZE * 0.55))));
 		builder.append("BT\n/F1 ").append(PdfViewExporter.format("%.4f", PdfViewExporter.TEXT_SIZE)).append(" Tf\n");
 		builder.append("0 0 0 rg\n");
@@ -379,8 +374,8 @@ final class PdfViewExporter {
 
 		String value = rawValue == null ? "" : rawValue;
 		final Optional<File> sourceFile = context == null || context.sourceFile() == null ? Optional.empty() : context.sourceFile();
-		final String fileName = sourceFile.map(File::getName).orElse(context == null || context.outputFile() == null ? "Untitled"
-				: context.outputFile().getName());
+		final String fileName = sourceFile.map(File::getName)
+				.orElse(context == null || context.outputFile() == null ? "Untitled" : context.outputFile().getName());
 		final PanelType panelType = context == null ? null : context.panelType();
 		value = value.replace("%FILENAME%", ViewExporter.baseName(fileName));
 		value = value.replace("%TYPE%", ViewExporter.typeToken(panelType));

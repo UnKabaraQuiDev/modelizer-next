@@ -3,7 +3,8 @@ package lu.kbra.modelizer_next.ui.export;
 /**
  * Options used by image based exporters.
  *
- * @param transparentBackground whether formats that support alpha should keep a transparent background
+ * @param transparentBackground whether formats that support alpha should keep a transparent
+ *                              background
  */
 public record ImageViewExportOptions(boolean transparentBackground) implements ViewExportOptions {
 

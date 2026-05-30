@@ -25,8 +25,9 @@ public enum ViewExportFormat {
 	PNG("png", "PNG", true) {
 
 		@Override
-		public void export(final DiagramCanvas canvas, final ViewExportRequest request, final ViewExportContext context,
-				final File outputFile) throws IOException {
+		public void
+				export(final DiagramCanvas canvas, final ViewExportRequest request, final ViewExportContext context, final File outputFile)
+						throws IOException {
 			ViewExportFormat.writeImage(canvas.createExportImage(request.scope()), request, "png", outputFile, this.supportsTransparency());
 		}
 
@@ -35,8 +36,9 @@ public enum ViewExportFormat {
 	JPEG("jpg", "JPEG", false) {
 
 		@Override
-		public void export(final DiagramCanvas canvas, final ViewExportRequest request, final ViewExportContext context,
-				final File outputFile) throws IOException {
+		public void
+				export(final DiagramCanvas canvas, final ViewExportRequest request, final ViewExportContext context, final File outputFile)
+						throws IOException {
 			ViewExportFormat.writeImage(canvas.createExportImage(request.scope()), request, "jpg", outputFile, this.supportsTransparency());
 		}
 
@@ -45,8 +47,9 @@ public enum ViewExportFormat {
 	BMP("bmp", "BMP", false) {
 
 		@Override
-		public void export(final DiagramCanvas canvas, final ViewExportRequest request, final ViewExportContext context,
-				final File outputFile) throws IOException {
+		public void
+				export(final DiagramCanvas canvas, final ViewExportRequest request, final ViewExportContext context, final File outputFile)
+						throws IOException {
 			ViewExportFormat.writeImage(canvas.createExportImage(request.scope()), request, "bmp", outputFile, this.supportsTransparency());
 		}
 
@@ -55,9 +58,11 @@ public enum ViewExportFormat {
 	TIFF("tiff", "TIFF", true) {
 
 		@Override
-		public void export(final DiagramCanvas canvas, final ViewExportRequest request, final ViewExportContext context,
-				final File outputFile) throws IOException {
-			ViewExportFormat.writeImage(canvas.createExportImage(request.scope()), request, "tiff", outputFile, this.supportsTransparency());
+		public void
+				export(final DiagramCanvas canvas, final ViewExportRequest request, final ViewExportContext context, final File outputFile)
+						throws IOException {
+			ViewExportFormat
+					.writeImage(canvas.createExportImage(request.scope()), request, "tiff", outputFile, this.supportsTransparency());
 		}
 
 	},
@@ -65,8 +70,9 @@ public enum ViewExportFormat {
 	TIF("tif", "TIF", true) {
 
 		@Override
-		public void export(final DiagramCanvas canvas, final ViewExportRequest request, final ViewExportContext context,
-				final File outputFile) throws IOException {
+		public void
+				export(final DiagramCanvas canvas, final ViewExportRequest request, final ViewExportContext context, final File outputFile)
+						throws IOException {
 			ViewExportFormat.writeImage(canvas.createExportImage(request.scope()), request, "tif", outputFile, this.supportsTransparency());
 		}
 
@@ -75,9 +81,11 @@ public enum ViewExportFormat {
 	WEBP("webp", "WebP", true) {
 
 		@Override
-		public void export(final DiagramCanvas canvas, final ViewExportRequest request, final ViewExportContext context,
-				final File outputFile) throws IOException {
-			ViewExportFormat.writeImage(canvas.createExportImage(request.scope()), request, "webp", outputFile, this.supportsTransparency());
+		public void
+				export(final DiagramCanvas canvas, final ViewExportRequest request, final ViewExportContext context, final File outputFile)
+						throws IOException {
+			ViewExportFormat
+					.writeImage(canvas.createExportImage(request.scope()), request, "webp", outputFile, this.supportsTransparency());
 		}
 
 	},
@@ -85,8 +93,9 @@ public enum ViewExportFormat {
 	PDF("pdf", "PDF", false) {
 
 		@Override
-		public void export(final DiagramCanvas canvas, final ViewExportRequest request, final ViewExportContext context,
-				final File outputFile) throws IOException {
+		public void
+				export(final DiagramCanvas canvas, final ViewExportRequest request, final ViewExportContext context, final File outputFile)
+						throws IOException {
 			PdfViewExporter.export(canvas, request, context, outputFile);
 		}
 
@@ -99,7 +108,7 @@ public enum ViewExportFormat {
 	/**
 	 * Flattens transparent pixels over an RGB background color.
 	 *
-	 * @param image raw image to flatten
+	 * @param image           raw image to flatten
 	 * @param backgroundColor background color to use
 	 * @return an RGB image
 	 */
@@ -118,10 +127,8 @@ public enum ViewExportFormat {
 		return rgbImage;
 	}
 
-	private static BufferedImage imageForFormat(
-			final BufferedImage rawImage,
-			final ViewExportRequest request,
-			final boolean formatSupportsTransparency) {
+	private static BufferedImage
+			imageForFormat(final BufferedImage rawImage, final ViewExportRequest request, final boolean formatSupportsTransparency) {
 
 		if (formatSupportsTransparency && request.imageOptions().transparentBackground()) {
 			return rawImage;
@@ -135,7 +142,8 @@ public enum ViewExportFormat {
 			final ViewExportRequest request,
 			final String format,
 			final File outputFile,
-			final boolean formatSupportsTransparency) throws IOException {
+			final boolean formatSupportsTransparency)
+			throws IOException {
 
 		final BufferedImage image = ViewExportFormat.imageForFormat(rawImage, request, formatSupportsTransparency);
 		final Iterator<ImageWriter> writers = ImageIO.getImageWritersByFormatName(format);
@@ -161,8 +169,8 @@ public enum ViewExportFormat {
 	/**
 	 * Creates a view export format instance.
 	 *
-	 * @param extension   text value for extension
-	 * @param displayName name value to use
+	 * @param extension            text value for extension
+	 * @param displayName          name value to use
 	 * @param supportsTransparency whether this format can store transparent pixels
 	 */
 	ViewExportFormat(final String extension, final String displayName, final boolean supportsTransparency) {
@@ -183,17 +191,14 @@ public enum ViewExportFormat {
 	/**
 	 * Exports a canvas to a file.
 	 *
-	 * @param canvas canvas instance to export
-	 * @param request request with common and format-specific settings
-	 * @param context export context values
+	 * @param canvas     canvas instance to export
+	 * @param request    request with common and format-specific settings
+	 * @param context    export context values
 	 * @param outputFile target file
 	 * @throws IOException if the file cannot be written
 	 */
-	public abstract void export(
-			DiagramCanvas canvas,
-			ViewExportRequest request,
-			ViewExportContext context,
-			File outputFile) throws IOException;
+	public abstract void export(DiagramCanvas canvas, ViewExportRequest request, ViewExportContext context, File outputFile)
+			throws IOException;
 
 	/**
 	 * Returns the display name.

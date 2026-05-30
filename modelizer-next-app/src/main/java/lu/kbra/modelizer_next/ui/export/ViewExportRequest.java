@@ -58,9 +58,8 @@ public record ViewExportRequest(
 	public ViewExportRequest {
 		final ViewExportFormat effectiveFormat = format == null ? ViewExportFormat.PNG : format;
 		format = effectiveFormat;
-		backgroundColor = backgroundColor == null ? Color.WHITE : new Color(backgroundColor.getRed(),
-				backgroundColor.getGreen(),
-				backgroundColor.getBlue());
+		backgroundColor = backgroundColor == null ? Color.WHITE
+				: new Color(backgroundColor.getRed(), backgroundColor.getGreen(), backgroundColor.getBlue());
 		options = options == null ? effectiveFormat.createDefaultOptions() : options;
 	}
 

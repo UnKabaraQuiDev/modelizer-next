@@ -5,15 +5,15 @@ import java.io.File;
 /**
  * Options used by the PDF exporter.
  *
- * @param pageFormat selected page format
- * @param orientation selected page orientation
- * @param customPageWidth custom page width in points, used when pageFormat is CUSTOM
- * @param customPageHeight custom page height in points, used when pageFormat is CUSTOM
- * @param margins page margins in points
+ * @param pageFormat        selected page format
+ * @param orientation       selected page orientation
+ * @param customPageWidth   custom page width in points, used when pageFormat is CUSTOM
+ * @param customPageHeight  custom page height in points, used when pageFormat is CUSTOM
+ * @param margins           page margins in points
  * @param underTemplateFile optional image template drawn below the diagram content
- * @param overTemplateFile optional image template drawn above the diagram content
- * @param headerText header text pattern
- * @param footerText footer text pattern
+ * @param overTemplateFile  optional image template drawn above the diagram content
+ * @param headerText        header text pattern
+ * @param footerText        footer text pattern
  */
 public record PdfViewExportOptions(
 		PdfPageFormat pageFormat,
@@ -52,8 +52,7 @@ public record PdfViewExportOptions(
 		if (this.pageFormat() == PdfPageFormat.CUSTOM) {
 			return this.baseHeight();
 		}
-		return this.orientation() == PdfPageOrientation.LANDSCAPE
-				? Math.min(this.baseWidth(), this.baseHeight())
+		return this.orientation() == PdfPageOrientation.LANDSCAPE ? Math.min(this.baseWidth(), this.baseHeight())
 				: Math.max(this.baseWidth(), this.baseHeight());
 	}
 
@@ -66,8 +65,7 @@ public record PdfViewExportOptions(
 		if (this.pageFormat() == PdfPageFormat.CUSTOM) {
 			return this.baseWidth();
 		}
-		return this.orientation() == PdfPageOrientation.LANDSCAPE
-				? Math.max(this.baseWidth(), this.baseHeight())
+		return this.orientation() == PdfPageOrientation.LANDSCAPE ? Math.max(this.baseWidth(), this.baseHeight())
 				: Math.min(this.baseWidth(), this.baseHeight());
 	}
 
