@@ -5,14 +5,18 @@ import java.util.Objects;
 import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lu.kbra.modelizer_next.domain.data.Cardinality;
+import lu.kbra.modelizer_next.domain.impl.StyleOwner;
+import lu.kbra.modelizer_next.domain.shared.ElementStyle;
 
 /**
  * Persistent model of a relationship between two link ends, optionally connected to an association
  * class.
  */
-public class LinkModel {
+public class LinkModel implements StyleOwner {
 
 	private String id;
 	@JsonAlias("name")
@@ -22,9 +26,22 @@ public class LinkModel {
 	private Cardinality cardinalityFrom;
 	private Cardinality cardinalityTo;
 	private String associationClassId;
-	private Color lineColor;
 	private String labelFrom;
 	private String labelTo;
+	private ElementStyle style;
+
+	@JsonIgnore
+	private String lastPaletteName;
+
+	@Override
+	public String getLastPaletteName() {
+		return this.lastPaletteName;
+	}
+
+	@Override
+	public void setLastPaletteName(final String lastPaletteName) {
+		this.lastPaletteName = lastPaletteName;
+	}
 
 	/**
 	 * Creates a link model instance.
@@ -37,9 +54,9 @@ public class LinkModel {
 		this.cardinalityFrom = Cardinality.ONE;
 		this.cardinalityTo = Cardinality.ZERO_OR_MANY;
 		this.associationClassId = null;
-		this.lineColor = Color.BLACK;
 		this.labelFrom = null;
 		this.labelTo = null;
+		this.style = ElementStyle.forLink();
 	}
 
 	/**
@@ -120,7 +137,7 @@ public class LinkModel {
 	 * @return the line color
 	 */
 	public Color getLineColor() {
-		return this.lineColor;
+		return this.getBorderColor();
 	}
 
 	/**
@@ -268,8 +285,9 @@ public class LinkModel {
 	 *
 	 * @param lineColor color value to use
 	 */
+	@JsonProperty("lineColor")
 	public void setLineColor(final Color lineColor) {
-		this.lineColor = lineColor;
+		this.setBorderColor(lineColor);
 	}
 
 	/**
@@ -281,16 +299,21 @@ public class LinkModel {
 		this.to = to;
 	}
 
-	/**
-	 * Builds a debug string for this link model.
-	 *
-	 * @return a debug string for this object
-	 */
+	@Override
+	public ElementStyle getStyle() {
+		return this.style;
+	}
+
+	@Override
+	public void setStyle(final ElementStyle style) {
+		this.style = style;
+	}
+
 	@Override
 	public String toString() {
-		return "LinkModel [id=" + this.id + ", label=" + this.label + ", from=" + this.from + ", to=" + this.to + ", cardinalityFrom="
-				+ this.cardinalityFrom + ", cardinalityTo=" + this.cardinalityTo + ", associationClassId=" + this.associationClassId
-				+ ", lineColor=" + this.lineColor + ", labelFrom=" + this.labelFrom + ", labelTo=" + this.labelTo + "]";
+		return "LinkModel@" + System.identityHashCode(this) + " [id=" + id + ", label=" + label + ", from=" + from + ", to=" + to
+				+ ", cardinalityFrom=" + cardinalityFrom + ", cardinalityTo=" + cardinalityTo + ", associationClassId=" + associationClassId
+				+ ", labelFrom=" + labelFrom + ", labelTo=" + labelTo + ", style=" + style + ", lastPaletteName=" + lastPaletteName + "]";
 	}
 
 }

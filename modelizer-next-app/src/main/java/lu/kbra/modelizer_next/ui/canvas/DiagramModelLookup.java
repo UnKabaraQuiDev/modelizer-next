@@ -115,7 +115,7 @@ interface DiagramModelLookup extends DiagramCanvasExt {
 	 * @param selectedElement selected element to read or update
 	 * @return the matching type, or {@code null} when no match exists
 	 */
-	default Object findType(final SelectedElement selectedElement) {
+	default Object findElement(final SelectedElement selectedElement) {
 		return switch (selectedElement.type()) {
 		case CLASS -> this.findClassById(selectedElement.classId());
 		case COMMENT -> this.findCommentById(selectedElement.commentId());

@@ -36,6 +36,7 @@ import lu.kbra.modelizer_next.domain.CommentModel;
 import lu.kbra.modelizer_next.domain.FieldModel;
 import lu.kbra.modelizer_next.domain.LinkModel;
 import lu.kbra.modelizer_next.domain.data.Cardinality;
+import lu.kbra.modelizer_next.domain.impl.StyleOwner;
 import lu.kbra.modelizer_next.domain.shared.ElementStyle;
 import lu.kbra.modelizer_next.layout.LayoutObjectType;
 import lu.kbra.modelizer_next.layout.NodeLayout;
@@ -116,7 +117,8 @@ public interface LiveEditor extends DiagramCanvasExt {
 	 * @param palette         palette value used by the operation
 	 * @param liveEditElement live edit element value used by the operation
 	 */
-	default void applyStyle(final StylePalette palette, final LiveEditElement liveEditElement) {
+	default void applyStyle(final StylePalette palette) {
+		final LiveEditElement liveEditElement = this.getCanvas().liveEditElement;
 		switch (liveEditElement.type()) {
 		case CLASS_STYLE -> {
 			final ClassModel classModel = this.getCanvas().findClassById(liveEditElement.classId());
@@ -136,6 +138,7 @@ public interface LiveEditor extends DiagramCanvasExt {
 		}
 		default -> new IllegalArgumentException("Unexpected type: " + liveEditElement);
 		}
+		this.getCanvas().repaint();
 	}
 
 	/**
@@ -309,7 +312,7 @@ public interface LiveEditor extends DiagramCanvasExt {
 	 * @param nextDir     numeric next dir value
 	 * @param alternative whether alternative is enabled
 	 */
-	default void confirmRenamingElement(final int nextDir, final boolean alternative) {
+	default void confirmLiveEditElement(final int nextDir, final boolean alternative) {
 		if (!this.isLiveEditingElement()) {
 			this.getCanvas().liveEditComponents.setVisible(false);
 			return;
@@ -323,7 +326,7 @@ public interface LiveEditor extends DiagramCanvasExt {
 
 			final StylePalette palette = liveEditComponents.paletteList().getSelectedValue();
 
-			this.applyStyle(palette, liveEditElement);
+			this.applyStyle(palette);
 
 			next = false;
 
@@ -446,7 +449,7 @@ public interface LiveEditor extends DiagramCanvasExt {
 		stylePaletteList.addListSelectionListener(e -> {
 
 			if (!e.getValueIsAdjusting() && this.isLiveEditingElement() && this.getCanvas().liveEditElement.type().isStyle()) {
-				this.applyStyle(stylePaletteList.getSelectedValue(), this.getCanvas().liveEditElement);
+				this.applyStyle(stylePaletteList.getSelectedValue());
 
 			}
 
@@ -460,10 +463,15 @@ public interface LiveEditor extends DiagramCanvasExt {
 
 				@Override
 				public void mouseMoved(final MouseEvent e) {
+					if (!e.getComponent().contains(e.getPoint())) {
+						return;
+					}
+
 					final int index = ((JList) e.getComponent()).locationToIndex(e.getPoint());
 
 					if (index >= 0 && index != stylePaletteList.getSelectedIndex()) {
 						((JList) e.getComponent()).setSelectedIndex(index);
+						LiveEditor.this.updateLiveEditPreview();
 					}
 				}
 
@@ -531,7 +539,7 @@ public interface LiveEditor extends DiagramCanvasExt {
 
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					LiveEditor.this.confirmRenamingElement(0, false);
+					LiveEditor.this.confirmLiveEditElement(0, false);
 				}
 
 			});
@@ -539,7 +547,7 @@ public interface LiveEditor extends DiagramCanvasExt {
 
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					LiveEditor.this.confirmRenamingElement(1, false);
+					LiveEditor.this.confirmLiveEditElement(1, false);
 				}
 
 			});
@@ -547,7 +555,7 @@ public interface LiveEditor extends DiagramCanvasExt {
 
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					LiveEditor.this.confirmRenamingElement(-1, false);
+					LiveEditor.this.confirmLiveEditElement(-1, false);
 				}
 
 			});
@@ -555,7 +563,7 @@ public interface LiveEditor extends DiagramCanvasExt {
 
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					LiveEditor.this.confirmRenamingElement(1, true);
+					LiveEditor.this.confirmLiveEditElement(1, true);
 				}
 
 			});
@@ -563,7 +571,7 @@ public interface LiveEditor extends DiagramCanvasExt {
 
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					LiveEditor.this.confirmRenamingElement(-1, true);
+					LiveEditor.this.confirmLiveEditElement(-1, true);
 				}
 
 			});
@@ -660,7 +668,9 @@ public interface LiveEditor extends DiagramCanvasExt {
 			((StylePaletteCellRenderer) list.getCellRenderer()).setScope(element.type().asSelectedType().asStyleScope());
 
 			list.setListData(palettes.toArray(StylePalette[]::new));
-			list.setSelectedValue(canvas.defaultPalette, true);
+			final StylePalette palette = canvas.findElement(element.asSelectedElement()) instanceof StyleOwner so
+					&& so.getLastPaletteName() != null ? getFrame().findPaletteByName(so.getLastPaletteName()) : canvas.defaultPalette;
+			list.setSelectedValue(palette == null ? canvas.defaultPalette : palette, true);
 			list.setFont(DiagramCanvas.BODY_FONT
 					.deriveFont(DiagramCanvas.BODY_FONT.getSize() * (float) this.getCanvas().getPanelState().getZoom()));
 
@@ -668,7 +678,7 @@ public interface LiveEditor extends DiagramCanvasExt {
 			final Dimension preferredSize = list.getPreferredSize();
 			final Point2D.Double point = this.getCanvas().getMouseViewportPos();
 
-			list.setBounds((int) point.getX() + 5,
+			list.setBounds((int) point.getX() + DiagramCanvas.LIVE_EDIT_STYLE_OFFSET_X,
 					(int) point.getY(),
 					(int) preferredSize.getWidth() + DiagramCanvas.TEXT_PADDING,
 					(int) preferredSize.getHeight());
@@ -718,7 +728,9 @@ public interface LiveEditor extends DiagramCanvasExt {
 		switch (selectedElement.type()) {
 		case CLASS -> {
 			if (liveEditElement.forceAlternative()) {
-				final Pair<ElementStyle, List<ElementStyle>> styles = (Pair<ElementStyle, List<ElementStyle>>) snapshotValue;
+				@SuppressWarnings(
+					"unchecked"
+				) final Pair<ElementStyle, List<ElementStyle>> styles = (Pair<ElementStyle, List<ElementStyle>>) snapshotValue;
 				final ClassModel classModel = this.getCanvas().findClassById(selectedElement.classId());
 				classModel.setStyle(styles.getKey());
 				for (int i = 0; i < classModel.getFields().size(); i++) {
@@ -737,6 +749,7 @@ public interface LiveEditor extends DiagramCanvasExt {
 		case LINK -> {
 			this.getCanvas().findLinkById(selectedElement.linkId()).setLineColor((Color) snapshotValue);
 		}
+		default -> throw new IllegalArgumentException("Unexpected value: " + selectedElement.type());
 		}
 	}
 
@@ -792,17 +805,17 @@ public interface LiveEditor extends DiagramCanvasExt {
 
 		final DiagramCanvas canvas = this.getCanvas();
 
-		final LiveEditElement renamingElement = canvas.liveEditElement;
-		final LiveEditComponents renamingComponents = canvas.liveEditComponents;
+		final LiveEditElement liveEditElement = canvas.liveEditElement;
+		final LiveEditComponents liveEditComponents = canvas.liveEditComponents;
 
-		if (!renamingElement.type().isStyle()) {
+		if (!liveEditElement.type().isStyle()) {
 			return;
 		}
 
-		final StylePalette palette = renamingComponents.paletteList().getSelectedValue();
+		final StylePalette palette = liveEditComponents.paletteList().getSelectedValue();
 
 		if (palette != null) {
-			this.applyStyle(palette, renamingElement);
+			this.applyStyle(palette);
 		}
 
 	}

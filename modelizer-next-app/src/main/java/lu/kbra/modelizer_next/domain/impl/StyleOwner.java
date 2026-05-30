@@ -77,4 +77,8 @@ public interface StyleOwner {
 		this.getStyle().setTextColor(c);
 	}
 
+	String getLastPaletteName();
+
+	void setLastPaletteName(String lastPaletteName);
+
 }

@@ -96,6 +96,8 @@ public class DiagramCanvas extends JPanel
 
 	public static final int TEXT_PADDING = 8;
 
+	public static final int LIVE_EDIT_STYLE_OFFSET_X = 20;
+
 	public static final Color CANVAS_BACKGROUND_COLOR = new Color(0xF2F2F2);
 	public static final Color GRID_COLOR = new Color(0xE4E4E4);
 	public static final Color SELECTION_COLOR = new Color(0x2F7DFF);
@@ -218,6 +220,9 @@ public class DiagramCanvas extends JPanel
 		this.liveEditComponents = this.createRenamingField();
 		this.liveEditComponents.forEach(super::add);
 		super.setLayout(null);
+
+		this.ensureConceptualAnchorCache();
+		this.ensureLayouts();
 	}
 
 	/**

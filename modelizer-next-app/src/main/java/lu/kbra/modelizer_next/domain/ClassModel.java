@@ -36,6 +36,16 @@ public class ClassModel implements VisibilityOwner, IdOwner, StyleOwner, NamesOw
 	private Map<String, FieldModel> fieldById = new HashMap<>();
 	@JsonIgnore
 	private Set<String> primaryKeyFieldIds = new HashSet<>();
+	@JsonIgnore
+	private String lastPaletteName;
+
+	public String getLastPaletteName() {
+		return lastPaletteName;
+	}
+
+	public void setLastPaletteName(String lastPaletteName) {
+		this.lastPaletteName = lastPaletteName;
+	}
 
 	/**
 	 * Creates a class model instance.
@@ -294,15 +304,11 @@ public class ClassModel implements VisibilityOwner, IdOwner, StyleOwner, NamesOw
 		this.visibility = visibility;
 	}
 
-	/**
-	 * Builds a debug string for this class model.
-	 *
-	 * @return a debug string for this object
-	 */
 	@Override
 	public String toString() {
-		return "ClassModel@" + System.identityHashCode(this) + " [id=" + this.id + ", names=" + this.names + ", visibility="
-				+ this.visibility + ", style=" + this.style + ", fields=" + this.fields + "]";
+		return "ClassModel@" + System.identityHashCode(this) + " [id=" + id + ", names=" + names + ", visibility=" + visibility + ", style="
+				+ style + ", fields=" + fields + ", fieldById=" + fieldById + ", primaryKeyFieldIds=" + primaryKeyFieldIds
+				+ ", lastPaletteName=" + lastPaletteName + "]";
 	}
 
 	public Map<String, FieldModel> validateFieldByIdIndex() {

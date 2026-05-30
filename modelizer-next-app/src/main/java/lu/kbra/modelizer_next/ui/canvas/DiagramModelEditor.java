@@ -94,7 +94,7 @@ interface DiagramModelEditor extends DiagramCanvasExt {
 
 		if (this.getCanvas().isLiveEditingElement() && this.getCanvas().liveEditElement.type().isClass()
 				&& this.getCanvas().liveEditElement.classId().equals(targetClass.getId())) {
-			this.getCanvas().confirmRenamingElement(0, false);
+			this.getCanvas().confirmLiveEditElement(0, false);
 		}
 		this.getCanvas().select(SelectedElement.forField(targetClass.getId(), fieldModel.getId()));
 		this.getCanvas().notifySelectionChanged();

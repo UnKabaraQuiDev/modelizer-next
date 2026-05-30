@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lu.kbra.modelizer_next.domain.impl.IdOwner;
 import lu.kbra.modelizer_next.domain.impl.NamesOwner;
@@ -34,6 +35,17 @@ public class FieldModel implements NamesOwner, IdOwner, StyleOwner {
 	private boolean unique;
 	private boolean notNull;
 	private String type;
+
+	@JsonIgnore
+	private String lastPaletteName;
+
+	public String getLastPaletteName() {
+		return lastPaletteName;
+	}
+
+	public void setLastPaletteName(String lastPaletteName) {
+		this.lastPaletteName = lastPaletteName;
+	}
 
 	/**
 	 * Creates a field model instance.

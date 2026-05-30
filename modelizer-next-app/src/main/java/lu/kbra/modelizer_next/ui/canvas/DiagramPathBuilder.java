@@ -73,11 +73,6 @@ interface DiagramPathBuilder extends DiagramCanvasExt {
 		return fromName + " > " + fromFieldName + " -> " + toFieldName + " < " + toName;
 	}
 
-	/**
-	 * Builds a selection path.
-	 *
-	 * @return the built selection path
-	 */
 	default String buildSelectionPath() {
 		if (this.getCanvas().selectedElement == null) {
 			return "";

@@ -3,6 +3,7 @@ package lu.kbra.modelizer_next.domain;
 import java.awt.Color;
 import java.util.UUID;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lu.kbra.modelizer_next.domain.data.CommentKind;
@@ -24,6 +25,19 @@ public class CommentModel implements StyleOwner, VisibilityOwner, IdOwner {
 	private LayerVisibility visibility;
 	private ElementStyle style;
 
+	@JsonIgnore
+	private String lastPaletteName;
+
+	@Override
+	public String getLastPaletteName() {
+		return this.lastPaletteName;
+	}
+
+	@Override
+	public void setLastPaletteName(final String lastPaletteName) {
+		this.lastPaletteName = lastPaletteName;
+	}
+
 	/**
 	 * Creates a comment model instance.
 	 */
@@ -33,7 +47,7 @@ public class CommentModel implements StyleOwner, VisibilityOwner, IdOwner {
 		this.text = null;
 		this.binding = null;
 		this.visibility = new LayerVisibility();
-		this.style = new ElementStyle();
+		this.style = ElementStyle.forComment();
 	}
 
 	/**

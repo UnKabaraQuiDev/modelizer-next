@@ -9,11 +9,6 @@ import lu.kbra.modelizer_next.common.ColorUtils;
  */
 public class ElementStyle implements ModelElement {
 
-	/**
-	 * Creates the default style for class elements.
-	 *
-	 * @return the for class result
-	 */
 	public static ElementStyle forClass() {
 		final ElementStyle style = new ElementStyle();
 		style.textColor = ColorUtils.ofRgb(0x000000);
@@ -22,11 +17,6 @@ public class ElementStyle implements ModelElement {
 		return style;
 	}
 
-	/**
-	 * Creates the default style for field elements.
-	 *
-	 * @return the for field result
-	 */
 	public static ElementStyle forField() {
 		final ElementStyle style = new ElementStyle();
 		style.textColor = ColorUtils.ofRgb(0x000000);
@@ -34,8 +24,25 @@ public class ElementStyle implements ModelElement {
 		return style;
 	}
 
+	public static ElementStyle forComment() {
+		final ElementStyle style = new ElementStyle();
+		style.textColor = ColorUtils.ofRgb(0x333333);
+		style.backgroundColor = ColorUtils.ofRgb(0xFFF8CC);
+		style.borderColor = ColorUtils.ofRgb(0x444444);
+		return style;
+	}
+
+	public static ElementStyle forLink() {
+		final ElementStyle style = new ElementStyle();
+		style.borderColor = ColorUtils.ofRgb(0x000000);
+		return style;
+	}
+
 	private Color textColor;
 	private Color backgroundColor;
+	/**
+	 * for all sorts of lines
+	 */
 	private Color borderColor;
 
 	/**

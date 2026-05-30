@@ -3,6 +3,8 @@ package lu.kbra.modelizer_next.layout;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 /**
  * Persistent state for one workspace panel.
  */
@@ -12,6 +14,7 @@ public class PanelState {
 	private double panX;
 	private double panY;
 	private List<NodeLayout> nodeLayouts;
+	@JsonIgnore
 	private List<LinkLayout> linkLayouts;
 
 	/**

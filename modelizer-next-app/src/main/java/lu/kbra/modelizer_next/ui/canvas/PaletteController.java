@@ -18,12 +18,7 @@ interface PaletteController extends DiagramCanvasExt {
 	 * @param classModel class model affected by the operation
 	 */
 	default void applyDefaultPaletteToClass(final ClassModel classModel) {
-		if (this.getCanvas().defaultPalette == null || classModel == null) {
-			return;
-		}
-		classModel.setTextColor(this.getCanvas().defaultPalette.getClassTextColor());
-		classModel.setBackgroundColor(this.getCanvas().defaultPalette.getClassBackgroundColor());
-		classModel.setBorderColor(this.getCanvas().defaultPalette.getClassBorderColor());
+		applyPaletteToClass(this.getCanvas().defaultPalette, classModel, false, false);
 	}
 
 	/**
@@ -35,17 +30,7 @@ interface PaletteController extends DiagramCanvasExt {
 	 */
 	@Deprecated
 	default void applyDefaultPaletteToClass(final ClassModel classModel, final boolean deep, final boolean visibleOnly) {
-		if (this.getCanvas().defaultPalette == null || classModel == null) {
-			return;
-		}
-		classModel.setTextColor(this.getCanvas().defaultPalette.getClassTextColor());
-		classModel.setBackgroundColor(this.getCanvas().defaultPalette.getClassBackgroundColor());
-		classModel.setBorderColor(this.getCanvas().defaultPalette.getClassBorderColor());
-		if (deep) {
-			for (final FieldModel fm : visibleOnly ? classModel.getFields(this.getPanelType()) : classModel.getFields()) {
-				this.applyDefaultPaletteToField(fm);
-			}
-		}
+		applyPaletteToClass(this.getCanvas().defaultPalette, classModel, deep, visibleOnly);
 	}
 
 	/**
@@ -54,12 +39,7 @@ interface PaletteController extends DiagramCanvasExt {
 	 * @param commentModel comment model affected by the operation
 	 */
 	default void applyDefaultPaletteToComment(final CommentModel commentModel) {
-		if (this.getCanvas().defaultPalette == null || commentModel == null) {
-			return;
-		}
-		commentModel.setTextColor(this.getCanvas().defaultPalette.getCommentTextColor());
-		commentModel.setBackgroundColor(this.getCanvas().defaultPalette.getCommentBackgroundColor());
-		commentModel.setBorderColor(this.getCanvas().defaultPalette.getCommentBorderColor());
+		applyPaletteToComment(this.getCanvas().defaultPalette, commentModel);
 	}
 
 	/**
@@ -68,11 +48,7 @@ interface PaletteController extends DiagramCanvasExt {
 	 * @param fieldModel field model affected by the operation
 	 */
 	default void applyDefaultPaletteToField(final FieldModel fieldModel) {
-		if (this.getCanvas().defaultPalette == null || fieldModel == null) {
-			return;
-		}
-		fieldModel.setTextColor(this.getCanvas().defaultPalette.getFieldTextColor());
-		fieldModel.setBackgroundColor(this.getCanvas().defaultPalette.getFieldBackgroundColor());
+		applyPaletteToField(this.getCanvas().defaultPalette, fieldModel);
 	}
 
 	/**
@@ -81,18 +57,13 @@ interface PaletteController extends DiagramCanvasExt {
 	 * @param linkModel link model affected by the operation
 	 */
 	default void applyDefaultPaletteToLink(final LinkModel linkModel) {
-		if (this.getCanvas().defaultPalette == null || linkModel == null) {
-			return;
-		}
-		linkModel.setLineColor(this.getCanvas().defaultPalette.getLinkColor());
+		applyPaletteToLink(getCanvas().defaultPalette, linkModel);
 	}
 
 	/**
 	 * Applies the default palette to selection.
-	 *
-	 * @param palette palette value used by the operation
 	 */
-	default void applyDefaultPaletteToSelection(final StylePalette palette) {
+	default void applyDefaultPaletteToSelection() {
 		this.applyPaletteToSelection(this.getCanvas().defaultPalette);
 	}
 
@@ -103,12 +74,7 @@ interface PaletteController extends DiagramCanvasExt {
 	 * @param classModel class model affected by the operation
 	 */
 	default void applyPaletteToClass(final StylePalette palette, final ClassModel classModel) {
-		if (palette == null || classModel == null) {
-			return;
-		}
-		classModel.setTextColor(palette.getClassTextColor());
-		classModel.setBackgroundColor(palette.getClassBackgroundColor());
-		classModel.setBorderColor(palette.getClassBorderColor());
+		applyPaletteToClass(palette, classModel, false, false);
 	}
 
 	/**
@@ -127,6 +93,7 @@ interface PaletteController extends DiagramCanvasExt {
 		classModel.setTextColor(palette.getClassTextColor());
 		classModel.setBackgroundColor(palette.getClassBackgroundColor());
 		classModel.setBorderColor(palette.getClassBorderColor());
+		classModel.setLastPaletteName(palette.getName());
 		if (deep) {
 			for (final FieldModel fm : visibleOnly ? classModel.getFields(this.getPanelType()) : classModel.getFields()) {
 				this.applyPaletteToField(palette, fm);
@@ -147,6 +114,7 @@ interface PaletteController extends DiagramCanvasExt {
 		commentModel.setTextColor(palette.getCommentTextColor());
 		commentModel.setBackgroundColor(palette.getCommentBackgroundColor());
 		commentModel.setBorderColor(palette.getCommentBorderColor());
+		commentModel.setLastPaletteName(palette.getName());
 	}
 
 	/**
@@ -161,6 +129,7 @@ interface PaletteController extends DiagramCanvasExt {
 		}
 		fieldModel.setTextColor(palette.getFieldTextColor());
 		fieldModel.setBackgroundColor(palette.getFieldBackgroundColor());
+		fieldModel.setLastPaletteName(palette.getName());
 	}
 
 	/**
@@ -174,6 +143,7 @@ interface PaletteController extends DiagramCanvasExt {
 			return;
 		}
 		linkModel.setLineColor(palette.getLinkColor());
+		linkModel.setLastPaletteName(palette.getName());
 	}
 
 	/**
