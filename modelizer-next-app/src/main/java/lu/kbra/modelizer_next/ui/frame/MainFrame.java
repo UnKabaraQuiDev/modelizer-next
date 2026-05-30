@@ -31,6 +31,9 @@ import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
+import io.github.andrewauclair.moderndocking.DockingRegion;
+import io.github.andrewauclair.moderndocking.app.Docking;
+import io.github.andrewauclair.moderndocking.app.RootDockingPanel;
 import lu.kbra.modelizer_next.MNMain;
 import lu.kbra.modelizer_next.bootstrap.AvailableUpdate;
 import lu.kbra.modelizer_next.bootstrap.UpdateRuntime;
@@ -51,10 +54,6 @@ import lu.kbra.modelizer_next.ui.impl.DocumentLoadHandler;
 import lu.kbra.pclib.PCUtils;
 import lu.kbra.pclib.datastructure.pair.Pair;
 import lu.kbra.pclib.datastructure.triplet.Triplet;
-
-import io.github.andrewauclair.moderndocking.DockingRegion;
-import io.github.andrewauclair.moderndocking.app.Docking;
-import io.github.andrewauclair.moderndocking.app.RootDockingPanel;
 
 /**
  * Main Swing window for editing Modelizer Next documents.
@@ -170,6 +169,209 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 			c.applyPaletteToSelection(palette);
 			c.clearSelection();
 		});
+	}
+
+	/**
+	 * Returns the active canvas, defaults to the conceptual one.
+	 *
+	 * @return the active canvas
+	 */
+	public DiagramCanvas getActiveCanvas() {
+		return this.activeCanvas == null ? this.conceptualCanvas : this.activeCanvas;
+	}
+
+	public DiagramCanvas getCanvas(final PanelType otherPanelType) {
+		return switch (otherPanelType) {
+		case CONCEPTUAL -> this.conceptualCanvas;
+		case LOGICAL -> this.logicalCanvas;
+		case PHYSICAL -> this.physicalCanvas;
+		};
+	}
+
+	/**
+	 * Returns the canvases.
+	 *
+	 * @return the canvases
+	 */
+	public List<DiagramCanvas> getCanvases() {
+		return Arrays.asList(this.conceptualCanvas, this.logicalCanvas, this.physicalCanvas);
+	}
+
+	/**
+	 * Returns the canvases by panel type.
+	 *
+	 * @return the canvases by panel type
+	 */
+	public Map<PanelType, DiagramCanvas> getCanvasesByPanelType() {
+		final Map<PanelType, DiagramCanvas> canvases = new LinkedHashMap<>();
+		canvases.put(PanelType.CONCEPTUAL, this.conceptualCanvas);
+		canvases.put(PanelType.LOGICAL, this.logicalCanvas);
+		canvases.put(PanelType.PHYSICAL, this.physicalCanvas);
+		return canvases;
+	}
+
+	@Override
+	public ModelDocument getDocument() {
+		return this.document;
+	}
+
+	/**
+	 * Returns the palettes loaded from the config.
+	 *
+	 * @return the palettes
+	 */
+	public List<StylePalette> getPalettes() {
+		return this.palettes;
+	}
+
+	@Override
+	public DocumentSession getSession() {
+		return this.session;
+	}
+
+	public List<DiagramCanvas> getVisibleCanvases() {
+		final List<DiagramCanvas> dcs = new ArrayList<>(3);
+		for (final DiagramCanvas dc : this.canvases) {
+			if (dc.isVisible() && dc.isShowing() && dc.isDisplayable()) {
+				dcs.add(dc);
+			}
+		}
+		return dcs;
+	}
+
+	/**
+	 * Loads the document from a file.
+	 *
+	 * @param selectedFile file to read or write
+	 * @return {@code true} if the document was successfully loaded; otherwise {@code false}
+	 */
+	public boolean loadDocument(final File selectedFile) {
+		return this.loadDocumentFromFile(selectedFile);
+	}
+
+	/**
+	 * Overwrites the frame content with the new document session.
+	 *
+	 * @param session document session to read or modify
+	 */
+	@Override
+	public void openInFrame(final DocumentSession session) {
+		SwingUtilities.invokeLater(() -> this.setContent(session));
+	}
+
+	/**
+	 * Refreshes the frame title from the current state.
+	 */
+	@Override
+	public void refreshFrameTitle() {
+		final String source = this.document.getSource() == null || this.document.getSource().isBlank() ? "Untitled"
+				: this.document.getSource();
+		this.setTitle(App.title(source + (this.session.isDirty() ? " *" : "")));
+	}
+
+	/**
+	 * Refreshes the toolbar labels from the current state.
+	 */
+	@Override
+	public void refreshToolbarMenuState() {
+		if (this.undoMenuItem != null) {
+			this.undoMenuItem.setEnabled(this.session.canUndo());
+		}
+		if (this.redoMenuItem != null) {
+			this.redoMenuItem.setEnabled(this.session.canRedo());
+		}
+
+		this.toolBar.refreshToolbarState(this);
+
+		this.refreshFrameTitle();
+	}
+
+	/**
+	 * Clears the frame state and rebuilds everything for the new document session. This is a
+	 * replacement to disposing of the JFrame and recreating it.
+	 *
+	 * @param session document session to read or modify
+	 */
+	protected void setContent(final DocumentSession session) {
+		Docking.deregisterAllDockables();
+		Docking.deregisterAllDockingPanels();
+
+		super.setTitle("Modelizer Next");
+
+		this.setContentPane(new JPanel());
+		this.clearListeners();
+
+		this.session = session;
+		this.document = session.getDocument();
+
+		this.setLayout(new BorderLayout());
+		this.installCloseHandling();
+
+		this.palettes = StylePaletteService.loadAll();
+
+		this.statusLabel = this.createStatusLabel();
+		this.selectionPathLabel = this.createSelectionPathLabel();
+
+		final DocumentChangeListener canvasListener = new DocumentChangeListener() {
+
+			@Override
+			public void onDocumentChanged() {
+				MainFrame.this.onDocumentChanged();
+			}
+
+			@Override
+			public void onSelectionChanged(final SelectionInfo selectionInfo) {
+				if (MainFrame.this.getActiveCanvas() != null
+						&& MainFrame.this.getActiveCanvas().getPanelType() == selectionInfo.panelType()) {
+					MainFrame.this.updateSelectionLabel(selectionInfo);
+				}
+			}
+
+			@Override
+			public void redo() {
+				MainFrame.this.redo();
+			}
+
+			@Override
+			public void undo() {
+				MainFrame.this.undo();
+			}
+
+		};
+
+		this.conceptualCanvas = new DiagramCanvas(this, this.document, PanelType.CONCEPTUAL, canvasListener);
+		this.logicalCanvas = new DiagramCanvas(this, this.document, PanelType.LOGICAL, canvasListener);
+		this.physicalCanvas = new DiagramCanvas(this, this.document, PanelType.PHYSICAL, canvasListener);
+		this.canvases = new DiagramCanvas[] { this.conceptualCanvas, this.logicalCanvas, this.physicalCanvas };
+		this.setDefaultPaletteToCanvases();
+
+		this.rootDockingPanel = new RootDockingPanel(this);
+
+		final DockableDiagramPanel conceptualDock = this.createDockableCanvasPanel("conceptual", "Conceptual", this.conceptualCanvas);
+		final DockableDiagramPanel logicalDock = this.createDockableCanvasPanel("logical", "Logical", this.logicalCanvas);
+		final DockableDiagramPanel physicalDock = this.createDockableCanvasPanel("physical", "Physical", this.physicalCanvas);
+
+		this.activeCanvas = this.conceptualCanvas;
+		Docking.dock(conceptualDock, this);
+		Docking.dock(logicalDock, conceptualDock, DockingRegion.CENTER);
+		Docking.dock(physicalDock, conceptualDock, DockingRegion.CENTER);
+		Docking.bringToFront(conceptualDock);
+
+		this.setJMenuBar(new MainFrameMenuBar(this));
+
+		this.toolBar = new MainFrameToolBar(this);
+		this.add(this.toolBar, BorderLayout.NORTH);
+
+		final JPanel statusPanel = this.createStatusPanel();
+
+		this.add(this.rootDockingPanel, BorderLayout.CENTER);
+		this.add(statusPanel, BorderLayout.SOUTH);
+
+		this.installFileDropSupport();
+		this.updateSelectionLabel(this.getActiveCanvas().getSelectionInfo());
+		this.refreshToolbarMenuState();
+		this.revalidate();
+		this.repaint();
 	}
 
 	/**
@@ -388,37 +590,6 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 	}
 
 	/**
-	 * Returns the active canvas, defaults to the conceptual one.
-	 *
-	 * @return the active canvas
-	 */
-	public DiagramCanvas getActiveCanvas() {
-		return this.activeCanvas == null ? this.conceptualCanvas : this.activeCanvas;
-	}
-
-	/**
-	 * Returns the canvases.
-	 *
-	 * @return the canvases
-	 */
-	public List<DiagramCanvas> getCanvases() {
-		return Arrays.asList(this.conceptualCanvas, this.logicalCanvas, this.physicalCanvas);
-	}
-
-	/**
-	 * Returns the canvases by panel type.
-	 *
-	 * @return the canvases by panel type
-	 */
-	public Map<PanelType, DiagramCanvas> getCanvasesByPanelType() {
-		final Map<PanelType, DiagramCanvas> canvases = new LinkedHashMap<>();
-		canvases.put(PanelType.CONCEPTUAL, this.conceptualCanvas);
-		canvases.put(PanelType.LOGICAL, this.logicalCanvas);
-		canvases.put(PanelType.PHYSICAL, this.physicalCanvas);
-		return canvases;
-	}
-
-	/**
 	 * Returns the default export directory.
 	 *
 	 * @return the default export directory
@@ -429,11 +600,6 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 		}
 
 		return new File(System.getProperty("user.home"));
-	}
-
-	@Override
-	public ModelDocument getDocument() {
-		return this.document;
 	}
 
 	/**
@@ -455,55 +621,11 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 	}
 
 	/**
-	 * Returns the palettes loaded from the config.
-	 *
-	 * @return the palettes
-	 */
-	public List<StylePalette> getPalettes() {
-		return this.palettes;
-	}
-
-	@Override
-	public DocumentSession getSession() {
-		return this.session;
-	}
-
-	public List<DiagramCanvas> getVisibleCanvases() {
-		final List<DiagramCanvas> dcs = new ArrayList<>(3);
-		for (final DiagramCanvas dc : this.canvases) {
-			if (dc.isVisible() && dc.isShowing() && dc.isDisplayable()) {
-				dcs.add(dc);
-			}
-		}
-		return dcs;
-	}
-
-	/**
-	 * Loads the document from a file.
-	 *
-	 * @param selectedFile file to read or write
-	 * @return {@code true} if the document was successfully loaded; otherwise {@code false}
-	 */
-	public boolean loadDocument(final File selectedFile) {
-		return this.loadDocumentFromFile(selectedFile);
-	}
-
-	/**
 	 * Handles the document changed event.
 	 */
 	void onDocumentChanged() {
 		this.session.markChanged();
 		this.refreshToolbarMenuState();
-	}
-
-	/**
-	 * Overwrites the frame content with the new document session.
-	 *
-	 * @param session document session to read or modify
-	 */
-	@Override
-	public void openInFrame(final DocumentSession session) {
-		SwingUtilities.invokeLater(() -> this.setContent(session));
 	}
 
 	/**
@@ -541,33 +663,6 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 	}
 
 	/**
-	 * Refreshes the frame title from the current state.
-	 */
-	@Override
-	public void refreshFrameTitle() {
-		final String source = this.document.getSource() == null || this.document.getSource().isBlank() ? "Untitled"
-				: this.document.getSource();
-		this.setTitle(App.title(source + (this.session.isDirty() ? " *" : "")));
-	}
-
-	/**
-	 * Refreshes the toolbar labels from the current state.
-	 */
-	@Override
-	public void refreshToolbarMenuState() {
-		if (this.undoMenuItem != null) {
-			this.undoMenuItem.setEnabled(this.session.canUndo());
-		}
-		if (this.redoMenuItem != null) {
-			this.redoMenuItem.setEnabled(this.session.canRedo());
-		}
-
-		this.toolBar.refreshToolbarState(this);
-
-		refreshFrameTitle();
-	}
-
-	/**
 	 * Removes the listener.
 	 *
 	 * @param listeners values for listeners
@@ -590,94 +685,6 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 	}
 
 	/**
-	 * Clears the frame state and rebuilds everything for the new document session. This is a
-	 * replacement to disposing of the JFrame and recreating it.
-	 *
-	 * @param session document session to read or modify
-	 */
-	protected void setContent(final DocumentSession session) {
-		Docking.deregisterAllDockables();
-		Docking.deregisterAllDockingPanels();
-
-		super.setTitle("Modelizer Next");
-
-		this.setContentPane(new JPanel());
-		this.clearListeners();
-
-		this.session = session;
-		this.document = session.getDocument();
-
-		this.setLayout(new BorderLayout());
-		this.installCloseHandling();
-
-		this.palettes = StylePaletteService.loadAll();
-
-		this.statusLabel = this.createStatusLabel();
-		this.selectionPathLabel = this.createSelectionPathLabel();
-
-		final DocumentChangeListener canvasListener = new DocumentChangeListener() {
-
-			@Override
-			public void onDocumentChanged() {
-				MainFrame.this.onDocumentChanged();
-			}
-
-			@Override
-			public void onSelectionChanged(final SelectionInfo selectionInfo) {
-				if (MainFrame.this.getActiveCanvas() != null
-						&& MainFrame.this.getActiveCanvas().getPanelType() == selectionInfo.panelType()) {
-					MainFrame.this.updateSelectionLabel(selectionInfo);
-				}
-			}
-
-			@Override
-			public void redo() {
-				MainFrame.this.redo();
-			}
-
-			@Override
-			public void undo() {
-				MainFrame.this.undo();
-			}
-
-		};
-
-		this.conceptualCanvas = new DiagramCanvas(this, this.document, PanelType.CONCEPTUAL, canvasListener);
-		this.logicalCanvas = new DiagramCanvas(this, this.document, PanelType.LOGICAL, canvasListener);
-		this.physicalCanvas = new DiagramCanvas(this, this.document, PanelType.PHYSICAL, canvasListener);
-		this.canvases = new DiagramCanvas[] { this.conceptualCanvas, this.logicalCanvas, this.physicalCanvas };
-		this.setDefaultPaletteToCanvases();
-
-		this.rootDockingPanel = new RootDockingPanel(this);
-
-		final DockableDiagramPanel conceptualDock = this.createDockableCanvasPanel("conceptual", "Conceptual", this.conceptualCanvas);
-		final DockableDiagramPanel logicalDock = this.createDockableCanvasPanel("logical", "Logical", this.logicalCanvas);
-		final DockableDiagramPanel physicalDock = this.createDockableCanvasPanel("physical", "Physical", this.physicalCanvas);
-
-		this.activeCanvas = this.conceptualCanvas;
-		Docking.dock(conceptualDock, this);
-		Docking.dock(logicalDock, conceptualDock, DockingRegion.CENTER);
-		Docking.dock(physicalDock, conceptualDock, DockingRegion.CENTER);
-		Docking.bringToFront(conceptualDock);
-
-		this.setJMenuBar(new MainFrameMenuBar(this));
-
-		this.toolBar = new MainFrameToolBar(this);
-		this.add(this.toolBar, BorderLayout.NORTH);
-
-		final JPanel statusPanel = this.createStatusPanel();
-
-		this.add(this.rootDockingPanel, BorderLayout.CENTER);
-		this.add(statusPanel, BorderLayout.SOUTH);
-
-		this.installFileDropSupport();
-		this.updateSelectionLabel(this.getActiveCanvas().getSelectionInfo());
-		this.refreshToolbarMenuState();
-		this.revalidate();
-		this.repaint();
-	}
-
-	/**
 	 * Restores the previous snapshot in the undo history.
 	 */
 	void undo() {
@@ -697,14 +704,6 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 		final String path = selectionInfo == null || selectionInfo.path() == null || selectionInfo.path().isBlank() ? "No selection"
 				: selectionInfo.path();
 		this.selectionPathLabel.setText(path);
-	}
-
-	public DiagramCanvas getCanvas(final PanelType otherPanelType) {
-		return switch (otherPanelType) {
-		case CONCEPTUAL -> this.conceptualCanvas;
-		case LOGICAL -> this.logicalCanvas;
-		case PHYSICAL -> this.physicalCanvas;
-		};
 	}
 
 }

@@ -92,10 +92,8 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 	 * Ensures that the layouts exists or is up to date.
 	 */
 	default void ensureLayouts() {
-		for (final ClassModel classModel : this.getDocument().getModel().getClasses()) {
-			if (classModel.isVisible(this.getPanelType())) {
-				this.getCanvas().findOrCreateNodeLayout(LayoutObjectType.CLASS, classModel.getId());
-			}
+		for (final ClassModel classModel : this.getDocument().getModel().getClasses(this.getPanelType())) {
+			this.getCanvas().findOrCreateNodeLayout(LayoutObjectType.CLASS, classModel.getId());
 		}
 
 		for (final CommentModel commentModel : this.getDocument().getModel().getComments()) {
@@ -417,14 +415,14 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 						() -> this.getCanvas().editSelectionStyle(true),
 						this.getCanvas()::focusSelection,
 						this.getCanvas()::focusAll,
-						() -> getCanvas().synchronizePosition(false, getPanelType().previous()),
-						() -> getCanvas().synchronizePosition(false, PanelType.CONCEPTUAL),
-						() -> getCanvas().synchronizePosition(false, PanelType.LOGICAL),
-						() -> getCanvas().synchronizePosition(false, PanelType.PHYSICAL),
-						() -> getCanvas().synchronizePosition(true, getPanelType().previous()),
-						() -> getCanvas().synchronizePosition(true, PanelType.CONCEPTUAL),
-						() -> getCanvas().synchronizePosition(true, PanelType.LOGICAL),
-						() -> getCanvas().synchronizePosition(true, PanelType.PHYSICAL)));
+						() -> this.getCanvas().synchronizePosition(false, this.getPanelType().previous()),
+						() -> this.getCanvas().synchronizePosition(false, PanelType.CONCEPTUAL),
+						() -> this.getCanvas().synchronizePosition(false, PanelType.LOGICAL),
+						() -> this.getCanvas().synchronizePosition(false, PanelType.PHYSICAL),
+						() -> this.getCanvas().synchronizePosition(true, this.getPanelType().previous()),
+						() -> this.getCanvas().synchronizePosition(true, PanelType.CONCEPTUAL),
+						() -> this.getCanvas().synchronizePosition(true, PanelType.LOGICAL),
+						() -> this.getCanvas().synchronizePosition(true, PanelType.PHYSICAL)));
 	}
 
 	/**
@@ -659,7 +657,7 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 			return new Point2D.Double(classBounds.getCenterX(), classBounds.getCenterY());
 		}
 
-		final List<FieldModel> visibleFields = classModel.getFields(getPanelType());
+		final List<FieldModel> visibleFields = classModel.getFields(this.getPanelType());
 		for (int i = 0; i < visibleFields.size(); i++) {
 			if (visibleFields.get(i).getId().equals(fieldId)) {
 				final double y = classBounds.getY() + DiagramCanvas.CLASS_HEADER_HEIGHT + i * DiagramCanvas.CLASS_ROW_HEIGHT
@@ -740,7 +738,7 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 
 		double centerX = classBounds.getCenterX();
 		if (fieldId != null) {
-			final List<FieldModel> visibleFields = classModel.getFields(getPanelType());
+			final List<FieldModel> visibleFields = classModel.getFields(this.getPanelType());
 			for (int i = 0; i < visibleFields.size(); i++) {
 				if (visibleFields.get(i).getId().equals(fieldId)) {
 					final Rectangle2D fieldBounds = new Rectangle2D.Double(classBounds.getX(),
@@ -779,7 +777,7 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 			return new Point2D.Double(x, classBounds.getCenterY());
 		}
 
-		final List<FieldModel> visibleFields = classModel.getFields(getPanelType());
+		final List<FieldModel> visibleFields = classModel.getFields(this.getPanelType());
 		for (int i = 0; i < visibleFields.size(); i++) {
 			if (visibleFields.get(i).getId().equals(fieldId)) {
 				final Rectangle2D fieldBounds = new Rectangle2D.Double(classBounds.getX(),
@@ -830,7 +828,7 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 					: new FieldAnchor(right, AnchorSide.RIGHT);
 		}
 
-		final List<FieldModel> visibleFields = classModel.getFields(getPanelType());
+		final List<FieldModel> visibleFields = classModel.getFields(this.getPanelType());
 		for (int i = 0; i < visibleFields.size(); i++) {
 			if (visibleFields.get(i).getId().equals(fieldId)) {
 				final Rectangle2D fieldBounds = new Rectangle2D.Double(classBounds.getX(),
@@ -875,7 +873,7 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 			return new Point2D.Double(x, classBounds.getCenterY());
 		}
 
-		final List<FieldModel> visibleFields = classModel.getFields(getPanelType());
+		final List<FieldModel> visibleFields = classModel.getFields(this.getPanelType());
 		for (int i = 0; i < visibleFields.size(); i++) {
 			if (visibleFields.get(i).getId().equals(fieldId)) {
 				final Rectangle2D fieldBounds = new Rectangle2D.Double(classBounds.getX(),

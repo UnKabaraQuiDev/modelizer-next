@@ -13,19 +13,19 @@ public enum PanelType {
 		return this != CONCEPTUAL;
 	}
 
-	public PanelType previous() {
-		return switch (this) {
-		case CONCEPTUAL -> null;
-		case LOGICAL -> CONCEPTUAL;
-		case PHYSICAL -> LOGICAL;
-		};
-	}
-
 	public PanelType next() {
 		return switch (this) {
 		case CONCEPTUAL -> LOGICAL;
 		case LOGICAL -> PHYSICAL;
 		case PHYSICAL -> null;
+		};
+	}
+
+	public PanelType previous() {
+		return switch (this) {
+		case CONCEPTUAL -> null;
+		case LOGICAL -> CONCEPTUAL;
+		case PHYSICAL -> LOGICAL;
 		};
 	}
 

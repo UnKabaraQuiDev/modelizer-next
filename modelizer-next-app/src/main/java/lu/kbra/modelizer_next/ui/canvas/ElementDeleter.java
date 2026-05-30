@@ -1,10 +1,13 @@
 package lu.kbra.modelizer_next.ui.canvas;
 
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
+
 import lu.kbra.modelizer_next.domain.ClassModel;
 import lu.kbra.modelizer_next.domain.CommentModel;
 import lu.kbra.modelizer_next.domain.FieldModel;
 import lu.kbra.modelizer_next.domain.LinkModel;
-import lu.kbra.modelizer_next.layout.LayoutObjectType;
 
 /**
  * Contains deletion actions for the current canvas selection.
@@ -23,31 +26,32 @@ public interface ElementDeleter extends DiagramCanvasExt {
 		}
 
 		this.getDocument().getModel().removeClass(classModel);
-		this.getCanvas()
-				.getPanelState()
-				.getNodeLayouts()
-				.removeIf(layout -> layout.getObjectType() == LayoutObjectType.CLASS && layout.getObjectId().equals(classId));
+		this.getCanvas().getPanelState().removeClassLayout(classId);
 
-		this.getCanvas()
-				.getActiveLinks()
-				.removeIf(link -> classId.equals(link.getFrom().getClassId()) || classId.equals(link.getTo().getClassId())
-						|| classId.equals(link.getAssociationClassId()));
+		final Set<LinkModel> tbr = new HashSet<>();
+		if (this.getPanelType().isTechnical()) {
+			this.getDocument()
+					.getModel()
+					.getTechnicalLinks()
+					.parallelStream()
+					.filter(l -> classId.equals(l.getFrom().getClassId()) || classId.equals(l.getTo().getClassId()))
+					.peek(tbr::add)
+					.forEach(c -> this.getDocument().getModel().removeTechnicalLink(c));
+		} else {
+			this.getDocument()
+					.getModel()
+					.getConceptualLinks()
+					.parallelStream()
+					.filter(l -> classId.equals(l.getFrom().getClassId()) || classId.equals(l.getTo().getClassId())
+							|| classId.equals(l.getAssociationClassId()))
+					.peek(tbr::add)
+					.forEach(c -> this.getDocument().getModel().removeConceptualLink(c));
+		}
 
-		this.getDocument()
-				.getModel()
-				.getConceptualLinks()
-				.removeIf(link -> classId.equals(link.getFrom().getClassId()) || classId.equals(link.getTo().getClassId())
-						|| classId.equals(link.getAssociationClassId()));
-		this.getDocument()
-				.getModel()
-				.getTechnicalLinks()
-				.removeIf(link -> classId.equals(link.getFrom().getClassId()) || classId.equals(link.getTo().getClassId())
-						|| classId.equals(link.getAssociationClassId()));
-
-		this.getCanvas()
-				.getPanelState()
-				.getLinkLayouts()
-				.removeIf(linkLayout -> this.getCanvas().findLinkById(linkLayout.getLinkId()) == null);
+		tbr.parallelStream()
+				.map(c -> this.getCanvas().findLinkLayout(classId))
+				.filter(Optional::isPresent)
+				.forEach(c -> this.getCanvas().getPanelState().removeLinkLayout(c.get()));
 	}
 
 	/**
@@ -58,10 +62,7 @@ public interface ElementDeleter extends DiagramCanvasExt {
 	default void deleteComment(final String commentId) {
 		final CommentModel commentModel = this.getCanvas().findCommentById(commentId);
 		this.getDocument().getModel().removeComment(commentModel);
-		this.getCanvas()
-				.getPanelState()
-				.getNodeLayouts()
-				.removeIf(layout -> layout.getObjectType() == LayoutObjectType.COMMENT && layout.getObjectId().equals(commentId));
+		this.getCanvas().getPanelState().removeCommentLayout(commentId);
 	}
 
 	/**
@@ -75,14 +76,18 @@ public interface ElementDeleter extends DiagramCanvasExt {
 		final FieldModel fieldModel = this.getCanvas().findFieldById(classModel, fieldId);
 
 		classModel.removeField(fieldModel);
+		final Set<LinkModel> tbr = new HashSet<>();
 		this.getDocument()
 				.getModel()
 				.getTechnicalLinks()
-				.removeIf(link -> fieldId.equals(link.getFrom().getFieldId()) || fieldId.equals(link.getTo().getFieldId()));
-		this.getCanvas()
-				.getPanelState()
-				.getLinkLayouts()
-				.removeIf(linkLayout -> this.getCanvas().findLinkById(linkLayout.getLinkId()) == null);
+				.parallelStream()
+				.filter(link -> fieldId.equals(link.getFrom().getFieldId()) || fieldId.equals(link.getTo().getFieldId()))
+				.peek(tbr::add)
+				.forEach(l -> this.getDocument().getModel().removeTechnicalLink(l));
+		tbr.parallelStream()
+				.map(c -> this.getCanvas().findLinkLayout(classId))
+				.filter(Optional::isPresent)
+				.forEach(c -> this.getCanvas().getPanelState().removeLinkLayout(c.get()));
 	}
 
 	/**
@@ -95,7 +100,7 @@ public interface ElementDeleter extends DiagramCanvasExt {
 		this.getCanvas().getActiveLinks().removeIf(link -> link.getId().equals(linkId));
 		this.getDocument().getModel().removeConceptualLink(linkModel);
 		this.getDocument().getModel().removeTechnicalLink(linkModel);
-		this.getCanvas().getPanelState().getLinkLayouts().removeIf(linkLayout -> linkLayout.getLinkId().equals(linkId));
+		this.getCanvas().getPanelState().removeLinkLayout(linkId);
 	}
 
 }

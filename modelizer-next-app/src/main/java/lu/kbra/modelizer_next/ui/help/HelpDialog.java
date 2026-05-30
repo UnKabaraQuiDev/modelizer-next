@@ -76,6 +76,15 @@ public class HelpDialog extends JFrame {
 	}
 
 	/**
+	 * Releases the dialog and its temporary resources.
+	 */
+	@Override
+	public void dispose() {
+		this.shortcutsTab.unregisterKeyDispatcher();
+		super.dispose();
+	}
+
+	/**
 	 * Creates a tabs.
 	 *
 	 * @return the created tabs
@@ -88,15 +97,6 @@ public class HelpDialog extends JFrame {
 		tabs.addTab("Shortcuts", this.shortcutsTab);
 
 		return tabs;
-	}
-
-	/**
-	 * Releases the dialog and its temporary resources.
-	 */
-	@Override
-	public void dispose() {
-		this.shortcutsTab.unregisterKeyDispatcher();
-		super.dispose();
 	}
 
 }

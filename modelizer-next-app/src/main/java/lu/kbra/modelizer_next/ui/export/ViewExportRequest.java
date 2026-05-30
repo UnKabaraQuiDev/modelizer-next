@@ -69,7 +69,7 @@ public record ViewExportRequest(
 	 * @return image options or image defaults when another option type is stored
 	 */
 	public ImageViewExportOptions imageOptions() {
-		return this.options() instanceof ImageViewExportOptions imageOptions ? imageOptions : ImageViewExportOptions.defaults();
+		return this.options() instanceof final ImageViewExportOptions imageOptions ? imageOptions : ImageViewExportOptions.defaults();
 	}
 
 	/**
@@ -78,7 +78,7 @@ public record ViewExportRequest(
 	 * @return PDF options or PDF defaults when another option type is stored
 	 */
 	public PdfViewExportOptions pdfOptions() {
-		return this.options() instanceof PdfViewExportOptions pdfOptions ? pdfOptions : PdfViewExportOptions.defaults();
+		return this.options() instanceof final PdfViewExportOptions pdfOptions ? pdfOptions : PdfViewExportOptions.defaults();
 	}
 
 }

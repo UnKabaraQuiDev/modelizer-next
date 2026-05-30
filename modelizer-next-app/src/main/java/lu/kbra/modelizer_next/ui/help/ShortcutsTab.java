@@ -112,31 +112,12 @@ public class ShortcutsTab extends JPanel {
 		}
 
 		/**
-		 * Returns the number of columns that fit in the current width.
-		 *
-		 * @return the current column count result
-		 */
-		private int currentColumnCount() {
-			final int width = this.getWidth() > 0 ? this.getWidth() : this.getParentWidth();
-			return width > 0 && width < HelpUi.RESPONSIVE_GRID_BREAKPOINT ? 1 : 2;
-		}
-
-		/**
 		 * Lays out the child components for the current width.
 		 */
 		@Override
 		public void doLayout() {
 			this.updateGridConstraints(this.currentColumnCount());
 			super.doLayout();
-		}
-
-		/**
-		 * Returns the parent width.
-		 *
-		 * @return the parent width
-		 */
-		private int getParentWidth() {
-			return this.getParent() == null ? 0 : this.getParent().getWidth();
 		}
 
 		/**
@@ -148,6 +129,25 @@ public class ShortcutsTab extends JPanel {
 		public Dimension getPreferredSize() {
 			this.updateGridConstraints(this.currentColumnCount());
 			return super.getPreferredSize();
+		}
+
+		/**
+		 * Returns the number of columns that fit in the current width.
+		 *
+		 * @return the current column count result
+		 */
+		private int currentColumnCount() {
+			final int width = this.getWidth() > 0 ? this.getWidth() : this.getParentWidth();
+			return width > 0 && width < HelpUi.RESPONSIVE_GRID_BREAKPOINT ? 1 : 2;
+		}
+
+		/**
+		 * Returns the parent width.
+		 *
+		 * @return the parent width
+		 */
+		private int getParentWidth() {
+			return this.getParent() == null ? 0 : this.getParent().getWidth();
 		}
 
 		/**
@@ -246,25 +246,6 @@ public class ShortcutsTab extends JPanel {
 		}
 
 		/**
-		 * Highlights the shortcut row for a short time.
-		 */
-		void highlightTemporarily() {
-			if (this.highlightTimer != null) {
-				this.highlightTimer.stop();
-			}
-
-			this.highlighted = true;
-			this.repaint();
-
-			this.highlightTimer = new Timer(HelpUi.HIGHLIGHT_DURATION_MS, event -> {
-				this.highlighted = false;
-				this.repaint();
-			});
-			this.highlightTimer.setRepeats(false);
-			this.highlightTimer.start();
-		}
-
-		/**
 		 * Paints the component.
 		 *
 		 * @param graphics graphics context used for drawing
@@ -286,6 +267,25 @@ public class ShortcutsTab extends JPanel {
 			}
 
 			super.paintComponent(graphics);
+		}
+
+		/**
+		 * Highlights the shortcut row for a short time.
+		 */
+		void highlightTemporarily() {
+			if (this.highlightTimer != null) {
+				this.highlightTimer.stop();
+			}
+
+			this.highlighted = true;
+			this.repaint();
+
+			this.highlightTimer = new Timer(HelpUi.HIGHLIGHT_DURATION_MS, event -> {
+				this.highlighted = false;
+				this.repaint();
+			});
+			this.highlightTimer.setRepeats(false);
+			this.highlightTimer.start();
 		}
 
 		/**
@@ -706,18 +706,6 @@ public class ShortcutsTab extends JPanel {
 	}
 
 	/**
-	 * Registers the key dispatcher.
-	 */
-	void registerKeyDispatcher() {
-		if (this.keyDispatcherRegistered) {
-			return;
-		}
-
-		KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(this.keyEventDispatcher);
-		this.keyDispatcherRegistered = true;
-	}
-
-	/**
 	 * Registers the shortcut bindings.
 	 *
 	 * @param shortcut shortcut value used by the operation
@@ -741,6 +729,31 @@ public class ShortcutsTab extends JPanel {
 	}
 
 	/**
+	 * Updates the pressed chips.
+	 */
+	private void updatePressedChips() {
+		for (final Map.Entry<String, List<KeyChip>> entry : this.keyChipsByKey.entrySet()) {
+			final boolean pressed = this.activeKeys.contains(entry.getKey());
+
+			for (final KeyChip chip : entry.getValue()) {
+				chip.setPressed(pressed);
+			}
+		}
+	}
+
+	/**
+	 * Registers the key dispatcher.
+	 */
+	void registerKeyDispatcher() {
+		if (this.keyDispatcherRegistered) {
+			return;
+		}
+
+		KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(this.keyEventDispatcher);
+		this.keyDispatcherRegistered = true;
+	}
+
+	/**
 	 * Unregisters the key dispatcher.
 	 */
 	void unregisterKeyDispatcher() {
@@ -752,19 +765,6 @@ public class ShortcutsTab extends JPanel {
 		this.keyDispatcherRegistered = false;
 		this.activeKeys.clear();
 		this.updatePressedChips();
-	}
-
-	/**
-	 * Updates the pressed chips.
-	 */
-	private void updatePressedChips() {
-		for (final Map.Entry<String, List<KeyChip>> entry : this.keyChipsByKey.entrySet()) {
-			final boolean pressed = this.activeKeys.contains(entry.getKey());
-
-			for (final KeyChip chip : entry.getValue()) {
-				chip.setPressed(pressed);
-			}
-		}
 	}
 
 }

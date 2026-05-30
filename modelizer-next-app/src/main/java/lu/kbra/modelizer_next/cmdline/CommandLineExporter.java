@@ -126,6 +126,85 @@ public final class CommandLineExporter {
 	}
 
 	/**
+	 * Runs the full operation represented by this class.
+	 *
+	 * @param args command-line arguments supplied by the launcher
+	 * @return the run result
+	 */
+	public static int run(final String[] args) {
+		System.setProperty("java.awt.headless", "true");
+
+		try {
+			final CommandLineExportOptions options = CommandLineExportParser.parse(args);
+			final List<File> inputFiles = CommandLineExporter
+					.resolveInputFiles(options.inputFile(), options.multiple(), options.wildcard());
+			final ModelDocumentProducer documentProducer = new InputFileDocumentProducer(inputFiles, options.force());
+			final ViewExportRequest request = new ViewExportRequest(options
+					.format(), options.scope(), options.panelTypes(), options.outputDirectory(), options.fileNamePattern(), false, false);
+
+			final IntPointer exportedFileCount = new IntPointer(0);
+
+			final int jobCount = options.jobCount();
+			final ScheduledExecutorService executor = Executors.newScheduledThreadPool(jobCount);
+			final List<Exception> caughtException = Collections.synchronizedList(new ArrayList<>());
+
+			Optional<LoadedDocument> loadedDocument;
+			while ((loadedDocument = documentProducer.next()).isPresent()) {
+				final LoadedDocument doc = loadedDocument.get();
+				executor.submit(() -> {
+					try {
+						final Map<PanelType, DiagramCanvas> canvases = CommandLineExporter.createCanvases(doc.document(),
+								options.panelTypes());
+
+						if (canvases.isEmpty()) {
+							System.err.println("Nothing to export for: " + doc.sourceFile().getPath());
+							return;
+						}
+
+						final List<Triplet<Optional<File>, PanelType, File>> exportedFiles = ViewExporter.exportViews(canvases,
+								request,
+								Optional.of(doc.sourceFile()),
+								triplet -> System.out.println("" + triplet.getFirst().map(File::getPath).orElse("?") + "\t"
+										+ triplet.getSecond().name() + "\t" + triplet.getThird().getPath()));
+
+						exportedFileCount.add(exportedFiles.size());
+					} catch (final Exception e) {
+						caughtException.add(e);
+						executor.shutdownNow();
+					}
+				});
+			}
+
+			executor.shutdown();
+			executor.awaitTermination(1, TimeUnit.HOURS);
+
+			if (!caughtException.isEmpty()) {
+				System.err.println("Got: " + caughtException.size() + " errors.");
+				caughtException.forEach(e -> e.printStackTrace(System.err));
+				return 1;
+			}
+
+			if (exportedFileCount.get() == 0) {
+				System.err.println("Nothing to export.");
+				return 3;
+			}
+
+			System.out.println("Exported " + exportedFileCount.get() + " images.");
+
+			return 0;
+		} catch (final CommandLineExportParser.HelpRequestedException ex) {
+			return 0;
+		} catch (final ExportAbortedException ex) {
+			System.err.println(ex.getMessage());
+			return 2;
+		} catch (final Exception ex) {
+			System.err.println("Export failed: " + ex.getMessage());
+			ex.printStackTrace(System.err);
+			return 1;
+		}
+	}
+
+	/**
 	 * Adds the input file.
 	 *
 	 * @param inputFiles values for input files
@@ -396,85 +475,6 @@ public final class CommandLineExporter {
 					.filter(path -> CommandLineExporter.matchesWildcard(path, absolutePattern, baseDirectory, matchers))
 					.sorted()
 					.toList();
-		}
-	}
-
-	/**
-	 * Runs the full operation represented by this class.
-	 *
-	 * @param args command-line arguments supplied by the launcher
-	 * @return the run result
-	 */
-	public static int run(final String[] args) {
-		System.setProperty("java.awt.headless", "true");
-
-		try {
-			final CommandLineExportOptions options = CommandLineExportParser.parse(args);
-			final List<File> inputFiles = CommandLineExporter
-					.resolveInputFiles(options.inputFile(), options.multiple(), options.wildcard());
-			final ModelDocumentProducer documentProducer = new InputFileDocumentProducer(inputFiles, options.force());
-			final ViewExportRequest request = new ViewExportRequest(options
-					.format(), options.scope(), options.panelTypes(), options.outputDirectory(), options.fileNamePattern(), false, false);
-
-			final IntPointer exportedFileCount = new IntPointer(0);
-
-			final int jobCount = options.jobCount();
-			final ScheduledExecutorService executor = Executors.newScheduledThreadPool(jobCount);
-			final List<Exception> caughtException = Collections.synchronizedList(new ArrayList<>());
-
-			Optional<LoadedDocument> loadedDocument;
-			while ((loadedDocument = documentProducer.next()).isPresent()) {
-				final LoadedDocument doc = loadedDocument.get();
-				executor.submit(() -> {
-					try {
-						final Map<PanelType, DiagramCanvas> canvases = CommandLineExporter.createCanvases(doc.document(),
-								options.panelTypes());
-
-						if (canvases.isEmpty()) {
-							System.err.println("Nothing to export for: " + doc.sourceFile().getPath());
-							return;
-						}
-
-						final List<Triplet<Optional<File>, PanelType, File>> exportedFiles = ViewExporter.exportViews(canvases,
-								request,
-								Optional.of(doc.sourceFile()),
-								triplet -> System.out.println("" + triplet.getFirst().map(File::getPath).orElse("?") + "\t"
-										+ triplet.getSecond().name() + "\t" + triplet.getThird().getPath()));
-
-						exportedFileCount.add(exportedFiles.size());
-					} catch (final Exception e) {
-						caughtException.add(e);
-						executor.shutdownNow();
-					}
-				});
-			}
-
-			executor.shutdown();
-			executor.awaitTermination(1, TimeUnit.HOURS);
-
-			if (!caughtException.isEmpty()) {
-				System.err.println("Got: " + caughtException.size() + " errors.");
-				caughtException.forEach(e -> e.printStackTrace(System.err));
-				return 1;
-			}
-
-			if (exportedFileCount.get() == 0) {
-				System.err.println("Nothing to export.");
-				return 3;
-			}
-
-			System.out.println("Exported " + exportedFileCount.get() + " images.");
-
-			return 0;
-		} catch (final CommandLineExportParser.HelpRequestedException ex) {
-			return 0;
-		} catch (final ExportAbortedException ex) {
-			System.err.println(ex.getMessage());
-			return 2;
-		} catch (final Exception ex) {
-			System.err.println("Export failed: " + ex.getMessage());
-			ex.printStackTrace(System.err);
-			return 1;
 		}
 	}
 

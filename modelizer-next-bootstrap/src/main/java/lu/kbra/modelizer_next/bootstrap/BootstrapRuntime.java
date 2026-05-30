@@ -78,6 +78,24 @@ public class BootstrapRuntime implements UpdateRuntime {
 	}
 
 	/**
+	 * Returns the instance during bootstrap/update processing.
+	 *
+	 * @return the instance
+	 */
+	public static synchronized BootstrapRuntime getInstance() {
+		return (BootstrapRuntime) UpdateRuntimes.getInstance();
+	}
+
+	/**
+	 * Checks whether active is enabled or applies during bootstrap/update processing.
+	 *
+	 * @return {@code true} if active is enabled or applies; otherwise {@code false}
+	 */
+	public static boolean isActive() {
+		return UpdateRuntimes.isActive();
+	}
+
+	/**
 	 * Builds a first launch message.
 	 *
 	 * @param manifest update manifest to inspect
@@ -150,24 +168,6 @@ public class BootstrapRuntime implements UpdateRuntime {
 		} catch (final NumberFormatException ex) {
 			return null;
 		}
-	}
-
-	/**
-	 * Returns the instance during bootstrap/update processing.
-	 *
-	 * @return the instance
-	 */
-	public static synchronized BootstrapRuntime getInstance() {
-		return (BootstrapRuntime) UpdateRuntimes.getInstance();
-	}
-
-	/**
-	 * Checks whether active is enabled or applies during bootstrap/update processing.
-	 *
-	 * @return {@code true} if active is enabled or applies; otherwise {@code false}
-	 */
-	public static boolean isActive() {
-		return UpdateRuntimes.isActive();
 	}
 
 	private final BootstrapConfiguration configuration;
@@ -319,52 +319,6 @@ public class BootstrapRuntime implements UpdateRuntime {
 	}
 
 	/**
-	 * Handles the outdated bootstrap launcher.
-	 *
-	 * @param launchException launch exception value used by the operation
-	 * @param forced          whether forced is enabled
-	 * @throws Exception if the operation cannot be completed
-	 */
-	private void handleOutdatedBootstrapLauncher(final AppLaunchException launchException, final boolean forced) throws Exception {
-		final ParsedVersion currentBootstrapVersion = VersionComparator.parse(BootstrapApp.VERSION);
-		final BootstrapLoadingFrame loadingFrame = new BootstrapLoadingFrame();
-		loadingFrame.setVisible(true);
-		try {
-			loadingFrame.update("Checking bootstrap launcher update...", 0, 0);
-			final BootstrapInstallerUpdate update = this.remoteUpdateService
-					.findLatestBootstrapInstaller(this.configuration.getUpdateChannel(), currentBootstrapVersion);
-			if (!update.isUpdateAvailable() && !forced) {
-				throw new AppLaunchException("The application needs a newer bootstrap launcher, but no bootstrap update is available.",
-						launchException);
-			}
-			if (update.platform() == Platform.UNSUPPORTED) {
-				throw new AppLaunchException("The application needs a newer bootstrap launcher, but this platform is not supported.",
-						launchException);
-			}
-
-			final String safeVersion = update.latestVersion().toString().replaceAll("[^A-Za-z0-9._-]", "_");
-			final Path installerPath = BootstrapApp.getTempDirectory()
-					.toPath()
-					.resolve("modelizer-next-bootstrap-" + safeVersion + update.platform().installerExtension());
-			this.remoteUpdateService
-					.download(update.installerUri(), installerPath, update.latestVersion().toString(), loadingFrame::update);
-			loadingFrame.dispose();
-
-			if (BootstrapInstallerLauncher.promptAndStartInstaller(update, installerPath)) {
-				System.exit(0);
-			}
-			throw new AppLaunchException(
-					"The application needs a newer bootstrap launcher. Install the downloaded installer to continue: " + installerPath,
-					launchException);
-		} catch (final InterruptedException ex) {
-			Thread.currentThread().interrupt();
-			throw new AppLaunchException("Interrupted while checking for a bootstrap launcher update.", ex);
-		} finally {
-			loadingFrame.dispose();
-		}
-	}
-
-	/**
 	 * Installs the update and restart.
 	 *
 	 * @param parentComponent parent component value used by the operation
@@ -405,7 +359,7 @@ public class BootstrapRuntime implements UpdateRuntime {
 
 		try {
 			BootstrapMain.restartSameCommand();
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			e.printStackTrace();
 			JOptionPane.showMessageDialog(parentComponent,
 					"Couldn't restart process, you may do it manually.\n" + PCUtils.toString(e),
@@ -455,7 +409,7 @@ public class BootstrapRuntime implements UpdateRuntime {
 	 * @param toBeOpened to be opened value used by the operation
 	 * @throws Exception if the operation cannot be completed
 	 */
-	public void launch(final String[] args, Queue<File> toBeOpened) throws Exception {
+	public void launch(final String[] args, final Queue<File> toBeOpened) throws Exception {
 		final BootstrapLoadingFrame loadingFrame = new BootstrapLoadingFrame();
 		loadingFrame.setVisible(true);
 		try {
@@ -502,6 +456,74 @@ public class BootstrapRuntime implements UpdateRuntime {
 				throw ex;
 			}
 			this.handleOutdatedBootstrapLauncher(ex, false);
+		}
+	}
+
+	/**
+	 * Sets the auto check updates.
+	 *
+	 * @param enabled whether enabled is enabled
+	 */
+	@Override
+	public void setAutoCheckUpdates(final boolean enabled) {
+		this.configuration.setAutoCheckUpdates(enabled);
+		BootstrapApp.saveConfiguration(this.configuration);
+	}
+
+	/**
+	 * Sets the selected channel during bootstrap/update processing.
+	 *
+	 * @param updateChannel update channel value used by the operation
+	 */
+	@Override
+	public void setSelectedChannel(final UpdateChannel updateChannel) {
+		this.configuration.setUpdateChannel(updateChannel);
+		BootstrapApp.saveConfiguration(this.configuration);
+	}
+
+	/**
+	 * Handles the outdated bootstrap launcher.
+	 *
+	 * @param launchException launch exception value used by the operation
+	 * @param forced          whether forced is enabled
+	 * @throws Exception if the operation cannot be completed
+	 */
+	private void handleOutdatedBootstrapLauncher(final AppLaunchException launchException, final boolean forced) throws Exception {
+		final ParsedVersion currentBootstrapVersion = VersionComparator.parse(BootstrapApp.VERSION);
+		final BootstrapLoadingFrame loadingFrame = new BootstrapLoadingFrame();
+		loadingFrame.setVisible(true);
+		try {
+			loadingFrame.update("Checking bootstrap launcher update...", 0, 0);
+			final BootstrapInstallerUpdate update = this.remoteUpdateService
+					.findLatestBootstrapInstaller(this.configuration.getUpdateChannel(), currentBootstrapVersion);
+			if (!update.isUpdateAvailable() && !forced) {
+				throw new AppLaunchException("The application needs a newer bootstrap launcher, but no bootstrap update is available.",
+						launchException);
+			}
+			if (update.platform() == Platform.UNSUPPORTED) {
+				throw new AppLaunchException("The application needs a newer bootstrap launcher, but this platform is not supported.",
+						launchException);
+			}
+
+			final String safeVersion = update.latestVersion().toString().replaceAll("[^A-Za-z0-9._-]", "_");
+			final Path installerPath = BootstrapApp.getTempDirectory()
+					.toPath()
+					.resolve("modelizer-next-bootstrap-" + safeVersion + update.platform().installerExtension());
+			this.remoteUpdateService
+					.download(update.installerUri(), installerPath, update.latestVersion().toString(), loadingFrame::update);
+			loadingFrame.dispose();
+
+			if (BootstrapInstallerLauncher.promptAndStartInstaller(update, installerPath)) {
+				System.exit(0);
+			}
+			throw new AppLaunchException(
+					"The application needs a newer bootstrap launcher. Install the downloaded installer to continue: " + installerPath,
+					launchException);
+		} catch (final InterruptedException ex) {
+			Thread.currentThread().interrupt();
+			throw new AppLaunchException("Interrupted while checking for a bootstrap launcher update.", ex);
+		} finally {
+			loadingFrame.dispose();
 		}
 	}
 
@@ -611,28 +633,6 @@ public class BootstrapRuntime implements UpdateRuntime {
 			Thread.currentThread().interrupt();
 			throw new IOException("Interrupted while checking for updates.", ex);
 		}
-	}
-
-	/**
-	 * Sets the auto check updates.
-	 *
-	 * @param enabled whether enabled is enabled
-	 */
-	@Override
-	public void setAutoCheckUpdates(final boolean enabled) {
-		this.configuration.setAutoCheckUpdates(enabled);
-		BootstrapApp.saveConfiguration(this.configuration);
-	}
-
-	/**
-	 * Sets the selected channel during bootstrap/update processing.
-	 *
-	 * @param updateChannel update channel value used by the operation
-	 */
-	@Override
-	public void setSelectedChannel(final UpdateChannel updateChannel) {
-		this.configuration.setUpdateChannel(updateChannel);
-		BootstrapApp.saveConfiguration(this.configuration);
 	}
 
 }

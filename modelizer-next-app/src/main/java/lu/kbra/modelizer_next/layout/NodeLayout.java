@@ -60,6 +60,19 @@ public class NodeLayout {
 		return this.size;
 	}
 
+	@Deprecated
+	public void set(final NodeLayout otherLayout) {
+		this.objectType = otherLayout.objectType;
+		this.objectId = otherLayout.objectId;
+		this.position.setLocation(otherLayout.position);
+		this.size.setLocation(otherLayout.size);
+	}
+
+	public void setLayout(final NodeLayout otherLayout) {
+		this.position.setLocation(otherLayout.position);
+		this.size.setLocation(otherLayout.size);
+	}
+
 	/**
 	 * Sets the object ID.
 	 *
@@ -105,19 +118,6 @@ public class NodeLayout {
 	public String toString() {
 		return "NodeLayout@" + System.identityHashCode(this) + " [objectType=" + this.objectType + ", objectId=" + this.objectId
 				+ ", position=" + this.position + ", size=" + this.size + "]";
-	}
-
-	@Deprecated
-	public void set(NodeLayout otherLayout) {
-		this.objectType = otherLayout.objectType;
-		this.objectId = otherLayout.objectId;
-		this.position.setLocation(otherLayout.position);
-		this.size.setLocation(otherLayout.size);
-	}
-
-	public void setLayout(NodeLayout otherLayout) {
-		this.position.setLocation(otherLayout.position);
-		this.size.setLocation(otherLayout.size);
 	}
 
 }

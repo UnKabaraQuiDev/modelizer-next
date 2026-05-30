@@ -199,6 +199,8 @@ public interface MainFrameDocumentController {
 	 */
 	void refreshFrameTitle();
 
+	void refreshToolbarMenuState();
+
 	/**
 	 * Saves the document.
 	 *
@@ -259,7 +261,5 @@ public interface MainFrameDocumentController {
 			return false;
 		}
 	}
-
-	void refreshToolbarMenuState();
 
 }

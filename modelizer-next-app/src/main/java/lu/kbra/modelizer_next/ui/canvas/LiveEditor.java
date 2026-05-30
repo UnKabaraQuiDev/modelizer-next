@@ -668,8 +668,8 @@ public interface LiveEditor extends DiagramCanvasExt {
 			((StylePaletteCellRenderer) list.getCellRenderer()).setScope(element.type().asSelectedType().asStyleScope());
 
 			list.setListData(palettes.toArray(StylePalette[]::new));
-			final StylePalette palette = canvas.findElement(element.asSelectedElement()) instanceof StyleOwner so
-					&& so.getLastPaletteName() != null ? getFrame().findPaletteByName(so.getLastPaletteName()) : canvas.defaultPalette;
+			final StylePalette palette = canvas.findElement(element.asSelectedElement()) instanceof final StyleOwner so
+					&& so.getLastPaletteName() != null ? this.getFrame().findPaletteByName(so.getLastPaletteName()) : canvas.defaultPalette;
 			list.setSelectedValue(palette == null ? canvas.defaultPalette : palette, true);
 			list.setFont(DiagramCanvas.BODY_FONT
 					.deriveFont(DiagramCanvas.BODY_FONT.getSize() * (float) this.getCanvas().getPanelState().getZoom()));

@@ -31,13 +31,6 @@ import lu.kbra.modelizer_next.ui.component.ColorButton;
 public final class ClassEditorDialog {
 
 	/**
-	 * Represents a holder in the dialog part of the application.
-	 */
-	private static final class Holder {
-		private Result result;
-	}
-
-	/**
 	 * Immutable value object for result data.
 	 *
 	 * @param conceptualName      name value to use
@@ -61,18 +54,10 @@ public final class ClassEditorDialog {
 	}
 
 	/**
-	 * Creates one labeled row for a dialog form.
-	 *
-	 * @param labelText text value for label text
-	 * @param component Swing component to configure
-	 * @return the row result
+	 * Represents a holder in the dialog part of the application.
 	 */
-	private static JPanel row(final String labelText, final Component component) {
-		final JPanel row = new JPanel(new BorderLayout(6, 6));
-		row.setBorder(BorderFactory.createEmptyBorder(4, 0, 4, 0));
-		row.add(new JLabel(labelText), BorderLayout.NORTH);
-		row.add(component, BorderLayout.CENTER);
-		return row;
+	private static final class Holder {
+		private Result result;
 	}
 
 	/**
@@ -154,6 +139,21 @@ public final class ClassEditorDialog {
 		dialog.setVisible(true);
 
 		return holder.result;
+	}
+
+	/**
+	 * Creates one labeled row for a dialog form.
+	 *
+	 * @param labelText text value for label text
+	 * @param component Swing component to configure
+	 * @return the row result
+	 */
+	private static JPanel row(final String labelText, final Component component) {
+		final JPanel row = new JPanel(new BorderLayout(6, 6));
+		row.setBorder(BorderFactory.createEmptyBorder(4, 0, 4, 0));
+		row.add(new JLabel(labelText), BorderLayout.NORTH);
+		row.add(component, BorderLayout.CENTER);
+		return row;
 	}
 
 	/**

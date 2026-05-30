@@ -66,6 +66,16 @@ public final class StylePaletteEditorDialog {
 		}
 
 		/**
+		 * Sets the palette.
+		 *
+		 * @param palette palette value used by the operation
+		 */
+		private void setPalette(final StylePalette palette) {
+			this.palette = palette;
+			this.repaint();
+		}
+
+		/**
 		 * Paints the component.
 		 *
 		 * @param graphics graphics context used for drawing
@@ -135,85 +145,6 @@ public final class StylePaletteEditorDialog {
 				g2.dispose();
 			}
 		}
-
-		/**
-		 * Sets the palette.
-		 *
-		 * @param palette palette value used by the operation
-		 */
-		private void setPalette(final StylePalette palette) {
-			this.palette = palette;
-			this.repaint();
-		}
-	}
-
-	/**
-	 * Builds a palette.
-	 *
-	 * @param name                         name value to read, write, or display
-	 * @param classTextColorButton         button to configure
-	 * @param classBackgroundColorButton   button to configure
-	 * @param classBorderColorButton       button to configure
-	 * @param fieldTextColorButton         button to configure
-	 * @param fieldBackgroundColorButton   button to configure
-	 * @param commentTextColorButton       button to configure
-	 * @param commentBackgroundColorButton button to configure
-	 * @param commentBorderColorButton     button to configure
-	 * @param linkColorButton              button to configure
-	 * @return the built palette
-	 */
-	private static StylePalette buildPalette(
-			final String name,
-			final ColorButton classTextColorButton,
-			final ColorButton classBackgroundColorButton,
-			final ColorButton classBorderColorButton,
-			final ColorButton fieldTextColorButton,
-			final ColorButton fieldBackgroundColorButton,
-			final ColorButton commentTextColorButton,
-			final ColorButton commentBackgroundColorButton,
-			final ColorButton commentBorderColorButton,
-			final ColorButton linkColorButton) {
-		final StylePalette palette = new StylePalette();
-		palette.setName(name == null || name.isBlank() ? "Unnamed palette" : name);
-		palette.setClassTextColor(classTextColorButton.getSelectedColor());
-		palette.setClassBackgroundColor(classBackgroundColorButton.getSelectedColor());
-		palette.setClassBorderColor(classBorderColorButton.getSelectedColor());
-		palette.setFieldTextColor(fieldTextColorButton.getSelectedColor());
-		palette.setFieldBackgroundColor(fieldBackgroundColorButton.getSelectedColor());
-		palette.setCommentTextColor(commentTextColorButton.getSelectedColor());
-		palette.setCommentBackgroundColor(commentBackgroundColorButton.getSelectedColor());
-		palette.setCommentBorderColor(commentBorderColorButton.getSelectedColor());
-		palette.setLinkColor(linkColorButton.getSelectedColor());
-		return palette;
-	}
-
-	/**
-	 * Creates a flow layout with consistent spacing.
-	 *
-	 * @param components values for components
-	 * @return the flow result
-	 */
-	private static JPanel flow(final Component... components) {
-		final JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
-		for (final Component component : components) {
-			panel.add(component);
-		}
-		return panel;
-	}
-
-	/**
-	 * Creates one labeled row for a dialog form.
-	 *
-	 * @param label     text value for label
-	 * @param component Swing component to configure
-	 * @return the row result
-	 */
-	private static JPanel row(final String label, final Component component) {
-		final JPanel panel = new JPanel(new BorderLayout(6, 6));
-		panel.setBorder(BorderFactory.createEmptyBorder(4, 0, 4, 0));
-		panel.add(new JLabel(label), BorderLayout.NORTH);
-		panel.add(component, BorderLayout.CENTER);
-		return panel;
 	}
 
 	/**
@@ -388,6 +319,75 @@ public final class StylePaletteEditorDialog {
 		dialog.setVisible(true);
 
 		return holder.palette;
+	}
+
+	/**
+	 * Builds a palette.
+	 *
+	 * @param name                         name value to read, write, or display
+	 * @param classTextColorButton         button to configure
+	 * @param classBackgroundColorButton   button to configure
+	 * @param classBorderColorButton       button to configure
+	 * @param fieldTextColorButton         button to configure
+	 * @param fieldBackgroundColorButton   button to configure
+	 * @param commentTextColorButton       button to configure
+	 * @param commentBackgroundColorButton button to configure
+	 * @param commentBorderColorButton     button to configure
+	 * @param linkColorButton              button to configure
+	 * @return the built palette
+	 */
+	private static StylePalette buildPalette(
+			final String name,
+			final ColorButton classTextColorButton,
+			final ColorButton classBackgroundColorButton,
+			final ColorButton classBorderColorButton,
+			final ColorButton fieldTextColorButton,
+			final ColorButton fieldBackgroundColorButton,
+			final ColorButton commentTextColorButton,
+			final ColorButton commentBackgroundColorButton,
+			final ColorButton commentBorderColorButton,
+			final ColorButton linkColorButton) {
+		final StylePalette palette = new StylePalette();
+		palette.setName(name == null || name.isBlank() ? "Unnamed palette" : name);
+		palette.setClassTextColor(classTextColorButton.getSelectedColor());
+		palette.setClassBackgroundColor(classBackgroundColorButton.getSelectedColor());
+		palette.setClassBorderColor(classBorderColorButton.getSelectedColor());
+		palette.setFieldTextColor(fieldTextColorButton.getSelectedColor());
+		palette.setFieldBackgroundColor(fieldBackgroundColorButton.getSelectedColor());
+		palette.setCommentTextColor(commentTextColorButton.getSelectedColor());
+		palette.setCommentBackgroundColor(commentBackgroundColorButton.getSelectedColor());
+		palette.setCommentBorderColor(commentBorderColorButton.getSelectedColor());
+		palette.setLinkColor(linkColorButton.getSelectedColor());
+		return palette;
+	}
+
+	/**
+	 * Creates a flow layout with consistent spacing.
+	 *
+	 * @param components values for components
+	 * @return the flow result
+	 */
+	private static JPanel flow(final Component... components) {
+		final JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
+		for (final Component component : components) {
+			panel.add(component);
+		}
+		return panel;
+	}
+
+	/**
+	 * Creates one labeled row for a dialog form.
+	 *
+	 * @param label     text value for label
+	 * @param component Swing component to configure
+	 * @return the row result
+	 */
+	private static JPanel row(final String label, final Component component) {
+		final JPanel panel = new JPanel(new BorderLayout(6, 6));
+		panel.setBorder(BorderFactory.createEmptyBorder(4, 0, 4, 0));
+		panel.add(new JLabel(label), BorderLayout.NORTH);
+		panel.add(component, BorderLayout.CENTER);
+		return panel;
 	}
 
 	/**

@@ -17,18 +17,18 @@ public class ElementStyle implements ModelElement {
 		return style;
 	}
 
-	public static ElementStyle forField() {
-		final ElementStyle style = new ElementStyle();
-		style.textColor = ColorUtils.ofRgb(0x000000);
-		style.backgroundColor = ColorUtils.ofRgb(0xFFFFFF);
-		return style;
-	}
-
 	public static ElementStyle forComment() {
 		final ElementStyle style = new ElementStyle();
 		style.textColor = ColorUtils.ofRgb(0x333333);
 		style.backgroundColor = ColorUtils.ofRgb(0xFFF8CC);
 		style.borderColor = ColorUtils.ofRgb(0x444444);
+		return style;
+	}
+
+	public static ElementStyle forField() {
+		final ElementStyle style = new ElementStyle();
+		style.textColor = ColorUtils.ofRgb(0x000000);
+		style.backgroundColor = ColorUtils.ofRgb(0xFFFFFF);
 		return style;
 	}
 

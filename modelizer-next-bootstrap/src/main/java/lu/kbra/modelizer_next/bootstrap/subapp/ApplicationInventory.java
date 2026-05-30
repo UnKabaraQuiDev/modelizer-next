@@ -53,7 +53,7 @@ public final class ApplicationInventory {
 	 * @return the matching latest installed, or {@code null} when no match exists
 	 * @throws IOException if the operation cannot be completed
 	 */
-	public Optional<InstalledApplication> findLatestInstalled(UpdateChannel wantedChannel) throws IOException {
+	public Optional<InstalledApplication> findLatestInstalled(final UpdateChannel wantedChannel) throws IOException {
 		final Path applicationsDirectory = BootstrapApp.getApplicationsDirectory().toPath();
 		if (!Files.isDirectory(applicationsDirectory)) {
 			return Optional.empty();

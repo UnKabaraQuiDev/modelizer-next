@@ -479,7 +479,6 @@ public interface ElementRenderer extends DiagramCanvasExt {
 					final boolean shouldFlipText = currentAngle > Math.PI / 2 || currentAngle < -Math.PI / 2;
 					final Direction2D defaultDirection = shouldFlipText ? Direction2D.TRAILING : Direction2D.HEADING;
 
-					System.err.println(angle);
 					if (linkModel.getCardinalityFrom() != null) {
 						this.getCanvas()
 								.drawAlignedLinkLabel(g2,

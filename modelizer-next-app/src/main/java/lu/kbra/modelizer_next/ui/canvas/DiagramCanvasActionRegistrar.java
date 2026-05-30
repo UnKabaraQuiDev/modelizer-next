@@ -19,6 +19,25 @@ import lu.kbra.modelizer_next.ui.frame.MainFrame;
 interface DiagramCanvasActionRegistrar extends DiagramCanvasExt {
 
 	/**
+	 * Adds the action to the action map of the active canvas.
+	 *
+	 * @param inputMap  Swing input map to update
+	 * @param actionMap Swing action map to update
+	 * @param actionKey key under which the action is registered
+	 * @param action    action to register or execute
+	 */
+	default void installActionBind(final InputMap inputMap, final ActionMap actionMap, final String actionKey, final Runnable action) {
+		actionMap.put(actionKey, new AbstractAction() {
+
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				action.run();
+			}
+
+		});
+	}
+
+	/**
 	 * Installs the default key bindings on the active canvas.
 	 *
 	 * @param actions actions value used by the operation
@@ -162,25 +181,6 @@ interface DiagramCanvasActionRegistrar extends DiagramCanvasExt {
 		this.installActionBind(inputMap, actionMap, "syncSelectionPositionConceptual", actions.syncSelectionPositionConceptual());
 		this.installActionBind(inputMap, actionMap, "syncSelectionPositionLogical", actions.syncSelectionPositionLogical());
 		this.installActionBind(inputMap, actionMap, "syncSelectionPositionPhysical", actions.syncSelectionPositionPhysical());
-	}
-
-	/**
-	 * Adds the action to the action map of the active canvas.
-	 *
-	 * @param inputMap  Swing input map to update
-	 * @param actionMap Swing action map to update
-	 * @param actionKey key under which the action is registered
-	 * @param action    action to register or execute
-	 */
-	default void installActionBind(final InputMap inputMap, final ActionMap actionMap, final String actionKey, final Runnable action) {
-		actionMap.put(actionKey, new AbstractAction() {
-
-			@Override
-			public void actionPerformed(final ActionEvent e) {
-				action.run();
-			}
-
-		});
 	}
 
 	/**

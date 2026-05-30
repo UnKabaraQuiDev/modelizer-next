@@ -50,7 +50,7 @@ final class ImportJsonSupport {
 		layout.setObjectId(classId);
 		layout.setPosition(new Point2D.Double(x, y));
 		layout.setSize(new Size2D(width, height));
-		panelState.getNodeLayouts().add(layout);
+		panelState.addClassLayout(layout);
 	}
 
 	/**
@@ -87,7 +87,7 @@ final class ImportJsonSupport {
 		layout.setObjectId(commentId);
 		layout.setPosition(new Point2D.Double(x, y));
 		layout.setSize(new Size2D(width, height));
-		panelState.getNodeLayouts().add(layout);
+		panelState.addCommentLayout(layout);
 	}
 
 	/**

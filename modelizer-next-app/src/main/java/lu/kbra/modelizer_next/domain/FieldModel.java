@@ -39,14 +39,6 @@ public class FieldModel implements NamesOwner, IdOwner, StyleOwner {
 	@JsonIgnore
 	private String lastPaletteName;
 
-	public String getLastPaletteName() {
-		return lastPaletteName;
-	}
-
-	public void setLastPaletteName(String lastPaletteName) {
-		this.lastPaletteName = lastPaletteName;
-	}
-
 	/**
 	 * Creates a field model instance.
 	 */
@@ -99,6 +91,11 @@ public class FieldModel implements NamesOwner, IdOwner, StyleOwner {
 	@Override
 	public String getId() {
 		return this.id;
+	}
+
+	@Override
+	public String getLastPaletteName() {
+		return this.lastPaletteName;
 	}
 
 	/**
@@ -194,6 +191,11 @@ public class FieldModel implements NamesOwner, IdOwner, StyleOwner {
 	@Override
 	public void setId(final String id) {
 		this.id = id;
+	}
+
+	@Override
+	public void setLastPaletteName(final String lastPaletteName) {
+		this.lastPaletteName = lastPaletteName;
 	}
 
 	/**

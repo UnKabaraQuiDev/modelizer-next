@@ -35,7 +35,7 @@ public interface VisibilityManager extends DiagramCanvasExt {
 		}
 
 		final String targetLinkId = commentModel.getBinding().getTargetId();
-		final boolean technicalLink = this.getDocument().getModel().validateTechnicalLinksByIdIndex().containsKey(targetLinkId);
+		final boolean technicalLink = this.getDocument().getModel().validateTechnicalLinkByIdIndex().containsKey(targetLinkId);
 
 		return this.getPanelType().isTechnical() == technicalLink;
 	}

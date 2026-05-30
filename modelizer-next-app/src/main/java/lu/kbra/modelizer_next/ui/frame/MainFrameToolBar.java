@@ -191,15 +191,6 @@ final class MainFrameToolBar extends JToolBar {
 		}
 	}
 
-	private void registerButtonEnabledSupplier(final JButton button, final Supplier<Boolean> enabledSupplier) {
-		if (enabledSupplier == null) {
-			return;
-		}
-
-		this.buttonEnabledSuppliers.put(button, enabledSupplier);
-		button.setEnabled(Boolean.TRUE.equals(enabledSupplier.get()));
-	}
-
 	/**
 	 * Creates a toolbar button.
 	 *
@@ -402,6 +393,21 @@ final class MainFrameToolBar extends JToolBar {
 		return wrapper;
 	}
 
+	/**
+	 * Returns the toolbar icon.
+	 *
+	 * @param frame frame that owns the created UI component
+	 * @param icon  text value for icon
+	 * @return the toolbar icon
+	 */
+	private ImageIcon getToolbarIcon(final MainFrame frame, final String icon) {
+		return this.toolbarIconCache.computeIfAbsent(icon, key -> {
+			final ImageIcon rawIcon = new ImageIcon(PCUtils.readPackagedBytesFile(frame.getClass(), "/icons/" + key));
+
+			return MainFrameToolBar.scaleIcon(rawIcon, 34, 34);
+		});
+	}
+
 	private void performCanvasAction(final MainFrame frame, final String actionKey) {
 		final DiagramCanvas canvas = frame.getActiveCanvas();
 		if (canvas == null) {
@@ -417,19 +423,13 @@ final class MainFrameToolBar extends JToolBar {
 		}
 	}
 
-	/**
-	 * Returns the toolbar icon.
-	 *
-	 * @param frame frame that owns the created UI component
-	 * @param icon  text value for icon
-	 * @return the toolbar icon
-	 */
-	private ImageIcon getToolbarIcon(final MainFrame frame, final String icon) {
-		return this.toolbarIconCache.computeIfAbsent(icon, key -> {
-			final ImageIcon rawIcon = new ImageIcon(PCUtils.readPackagedBytesFile(frame.getClass(), "/icons/" + key));
+	private void registerButtonEnabledSupplier(final JButton button, final Supplier<Boolean> enabledSupplier) {
+		if (enabledSupplier == null) {
+			return;
+		}
 
-			return MainFrameToolBar.scaleIcon(rawIcon, 34, 34);
-		});
+		this.buttonEnabledSuppliers.put(button, enabledSupplier);
+		button.setEnabled(Boolean.TRUE.equals(enabledSupplier.get()));
 	}
 
 }

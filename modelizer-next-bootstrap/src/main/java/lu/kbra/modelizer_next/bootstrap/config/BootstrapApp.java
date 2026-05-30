@@ -40,19 +40,6 @@ public final class BootstrapApp {
 	public static BootstrapConfig BOOTSTRAP_CONFIG;
 
 	/**
-	 * Creates a mapper during bootstrap/update processing.
-	 *
-	 * @return the created mapper
-	 */
-	private static ObjectMapper createMapper() {
-		final ObjectMapper mapper = new ObjectMapper();
-		mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-		mapper.registerModule(new ParsedVersionModule());
-		mapper.registerModule(new JavaTimeModule());
-		return mapper;
-	}
-
-	/**
 	 * Ensures that the directories exists or is up to date during bootstrap/update processing.
 	 *
 	 * @throws IOException if the operation cannot be completed
@@ -182,6 +169,19 @@ public final class BootstrapApp {
 		} catch (final IOException ex) {
 			ex.printStackTrace();
 		}
+	}
+
+	/**
+	 * Creates a mapper during bootstrap/update processing.
+	 *
+	 * @return the created mapper
+	 */
+	private static ObjectMapper createMapper() {
+		final ObjectMapper mapper = new ObjectMapper();
+		mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+		mapper.registerModule(new ParsedVersionModule());
+		mapper.registerModule(new JavaTimeModule());
+		return mapper;
 	}
 
 	/**

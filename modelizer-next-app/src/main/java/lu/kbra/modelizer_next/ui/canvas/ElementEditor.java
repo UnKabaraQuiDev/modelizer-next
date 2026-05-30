@@ -66,6 +66,7 @@ public interface ElementEditor extends DiagramCanvasExt {
 		classModel.setBackgroundColor(result.backgroundColor());
 		classModel.setBorderColor(result.borderColor());
 		classModel.setVisibility(result.visibleInConceptual(), result.visibleInLogical(), result.visibleInPhysical());
+		this.getDocument().getModel().validateClassByPanel(classModel);
 
 		this.getCanvas().notifySelectionChanged();
 		this.getCanvas().notifyDocumentChanged();

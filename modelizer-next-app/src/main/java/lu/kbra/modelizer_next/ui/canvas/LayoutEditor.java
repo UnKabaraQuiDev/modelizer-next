@@ -17,7 +17,7 @@ public interface LayoutEditor extends DiagramCanvasExt {
 
 		for (final ClassModel classModel : this.getDocument().getModel().getClasses()) {
 			if (classModel == null || !classModel.isVisible(this.getPanelType())
-					|| (selectionOnly && !this.getCanvas().isClassSelected(classModel.getId()))) {
+					|| selectionOnly && !this.getCanvas().isClassSelected(classModel.getId())) {
 				continue;
 			}
 
@@ -28,7 +28,7 @@ public interface LayoutEditor extends DiagramCanvasExt {
 
 		for (final CommentModel commentModel : this.getDocument().getModel().getComments()) {
 			if (commentModel == null || !commentModel.isVisible(this.getPanelType())
-					|| (selectionOnly && !this.getCanvas().isCommentSelected(commentModel.getId()))) {
+					|| selectionOnly && !this.getCanvas().isCommentSelected(commentModel.getId())) {
 				continue;
 			}
 

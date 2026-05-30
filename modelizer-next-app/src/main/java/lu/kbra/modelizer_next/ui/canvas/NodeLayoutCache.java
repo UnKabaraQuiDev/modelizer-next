@@ -1,9 +1,12 @@
 package lu.kbra.modelizer_next.ui.canvas;
 
 import java.awt.geom.Point2D;
+import java.util.List;
 import java.util.Optional;
 
 import lu.kbra.modelizer_next.common.Size2D;
+import lu.kbra.modelizer_next.domain.ClassModel;
+import lu.kbra.modelizer_next.domain.CommentModel;
 import lu.kbra.modelizer_next.layout.LayoutObjectType;
 import lu.kbra.modelizer_next.layout.LinkLayout;
 import lu.kbra.modelizer_next.layout.NodeLayout;
@@ -13,6 +16,16 @@ import lu.kbra.modelizer_next.layout.PanelState;
  * Contains node layout lookup, creation, and bounds cache helpers.
  */
 public interface NodeLayoutCache extends DiagramCanvasExt {
+
+	default Optional<LinkLayout> findLinkLayout(final String linkId) {
+		if (linkId == null) {
+			return Optional.empty();
+		}
+
+		final LinkLayout ll = this.getCanvas().getPanelState().validateLinkLayoutByLinkIdIndex().get(linkId);
+
+		return Optional.ofNullable(ll);
+	}
 
 	/**
 	 * Finds the node layout that matches the supplied input.
@@ -26,13 +39,12 @@ public interface NodeLayoutCache extends DiagramCanvasExt {
 			return Optional.empty();
 		}
 
-		for (final NodeLayout layout : this.getCanvas().getPanelState().getNodeLayouts()) {
-			if (layout.getObjectType() == objectType && objectId.equals(layout.getObjectId())) {
-				return Optional.of(layout);
-			}
-		}
+		final NodeLayout nl = (switch (objectType) {
+		case CLASS -> this.getCanvas().getPanelState().validateClassLayoutByObjectIdIndex();
+		case COMMENT -> this.getCanvas().getPanelState().validateCommentLayoutByObjectIdIndex();
+		}).get(objectId);
 
-		return Optional.empty();
+		return Optional.ofNullable(nl);
 	}
 
 	/**
@@ -42,16 +54,23 @@ public interface NodeLayoutCache extends DiagramCanvasExt {
 	 * @return the matching or create link layout, or {@code null} when no match exists
 	 */
 	default LinkLayout findOrCreateLinkLayout(final String linkId) {
-		for (final LinkLayout linkLayout : this.getCanvas().getPanelState().getLinkLayouts()) {
-			if (linkLayout.getLinkId().equals(linkId)) {
-				return linkLayout;
-			}
+		final LinkLayout ll = this.getCanvas().getPanelState().validateLinkLayoutByLinkIdIndex().get(linkId);
+		if (ll != null) {
+			return ll;
 		}
 
 		final LinkLayout linkLayout = new LinkLayout();
 		linkLayout.setLinkId(linkId);
-		this.getCanvas().getPanelState().getLinkLayouts().add(linkLayout);
+		this.getCanvas().getPanelState().addLinkLayout(linkLayout);
 		return linkLayout;
+	}
+
+	default NodeLayout findOrCreateNodeLayout(final ClassModel classModel) {
+		return this.findOrCreateNodeLayout(LayoutObjectType.CLASS, classModel.getId());
+	}
+
+	default NodeLayout findOrCreateNodeLayout(final CommentModel commentModel) {
+		return this.findOrCreateNodeLayout(LayoutObjectType.COMMENT, commentModel.getId());
 	}
 
 	/**
@@ -62,20 +81,27 @@ public interface NodeLayoutCache extends DiagramCanvasExt {
 	 * @return the matching or create node layout, or {@code null} when no match exists
 	 */
 	default NodeLayout findOrCreateNodeLayout(final LayoutObjectType objectType, final String objectId) {
-		// TODO: make this O(1)
-		for (final NodeLayout layout : this.getCanvas().getPanelState().getNodeLayouts()) {
-			if (layout.getObjectType() == objectType && layout.getObjectId().equals(objectId)) {
-				return layout;
-			}
+		final NodeLayout nl = (switch (objectType) {
+		case CLASS -> this.getCanvas().getPanelState().validateClassLayoutByObjectIdIndex();
+		case COMMENT -> this.getCanvas().getPanelState().validateCommentLayoutByObjectIdIndex();
+		}).get(objectId);
+		if (nl != null) {
+			return nl;
 		}
 
+		final List<NodeLayout> list = switch (objectType) {
+		case CLASS -> this.getCanvas().getPanelState().getClassLayouts();
+		case COMMENT -> this.getCanvas().getPanelState().getCommentLayouts();
+		};
 		final NodeLayout layout = new NodeLayout();
 		layout.setObjectType(objectType);
 		layout.setObjectId(objectId);
-		layout.setPosition(new Point2D.Double(80 + this.getCanvas().getPanelState().getNodeLayouts().size() * 30,
-				80 + this.getCanvas().getPanelState().getNodeLayouts().size() * 30));
+		layout.setPosition(new Point2D.Double(80 + list.size() * 30, 80 + list.size() * 30));
 		layout.setSize(new Size2D(0, 0));
-		this.getCanvas().getPanelState().getNodeLayouts().add(layout);
+		switch (objectType) {
+		case CLASS -> this.getCanvas().getPanelState().addClassLayout(layout);
+		case COMMENT -> this.getCanvas().getPanelState().addCommentLayout(layout);
+		}
 		return layout;
 	}
 

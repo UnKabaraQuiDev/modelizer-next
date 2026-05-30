@@ -186,72 +186,6 @@ public final class LinkEditorDialog {
 	}
 
 	/**
-	 * Finds the association option that matches the supplied input.
-	 *
-	 * @param box     box value used by the operation
-	 * @param classId id of the class to look up or modify
-	 * @return the matching association option, or {@code null} when no match exists
-	 */
-	private static AssociationOption findAssociationOption(final JComboBox<AssociationOption> box, final String classId) {
-		for (int i = 0; i < box.getItemCount(); i++) {
-			final AssociationOption option = box.getItemAt(i);
-			if (Objects.equals(option.classId(), classId)) {
-				return option;
-			}
-		}
-		return box.getItemAt(0);
-	}
-
-	/**
-	 * Finds the class that matches the supplied input.
-	 *
-	 * @param classes values for classes
-	 * @param id      stable id of the model element
-	 * @return the matching class, or {@code null} when no match exists
-	 */
-	private static ClassModel findClass(final List<ClassModel> classes, final String id) {
-		for (final ClassModel classModel : classes) {
-			if (classModel.getId().equals(id)) {
-				return classModel;
-			}
-		}
-		return null;
-	}
-
-	/**
-	 * Finds the field that matches the supplied input.
-	 *
-	 * @param classModel class model affected by the operation
-	 * @param id         stable id of the model element
-	 * @return the matching field, or {@code null} when no match exists
-	 */
-	private static FieldModel findField(final ClassModel classModel, final String id) {
-		if (classModel == null || id == null) {
-			return null;
-		}
-		for (final FieldModel fieldModel : classModel.getFields()) {
-			if (fieldModel.getId().equals(id)) {
-				return fieldModel;
-			}
-		}
-		return null;
-	}
-
-	/**
-	 * Creates a labeled option for a combo box or selector.
-	 *
-	 * @param labelText text value for label text
-	 * @param component Swing component to configure
-	 * @return the labeled result
-	 */
-	private static JPanel labeled(final String labelText, final Component component) {
-		final JPanel panel = new JPanel(new BorderLayout(4, 4));
-		panel.add(new JLabel(labelText), BorderLayout.NORTH);
-		panel.add(component, BorderLayout.CENTER);
-		return panel;
-	}
-
-	/**
 	 * Shows the dialog.
 	 *
 	 * @param parent    parent component used for dialog ownership
@@ -498,6 +432,72 @@ public final class LinkEditorDialog {
 		dialog.setVisible(true);
 
 		return holder.result;
+	}
+
+	/**
+	 * Finds the association option that matches the supplied input.
+	 *
+	 * @param box     box value used by the operation
+	 * @param classId id of the class to look up or modify
+	 * @return the matching association option, or {@code null} when no match exists
+	 */
+	private static AssociationOption findAssociationOption(final JComboBox<AssociationOption> box, final String classId) {
+		for (int i = 0; i < box.getItemCount(); i++) {
+			final AssociationOption option = box.getItemAt(i);
+			if (Objects.equals(option.classId(), classId)) {
+				return option;
+			}
+		}
+		return box.getItemAt(0);
+	}
+
+	/**
+	 * Finds the class that matches the supplied input.
+	 *
+	 * @param classes values for classes
+	 * @param id      stable id of the model element
+	 * @return the matching class, or {@code null} when no match exists
+	 */
+	private static ClassModel findClass(final List<ClassModel> classes, final String id) {
+		for (final ClassModel classModel : classes) {
+			if (classModel.getId().equals(id)) {
+				return classModel;
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * Finds the field that matches the supplied input.
+	 *
+	 * @param classModel class model affected by the operation
+	 * @param id         stable id of the model element
+	 * @return the matching field, or {@code null} when no match exists
+	 */
+	private static FieldModel findField(final ClassModel classModel, final String id) {
+		if (classModel == null || id == null) {
+			return null;
+		}
+		for (final FieldModel fieldModel : classModel.getFields()) {
+			if (fieldModel.getId().equals(id)) {
+				return fieldModel;
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * Creates a labeled option for a combo box or selector.
+	 *
+	 * @param labelText text value for label text
+	 * @param component Swing component to configure
+	 * @return the labeled result
+	 */
+	private static JPanel labeled(final String labelText, final Component component) {
+		final JPanel panel = new JPanel(new BorderLayout(4, 4));
+		panel.add(new JLabel(labelText), BorderLayout.NORTH);
+		panel.add(component, BorderLayout.CENTER);
+		return panel;
 	}
 
 	/**

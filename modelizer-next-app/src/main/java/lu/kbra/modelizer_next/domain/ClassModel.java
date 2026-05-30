@@ -39,14 +39,6 @@ public class ClassModel implements VisibilityOwner, IdOwner, StyleOwner, NamesOw
 	@JsonIgnore
 	private String lastPaletteName;
 
-	public String getLastPaletteName() {
-		return lastPaletteName;
-	}
-
-	public void setLastPaletteName(String lastPaletteName) {
-		this.lastPaletteName = lastPaletteName;
-	}
-
 	/**
 	 * Creates a class model instance.
 	 */
@@ -205,6 +197,11 @@ public class ClassModel implements VisibilityOwner, IdOwner, StyleOwner, NamesOw
 		return this.id;
 	}
 
+	@Override
+	public String getLastPaletteName() {
+		return this.lastPaletteName;
+	}
+
 	/**
 	 * Returns the names.
 	 *
@@ -270,6 +267,11 @@ public class ClassModel implements VisibilityOwner, IdOwner, StyleOwner, NamesOw
 		this.id = id;
 	}
 
+	@Override
+	public void setLastPaletteName(final String lastPaletteName) {
+		this.lastPaletteName = lastPaletteName;
+	}
+
 	/**
 	 * Sets the names.
 	 *
@@ -306,9 +308,9 @@ public class ClassModel implements VisibilityOwner, IdOwner, StyleOwner, NamesOw
 
 	@Override
 	public String toString() {
-		return "ClassModel@" + System.identityHashCode(this) + " [id=" + id + ", names=" + names + ", visibility=" + visibility + ", style="
-				+ style + ", fields=" + fields + ", fieldById=" + fieldById + ", primaryKeyFieldIds=" + primaryKeyFieldIds
-				+ ", lastPaletteName=" + lastPaletteName + "]";
+		return "ClassModel@" + System.identityHashCode(this) + " [id=" + this.id + ", names=" + this.names + ", visibility="
+				+ this.visibility + ", style=" + this.style + ", fields=" + this.fields + ", fieldById=" + this.fieldById
+				+ ", primaryKeyFieldIds=" + this.primaryKeyFieldIds + ", lastPaletteName=" + this.lastPaletteName + "]";
 	}
 
 	public Map<String, FieldModel> validateFieldByIdIndex() {

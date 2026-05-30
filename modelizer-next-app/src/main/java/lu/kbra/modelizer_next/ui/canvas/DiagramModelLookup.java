@@ -33,6 +33,22 @@ interface DiagramModelLookup extends DiagramCanvasExt {
 	}
 
 	/**
+	 * Finds the type that matches the supplied input.
+	 *
+	 * @param selectedElement selected element to read or update
+	 * @return the matching type, or {@code null} when no match exists
+	 */
+	default Object findElement(final SelectedElement selectedElement) {
+		return switch (selectedElement.type()) {
+		case CLASS -> this.findClassById(selectedElement.classId());
+		case COMMENT -> this.findCommentById(selectedElement.commentId());
+		case FIELD -> this.findFieldById(selectedElement.classId(), selectedElement.fieldId());
+		case LINK -> this.findLinkById(selectedElement.linkId());
+		default -> null;
+		};
+	}
+
+	/**
 	 * Finds the field by ID that matches the supplied input.
 	 *
 	 * @param classModel class model affected by the operation
@@ -107,22 +123,6 @@ interface DiagramModelLookup extends DiagramCanvasExt {
 		}
 
 		return this.findFieldById(classModel, classModel.validatePrimaryKeyFieldIdsIndex().iterator().next());
-	}
-
-	/**
-	 * Finds the type that matches the supplied input.
-	 *
-	 * @param selectedElement selected element to read or update
-	 * @return the matching type, or {@code null} when no match exists
-	 */
-	default Object findElement(final SelectedElement selectedElement) {
-		return switch (selectedElement.type()) {
-		case CLASS -> this.findClassById(selectedElement.classId());
-		case COMMENT -> this.findCommentById(selectedElement.commentId());
-		case FIELD -> this.findFieldById(selectedElement.classId(), selectedElement.fieldId());
-		case LINK -> this.findLinkById(selectedElement.linkId());
-		default -> null;
-		};
 	}
 
 	default boolean linkEndpointExists(final LinkEnd linkEnd) {

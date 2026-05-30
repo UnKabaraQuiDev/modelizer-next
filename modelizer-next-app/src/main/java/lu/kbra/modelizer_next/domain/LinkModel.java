@@ -33,16 +33,6 @@ public class LinkModel implements StyleOwner {
 	@JsonIgnore
 	private String lastPaletteName;
 
-	@Override
-	public String getLastPaletteName() {
-		return this.lastPaletteName;
-	}
-
-	@Override
-	public void setLastPaletteName(final String lastPaletteName) {
-		this.lastPaletteName = lastPaletteName;
-	}
-
 	/**
 	 * Creates a link model instance.
 	 */
@@ -131,6 +121,11 @@ public class LinkModel implements StyleOwner {
 		return this.labelTo;
 	}
 
+	@Override
+	public String getLastPaletteName() {
+		return this.lastPaletteName;
+	}
+
 	/**
 	 * Returns the line color.
 	 *
@@ -138,6 +133,11 @@ public class LinkModel implements StyleOwner {
 	 */
 	public Color getLineColor() {
 		return this.getBorderColor();
+	}
+
+	@Override
+	public ElementStyle getStyle() {
+		return this.style;
 	}
 
 	/**
@@ -280,6 +280,11 @@ public class LinkModel implements StyleOwner {
 		this.labelTo = labelTo;
 	}
 
+	@Override
+	public void setLastPaletteName(final String lastPaletteName) {
+		this.lastPaletteName = lastPaletteName;
+	}
+
 	/**
 	 * Sets the line color.
 	 *
@@ -288,6 +293,11 @@ public class LinkModel implements StyleOwner {
 	@JsonProperty("lineColor")
 	public void setLineColor(final Color lineColor) {
 		this.setBorderColor(lineColor);
+	}
+
+	@Override
+	public void setStyle(final ElementStyle style) {
+		this.style = style;
 	}
 
 	/**
@@ -300,20 +310,11 @@ public class LinkModel implements StyleOwner {
 	}
 
 	@Override
-	public ElementStyle getStyle() {
-		return this.style;
-	}
-
-	@Override
-	public void setStyle(final ElementStyle style) {
-		this.style = style;
-	}
-
-	@Override
 	public String toString() {
-		return "LinkModel@" + System.identityHashCode(this) + " [id=" + id + ", label=" + label + ", from=" + from + ", to=" + to
-				+ ", cardinalityFrom=" + cardinalityFrom + ", cardinalityTo=" + cardinalityTo + ", associationClassId=" + associationClassId
-				+ ", labelFrom=" + labelFrom + ", labelTo=" + labelTo + ", style=" + style + ", lastPaletteName=" + lastPaletteName + "]";
+		return "LinkModel@" + System.identityHashCode(this) + " [id=" + this.id + ", label=" + this.label + ", from=" + this.from + ", to="
+				+ this.to + ", cardinalityFrom=" + this.cardinalityFrom + ", cardinalityTo=" + this.cardinalityTo + ", associationClassId="
+				+ this.associationClassId + ", labelFrom=" + this.labelFrom + ", labelTo=" + this.labelTo + ", style=" + this.style
+				+ ", lastPaletteName=" + this.lastPaletteName + "]";
 	}
 
 }

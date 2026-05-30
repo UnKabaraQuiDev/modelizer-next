@@ -27,6 +27,8 @@ public interface StyleOwner {
 		return this.getStyle().getBorderColor();
 	}
 
+	String getLastPaletteName();
+
 	/**
 	 * Returns the style.
 	 *
@@ -61,6 +63,8 @@ public interface StyleOwner {
 		this.getStyle().setBorderColor(c);
 	}
 
+	void setLastPaletteName(String lastPaletteName);
+
 	/**
 	 * Sets the style.
 	 *
@@ -76,9 +80,5 @@ public interface StyleOwner {
 	default void setTextColor(final Color c) {
 		this.getStyle().setTextColor(c);
 	}
-
-	String getLastPaletteName();
-
-	void setLastPaletteName(String lastPaletteName);
 
 }

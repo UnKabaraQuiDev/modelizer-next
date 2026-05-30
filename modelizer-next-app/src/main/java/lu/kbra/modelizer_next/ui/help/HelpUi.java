@@ -47,59 +47,6 @@ import com.formdev.flatlaf.FlatClientProperties;
 final class HelpUi {
 
 	/**
-	 * Represents a card panel in the help part of the application.
-	 */
-	static final class CardPanel extends JPanel {
-
-		private static final long serialVersionUID = 5726550619135877533L;
-
-		/**
-		 * Creates a card panel instance.
-		 *
-		 * @param layout layout object to read or update
-		 */
-		CardPanel(final java.awt.LayoutManager layout) {
-			super(layout);
-			this.setOpaque(false);
-			this.setBackground(HelpUi.CARD_BACKGROUND);
-			this.setAlignmentX(Component.LEFT_ALIGNMENT);
-		}
-
-		/**
-		 * Returns the maximum size.
-		 *
-		 * @return the maximum size
-		 */
-		@Override
-		public Dimension getMaximumSize() {
-			return new Dimension(Integer.MAX_VALUE, this.getPreferredSize().height);
-		}
-
-		/**
-		 * Paints the component.
-		 *
-		 * @param graphics graphics context used for drawing
-		 */
-		@Override
-		protected void paintComponent(final Graphics graphics) {
-			final Graphics2D g2 = (Graphics2D) graphics.create();
-			g2.setComposite(AlphaComposite.SrcOver);
-			g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-
-			try {
-				g2.setColor(this.getBackground());
-				g2.fillRoundRect(0, 0, this.getWidth() - 1, this.getHeight() - 1, HelpUi.CARD_ARC, HelpUi.CARD_ARC);
-				g2.setColor(HelpUi.BORDER_COLOR);
-				g2.drawRoundRect(0, 0, this.getWidth() - 1, this.getHeight() - 1, HelpUi.CARD_ARC, HelpUi.CARD_ARC);
-			} finally {
-				g2.dispose();
-			}
-
-			super.paintComponent(graphics);
-		}
-	}
-
-	/**
 	 * Represents a scrollable page in the help part of the application.
 	 */
 	private static final class ScrollablePage extends JPanel implements Scrollable {
@@ -215,6 +162,59 @@ final class HelpUi {
 		}
 	}
 
+	/**
+	 * Represents a card panel in the help part of the application.
+	 */
+	static final class CardPanel extends JPanel {
+
+		private static final long serialVersionUID = 5726550619135877533L;
+
+		/**
+		 * Creates a card panel instance.
+		 *
+		 * @param layout layout object to read or update
+		 */
+		CardPanel(final java.awt.LayoutManager layout) {
+			super(layout);
+			this.setOpaque(false);
+			this.setBackground(HelpUi.CARD_BACKGROUND);
+			this.setAlignmentX(Component.LEFT_ALIGNMENT);
+		}
+
+		/**
+		 * Returns the maximum size.
+		 *
+		 * @return the maximum size
+		 */
+		@Override
+		public Dimension getMaximumSize() {
+			return new Dimension(Integer.MAX_VALUE, this.getPreferredSize().height);
+		}
+
+		/**
+		 * Paints the component.
+		 *
+		 * @param graphics graphics context used for drawing
+		 */
+		@Override
+		protected void paintComponent(final Graphics graphics) {
+			final Graphics2D g2 = (Graphics2D) graphics.create();
+			g2.setComposite(AlphaComposite.SrcOver);
+			g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+			try {
+				g2.setColor(this.getBackground());
+				g2.fillRoundRect(0, 0, this.getWidth() - 1, this.getHeight() - 1, HelpUi.CARD_ARC, HelpUi.CARD_ARC);
+				g2.setColor(HelpUi.BORDER_COLOR);
+				g2.drawRoundRect(0, 0, this.getWidth() - 1, this.getHeight() - 1, HelpUi.CARD_ARC, HelpUi.CARD_ARC);
+			} finally {
+				g2.dispose();
+			}
+
+			super.paintComponent(graphics);
+		}
+	}
+
 	static final int PAGE_WIDTH = 980;
 	static final int CARD_ARC = 24;
 	static final int CHIP_ARC = 10;
@@ -292,6 +292,16 @@ final class HelpUi {
 
 	static final Border PRESSED_CHIP_BORDER = new CompoundBorder(new LineBorder(HelpUi.ACCENT_COLOR, 1, true),
 			new EmptyBorder(HelpUi.PRESSED_CHIP_INSETS));
+
+	/**
+	 * Removes simple HTML tags from text used in the help UI.
+	 *
+	 * @param text text to display or edit
+	 * @return the strip simple HTML result
+	 */
+	private static String stripSimpleHtml(final String text) {
+		return text.replace("<html>", "").replace("</html>", "").replace("<b>", "").replace("</b>", "");
+	}
 
 	/**
 	 * Blends two colors using the supplied ratio.
@@ -562,16 +572,6 @@ final class HelpUi {
 		area.setAlignmentX(Component.LEFT_ALIGNMENT);
 		area.setMaximumSize(HelpUi.FULL_WIDTH_MAXIMUM_SIZE);
 		return area;
-	}
-
-	/**
-	 * Removes simple HTML tags from text used in the help UI.
-	 *
-	 * @param text text to display or edit
-	 * @return the strip simple HTML result
-	 */
-	private static String stripSimpleHtml(final String text) {
-		return text.replace("<html>", "").replace("</html>", "").replace("<b>", "").replace("</b>", "");
 	}
 
 	/**

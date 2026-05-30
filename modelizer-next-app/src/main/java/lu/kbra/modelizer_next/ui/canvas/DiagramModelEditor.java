@@ -231,7 +231,7 @@ interface DiagramModelEditor extends DiagramCanvasExt {
 			}
 			this.getCanvas()
 					.select(SelectedElement.forField(this.getCanvas().selectedElement.classId(),
-							classModel.getFields().get(delta >= 0 ? 0 : classModel.getFields(getPanelType()).size() - 1).getId()));
+							classModel.getFields().get(delta >= 0 ? 0 : classModel.getFields(this.getPanelType()).size() - 1).getId()));
 			return;
 		}
 
@@ -244,7 +244,7 @@ interface DiagramModelEditor extends DiagramCanvasExt {
 			return;
 		}
 
-		final List<FieldModel> visibleFields = classModel.getFields(getPanelType());
+		final List<FieldModel> visibleFields = classModel.getFields(this.getPanelType());
 		int currentIndex = -1;
 		for (int i = 0; i < visibleFields.size(); i++) {
 			if (Objects.equals(visibleFields.get(i).getId(), this.getCanvas().selectedElement.fieldId())) {

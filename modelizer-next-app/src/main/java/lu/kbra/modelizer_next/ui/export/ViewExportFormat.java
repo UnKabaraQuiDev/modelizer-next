@@ -105,28 +105,6 @@ public enum ViewExportFormat {
 		ImageIO.scanForPlugins();
 	}
 
-	/**
-	 * Flattens transparent pixels over an RGB background color.
-	 *
-	 * @param image           raw image to flatten
-	 * @param backgroundColor background color to use
-	 * @return an RGB image
-	 */
-	static BufferedImage flattenImage(final BufferedImage image, final Color backgroundColor) {
-		final Color rgbBackground = backgroundColor == null ? Color.WHITE
-				: new Color(backgroundColor.getRed(), backgroundColor.getGreen(), backgroundColor.getBlue());
-		final BufferedImage rgbImage = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_RGB);
-		final Graphics2D g2 = rgbImage.createGraphics();
-		try {
-			g2.setColor(rgbBackground);
-			g2.fillRect(0, 0, image.getWidth(), image.getHeight());
-			g2.drawImage(image, 0, 0, null);
-		} finally {
-			g2.dispose();
-		}
-		return rgbImage;
-	}
-
 	private static BufferedImage
 			imageForFormat(final BufferedImage rawImage, final ViewExportRequest request, final boolean formatSupportsTransparency) {
 
@@ -160,6 +138,28 @@ public enum ViewExportFormat {
 		} finally {
 			writer.dispose();
 		}
+	}
+
+	/**
+	 * Flattens transparent pixels over an RGB background color.
+	 *
+	 * @param image           raw image to flatten
+	 * @param backgroundColor background color to use
+	 * @return an RGB image
+	 */
+	static BufferedImage flattenImage(final BufferedImage image, final Color backgroundColor) {
+		final Color rgbBackground = backgroundColor == null ? Color.WHITE
+				: new Color(backgroundColor.getRed(), backgroundColor.getGreen(), backgroundColor.getBlue());
+		final BufferedImage rgbImage = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_RGB);
+		final Graphics2D g2 = rgbImage.createGraphics();
+		try {
+			g2.setColor(rgbBackground);
+			g2.fillRect(0, 0, image.getWidth(), image.getHeight());
+			g2.drawImage(image, 0, 0, null);
+		} finally {
+			g2.dispose();
+		}
+		return rgbImage;
 	}
 
 	private final String extension;

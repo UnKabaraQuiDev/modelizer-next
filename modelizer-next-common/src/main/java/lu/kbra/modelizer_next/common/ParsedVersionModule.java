@@ -15,8 +15,6 @@ import lu.kbra.modelizer_next.common.VersionComparator.ParsedVersion;
  */
 public class ParsedVersionModule extends SimpleModule {
 
-	private static final long serialVersionUID = 2445328002171384394L;
-
 	/**
 	 * Represents a parsed version deserializer in the shared utility part of the application.
 	 */
@@ -43,6 +41,8 @@ public class ParsedVersionModule extends SimpleModule {
 		}
 
 	}
+
+	private static final long serialVersionUID = 2445328002171384394L;
 
 	/**
 	 * Creates a parsed version module instance.

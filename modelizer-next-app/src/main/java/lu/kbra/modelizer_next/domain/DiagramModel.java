@@ -2,21 +2,24 @@ package lu.kbra.modelizer_next.domain;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
+import java.util.Set;
 
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+
+import lu.kbra.modelizer_next.layout.PanelType;
+import lu.kbra.modelizer_next.ui.impl.PostConstructOwner;
+import lu.kbra.modelizer_next.ui.impl.PreDeconstructOwner;
 
 /**
  * Root model for diagram elements. It stores classes, links, comments, and their relationships.
  */
-public class DiagramModel {
+public class DiagramModel implements PostConstructOwner, PreDeconstructOwner {
 
 	private List<ClassModel> classes;
 	private List<LinkModel> conceptualLinks;
@@ -24,17 +27,19 @@ public class DiagramModel {
 	private List<CommentModel> comments;
 
 	@JsonIgnore
-	private Map<String, ClassModel> classById = new HashMap<>();
+	private final Map<String, ClassModel> classById = new HashMap<>();
 	@JsonIgnore
-	private Map<String, LinkModel> conceptualLinkById = new HashMap<>();
+	private final Map<String, LinkModel> conceptualLinkById = new HashMap<>();
 	@JsonIgnore
-	private Map<String, LinkModel> technicalLinkById = new HashMap<>();
+	private final Map<String, LinkModel> technicalLinkById = new HashMap<>();
 	@JsonIgnore
-	private Map<String, CommentModel> commentById = new HashMap<>();
+	private final Map<String, CommentModel> commentById = new HashMap<>();
 	@JsonIgnore
-	private Map<String, LinkModel> linkByAssociationClassId = new HashMap<>();
+	private final Map<String, LinkModel> linkByAssociationClassId = new HashMap<>();
 	@JsonIgnore
-	private Map<String, LinkModel> linkById = new HashMap<>();
+	private final Map<String, LinkModel> linkById = new HashMap<>();
+	@JsonIgnore
+	private final Map<PanelType, Set<ClassModel>> classesByPanel = new EnumMap<>(PanelType.class);
 
 	/**
 	 * Creates a diagram model instance.
@@ -86,6 +91,28 @@ public class DiagramModel {
 		this.classById.clear();
 		this.classes.stream().forEach(f -> this.classById.put(f.getId(), f));
 		return this.classById;
+	}
+
+	public Map<PanelType, Set<ClassModel>> buildClassesByPanelIndex() {
+		this.classesByPanel.clear();
+		final Set<ClassModel> conceptualList = new HashSet<>();
+		final Set<ClassModel> logicalList = new HashSet<>();
+		final Set<ClassModel> physicalList = new HashSet<>();
+		for (final ClassModel classModel : this.classes) {
+			if (classModel.isVisibleInConceptual()) {
+				conceptualList.add(classModel);
+			}
+			if (classModel.isVisibleInLogical()) {
+				logicalList.add(classModel);
+			}
+			if (classModel.isVisibleInPhysical()) {
+				physicalList.add(classModel);
+			}
+		}
+		this.classesByPanel.put(PanelType.CONCEPTUAL, conceptualList);
+		this.classesByPanel.put(PanelType.LOGICAL, logicalList);
+		this.classesByPanel.put(PanelType.PHYSICAL, physicalList);
+		return this.classesByPanel;
 	}
 
 	public Map<String, CommentModel> buildCommentByIdIndex() {
@@ -143,6 +170,14 @@ public class DiagramModel {
 		return this.classes;
 	}
 
+	public Set<ClassModel> getClasses(final PanelType panelType) {
+		return this.classesByPanel.get(panelType);
+	}
+
+	public Map<PanelType, Set<ClassModel>> getClassesByPanel() {
+		return this.classesByPanel;
+	}
+
 	public Map<String, CommentModel> getCommentById() {
 		return this.commentById;
 	}
@@ -193,22 +228,23 @@ public class DiagramModel {
 	/**
 	 * Restores derived model state after JSON deserialization.
 	 */
-	@JsonAnyGetter
+	@Override
 	public void postConstruct() {
 		this.validateData();
 
-		this.validateClassByIdIndex();
-		this.validateCommentsByIdIndex();
-		this.validateConceptualLinkByIdIndex();
-		this.validateTechnicalLinksByIdIndex();
-		this.validateLinkByAssociationClassIdIndex();
-		this.validateLinkByIdIndex();
+		this.buildClassByIdIndex();
+		this.buildCommentByIdIndex();
+		this.buildConceptualLinkByIdIndex();
+		this.buildTechnicalLinkByIdIndex();
+		this.buildLinkByAssociationClassIdIndex();
+		this.buildLinkByIdIndex();
+		this.buildClassesByPanelIndex();
 	}
 
 	/**
 	 * Prepares the model before it is serialized.
 	 */
-	@JsonAnySetter
+	@Override
 	public void preDeconstruct() {
 		this.validateData();
 	}
@@ -249,10 +285,6 @@ public class DiagramModel {
 //		linkByAssociationClassId.remove(linkModel.getAssociationClassId());
 	}
 
-	public void setClassById(final Map<String, ClassModel> classById) {
-		this.classById = classById;
-	}
-
 	/**
 	 * Sets the classes.
 	 *
@@ -262,10 +294,6 @@ public class DiagramModel {
 	public void setClasses(final List<ClassModel> classes) {
 		this.classes = classes;
 		this.buildClassByIdIndex();
-	}
-
-	public void setCommentById(final Map<String, CommentModel> commentById) {
-		this.commentById = commentById;
 	}
 
 	/**
@@ -279,26 +307,10 @@ public class DiagramModel {
 		this.buildCommentByIdIndex();
 	}
 
-	public void setConceptualLinkById(final Map<String, LinkModel> conceptualLinkById) {
-		this.conceptualLinkById = conceptualLinkById;
-	}
-
 	@JsonProperty("conceptualLinks")
 	public void setConceptualLinks(final List<LinkModel> conceptualLinks) {
 		this.conceptualLinks = conceptualLinks;
 		this.buildConceptualLinkByIdIndex();
-	}
-
-	public void setLinkByAssociationClassId(final Map<String, LinkModel> linkByAssociationClassId) {
-		this.linkByAssociationClassId = linkByAssociationClassId;
-	}
-
-	public void setLinkById(final Map<String, LinkModel> linkById) {
-		this.linkById = linkById;
-	}
-
-	public void setTechnicalLinkById(final Map<String, LinkModel> technicalLinkById) {
-		this.technicalLinkById = technicalLinkById;
 	}
 
 	@JsonProperty("technicalLinks")
@@ -319,19 +331,31 @@ public class DiagramModel {
 	}
 
 	public Map<String, ClassModel> validateClassByIdIndex() {
-		if (this.classById == null) {
-			this.classById = new HashMap<>();
-		}
 		if (this.classById.size() != this.classes.size()) {
 			this.buildClassByIdIndex();
 		}
 		return this.classById;
 	}
 
-	public Map<String, CommentModel> validateCommentsByIdIndex() {
-		if (this.commentById == null) {
-			this.commentById = new HashMap<>();
+	public void validateClassByPanel(final ClassModel classModel) {
+		if (classModel.isVisibleInConceptual()) {
+			this.classesByPanel.get(PanelType.CONCEPTUAL).add(classModel);
+		} else {
+			this.classesByPanel.get(PanelType.CONCEPTUAL).remove(classModel);
 		}
+		if (classModel.isVisibleInLogical()) {
+			this.classesByPanel.get(PanelType.LOGICAL).add(classModel);
+		} else {
+			this.classesByPanel.get(PanelType.LOGICAL).remove(classModel);
+		}
+		if (classModel.isVisibleInPhysical()) {
+			this.classesByPanel.get(PanelType.PHYSICAL).add(classModel);
+		} else {
+			this.classesByPanel.get(PanelType.PHYSICAL).remove(classModel);
+		}
+	}
+
+	public Map<String, CommentModel> validateCommentsByIdIndex() {
 		if (this.commentById.size() != this.comments.size()) {
 			this.buildCommentByIdIndex();
 		}
@@ -339,9 +363,6 @@ public class DiagramModel {
 	}
 
 	public Map<String, LinkModel> validateConceptualLinkByIdIndex() {
-		if (this.conceptualLinkById == null) {
-			this.conceptualLinkById = new HashMap<>();
-		}
 		if (this.conceptualLinkById.size() != this.conceptualLinks.size()) {
 			this.buildConceptualLinkByIdIndex();
 		}
@@ -352,34 +373,25 @@ public class DiagramModel {
 	 * Validates the data before it is used.
 	 */
 	public void validateData() {
-		this.getClasses().removeIf(Objects::isNull);
-		this.getComments().removeIf(Objects::isNull);
-		this.getConceptualLinks().removeIf(Objects::isNull);
-		this.getTechnicalLinks().removeIf(Objects::isNull);
+		this.getClasses().removeIf(c -> c == null || c.getId() == null || c.getId().isBlank());
+		this.getComments().removeIf(c -> c == null || c.getId() == null || c.getId().isBlank());
+		this.getConceptualLinks().removeIf(c -> c == null || c.getId() == null || c.getId().isBlank());
+		this.getTechnicalLinks().removeIf(c -> c == null || c.getId() == null || c.getId().isBlank());
 	}
 
 	public Map<String, LinkModel> validateLinkByAssociationClassIdIndex() {
-		if (this.linkByAssociationClassId == null) {
-			this.linkByAssociationClassId = new HashMap<>();
-		}
 		this.buildLinkByAssociationClassIdIndex();
 		return this.linkByAssociationClassId;
 	}
 
 	public Map<String, LinkModel> validateLinkByIdIndex() {
-		if (this.linkById == null) {
-			this.linkById = new HashMap<>();
-		}
 		if (this.linkById.size() != this.technicalLinks.size() + this.conceptualLinks.size()) {
 			this.buildLinkByIdIndex();
 		}
 		return this.linkById;
 	}
 
-	public Map<String, LinkModel> validateTechnicalLinksByIdIndex() {
-		if (this.technicalLinkById == null) {
-			this.technicalLinkById = new HashMap<>();
-		}
+	public Map<String, LinkModel> validateTechnicalLinkByIdIndex() {
 		if (this.technicalLinkById.size() != this.technicalLinks.size()) {
 			this.buildTechnicalLinkByIdIndex();
 		}

@@ -40,6 +40,42 @@ public class LegacyModelizerImporter {
 	}
 
 	/**
+	 * Imports the file.
+	 *
+	 * @param file file to read or write
+	 * @return the import file result
+	 * @throws IOException if the operation cannot be completed
+	 */
+	public static ModelDocument importFile(final File file) throws IOException {
+		final JsonNode root = MNMain.OBJECT_MAPPER.readTree(file);
+		if (!LegacyModelizerImporter.isLegacyRoot(root)) {
+			throw new IOException("Unsupported legacy Modelizer file format.");
+		}
+
+		return LegacyModelizerImporter.importRoot(root);
+	}
+
+	/**
+	 * Checks whether legacy file is enabled or applies while converting JSON data.
+	 *
+	 * @param file file to read or write
+	 * @return {@code true} if legacy file is enabled or applies; otherwise {@code false}
+	 * @throws IOException if the operation cannot be completed
+	 */
+	public static boolean isLegacyFile(final File file) throws IOException {
+		if (file == null) {
+			return false;
+		}
+
+		final String fileName = file.getName().toLowerCase();
+		if (fileName.endsWith(".mod")) {
+			return true;
+		}
+
+		return LegacyModelizerImporter.isLegacyRoot(MNMain.OBJECT_MAPPER.readTree(file));
+	}
+
+	/**
 	 * Adds the class layout while converting JSON data.
 	 *
 	 * @param panelState panel state value used by the operation
@@ -53,7 +89,7 @@ public class LegacyModelizerImporter {
 		layout.setObjectId(classId);
 		layout.setPosition(new Point2D.Double(x, y));
 		layout.setSize(new Size2D(0.0, 0.0));
-		panelState.getNodeLayouts().add(layout);
+		panelState.addClassLayout(layout);
 	}
 
 	/**
@@ -70,7 +106,7 @@ public class LegacyModelizerImporter {
 		layout.setObjectId(commentId);
 		layout.setPosition(new Point2D.Double(x, y));
 		layout.setSize(new Size2D(220.0, 80.0));
-		panelState.getNodeLayouts().add(layout);
+		panelState.addCommentLayout(layout);
 	}
 
 	/**
@@ -177,22 +213,6 @@ public class LegacyModelizerImporter {
 		linkModel.setFrom(new LinkEnd(fromClassId, fromFieldId));
 		linkModel.setTo(new LinkEnd(toClassId, toFieldId));
 		return linkModel;
-	}
-
-	/**
-	 * Imports the file.
-	 *
-	 * @param file file to read or write
-	 * @return the import file result
-	 * @throws IOException if the operation cannot be completed
-	 */
-	public static ModelDocument importFile(final File file) throws IOException {
-		final JsonNode root = MNMain.OBJECT_MAPPER.readTree(file);
-		if (!LegacyModelizerImporter.isLegacyRoot(root)) {
-			throw new IOException("Unsupported legacy Modelizer file format.");
-		}
-
-		return LegacyModelizerImporter.importRoot(root);
 	}
 
 	/**
@@ -315,26 +335,6 @@ public class LegacyModelizerImporter {
 		}
 
 		return document;
-	}
-
-	/**
-	 * Checks whether legacy file is enabled or applies while converting JSON data.
-	 *
-	 * @param file file to read or write
-	 * @return {@code true} if legacy file is enabled or applies; otherwise {@code false}
-	 * @throws IOException if the operation cannot be completed
-	 */
-	public static boolean isLegacyFile(final File file) throws IOException {
-		if (file == null) {
-			return false;
-		}
-
-		final String fileName = file.getName().toLowerCase();
-		if (fileName.endsWith(".mod")) {
-			return true;
-		}
-
-		return LegacyModelizerImporter.isLegacyRoot(MNMain.OBJECT_MAPPER.readTree(file));
 	}
 
 	/**

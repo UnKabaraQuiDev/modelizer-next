@@ -11,6 +11,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.font.FontRenderContext;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
@@ -71,7 +72,8 @@ public class DiagramCanvas extends JPanel
 			DiagramCanvasCoreSupport,
 			DiagramCanvasActionRegistrar,
 			LiveEditor,
-			LayoutEditor {
+			LayoutEditor,
+			LayoutCache {
 
 	private static final long serialVersionUID = -768210073584363710L;
 
@@ -165,6 +167,7 @@ public class DiagramCanvas extends JPanel
 	boolean dragOccurred;
 
 	Point2D.Double currentDragOffset = new Point2D.Double();
+	final Map<String, Rectangle2D> classBoundsById = new HashMap<>();
 	final Map<String, AnchorPair> conceptualAnchorCache = new HashMap<>();
 	final Map<String, LinkAnchorPlacement> conceptualAnchorPlacements = new HashMap<>();
 	final Map<ClassSideKey, List<String>> conceptualSideLinkCache = new HashMap<>();
@@ -221,7 +224,7 @@ public class DiagramCanvas extends JPanel
 		this.liveEditComponents.forEach(super::add);
 		super.setLayout(null);
 
-		this.ensureConceptualAnchorCache();
+		this.rebuildConceptualAnchorCache();
 		this.ensureLayouts();
 	}
 

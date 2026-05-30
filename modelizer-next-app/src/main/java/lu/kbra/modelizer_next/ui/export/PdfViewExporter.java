@@ -50,15 +50,6 @@ final class PdfViewExporter {
 			return this.addObject(body.getBytes(StandardCharsets.ISO_8859_1));
 		}
 
-		private int reserveObject() {
-			this.objects.add(new byte[0]);
-			return this.objects.size();
-		}
-
-		private void setObject(final int objectId, final String body) {
-			this.objects.set(objectId - 1, body.getBytes(StandardCharsets.ISO_8859_1));
-		}
-
 		private int addStreamObject(final String dictionary, final byte[] streamData) {
 			final ByteArrayOutputStream out = new ByteArrayOutputStream();
 			try {
@@ -69,6 +60,15 @@ final class PdfViewExporter {
 				throw new IllegalStateException("Could not create PDF stream object.", ex);
 			}
 			return this.addObject(out.toByteArray());
+		}
+
+		private int reserveObject() {
+			this.objects.add(new byte[0]);
+			return this.objects.size();
+		}
+
+		private void setObject(final int objectId, final String body) {
+			this.objects.set(objectId - 1, body.getBytes(StandardCharsets.ISO_8859_1));
 		}
 
 		private void writeTo(final File file, final int catalogObjectId) throws IOException {
@@ -175,6 +175,25 @@ final class PdfViewExporter {
 				+ " /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /FlateDecode /Length " + compressedBytes.length + " >>";
 		final int objectId = writer.addStreamObject(dictionary, compressedBytes);
 		return new PdfImageResource(name, objectId, rgbImage.getWidth(), rgbImage.getHeight());
+	}
+
+	private static void appendImageCommand(
+			final StringBuilder builder,
+			final PdfImageResource image,
+			final double x,
+			final double y,
+			final double width,
+			final double height) {
+		builder.append(PdfViewExporter.format("q %.4f 0 0 %.4f %.4f %.4f cm /%s Do Q\n", width, height, x, y, image.name()));
+	}
+
+	private static void
+			appendText(final StringBuilder builder, final String rawText, final double x, final double y, final double maxWidth) {
+		final String text = PdfViewExporter.truncate(rawText, (int) Math.max(1, Math.floor(maxWidth / (PdfViewExporter.TEXT_SIZE * 0.55))));
+		builder.append("BT\n/F1 ").append(PdfViewExporter.format("%.4f", PdfViewExporter.TEXT_SIZE)).append(" Tf\n");
+		builder.append("0 0 0 rg\n");
+		builder.append(PdfViewExporter.format("%.4f %.4f Td\n", x, y));
+		builder.append('(').append(PdfViewExporter.escapePdfText(text)).append(") Tj\nET\n");
 	}
 
 	private static String createCatalogObject(final int pagesId, final int underOcgId, final int overOcgId) {
@@ -318,6 +337,10 @@ final class PdfViewExporter {
 		return out.toByteArray();
 	}
 
+	private static String escapePdfText(final String value) {
+		return value.replace("\\", "\\\\").replace("(", "\\(").replace(")", "\\)").replace("\r", " ").replace("\n", " ");
+	}
+
 	private static String fillColorCommand(final Color color) {
 		final Color rgbColor = color == null ? Color.WHITE : color;
 		return PdfViewExporter
@@ -326,29 +349,6 @@ final class PdfViewExporter {
 
 	private static String format(final String format, final Object... args) {
 		return String.format(Locale.US, format, args);
-	}
-
-	private static void appendImageCommand(
-			final StringBuilder builder,
-			final PdfImageResource image,
-			final double x,
-			final double y,
-			final double width,
-			final double height) {
-		builder.append(PdfViewExporter.format("q %.4f 0 0 %.4f %.4f %.4f cm /%s Do Q\n", width, height, x, y, image.name()));
-	}
-
-	private static void
-			appendText(final StringBuilder builder, final String rawText, final double x, final double y, final double maxWidth) {
-		final String text = PdfViewExporter.truncate(rawText, (int) Math.max(1, Math.floor(maxWidth / (PdfViewExporter.TEXT_SIZE * 0.55))));
-		builder.append("BT\n/F1 ").append(PdfViewExporter.format("%.4f", PdfViewExporter.TEXT_SIZE)).append(" Tf\n");
-		builder.append("0 0 0 rg\n");
-		builder.append(PdfViewExporter.format("%.4f %.4f Td\n", x, y));
-		builder.append('(').append(PdfViewExporter.escapePdfText(text)).append(") Tj\nET\n");
-	}
-
-	private static String escapePdfText(final String value) {
-		return value.replace("\\", "\\\\").replace("(", "\\(").replace(")", "\\)").replace("\r", " ").replace("\n", " ");
 	}
 
 	private static BufferedImage readOptionalTemplate(final File file) throws IOException {
@@ -383,8 +383,7 @@ final class PdfViewExporter {
 		value = value.replace("%EXTENSION%", request == null || request.format() == null ? "pdf" : request.format().getExtension());
 		value = value.replace("%PAGE%", Integer.toString(page));
 		value = value.replace("%PAGES%", Integer.toString(pages));
-		value = ViewExporter.replaceDateTimeTokens(value);
-		return value;
+		return ViewExporter.replaceDateTimeTokens(value);
 	}
 
 	private static byte[] toRgbBytes(final BufferedImage image) {
@@ -393,8 +392,8 @@ final class PdfViewExporter {
 		for (int y = 0; y < image.getHeight(); y++) {
 			for (int x = 0; x < image.getWidth(); x++) {
 				final int rgb = image.getRGB(x, y);
-				bytes[index++] = (byte) ((rgb >> 16) & 0xFF);
-				bytes[index++] = (byte) ((rgb >> 8) & 0xFF);
+				bytes[index++] = (byte) (rgb >> 16 & 0xFF);
+				bytes[index++] = (byte) (rgb >> 8 & 0xFF);
 				bytes[index++] = (byte) (rgb & 0xFF);
 			}
 		}

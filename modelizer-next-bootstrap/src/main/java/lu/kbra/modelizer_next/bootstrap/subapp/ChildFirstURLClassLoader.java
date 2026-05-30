@@ -65,6 +65,21 @@ public final class ChildFirstURLClassLoader extends URLClassLoader {
 	}
 
 	/**
+	 * Loads the parent first during bootstrap/update processing.
+	 *
+	 * @param name name value to read, write, or display
+	 * @return the load parent first result
+	 * @throws ClassNotFoundException if the operation cannot be completed
+	 */
+	private Class<?> loadParentFirst(final String name) throws ClassNotFoundException {
+		try {
+			return this.getParent().loadClass(name);
+		} catch (final ClassNotFoundException ignored) {
+			return this.findClass(name);
+		}
+	}
+
+	/**
 	 * Loads the class during bootstrap/update processing.
 	 *
 	 * @param name    name value to read, write, or display
@@ -90,21 +105,6 @@ public final class ChildFirstURLClassLoader extends URLClassLoader {
 			}
 
 			return loadedClass;
-		}
-	}
-
-	/**
-	 * Loads the parent first during bootstrap/update processing.
-	 *
-	 * @param name name value to read, write, or display
-	 * @return the load parent first result
-	 * @throws ClassNotFoundException if the operation cannot be completed
-	 */
-	private Class<?> loadParentFirst(final String name) throws ClassNotFoundException {
-		try {
-			return this.getParent().loadClass(name);
-		} catch (final ClassNotFoundException ignored) {
-			return this.findClass(name);
 		}
 	}
 

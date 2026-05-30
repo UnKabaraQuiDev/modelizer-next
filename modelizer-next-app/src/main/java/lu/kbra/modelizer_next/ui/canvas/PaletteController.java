@@ -18,7 +18,7 @@ interface PaletteController extends DiagramCanvasExt {
 	 * @param classModel class model affected by the operation
 	 */
 	default void applyDefaultPaletteToClass(final ClassModel classModel) {
-		applyPaletteToClass(this.getCanvas().defaultPalette, classModel, false, false);
+		this.applyPaletteToClass(this.getCanvas().defaultPalette, classModel, false, false);
 	}
 
 	/**
@@ -30,7 +30,7 @@ interface PaletteController extends DiagramCanvasExt {
 	 */
 	@Deprecated
 	default void applyDefaultPaletteToClass(final ClassModel classModel, final boolean deep, final boolean visibleOnly) {
-		applyPaletteToClass(this.getCanvas().defaultPalette, classModel, deep, visibleOnly);
+		this.applyPaletteToClass(this.getCanvas().defaultPalette, classModel, deep, visibleOnly);
 	}
 
 	/**
@@ -39,7 +39,7 @@ interface PaletteController extends DiagramCanvasExt {
 	 * @param commentModel comment model affected by the operation
 	 */
 	default void applyDefaultPaletteToComment(final CommentModel commentModel) {
-		applyPaletteToComment(this.getCanvas().defaultPalette, commentModel);
+		this.applyPaletteToComment(this.getCanvas().defaultPalette, commentModel);
 	}
 
 	/**
@@ -48,7 +48,7 @@ interface PaletteController extends DiagramCanvasExt {
 	 * @param fieldModel field model affected by the operation
 	 */
 	default void applyDefaultPaletteToField(final FieldModel fieldModel) {
-		applyPaletteToField(this.getCanvas().defaultPalette, fieldModel);
+		this.applyPaletteToField(this.getCanvas().defaultPalette, fieldModel);
 	}
 
 	/**
@@ -57,7 +57,7 @@ interface PaletteController extends DiagramCanvasExt {
 	 * @param linkModel link model affected by the operation
 	 */
 	default void applyDefaultPaletteToLink(final LinkModel linkModel) {
-		applyPaletteToLink(getCanvas().defaultPalette, linkModel);
+		this.applyPaletteToLink(this.getCanvas().defaultPalette, linkModel);
 	}
 
 	/**
@@ -74,7 +74,7 @@ interface PaletteController extends DiagramCanvasExt {
 	 * @param classModel class model affected by the operation
 	 */
 	default void applyPaletteToClass(final StylePalette palette, final ClassModel classModel) {
-		applyPaletteToClass(palette, classModel, false, false);
+		this.applyPaletteToClass(palette, classModel, false, false);
 	}
 
 	/**

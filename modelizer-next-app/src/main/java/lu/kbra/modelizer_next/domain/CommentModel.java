@@ -28,16 +28,6 @@ public class CommentModel implements StyleOwner, VisibilityOwner, IdOwner {
 	@JsonIgnore
 	private String lastPaletteName;
 
-	@Override
-	public String getLastPaletteName() {
-		return this.lastPaletteName;
-	}
-
-	@Override
-	public void setLastPaletteName(final String lastPaletteName) {
-		this.lastPaletteName = lastPaletteName;
-	}
-
 	/**
 	 * Creates a comment model instance.
 	 */
@@ -86,6 +76,11 @@ public class CommentModel implements StyleOwner, VisibilityOwner, IdOwner {
 	 */
 	public CommentKind getKind() {
 		return this.kind;
+	}
+
+	@Override
+	public String getLastPaletteName() {
+		return this.lastPaletteName;
 	}
 
 	/**
@@ -165,6 +160,11 @@ public class CommentModel implements StyleOwner, VisibilityOwner, IdOwner {
 	 */
 	public void setKind(final CommentKind kind) {
 		this.kind = kind;
+	}
+
+	@Override
+	public void setLastPaletteName(final String lastPaletteName) {
+		this.lastPaletteName = lastPaletteName;
 	}
 
 	/**

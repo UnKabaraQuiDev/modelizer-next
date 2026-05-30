@@ -95,15 +95,6 @@ public final class RemoteUpdateService {
 			.build();
 
 	/**
-	 * Detects the current value from the runtime environment.
-	 *
-	 * @return the detect platform result
-	 */
-	private Platform detectPlatform() {
-		return Platform.get();
-	}
-
-	/**
 	 * Downloads an update artifact.
 	 *
 	 * @param update      update metadata to download or install
@@ -223,51 +214,6 @@ public final class RemoteUpdateService {
 	}
 
 	/**
-	 * Finds the bootstrap node that matches the supplied input.
-	 *
-	 * @param manifest update manifest to inspect
-	 * @param channel  update channel to query
-	 * @return the matching bootstrap node, or {@code null} when no match exists
-	 */
-	private JsonNode findBootstrapNode(final JsonNode manifest, final UpdateChannel channel) {
-		final String latest = manifest.path("version").asText();
-		final Platform platform = this.detectPlatform();
-		final JsonNode entries = manifest.path("entries");
-		if (entries.isArray()) {
-			for (final JsonNode entry : entries) {
-				if (entry != null && entry.isObject() && Objects.equals(latest, entry.path("version").asText())) {
-					return entry;
-				}
-			}
-		}
-		return null;
-	}
-
-	/**
-	 * Finds the installer URI that matches the supplied input.
-	 *
-	 * @param bootstrap bootstrap value used by the operation
-	 * @param platform  target platform to match
-	 * @return the matching installer URI, or {@code null} when no match exists
-	 */
-	private URI findInstallerUri(final JsonNode bootstrap, final Platform platform) {
-		final JsonNode assets = bootstrap.path("assets");
-		if (platform == Platform.UNSUPPORTED || assets == null || assets.isMissingNode() || !assets.isArray()) {
-			return null;
-		}
-		for (JsonNode node : assets) {
-			if (node.path("platform").asText().equals(platform.manifestKey()) && "bootstrap-native".equals(node.path("kind").asText())) {
-				try {
-					return URI.create(node.path("url").asText());
-				} catch (IllegalArgumentException e) {
-					return null;
-				}
-			}
-		}
-		return null;
-	}
-
-	/**
 	 * Finds the latest that matches the supplied input.
 	 *
 	 * @param channel        update channel to query
@@ -332,7 +278,7 @@ public final class RemoteUpdateService {
 		URI releasePageUri;
 		try {
 			releasePageUri = URI.create(bootstrap.path("releaseUrl").asText());
-		} catch (IllegalArgumentException e) {
+		} catch (final IllegalArgumentException e) {
 			releasePageUri = null;
 		}
 		return new BootstrapInstallerUpdate(currentVersion,
@@ -340,6 +286,60 @@ public final class RemoteUpdateService {
 				installerUri,
 				releasePageUri == null ? URI.create(BootstrapApp.RELEASES_URL) : releasePageUri,
 				platform);
+	}
+
+	/**
+	 * Detects the current value from the runtime environment.
+	 *
+	 * @return the detect platform result
+	 */
+	private Platform detectPlatform() {
+		return Platform.get();
+	}
+
+	/**
+	 * Finds the bootstrap node that matches the supplied input.
+	 *
+	 * @param manifest update manifest to inspect
+	 * @param channel  update channel to query
+	 * @return the matching bootstrap node, or {@code null} when no match exists
+	 */
+	private JsonNode findBootstrapNode(final JsonNode manifest, final UpdateChannel channel) {
+		final String latest = manifest.path("version").asText();
+		final Platform platform = this.detectPlatform();
+		final JsonNode entries = manifest.path("entries");
+		if (entries.isArray()) {
+			for (final JsonNode entry : entries) {
+				if (entry != null && entry.isObject() && Objects.equals(latest, entry.path("version").asText())) {
+					return entry;
+				}
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * Finds the installer URI that matches the supplied input.
+	 *
+	 * @param bootstrap bootstrap value used by the operation
+	 * @param platform  target platform to match
+	 * @return the matching installer URI, or {@code null} when no match exists
+	 */
+	private URI findInstallerUri(final JsonNode bootstrap, final Platform platform) {
+		final JsonNode assets = bootstrap.path("assets");
+		if (platform == Platform.UNSUPPORTED || assets == null || assets.isMissingNode() || !assets.isArray()) {
+			return null;
+		}
+		for (final JsonNode node : assets) {
+			if (node.path("platform").asText().equals(platform.manifestKey()) && "bootstrap-native".equals(node.path("kind").asText())) {
+				try {
+					return URI.create(node.path("url").asText());
+				} catch (final IllegalArgumentException e) {
+					return null;
+				}
+			}
+		}
+		return null;
 	}
 
 }

@@ -69,18 +69,6 @@ public final class ApplicationUpdateStorage {
 	}
 
 	/**
-	 * Deletes the if exists during bootstrap/update processing.
-	 *
-	 * @param path file system path to read or write
-	 * @return the delete if exists result
-	 * @throws IOException if the operation cannot be completed
-	 */
-	private long deleteIfExists(final Path path) throws IOException {
-		final long size = this.sizeOf(path);
-		return Files.deleteIfExists(path) ? size : 0L;
-	}
-
-	/**
 	 * Deletes downloaded update files that are no longer needed.
 	 *
 	 * @param activeChannel     active channel value used by the operation
@@ -139,6 +127,18 @@ public final class ApplicationUpdateStorage {
 	 */
 	public Path getUpdatesDirectory() {
 		return BootstrapApp.getApplicationsDirectory().toPath();
+	}
+
+	/**
+	 * Deletes the if exists during bootstrap/update processing.
+	 *
+	 * @param path file system path to read or write
+	 * @return the delete if exists result
+	 * @throws IOException if the operation cannot be completed
+	 */
+	private long deleteIfExists(final Path path) throws IOException {
+		final long size = this.sizeOf(path);
+		return Files.deleteIfExists(path) ? size : 0L;
 	}
 
 	/**

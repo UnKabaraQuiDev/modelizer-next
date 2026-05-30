@@ -62,30 +62,6 @@ public class MNMain {
 	}
 
 	/**
-	 * Creates a mapper.
-	 *
-	 * @return the created mapper
-	 */
-	private static ObjectMapper createMapper() {
-		final ObjectMapper mapper = new ObjectMapper(JsonFactory.builder()
-				.configure(StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION, true)
-				.configure(JsonReadFeature.ALLOW_JAVA_COMMENTS, true)
-				.build());
-
-		mapper.registerModule(new JavaTimeModule());
-		mapper.registerModule(new ColorModule());
-
-		mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-		mapper.enable(SerializationFeature.INDENT_OUTPUT);
-		mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
-
-		mapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.NONE);
-		mapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
-
-		return mapper;
-	}
-
-	/**
 	 * Starts the application entry point.
 	 *
 	 * @param args command-line arguments supplied by the launcher
@@ -131,6 +107,31 @@ public class MNMain {
 		new ProcessBuilder(restartCommand).directory(new File(System.getProperty("user.dir"))).inheritIO().start();
 
 		System.exit(0);
+	}
+
+	/**
+	 * Creates a mapper.
+	 *
+	 * @return the created mapper
+	 */
+	private static ObjectMapper createMapper() {
+		final ObjectMapper mapper = new ObjectMapper(JsonFactory.builder()
+				.configure(StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION, true)
+				.configure(JsonReadFeature.ALLOW_JAVA_COMMENTS, true)
+				.build());
+
+		mapper.registerModule(new LifecycleModule());
+		mapper.registerModule(new JavaTimeModule());
+		mapper.registerModule(new ColorModule());
+
+		mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+		mapper.enable(SerializationFeature.INDENT_OUTPUT);
+		mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+
+		mapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.NONE);
+		mapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
+
+		return mapper;
 	}
 
 }

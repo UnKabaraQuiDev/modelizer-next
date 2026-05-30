@@ -34,61 +34,13 @@ public final class ViewExporter {
 	public static final String SVG_NAMESPACE_URI = "http://www.w3.org/2000/svg";
 
 	/**
-	 * Returns an unused output path by adding a numeric suffix when needed.
+	 * Returns a file name without its last extension.
 	 *
-	 * @param originalFile file to read or write
-	 * @param usedPaths    used paths value used by the operation
-	 * @return the avoid duplicate path result
+	 * @param fileName name value to process
+	 * @return the base name
 	 */
-	private static File avoidDuplicatePath(final File originalFile, final Set<String> usedPaths) {
-		File candidate = originalFile;
-		int counter = 2;
-		while (!usedPaths.add(candidate.getAbsolutePath())) {
-			final String extension = PCUtils.removeFileExtension(candidate.getName()).equals(candidate.getName()) ? ""
-					: "." + ViewExporter.getExtension(candidate.getName());
-			final String nameWithoutExtension = PCUtils.removeFileExtension(originalFile.getName());
-			candidate = new File(originalFile.getParentFile(), nameWithoutExtension + "-" + counter + extension);
-			counter++;
-		}
-		return candidate;
-	}
-
-	/**
-	 * Builds a file name.
-	 *
-	 * @param rawPattern     text value for raw pattern
-	 * @param sourceFileName name value to use
-	 * @param panelType      diagram panel type whose model or layout should be used
-	 * @param format         export format to use
-	 * @return the built file name
-	 */
-	private static String
-			buildFileName(final String rawPattern, final String sourceFileName, final PanelType panelType, final ViewExportFormat format) {
-
-		String pattern = rawPattern == null || rawPattern.isBlank() ? ViewExporter.DEFAULT_FILE_PATTERN : rawPattern;
-		final LocalDateTime now = LocalDateTime.now();
-		pattern = pattern.replace("%FILENAME%", sourceFileName);
-		pattern = pattern.replace("%TYPE%", ViewExporter.typeToken(panelType));
-		pattern = pattern.replace("%EXTENSION%", format.getExtension());
-		pattern = pattern.replace("%DATE%", ViewExporter.DATE_FORMAT.format(now));
-		pattern = pattern.replace("%TIME%", ViewExporter.TIME_FORMAT.format(now));
-
-		final String cleaned = ViewExporter.sanitizeFileName(pattern);
-		return cleaned.isBlank() ? sourceFileName + "-" + ViewExporter.typeToken(panelType) + "." + format.getExtension() : cleaned;
-	}
-
-	/**
-	 * Ensures that the extension exists or is up to date.
-	 *
-	 * @param file      file to read or write
-	 * @param extension text value for extension
-	 * @return the ensure extension result
-	 */
-	private static File ensureExtension(final File file, final String extension) {
-		if (file.getName().toLowerCase().endsWith("." + extension.toLowerCase())) {
-			return file;
-		}
-		return new File(file.getParentFile(), file.getName() + "." + extension);
+	public static String baseName(final String fileName) {
+		return PCUtils.removeFileExtension(fileName == null ? "" : fileName);
 	}
 
 	/**
@@ -154,16 +106,6 @@ public final class ViewExporter {
 	}
 
 	/**
-	 * Returns a file name without its last extension.
-	 *
-	 * @param fileName name value to process
-	 * @return the base name
-	 */
-	public static String baseName(final String fileName) {
-		return PCUtils.removeFileExtension(fileName == null ? "" : fileName);
-	}
-
-	/**
 	 * Replaces date and time fields in an export text.
 	 *
 	 * @param value text value to process
@@ -176,8 +118,82 @@ public final class ViewExporter {
 
 		final LocalDateTime now = LocalDateTime.now();
 		value = value.replace("%DATE%", ViewExporter.DATE_FORMAT.format(now));
-		value = value.replace("%TIME%", ViewExporter.TIME_FORMAT.format(now));
-		return value;
+		return value.replace("%TIME%", ViewExporter.TIME_FORMAT.format(now));
+	}
+
+	/**
+	 * Returns the file-name token for a panel type.
+	 *
+	 * @param panelType diagram panel type whose model or layout should be used
+	 * @return the type token result
+	 */
+	public static String typeToken(final PanelType panelType) {
+		if (panelType == null) {
+			return "view";
+		}
+		return switch (panelType) {
+		case CONCEPTUAL -> "conceptual";
+		case LOGICAL -> "logical";
+		case PHYSICAL -> "physical";
+		};
+	}
+
+	/**
+	 * Returns an unused output path by adding a numeric suffix when needed.
+	 *
+	 * @param originalFile file to read or write
+	 * @param usedPaths    used paths value used by the operation
+	 * @return the avoid duplicate path result
+	 */
+	private static File avoidDuplicatePath(final File originalFile, final Set<String> usedPaths) {
+		File candidate = originalFile;
+		int counter = 2;
+		while (!usedPaths.add(candidate.getAbsolutePath())) {
+			final String extension = PCUtils.removeFileExtension(candidate.getName()).equals(candidate.getName()) ? ""
+					: "." + ViewExporter.getExtension(candidate.getName());
+			final String nameWithoutExtension = PCUtils.removeFileExtension(originalFile.getName());
+			candidate = new File(originalFile.getParentFile(), nameWithoutExtension + "-" + counter + extension);
+			counter++;
+		}
+		return candidate;
+	}
+
+	/**
+	 * Builds a file name.
+	 *
+	 * @param rawPattern     text value for raw pattern
+	 * @param sourceFileName name value to use
+	 * @param panelType      diagram panel type whose model or layout should be used
+	 * @param format         export format to use
+	 * @return the built file name
+	 */
+	private static String
+			buildFileName(final String rawPattern, final String sourceFileName, final PanelType panelType, final ViewExportFormat format) {
+
+		String pattern = rawPattern == null || rawPattern.isBlank() ? ViewExporter.DEFAULT_FILE_PATTERN : rawPattern;
+		final LocalDateTime now = LocalDateTime.now();
+		pattern = pattern.replace("%FILENAME%", sourceFileName);
+		pattern = pattern.replace("%TYPE%", ViewExporter.typeToken(panelType));
+		pattern = pattern.replace("%EXTENSION%", format.getExtension());
+		pattern = pattern.replace("%DATE%", ViewExporter.DATE_FORMAT.format(now));
+		pattern = pattern.replace("%TIME%", ViewExporter.TIME_FORMAT.format(now));
+
+		final String cleaned = ViewExporter.sanitizeFileName(pattern);
+		return cleaned.isBlank() ? sourceFileName + "-" + ViewExporter.typeToken(panelType) + "." + format.getExtension() : cleaned;
+	}
+
+	/**
+	 * Ensures that the extension exists or is up to date.
+	 *
+	 * @param file      file to read or write
+	 * @param extension text value for extension
+	 * @return the ensure extension result
+	 */
+	private static File ensureExtension(final File file, final String extension) {
+		if (file.getName().toLowerCase().endsWith("." + extension.toLowerCase())) {
+			return file;
+		}
+		return new File(file.getParentFile(), file.getName() + "." + extension);
 	}
 
 	/**
@@ -204,23 +220,6 @@ public final class ViewExporter {
 
 		final String normalized = Normalizer.normalize(value, Normalizer.Form.NFKC);
 		return normalized.replaceAll("[\\\\/:*?\"<>|]", "-").trim();
-	}
-
-	/**
-	 * Returns the file-name token for a panel type.
-	 *
-	 * @param panelType diagram panel type whose model or layout should be used
-	 * @return the type token result
-	 */
-	public static String typeToken(final PanelType panelType) {
-		if (panelType == null) {
-			return "view";
-		}
-		return switch (panelType) {
-		case CONCEPTUAL -> "conceptual";
-		case LOGICAL -> "logical";
-		case PHYSICAL -> "physical";
-		};
 	}
 
 	/**
