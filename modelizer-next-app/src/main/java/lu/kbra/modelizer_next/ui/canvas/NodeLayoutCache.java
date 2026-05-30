@@ -62,6 +62,7 @@ public interface NodeLayoutCache extends DiagramCanvasExt {
 	 * @return the matching or create node layout, or {@code null} when no match exists
 	 */
 	default NodeLayout findOrCreateNodeLayout(final LayoutObjectType objectType, final String objectId) {
+		// TODO: make this O(1)
 		for (final NodeLayout layout : this.getCanvas().getPanelState().getNodeLayouts()) {
 			if (layout.getObjectType() == objectType && layout.getObjectId().equals(objectId)) {
 				return layout;

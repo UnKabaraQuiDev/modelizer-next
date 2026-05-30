@@ -153,6 +153,34 @@ interface DiagramCanvasActionRegistrar extends DiagramCanvasExt {
 				KeyStroke.getKeyStroke(KeyEvent.VK_F, InputEvent.SHIFT_DOWN_MASK),
 				"focusAll",
 				actions.focusAll());
+
+		this.installActionBind(inputMap, actionMap, "syncPositionPrevious", actions.syncPositionPrevious());
+		this.installActionBind(inputMap, actionMap, "syncPositionConceptual", actions.syncPositionConceptual());
+		this.installActionBind(inputMap, actionMap, "syncPositionLogical", actions.syncPositionLogical());
+		this.installActionBind(inputMap, actionMap, "syncPositionPhysical", actions.syncPositionPhysical());
+		this.installActionBind(inputMap, actionMap, "syncSelectionPositionPrevious", actions.syncSelectionPositionPrevious());
+		this.installActionBind(inputMap, actionMap, "syncSelectionPositionConceptual", actions.syncSelectionPositionConceptual());
+		this.installActionBind(inputMap, actionMap, "syncSelectionPositionLogical", actions.syncSelectionPositionLogical());
+		this.installActionBind(inputMap, actionMap, "syncSelectionPositionPhysical", actions.syncSelectionPositionPhysical());
+	}
+
+	/**
+	 * Adds the action to the action map of the active canvas.
+	 *
+	 * @param inputMap  Swing input map to update
+	 * @param actionMap Swing action map to update
+	 * @param actionKey key under which the action is registered
+	 * @param action    action to register or execute
+	 */
+	default void installActionBind(final InputMap inputMap, final ActionMap actionMap, final String actionKey, final Runnable action) {
+		actionMap.put(actionKey, new AbstractAction() {
+
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				action.run();
+			}
+
+		});
 	}
 
 	/**
@@ -170,17 +198,8 @@ interface DiagramCanvasActionRegistrar extends DiagramCanvasExt {
 			final KeyStroke keyStroke,
 			final String actionKey,
 			final Runnable action) {
-
 		inputMap.put(keyStroke, actionKey);
-		actionMap.put(actionKey, new AbstractAction() {
-
-			@Override
-			public void actionPerformed(final ActionEvent e) {
-				action.run();
-			}
-
-		});
-
+		this.installActionBind(inputMap, actionMap, actionKey, action);
 	}
 
 }

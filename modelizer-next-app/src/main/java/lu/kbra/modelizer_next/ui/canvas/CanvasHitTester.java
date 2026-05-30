@@ -33,7 +33,7 @@ interface CanvasHitTester extends DiagramCanvasExt {
 	 * @return the matching field hit, or {@code null} when no match exists
 	 */
 	default FieldHitResult findFieldHit(final ClassModel classModel, final Rectangle2D classBounds, final Point2D.Double worldPoint) {
-		final List<FieldModel> visibleFields = this.getCanvas().getVisibleFields(classModel);
+		final List<FieldModel> visibleFields = classModel.getFields(getPanelType());
 
 		for (int i = 0; i < visibleFields.size(); i++) {
 			final Rectangle2D fieldBounds = new Rectangle2D.Double(classBounds.getX(),

@@ -50,8 +50,6 @@ final class MainFrameMenuBar extends JMenuBar {
 		this.add(this.createAppearanceMenu(frame));
 		this.add(this.createStylesMenu(frame));
 		this.add(new InfoMenu(frame));
-
-		frame.updateUndoRedoMenuItems();
 	}
 
 	/**

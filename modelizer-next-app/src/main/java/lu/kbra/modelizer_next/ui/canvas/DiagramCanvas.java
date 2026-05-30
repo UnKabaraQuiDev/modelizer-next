@@ -70,7 +70,8 @@ public class DiagramCanvas extends JPanel
 			NodeLayoutManager,
 			DiagramCanvasCoreSupport,
 			DiagramCanvasActionRegistrar,
-			LiveEditor {
+			LiveEditor,
+			LayoutEditor {
 
 	private static final long serialVersionUID = -768210073584363710L;
 

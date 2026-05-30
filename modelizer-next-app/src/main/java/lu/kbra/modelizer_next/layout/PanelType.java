@@ -9,13 +9,24 @@ public enum PanelType {
 	LOGICAL,
 	PHYSICAL;
 
-	/**
-	 * Checks whether technical is enabled or applies.
-	 *
-	 * @return {@code true} if technical is enabled or applies; otherwise {@code false}
-	 */
 	public boolean isTechnical() {
 		return this != CONCEPTUAL;
+	}
+
+	public PanelType previous() {
+		return switch (this) {
+		case CONCEPTUAL -> null;
+		case LOGICAL -> CONCEPTUAL;
+		case PHYSICAL -> LOGICAL;
+		};
+	}
+
+	public PanelType next() {
+		return switch (this) {
+		case CONCEPTUAL -> LOGICAL;
+		case LOGICAL -> PHYSICAL;
+		case PHYSICAL -> null;
+		};
 	}
 
 }

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="5.333333in"
+   height="5.333333in"
+   viewBox="0 0 511.99997 511.99997"
+   version="1.1"
+   id="svg1"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs1">
+    <clipPath
+       clipPathUnits="userSpaceOnUse"
+       id="clipPath28">
+      <path
+         id="path29"
+         style="display:none;fill:#e6e6fa;fill-opacity:1;stroke:none;stroke-width:9.44882;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:1.7;stroke-dasharray:none;stroke-opacity:1"
+         d="M 4819.748,0 V 121.74805 H 4698 v 268.5039 h 121.748 V 512 H 5088.25 V 390.25195 H 5210 V 121.74805 H 5088.25 V 0 Z" />
+      <path
+         id="lpe_path-effect29"
+         style="fill:#e6e6fa;fill-opacity:1;stroke:none;stroke-width:9.44882;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:1.7;stroke-dasharray:none;stroke-opacity:1"
+         class="powerclip"
+         d="m 4719.9419,36.199997 h 468.1164 V 475.8 H 4719.9419 Z M 4819.748,0 V 121.74805 H 4698 v 268.5039 h 121.748 V 512 H 5088.25 V 390.25195 H 5210 V 121.74805 H 5088.25 V 0 Z" />
+    </clipPath>
+  </defs>
+  <g
+     id="layer1"
+     transform="translate(-4697.9998)">
+    <path
+       style="fill:none;stroke:#000000;stroke-width:20;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:1.7;stroke-dasharray:none;stroke-opacity:1"
+       id="rect5"
+       width="438.11646"
+       height="409.60001"
+       x="4734.9419"
+       y="51.199997"
+       ry="29.302736"
+       clip-path="url(#clipPath28)"
+       d="m 4764.2446,51.199997 h 379.511 c 16.2337,0 29.3027,13.06902 29.3027,29.302736 V 431.49727 c 0,16.23371 -13.069,29.30273 -29.3027,29.30273 h -379.511 c -16.2337,0 -29.3027,-13.06902 -29.3027,-29.30273 V 80.502733 c 0,-16.233716 13.069,-29.302736 29.3027,-29.302736 z" />
+    <rect
+       style="fill:#7fff00;fill-opacity:1;stroke:#000000;stroke-width:6.018;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:1.7;stroke-dasharray:none"
+       id="rect28-3"
+       width="243.80211"
+       height="231.58203"
+       x="4832.0991"
+       y="140.20898"
+       ry="5.5001001"
+       d="m 613.02158,93.904465 h 329.95684 c 3.04705,0 5.5001,2.453044 5.5001,5.5001 V 412.27137 c 0,3.04705 -2.45305,5.5001 -5.5001,5.5001 H 613.02158 c -3.04705,0 -5.5001,-2.45305 -5.5001,-5.5001 V 99.404565 c 0,-3.047056 2.45305,-5.5001 5.5001,-5.5001 z" />
+  </g>
+</svg>

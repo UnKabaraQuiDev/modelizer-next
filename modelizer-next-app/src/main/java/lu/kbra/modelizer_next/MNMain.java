@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.swing.UIManager;
+
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.core.JsonFactory;
@@ -55,6 +57,8 @@ public class MNMain {
 		} catch (final Exception ignored) {
 			ignored.printStackTrace();
 		}
+
+		UIManager.put("Button.showMnemonics", Boolean.TRUE);
 	}
 
 	/**

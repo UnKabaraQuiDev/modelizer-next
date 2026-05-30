@@ -107,4 +107,17 @@ public class NodeLayout {
 				+ ", position=" + this.position + ", size=" + this.size + "]";
 	}
 
+	@Deprecated
+	public void set(NodeLayout otherLayout) {
+		this.objectType = otherLayout.objectType;
+		this.objectId = otherLayout.objectId;
+		this.position.setLocation(otherLayout.position);
+		this.size.setLocation(otherLayout.size);
+	}
+
+	public void setLayout(NodeLayout otherLayout) {
+		this.position.setLocation(otherLayout.position);
+		this.size.setLocation(otherLayout.size);
+	}
+
 }

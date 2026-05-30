@@ -50,6 +50,14 @@ public record DiagramCanvasActions(
 		Runnable editStyle,
 		Runnable editStyleAlt,
 		Runnable focusSelection,
-		Runnable focusAll) {
+		Runnable focusAll,
+		Runnable syncPositionPrevious,
+		Runnable syncPositionConceptual,
+		Runnable syncPositionLogical,
+		Runnable syncPositionPhysical,
+		Runnable syncSelectionPositionPrevious,
+		Runnable syncSelectionPositionConceptual,
+		Runnable syncSelectionPositionLogical,
+		Runnable syncSelectionPositionPhysical) {
 
 }

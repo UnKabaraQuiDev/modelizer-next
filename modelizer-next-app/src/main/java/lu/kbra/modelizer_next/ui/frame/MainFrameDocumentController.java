@@ -235,11 +235,6 @@ public interface MainFrameDocumentController {
 	}
 
 	/**
-	 * Updates the undo redo menu items.
-	 */
-	void updateUndoRedoMenuItems();
-
-	/**
 	 * Writes the document.
 	 *
 	 * @param file file to read or write
@@ -253,7 +248,7 @@ public interface MainFrameDocumentController {
 
 			MNMain.OBJECT_MAPPER.writeValue(file, this.getDocument());
 			this.getSession().markSaved(file);
-			this.updateUndoRedoMenuItems();
+			this.refreshToolbarMenuState();
 			this.refreshFrameTitle();
 			return true;
 		} catch (final IOException ex) {
@@ -264,5 +259,7 @@ public interface MainFrameDocumentController {
 			return false;
 		}
 	}
+
+	void refreshToolbarMenuState();
 
 }

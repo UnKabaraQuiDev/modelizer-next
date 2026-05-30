@@ -243,7 +243,7 @@ interface DiagramModelEditor extends DiagramCanvasExt {
 			return;
 		}
 
-		final List<FieldModel> visibleFields = this.getCanvas().getVisibleFields(classModel);
+		final List<FieldModel> visibleFields = classModel.getFields(getPanelType());
 		int currentIndex = -1;
 		for (int i = 0; i < visibleFields.size(); i++) {
 			if (Objects.equals(visibleFields.get(i).getId(), this.getCanvas().selectedElement.fieldId())) {

@@ -360,26 +360,6 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 	}
 
 	/**
-	 * Returns the visible fields.
-	 *
-	 * @param classModel class model affected by the operation
-	 * @return the visible fields
-	 */
-	@Deprecated
-	default List<FieldModel> getVisibleFields(final ClassModel classModel) {
-		final List<FieldModel> visibleFields = new ArrayList<>();
-
-		for (final FieldModel fieldModel : classModel.getFields()) {
-			if (this.getCanvas().panelType == PanelType.CONCEPTUAL && fieldModel.isTechnicalOnly()) {
-				continue;
-			}
-			visibleFields.add(fieldModel);
-		}
-
-		return visibleFields;
-	}
-
-	/**
 	 * Checks whether this object has an association class.
 	 *
 	 * @param linkModel link model affected by the operation
@@ -436,7 +416,15 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 						() -> this.getCanvas().editSelectionStyle(false),
 						() -> this.getCanvas().editSelectionStyle(true),
 						this.getCanvas()::focusSelection,
-						this.getCanvas()::focusAll));
+						this.getCanvas()::focusAll,
+						() -> getCanvas().synchronizePosition(false, getPanelType().previous()),
+						() -> getCanvas().synchronizePosition(false, PanelType.CONCEPTUAL),
+						() -> getCanvas().synchronizePosition(false, PanelType.LOGICAL),
+						() -> getCanvas().synchronizePosition(false, PanelType.PHYSICAL),
+						() -> getCanvas().synchronizePosition(true, getPanelType().previous()),
+						() -> getCanvas().synchronizePosition(true, PanelType.CONCEPTUAL),
+						() -> getCanvas().synchronizePosition(true, PanelType.LOGICAL),
+						() -> getCanvas().synchronizePosition(true, PanelType.PHYSICAL)));
 	}
 
 	/**
@@ -671,7 +659,7 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 			return new Point2D.Double(classBounds.getCenterX(), classBounds.getCenterY());
 		}
 
-		final List<FieldModel> visibleFields = this.getCanvas().getVisibleFields(classModel);
+		final List<FieldModel> visibleFields = classModel.getFields(getPanelType());
 		for (int i = 0; i < visibleFields.size(); i++) {
 			if (visibleFields.get(i).getId().equals(fieldId)) {
 				final double y = classBounds.getY() + DiagramCanvas.CLASS_HEADER_HEIGHT + i * DiagramCanvas.CLASS_ROW_HEIGHT
@@ -752,7 +740,7 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 
 		double centerX = classBounds.getCenterX();
 		if (fieldId != null) {
-			final List<FieldModel> visibleFields = this.getCanvas().getVisibleFields(classModel);
+			final List<FieldModel> visibleFields = classModel.getFields(getPanelType());
 			for (int i = 0; i < visibleFields.size(); i++) {
 				if (visibleFields.get(i).getId().equals(fieldId)) {
 					final Rectangle2D fieldBounds = new Rectangle2D.Double(classBounds.getX(),
@@ -791,7 +779,7 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 			return new Point2D.Double(x, classBounds.getCenterY());
 		}
 
-		final List<FieldModel> visibleFields = this.getCanvas().getVisibleFields(classModel);
+		final List<FieldModel> visibleFields = classModel.getFields(getPanelType());
 		for (int i = 0; i < visibleFields.size(); i++) {
 			if (visibleFields.get(i).getId().equals(fieldId)) {
 				final Rectangle2D fieldBounds = new Rectangle2D.Double(classBounds.getX(),
@@ -842,7 +830,7 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 					: new FieldAnchor(right, AnchorSide.RIGHT);
 		}
 
-		final List<FieldModel> visibleFields = this.getCanvas().getVisibleFields(classModel);
+		final List<FieldModel> visibleFields = classModel.getFields(getPanelType());
 		for (int i = 0; i < visibleFields.size(); i++) {
 			if (visibleFields.get(i).getId().equals(fieldId)) {
 				final Rectangle2D fieldBounds = new Rectangle2D.Double(classBounds.getX(),
@@ -887,7 +875,7 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 			return new Point2D.Double(x, classBounds.getCenterY());
 		}
 
-		final List<FieldModel> visibleFields = this.getCanvas().getVisibleFields(classModel);
+		final List<FieldModel> visibleFields = classModel.getFields(getPanelType());
 		for (int i = 0; i < visibleFields.size(); i++) {
 			if (visibleFields.get(i).getId().equals(fieldId)) {
 				final Rectangle2D fieldBounds = new Rectangle2D.Double(classBounds.getX(),

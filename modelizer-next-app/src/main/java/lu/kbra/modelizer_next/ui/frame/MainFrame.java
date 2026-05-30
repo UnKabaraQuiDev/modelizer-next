@@ -21,7 +21,6 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import javax.swing.ImageIcon;
-import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -181,7 +180,6 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 	void applyThemeAndReopen(final ThemeMode mode) {
 		App.CONFIG.setThemeMode(mode);
 		App.saveConfig();
-		// TODO: Maybe use SwingUtilities.updateComponentTreeUI(...); ?
 		this.reopenWithCurrentDocument();
 	}
 
@@ -289,7 +287,7 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 		return new DockableDiagramPanel("modelizer-next." + System.identityHashCode(this) + "." + id, title, canvas, () -> {
 			this.activeCanvas = canvas;
 			this.updateSelectionLabel(canvas.getSelectionInfo());
-			this.refreshToolbarLabels();
+			this.refreshToolbarMenuState();
 		});
 	}
 
@@ -495,8 +493,7 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 	 */
 	void onDocumentChanged() {
 		this.session.markChanged();
-		this.updateUndoRedoMenuItems();
-		this.refreshFrameTitle();
+		this.refreshToolbarMenuState();
 	}
 
 	/**
@@ -538,9 +535,7 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 		this.logicalCanvas.resetUiAfterDocumentRestore();
 		this.physicalCanvas.resetUiAfterDocumentRestore();
 		this.updateSelectionLabel(this.getActiveCanvas().getSelectionInfo());
-		this.refreshToolbarLabels();
-		this.updateUndoRedoMenuItems();
-		this.refreshFrameTitle();
+		this.refreshToolbarMenuState();
 		this.revalidate();
 		this.repaint();
 	}
@@ -558,20 +553,18 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 	/**
 	 * Refreshes the toolbar labels from the current state.
 	 */
-	void refreshToolbarLabels() {
-		for (int i = 0; i < this.toolBar.getComponentCount(); i++) {
-			if (this.toolBar.getComponent(i) instanceof final JButton button) {
-				final String actionKey = (String) button.getClientProperty("actionKey");
-				final String baseText = (String) button.getClientProperty("baseText");
-				if (actionKey == null || baseText == null) {
-					continue;
-				}
-
-				final DiagramCanvas canvas = this.getActiveCanvas();
-				final String shortcutText = canvas == null ? "" : this.findShortcutText(canvas, actionKey);
-				button.setText(shortcutText.isBlank() ? baseText : baseText + " (" + shortcutText + ")");
-			}
+	@Override
+	public void refreshToolbarMenuState() {
+		if (this.undoMenuItem != null) {
+			this.undoMenuItem.setEnabled(this.session.canUndo());
 		}
+		if (this.redoMenuItem != null) {
+			this.redoMenuItem.setEnabled(this.session.canRedo());
+		}
+
+		this.toolBar.refreshToolbarState(this);
+
+		refreshFrameTitle();
 	}
 
 	/**
@@ -679,9 +672,7 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 
 		this.installFileDropSupport();
 		this.updateSelectionLabel(this.getActiveCanvas().getSelectionInfo());
-		this.refreshToolbarLabels();
-		this.updateUndoRedoMenuItems();
-		this.refreshFrameTitle();
+		this.refreshToolbarMenuState();
 		this.revalidate();
 		this.repaint();
 	}
@@ -708,25 +699,12 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 		this.selectionPathLabel.setText(path);
 	}
 
-	/**
-	 * Updates the undo redo menu items.
-	 */
-	@Override
-	public void updateUndoRedoMenuItems() {
-		if (this.undoMenuItem != null) {
-			this.undoMenuItem.setEnabled(this.session.canUndo());
-		}
-		if (this.redoMenuItem != null) {
-			this.redoMenuItem.setEnabled(this.session.canRedo());
-		}
-		if (this.toolBar != null) {
-			if (this.toolBar.undoButton != null) {
-				this.toolBar.undoButton.setEnabled(this.session.canUndo());
-			}
-			if (this.toolBar.redoButton != null) {
-				this.toolBar.redoButton.setEnabled(this.session.canRedo());
-			}
-		}
+	public DiagramCanvas getCanvas(final PanelType otherPanelType) {
+		return switch (otherPanelType) {
+		case CONCEPTUAL -> this.conceptualCanvas;
+		case LOGICAL -> this.logicalCanvas;
+		case PHYSICAL -> this.physicalCanvas;
+		};
 	}
 
 }
