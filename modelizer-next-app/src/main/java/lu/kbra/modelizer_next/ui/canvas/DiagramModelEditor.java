@@ -230,7 +230,8 @@ interface DiagramModelEditor extends DiagramCanvasExt {
 				return;
 			}
 			this.getCanvas()
-					.select(SelectedElement.forField(this.getCanvas().selectedElement.classId(), classModel.getFields().get(0).getId()));
+					.select(SelectedElement.forField(this.getCanvas().selectedElement.classId(),
+							classModel.getFields().get(delta >= 0 ? 0 : classModel.getFields(getPanelType()).size() - 1).getId()));
 			return;
 		}
 
@@ -252,17 +253,13 @@ interface DiagramModelEditor extends DiagramCanvasExt {
 			}
 		}
 
-		if (currentIndex == 0 && delta == -1) {
-			this.getCanvas().select(SelectedElement.forClass(classModel.getId()));
-			return;
-		}
-
 		if (currentIndex < 0) {
-			return;
+			currentIndex = 0;
 		}
 
 		final int newIndex = currentIndex + delta;
 		if (newIndex < 0 || newIndex >= visibleFields.size()) {
+			this.getCanvas().select(SelectedElement.forClass(classModel.getId()));
 			return;
 		}
 
