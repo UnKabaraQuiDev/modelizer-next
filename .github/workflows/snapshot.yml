@@ -366,6 +366,6 @@ jobs:
 
           bash "$GITHUB_WORKSPACE/script/rebuild-versions-manifest.sh" registry registry/versions.json
 
-          git add -A script .gitignore registry/release.json registry/snapshot.json registry/nightly.json registry/versions.json
+          git add -A -f script .gitignore registry/release.json registry/snapshot.json registry/nightly.json registry/versions.json
           git commit -m "[bot] Sync scripts from main and update snapshot registry to $VERSION" || exit 0
           git push origin HEAD:registry
