@@ -16,11 +16,11 @@
     "updatedAt": "2026-05-29T13:23:27Z"
   },
   "nightly": {
-    "version": "9-NIGHTLY-275",
-    "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/9-NIGHTLY-275/modelizer-next-app-9-NIGHTLY-275.jar",
-    "releaseUrl": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/tag/9-NIGHTLY-275",
+    "version": "8-NIGHTLY-286",
+    "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/8-NIGHTLY-286/modelizer-next-app-8-NIGHTLY-286.jar",
+    "releaseUrl": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/tag/8-NIGHTLY-286",
     "notes": "Latest nightly build.",
-    "tag": "9-NIGHTLY-275",
-    "updatedAt": "2026-05-29T05:26:12Z"
+    "tag": "8-NIGHTLY-286",
+    "updatedAt": "2026-05-30T12:34:22Z"
   }
 }
