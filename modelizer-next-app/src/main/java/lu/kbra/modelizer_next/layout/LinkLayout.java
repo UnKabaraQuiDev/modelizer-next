@@ -10,6 +10,7 @@ import java.util.List;
 public class LinkLayout {
 
 	private String linkId;
+	// TODO: remove this, because it is unused ?
 	private List<Point2D.Double> bendPoints;
 	private Point2D.Double nameLabelPosition;
 

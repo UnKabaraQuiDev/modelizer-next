@@ -456,34 +456,37 @@ public interface ElementRenderer extends DiagramCanvasExt {
 			g2.setStroke(DiagramCanvas.DEFAULT_STROKE);
 
 			if (this.getPanelType() == PanelType.CONCEPTUAL && linkModel.getLabel() != null && !linkModel.getLabel().isBlank()) {
+				final boolean isSelfLinking = linkModel.isSelfLinking();
+
 				this.getCanvas()
 						.drawAlignedLinkLabel(g2,
 								linkModel.getLabel(),
 								geometry.labelPoint(),
-								geometry.labelAngle(),
+								isSelfLinking ? 0 : geometry.labelAngle(),
 								false,
 								Direction2D.CENTER);
 			}
 
 			if (this.getPanelType() == PanelType.CONCEPTUAL) {
-				final boolean isEdgeLink = linkModel.isSelfLinking();
+				final boolean isSelfLinking = linkModel.isSelfLinking();
+				final double angle = isSelfLinking ? 0 : geometry.labelAngle();
 
 				{
 					final Point2D anchor = geometry.fromPoint();
 					final Point2D adjacentPoint = geometry.points().get(1);
-					final double angle = geometry.labelAngle();
 
 					final double currentAngle = Math.atan2(adjacentPoint.getY() - anchor.getY(), adjacentPoint.getX() - anchor.getX());
 					final boolean shouldFlipText = currentAngle > Math.PI / 2 || currentAngle < -Math.PI / 2;
 					final Direction2D defaultDirection = shouldFlipText ? Direction2D.TRAILING : Direction2D.HEADING;
 
+					System.err.println(angle);
 					if (linkModel.getCardinalityFrom() != null) {
 						this.getCanvas()
 								.drawAlignedLinkLabel(g2,
 										linkModel.getCardinalityFrom().getDisplayValue(),
 										anchor,
 										angle,
-										isEdgeLink && geometry.fromSide() == AnchorSide.BOTTOM,
+										isSelfLinking && geometry.fromSide() == AnchorSide.BOTTOM,
 										defaultDirection);
 					}
 					if (linkModel.getLabelFrom() != null) {
@@ -492,8 +495,9 @@ public interface ElementRenderer extends DiagramCanvasExt {
 										linkModel.getLabelFrom(),
 										anchor,
 										angle,
-										isEdgeLink ? geometry.fromSide().isLeftRight() || geometry.fromSide() == AnchorSide.BOTTOM : true,
-										isEdgeLink && (geometry.fromSide().isTopBottom() || geometry.fromSide() == AnchorSide.LEFT)
+										isSelfLinking ? geometry.fromSide().isLeftRight() || geometry.fromSide() == AnchorSide.BOTTOM
+												: true,
+										isSelfLinking && (geometry.fromSide().isTopBottom() || geometry.fromSide() == AnchorSide.LEFT)
 												? Direction2D.TRAILING
 												: defaultDirection);
 					}
@@ -502,7 +506,6 @@ public interface ElementRenderer extends DiagramCanvasExt {
 				{
 					final Point2D anchor = geometry.toPoint();
 					final Point2D adjacentPoint = geometry.points().get(geometry.points().size() - 2);
-					final double angle = geometry.labelAngle();
 
 					final double currentAngle = Math.atan2(adjacentPoint.getY() - anchor.getY(), adjacentPoint.getX() - anchor.getX());
 					final boolean shouldFlipText = currentAngle > Math.PI / 2 || currentAngle < -Math.PI / 2;
@@ -513,7 +516,7 @@ public interface ElementRenderer extends DiagramCanvasExt {
 										linkModel.getCardinalityTo().getDisplayValue(),
 										anchor,
 										angle,
-										isEdgeLink && geometry.toSide() == AnchorSide.BOTTOM,
+										isSelfLinking && geometry.toSide() == AnchorSide.BOTTOM,
 										defaultDirection);
 					}
 					if (linkModel.getLabelTo() != null) {
@@ -522,8 +525,8 @@ public interface ElementRenderer extends DiagramCanvasExt {
 										linkModel.getLabelTo(),
 										anchor,
 										angle,
-										isEdgeLink ? geometry.toSide().isLeftRight() || geometry.toSide() == AnchorSide.BOTTOM : true,
-										isEdgeLink && (geometry.toSide().isTopBottom() || geometry.toSide() == AnchorSide.LEFT)
+										isSelfLinking ? geometry.toSide().isLeftRight() || geometry.toSide() == AnchorSide.BOTTOM : true,
+										isSelfLinking && (geometry.toSide().isTopBottom() || geometry.toSide() == AnchorSide.LEFT)
 												? Direction2D.TRAILING
 												: defaultDirection);
 					}
