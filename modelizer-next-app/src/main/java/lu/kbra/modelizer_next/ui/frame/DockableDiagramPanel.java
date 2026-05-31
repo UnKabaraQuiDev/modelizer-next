@@ -8,9 +8,10 @@ import java.awt.event.MouseEvent;
 
 import javax.swing.JPanel;
 
+import lu.kbra.modelizer_next.ui.canvas.DiagramCanvas;
+
 import io.github.andrewauclair.moderndocking.Dockable;
 import io.github.andrewauclair.moderndocking.app.Docking;
-import lu.kbra.modelizer_next.ui.canvas.DiagramCanvas;
 
 /**
  * Dockable Swing panel that wraps a diagram canvas.
