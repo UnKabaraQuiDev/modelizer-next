@@ -115,7 +115,6 @@ public interface LiveEditor extends DiagramCanvasExt {
 	 * Applies the style on the active canvas.
 	 *
 	 * @param palette         palette value used by the operation
-	 * @param liveEditElement live edit element value used by the operation
 	 */
 	default void applyStyle(final StylePalette palette) {
 		final LiveEditElement liveEditElement = this.getCanvas().liveEditElement;
