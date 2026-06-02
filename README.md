@@ -22,7 +22,7 @@
   <tr>
     <td>
       <strong>Export models as images</strong><br>
-      Supports <code>.svg</code> and  <code>.png</code>. A command line export option is also present, try <code>modelizer-next --help</code> for information
+      Supports <code>.svg</code>, <code>.webp</code>, <code>jpeg</code>, <code>.tif</code>, <code>.tiff</code>, <code>.bmp</code> and  <code>.png</code>. A command line export option is also present, try <code>modelizer-next --help</code> for information
     </td>
   </tr>
   <tr>
