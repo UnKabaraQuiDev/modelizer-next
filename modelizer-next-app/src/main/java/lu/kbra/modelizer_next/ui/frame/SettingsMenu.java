@@ -18,7 +18,9 @@ public class SettingsMenu extends JMenu {
 
 	public SettingsMenu(final MainFrame frame) {
 		super("Settings");
-		this.add(this.createCheckboxItem("Emulate middle mouse button", v -> App.editConfig(c -> c.setEmulateMiddleClick(v))));
+		this.add(this.createCheckboxItem("Emulate middle mouse button",
+				v -> App.editConfig(c -> c.setEmulateMiddleClick(v)),
+				App.CONFIG.isEmulateMiddleClick()));
 		this.add(this.createModifierMaskItem("Key modifier",
 				mask -> App.editConfig(c -> c.setAlternativeLiveEditKey(mask)),
 				App.CONFIG.hasAlternativeLiveEditKey() ? App.CONFIG.getAlternativeLiveEditKey() : 0));
@@ -57,8 +59,9 @@ public class SettingsMenu extends JMenu {
 		return menu;
 	}
 
-	private JMenuItem createCheckboxItem(final String text, final Consumer<Boolean> hook) {
+	private JMenuItem createCheckboxItem(final String text, final Consumer<Boolean> hook, final boolean checked) {
 		final JCheckBoxMenuItem item = new JCheckBoxMenuItem(text);
+		item.setSelected(checked);
 		item.addActionListener(e -> hook.accept(item.isSelected()));
 		return item;
 	}

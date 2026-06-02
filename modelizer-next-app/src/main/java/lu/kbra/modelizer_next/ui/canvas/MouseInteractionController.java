@@ -9,6 +9,7 @@ import java.awt.geom.Rectangle2D;
 
 import javax.swing.SwingUtilities;
 
+import lu.kbra.modelizer_next.common.App;
 import lu.kbra.modelizer_next.layout.PanelState;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.DraggedLayout;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.HitResult;
@@ -149,7 +150,7 @@ interface MouseInteractionController extends DiagramCanvasExt {
 		this.getCanvas().requestFocusInWindow();
 		this.getCanvas().lastScreenPoint = event.getPoint();
 
-		if (SwingUtilities.isMiddleMouseButton(event)) {
+		if (SwingUtilities.isMiddleMouseButton(event) || (App.CONFIG.isEmulateMiddleClick() && SwingUtilities.isLeftMouseButton(event))) {
 			this.getCanvas().panning = true;
 			this.getCanvas().setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
 			return;
