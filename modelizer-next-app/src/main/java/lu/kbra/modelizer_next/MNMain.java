@@ -24,6 +24,7 @@ import lu.kbra.modelizer_next.common.AppConfig;
 import lu.kbra.modelizer_next.common.FileOpenBridge;
 import lu.kbra.modelizer_next.common.SystemThemeDetector;
 import lu.kbra.modelizer_next.json.ColorModule;
+import lu.kbra.modelizer_next.json.LifecycleModule;
 import lu.kbra.modelizer_next.ui.ThemeMode;
 
 /**

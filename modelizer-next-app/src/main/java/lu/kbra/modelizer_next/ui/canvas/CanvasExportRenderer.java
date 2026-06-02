@@ -97,7 +97,7 @@ interface CanvasExportRenderer extends DiagramCanvasExt {
 		this.getCanvas().suppressInteractiveOverlays = true;
 
 		try {
-			final Dimension exportSize = this.getCanvas().computeExportSize(graphics, scope);
+//			final Dimension exportSize = this.getCanvas().computeExportSize(graphics, scope);
 			final Rectangle2D.Double worldBounds = this.getCanvas().computeExportWorldBounds(graphics, scope);
 
 			final AffineTransform oldTransform = graphics.getTransform();

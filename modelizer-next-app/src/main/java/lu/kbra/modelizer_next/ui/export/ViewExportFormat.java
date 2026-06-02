@@ -22,73 +22,28 @@ import lu.kbra.modelizer_next.ui.canvas.DiagramCanvas;
  */
 public enum ViewExportFormat {
 
-	PNG("png", "PNG", true) {
+	SVG("svg", "SVG", true) {
 
 		@Override
 		public void
 				export(final DiagramCanvas canvas, final ViewExportRequest request, final ViewExportContext context, final File outputFile)
 						throws IOException {
-			ViewExportFormat.writeImage(canvas.createExportImage(request.scope()), request, "png", outputFile, this.supportsTransparency());
+			SvgViewExporter.export(canvas, request, context, outputFile);
 		}
 
 	},
 
-	JPEG("jpg", "JPEG", false) {
+	PNG("png", "PNG", true),
 
-		@Override
-		public void
-				export(final DiagramCanvas canvas, final ViewExportRequest request, final ViewExportContext context, final File outputFile)
-						throws IOException {
-			ViewExportFormat.writeImage(canvas.createExportImage(request.scope()), request, "jpg", outputFile, this.supportsTransparency());
-		}
+	JPEG("jpg", "JPEG", false),
 
-	},
+	BMP("bmp", "BMP", false),
 
-	BMP("bmp", "BMP", false) {
+	TIFF("tiff", "TIFF", true),
 
-		@Override
-		public void
-				export(final DiagramCanvas canvas, final ViewExportRequest request, final ViewExportContext context, final File outputFile)
-						throws IOException {
-			ViewExportFormat.writeImage(canvas.createExportImage(request.scope()), request, "bmp", outputFile, this.supportsTransparency());
-		}
+	TIF("tif", "TIF", true),
 
-	},
-
-	TIFF("tiff", "TIFF", true) {
-
-		@Override
-		public void
-				export(final DiagramCanvas canvas, final ViewExportRequest request, final ViewExportContext context, final File outputFile)
-						throws IOException {
-			ViewExportFormat
-					.writeImage(canvas.createExportImage(request.scope()), request, "tiff", outputFile, this.supportsTransparency());
-		}
-
-	},
-
-	TIF("tif", "TIF", true) {
-
-		@Override
-		public void
-				export(final DiagramCanvas canvas, final ViewExportRequest request, final ViewExportContext context, final File outputFile)
-						throws IOException {
-			ViewExportFormat.writeImage(canvas.createExportImage(request.scope()), request, "tif", outputFile, this.supportsTransparency());
-		}
-
-	},
-
-	WEBP("webp", "WebP", true) {
-
-		@Override
-		public void
-				export(final DiagramCanvas canvas, final ViewExportRequest request, final ViewExportContext context, final File outputFile)
-						throws IOException {
-			ViewExportFormat
-					.writeImage(canvas.createExportImage(request.scope()), request, "webp", outputFile, this.supportsTransparency());
-		}
-
-	},
+	WEBP("webp", "WebP", true),
 
 	PDF("pdf", "PDF", false) {
 
@@ -197,8 +152,11 @@ public enum ViewExportFormat {
 	 * @param outputFile target file
 	 * @throws IOException if the file cannot be written
 	 */
-	public abstract void export(DiagramCanvas canvas, ViewExportRequest request, ViewExportContext context, File outputFile)
-			throws IOException;
+	public void export(final DiagramCanvas canvas, final ViewExportRequest request, final ViewExportContext context, final File outputFile)
+			throws IOException {
+		ViewExportFormat
+				.writeImage(canvas.createExportImage(request.scope()), request, this.extension, outputFile, this.supportsTransparency());
+	}
 
 	/**
 	 * Returns the display name.

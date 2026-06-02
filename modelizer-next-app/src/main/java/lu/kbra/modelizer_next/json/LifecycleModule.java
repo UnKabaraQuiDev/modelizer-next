@@ -1,4 +1,4 @@
-package lu.kbra.modelizer_next;
+package lu.kbra.modelizer_next.json;
 
 import java.io.IOException;
 
