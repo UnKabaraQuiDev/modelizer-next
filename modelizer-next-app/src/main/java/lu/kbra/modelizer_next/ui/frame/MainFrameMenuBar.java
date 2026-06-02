@@ -49,6 +49,7 @@ final class MainFrameMenuBar extends JMenuBar {
 		this.add(new InsertMenu(frame));
 		this.add(this.createAppearanceMenu(frame));
 		this.add(this.createStylesMenu(frame));
+		this.add(new SettingsMenu(frame));
 		this.add(new InfoMenu(frame));
 	}
 

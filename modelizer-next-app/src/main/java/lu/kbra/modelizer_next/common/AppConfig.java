@@ -1,5 +1,6 @@
 package lu.kbra.modelizer_next.common;
 
+import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,6 +17,8 @@ public class AppConfig {
 	private List<String> pinnedPaletteNames = new ArrayList<>();
 	private boolean autoCheckUpdates = true;
 	private String skippedUpdateVersion;
+	private boolean emulateMiddleClick = false;
+	private Integer alternativeLiveEditKey;
 
 	/**
 	 * Returns the default palette name.
@@ -128,17 +131,32 @@ public class AppConfig {
 		this.themeMode = themeMode;
 	}
 
-	/**
-	 * Builds a debug string for this application config.
-	 *
-	 * @return a debug string for this object
-	 */
+	public boolean isEmulateMiddleClick() {
+		return emulateMiddleClick;
+	}
+
+	public void setEmulateMiddleClick(boolean emulateMiddleClick) {
+		this.emulateMiddleClick = emulateMiddleClick;
+	}
+
+	public int getAlternativeLiveEditKey() {
+		return alternativeLiveEditKey == null ? KeyEvent.ALT_DOWN_MASK : alternativeLiveEditKey;
+	}
+
+	public void setAlternativeLiveEditKey(Integer alternativeLiveEditKey) {
+		this.alternativeLiveEditKey = alternativeLiveEditKey == null || alternativeLiveEditKey == 0 ? null : alternativeLiveEditKey;
+	}
+
+	public boolean hasAlternativeLiveEditKey() {
+		return alternativeLiveEditKey != null;
+	}
+
 	@Override
 	public String toString() {
-		return "AppConfig@" + System.identityHashCode(this) + " [themeMode=" + this.themeMode + ", selectedPaletteName="
-				+ this.selectedPaletteName + ", defaultPaletteName=" + this.defaultPaletteName + ", pinnedPaletteNames="
-				+ this.getPinnedPaletteNames() + ", autoCheckUpdates=" + this.autoCheckUpdates + ", skippedUpdateVersion="
-				+ this.skippedUpdateVersion + "]";
+		return "AppConfig@" + System.identityHashCode(this) + " [themeMode=" + themeMode + ", selectedPaletteName=" + selectedPaletteName
+				+ ", defaultPaletteName=" + defaultPaletteName + ", pinnedPaletteNames=" + pinnedPaletteNames + ", autoCheckUpdates="
+				+ autoCheckUpdates + ", skippedUpdateVersion=" + skippedUpdateVersion + ", emulateMiddleClick=" + emulateMiddleClick
+				+ ", alternativeLiveEditKey=" + alternativeLiveEditKey + "]";
 	}
 
 }

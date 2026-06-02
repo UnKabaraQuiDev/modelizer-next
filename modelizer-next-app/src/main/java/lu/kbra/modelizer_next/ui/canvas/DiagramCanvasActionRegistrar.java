@@ -10,6 +10,8 @@ import javax.swing.InputMap;
 import javax.swing.JComponent;
 import javax.swing.KeyStroke;
 
+import lu.kbra.modelizer_next.common.App;
+import lu.kbra.modelizer_next.common.AppConfig;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.DiagramCanvasActions;
 import lu.kbra.modelizer_next.ui.frame.MainFrame;
 
@@ -46,6 +48,8 @@ interface DiagramCanvasActionRegistrar extends DiagramCanvasExt {
 		final InputMap inputMap = this.getCanvas().getInputMap(JComponent.WHEN_FOCUSED);
 		final ActionMap actionMap = this.getCanvas().getActionMap();
 
+		final AppConfig config = App.CONFIG;
+
 		this.installKeyBind(inputMap, actionMap, KeyStroke.getKeyStroke(KeyEvent.VK_Z, MainFrame.CTRL_MODIFIER), "undo", actions.undo());
 		this.installKeyBind(inputMap,
 				actionMap,
@@ -60,14 +64,14 @@ interface DiagramCanvasActionRegistrar extends DiagramCanvasExt {
 				actions.editStyle());
 		this.installKeyBind(inputMap,
 				actionMap,
-				KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.SHIFT_DOWN_MASK | InputEvent.ALT_DOWN_MASK),
+				KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.SHIFT_DOWN_MASK | config.getAlternativeLiveEditKey()),
 				"editSelectionStyleAlt",
 				actions.editStyleAlt());
 
 		this.installKeyBind(inputMap, actionMap, KeyStroke.getKeyStroke(KeyEvent.VK_F2, 0), "renameSelection", actions.renameSelection());
 		this.installKeyBind(inputMap,
 				actionMap,
-				KeyStroke.getKeyStroke(KeyEvent.VK_F2, InputEvent.ALT_DOWN_MASK),
+				KeyStroke.getKeyStroke(KeyEvent.VK_F2, config.getAlternativeLiveEditKey()),
 				"renameSelectionAlt",
 				actions.renameSelectionAlt());
 
@@ -200,6 +204,12 @@ interface DiagramCanvasActionRegistrar extends DiagramCanvasExt {
 			final Runnable action) {
 		inputMap.put(keyStroke, actionKey);
 		this.installActionBind(inputMap, actionMap, actionKey, action);
+	}
+
+	default void resetKeyBinds() {
+		final DiagramCanvas canvas = this.getCanvas();
+		canvas.setInputMap(JComponent.WHEN_FOCUSED, new InputMap());
+		canvas.setActionMap(new ActionMap());
 	}
 
 }

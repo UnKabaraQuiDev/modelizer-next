@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import lu.kbra.modelizer_next.common.App;
 import lu.kbra.modelizer_next.domain.ClassModel;
 import lu.kbra.modelizer_next.domain.CommentModel;
 import lu.kbra.modelizer_next.domain.FieldModel;
@@ -392,6 +393,7 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 	 * Installs the key bindings on the active canvas.
 	 */
 	default void installKeyBindings() {
+		this.getCanvas().resetKeyBinds();
 		this.getCanvas()
 				.installDefaultKeyBindings(new DiagramCanvasActions(() -> this.getCanvas().renameSelection(false),
 						() -> this.getCanvas().renameSelection(true),

@@ -2,6 +2,9 @@ package lu.kbra.modelizer_next.common;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.function.Consumer;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -31,6 +34,8 @@ public class App {
 	public static String AUTHOR_WEBSITE_URL;
 
 	public static AppConfig CONFIG;
+
+	private static Set<Consumer<AppConfig>> CONFIG_HOOKS = new HashSet<>();
 
 	/**
 	 * Ensures that the dirs exists exists or is up to date.
@@ -163,6 +168,20 @@ public class App {
 	 */
 	public static String title(final String title) {
 		return App.NAME + " - " + title;
+	}
+
+	public static void editConfig(final Consumer<AppConfig> configEditor) {
+		configEditor.accept(App.CONFIG);
+		try {
+			CONFIG_HOOKS.parallelStream().forEach(v -> v.accept(App.CONFIG));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		App.saveConfig();
+	}
+
+	public static void addConfigHook(Consumer<AppConfig> appConfig) {
+		CONFIG_HOOKS.add(appConfig);
 	}
 
 }

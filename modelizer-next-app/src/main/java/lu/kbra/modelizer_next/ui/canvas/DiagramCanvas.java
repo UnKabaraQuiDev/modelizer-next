@@ -21,6 +21,7 @@ import java.util.Map;
 import javax.swing.Action;
 import javax.swing.JPanel;
 
+import lu.kbra.modelizer_next.common.App;
 import lu.kbra.modelizer_next.document.ModelDocument;
 import lu.kbra.modelizer_next.domain.ClassModel;
 import lu.kbra.modelizer_next.layout.PanelState;
@@ -214,6 +215,7 @@ public class DiagramCanvas extends JPanel
 		super.setFocusable(true);
 
 		this.installKeyBindings();
+		App.addConfigHook(config -> this.installKeyBindings());
 
 		final MouseAdapter mouseAdapter = this.createMouseAdapter();
 		super.addMouseListener(mouseAdapter);
