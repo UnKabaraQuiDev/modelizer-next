@@ -13,6 +13,7 @@ import com.formdev.flatlaf.FlatLightLaf;
 
 import lu.kbra.modelizer_next.common.FileOpenBridge;
 import lu.kbra.modelizer_next.common.SystemThemeDetector;
+import lu.kbra.pclib.PCUtils;
 
 /**
  * Native bootstrap main class that starts the bootstrap runtime.
@@ -66,7 +67,7 @@ public final class BootstrapMain {
 			ex.printStackTrace();
 			SwingUtilities.invokeLater(() -> {
 				JOptionPane.showMessageDialog(null,
-						"Failed to start Modelizer Next:\n" + ex.getMessage(),
+						"Failed to start Modelizer Next:\n" + PCUtils.getStackTraceAsString(ex),
 						"Bootstrap error",
 						JOptionPane.ERROR_MESSAGE);
 				System.exit(1);

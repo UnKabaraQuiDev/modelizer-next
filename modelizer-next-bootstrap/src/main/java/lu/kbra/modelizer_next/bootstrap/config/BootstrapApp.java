@@ -45,8 +45,8 @@ public final class BootstrapApp {
 	 * @throws IOException if the operation cannot be completed
 	 */
 	public static void ensureDirectories() throws IOException {
-		BootstrapApp.getHomeDirectory().mkdirs();
-		BootstrapApp.getApplicationsDirectory().mkdirs();
+		BootstrapApp.getApplicationDirectory().mkdirs();
+		BootstrapApp.getupdatesDirectory().mkdirs();
 		BootstrapApp.getTempDirectory().mkdirs();
 	}
 
@@ -55,8 +55,8 @@ public final class BootstrapApp {
 	 *
 	 * @return the applications directory
 	 */
-	public static File getApplicationsDirectory() {
-		return new File(BootstrapApp.getHomeDirectory(), "updates");
+	public static File getupdatesDirectory() {
+		return new File(BootstrapApp.getApplicationDirectory(), "updates");
 	}
 
 	/**
@@ -65,7 +65,7 @@ public final class BootstrapApp {
 	 * @return the bootstrap config file
 	 */
 	public static File getBootstrapConfigFile() {
-		return new File(BootstrapApp.getHomeDirectory(), "bootstrap-config.json");
+		return new File(BootstrapApp.getApplicationDirectory(), "bootstrap-config.json");
 	}
 
 	/**
@@ -73,7 +73,7 @@ public final class BootstrapApp {
 	 *
 	 * @return the home directory
 	 */
-	public static File getHomeDirectory() {
+	public static File getApplicationDirectory() {
 		final String override = System.getProperty(BootstrapApp.APP_DIR_PROPERTY);
 		if (override != null && !override.isBlank()) {
 			return new File(override);
@@ -91,6 +91,38 @@ public final class BootstrapApp {
 			return new File(home, "Library/Application Support/" + BootstrapApp.APP_FOLDER_NAME);
 		}
 
+		final String xdgConfigHome = System.getenv("XDG_CONFIG_HOME");
+		if (xdgConfigHome != null && !xdgConfigHome.isBlank()) {
+			return new File(xdgConfigHome, BootstrapApp.APP_FOLDER_NAME);
+		}
+
+		return new File(home, ".config/" + BootstrapApp.APP_FOLDER_NAME);
+	}
+
+	@Deprecated
+	public static File getOldApplicationDirectory() {
+		final String override = System.getProperty(BootstrapApp.APP_DIR_PROPERTY);
+		if (override != null && !override.isBlank()) {
+			return new File(override);
+		}
+
+		final String os = System.getProperty("os.name", "").toLowerCase();
+		final String home = System.getProperty("user.home");
+
+		if (os.contains("win")) {
+			final String appData = System.getenv("APPDATA");
+			if (appData != null && !appData.isBlank()) {
+				return new File(appData, BootstrapApp.APP_FOLDER_NAME);
+			}
+		} else if (os.contains("mac")) {
+			return new File(home, "Library/Application Support/" + BootstrapApp.APP_FOLDER_NAME);
+		}
+
+		final String xdgConfigHome = System.getenv("XDG_CONFIG_HOME");
+		if (xdgConfigHome != null && !xdgConfigHome.isBlank()) {
+			return new File(xdgConfigHome, BootstrapApp.APP_FOLDER_NAME);
+		}
+
 		return new File(home, "." + BootstrapApp.APP_FOLDER_NAME);
 	}
 
@@ -100,7 +132,7 @@ public final class BootstrapApp {
 	 * @return the temp directory
 	 */
 	public static File getTempDirectory() {
-		return new File(BootstrapApp.getHomeDirectory(), "updates");
+		return new File(BootstrapApp.getApplicationDirectory(), "tmp");
 	}
 
 	/**

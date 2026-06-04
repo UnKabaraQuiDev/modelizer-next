@@ -127,7 +127,7 @@ public class InfoTab extends JPanel {
 		body.add(HelpUi.infoRow("OS",
 				this.systemProperty("os.name") + " " + this.systemProperty("os.version") + " " + this.systemProperty("os.arch")));
 		body.add(HelpUi.infoRow("Working directory", this.systemProperty("user.dir")));
-		body.add(HelpUi.infoRow("App directory", App.getAppDirectory().getAbsolutePath()));
+		body.add(HelpUi.infoRow("App directory", App.getApplicationDirectory().getAbsolutePath()));
 
 		card.add(body, BorderLayout.CENTER);
 		return card;

@@ -1,10 +1,15 @@
 package lu.kbra.modelizer_next.bootstrap;
 
+import java.awt.BorderLayout;
 import java.awt.Component;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.StandardCopyOption;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -13,7 +18,12 @@ import java.util.Queue;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JProgressBar;
+import javax.swing.SwingUtilities;
+import javax.swing.WindowConstants;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -55,7 +65,12 @@ public class BootstrapRuntime implements UpdateRuntime {
 		BootstrapApp.init();
 
 		System.out.println(BootstrapApp.NAME + " / " + BootstrapApp.VERSION + " [" + BootstrapApp.DISTRIBUTOR + "]");
-		System.out.println("Boostrap dir: " + BootstrapApp.getHomeDirectory());
+		System.out.println("Boostrap dir: " + BootstrapApp.getApplicationDirectory());
+
+		if (BootstrapApp.isFirstLaunch() && BootstrapApp.getOldApplicationDirectory().exists()
+				&& !BootstrapApp.getOldApplicationDirectory().equals(BootstrapApp.getApplicationDirectory())) {
+			BootstrapRuntime.migrateFilesWithPopup();
+		}
 
 		final boolean firstLaunch = BootstrapApp.isFirstLaunch();
 		final BootstrapConfiguration configuration = BootstrapApp.loadConfiguration();
@@ -75,6 +90,114 @@ public class BootstrapRuntime implements UpdateRuntime {
 
 		UpdateRuntimes.install(runtime);
 		return runtime;
+	}
+
+	public static void migrateFilesWithPopup() {
+		final JFrame frame = new JFrame("Modelizer Next");
+		final JLabel label = new JLabel("Preparing file migration...");
+		final JProgressBar bar = new JProgressBar();
+		bar.setIndeterminate(true);
+
+		frame.setLayout(new BorderLayout(10, 10));
+		frame.add(label, BorderLayout.CENTER);
+		frame.add(bar, BorderLayout.SOUTH);
+		frame.setSize(400, 120);
+		frame.setLocationRelativeTo(null);
+		frame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+		frame.setVisible(true);
+
+		final Exception[] exception = new Exception[1];
+		final Thread thread = new Thread(() -> {
+			try {
+				label.setText("Copying files...");
+
+				BootstrapRuntime.moveDirSafe(BootstrapApp.getOldApplicationDirectory().toPath(),
+						BootstrapApp.getApplicationDirectory().toPath());
+
+				SwingUtilities.invokeLater(frame::dispose);
+			} catch (final Exception e) {
+				exception[0] = e;
+				SwingUtilities.invokeLater(() -> {
+					JOptionPane.showMessageDialog(frame, "Migration failed:\n" + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+					frame.dispose();
+				});
+			}
+		});
+		thread.start();
+		try {
+			thread.join();
+			if (exception[0] != null) {
+				throw new RuntimeException(exception[0]);
+			}
+			System.err.println("thread joined");
+		} catch (final InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public static void moveDirSafe(final Path source, final Path target) throws IOException {
+		if (!Files.exists(source)) {
+			return;
+		}
+
+		Files.createDirectories(target);
+
+		Files.walkFileTree(source, new SimpleFileVisitor<>() {
+
+			@Override
+			public FileVisitResult preVisitDirectory(final Path dir, final BasicFileAttributes attrs) throws IOException {
+				final Path rel = source.relativize(dir);
+				final Path dest = target.resolve(rel);
+
+				Files.createDirectories(dest);
+
+				return FileVisitResult.CONTINUE;
+			}
+
+			@Override
+			public FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs) throws IOException {
+				final Path rel = source.relativize(file);
+				final Path dest = target.resolve(rel);
+
+				System.err.println(file + " -> " + dest);
+
+				Files.copy(file, dest, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.COPY_ATTRIBUTES);
+
+				return FileVisitResult.CONTINUE;
+			}
+
+			@Override
+			public FileVisitResult postVisitDirectory(final Path dir, final IOException exc) throws IOException {
+				if (exc != null) {
+					throw exc;
+				}
+
+				return FileVisitResult.CONTINUE;
+			}
+
+		});
+
+		Files.walkFileTree(source, new SimpleFileVisitor<>() {
+
+			@Override
+			public FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs) throws IOException {
+				Files.delete(file);
+
+				return FileVisitResult.CONTINUE;
+			}
+
+			@Override
+			public FileVisitResult postVisitDirectory(final Path dir, final IOException exc) throws IOException {
+				if (exc != null) {
+					throw exc;
+				}
+
+				Files.delete(dir);
+
+				return FileVisitResult.CONTINUE;
+			}
+
+		});
 	}
 
 	/**
@@ -416,8 +539,8 @@ public class BootstrapRuntime implements UpdateRuntime {
 			loadingFrame.update("Checking installed application...", 0, 0);
 
 			if (this.getForceJarName() != null
-					&& Files.exists(BootstrapApp.getApplicationsDirectory().toPath().resolve(this.getForceJarName()))) {
-				final Path path = BootstrapApp.getApplicationsDirectory().toPath().resolve(this.getForceJarName());
+					&& Files.exists(BootstrapApp.getupdatesDirectory().toPath().resolve(this.getForceJarName()))) {
+				final Path path = BootstrapApp.getupdatesDirectory().toPath().resolve(this.getForceJarName());
 				this.currentApplication = this.inventory.readInstalledApplication(path)
 						.orElseThrow(
 								() -> new IllegalArgumentException("File: '" + this.getForceJarName() + "' not found, resolved: " + path));

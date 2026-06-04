@@ -126,7 +126,7 @@ public final class ApplicationUpdateStorage {
 	 * @return the updates directory
 	 */
 	public Path getUpdatesDirectory() {
-		return BootstrapApp.getApplicationsDirectory().toPath();
+		return BootstrapApp.getupdatesDirectory().toPath();
 	}
 
 	/**

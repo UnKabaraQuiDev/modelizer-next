@@ -17,7 +17,7 @@ import lu.kbra.pclib.PCUtils;
  */
 public class App {
 
-	private static final String APP_DIR_PROPERTY = "APP_DIR";
+	private static final String OVERRIDE_APP_DIR_PROPERTY = App.class.getSimpleName() + ".override_app_dir";
 	private static final String APP_FOLDER_NAME = "modelizer-next";
 
 	public static JsonNode JSON;
@@ -41,9 +41,9 @@ public class App {
 	 * Ensures that the dirs exists exists or is up to date.
 	 */
 	public static void ensureDirsExists() {
-		App.getAppDirectory().mkdirs();
+		App.getApplicationDirectory().mkdirs();
 		App.getStylesDirectory().mkdirs();
-		App.getUpdateDownloadsDirectory().mkdirs();
+//		App.getUpdateDownloadsDirectory().mkdirs();
 	}
 
 	/**
@@ -51,8 +51,8 @@ public class App {
 	 *
 	 * @return the application directory
 	 */
-	public static File getAppDirectory() {
-		final String override = System.getProperty(App.APP_DIR_PROPERTY);
+	public static File getApplicationDirectory() {
+		final String override = System.getProperty(App.OVERRIDE_APP_DIR_PROPERTY);
 		if (override != null && !override.isBlank()) {
 			return new File(override);
 		}
@@ -73,7 +73,12 @@ public class App {
 			return new File(home, "Library/Application Support/" + App.APP_FOLDER_NAME);
 		}
 
-		return new File(home, "." + App.APP_FOLDER_NAME);
+		final String xdgConfigHome = System.getenv("XDG_CONFIG_HOME");
+		if (xdgConfigHome != null && !xdgConfigHome.isBlank()) {
+			return new File(xdgConfigHome, App.APP_FOLDER_NAME);
+		}
+
+		return new File(home, ".config/" + App.APP_FOLDER_NAME);
 	}
 
 	/**
@@ -82,7 +87,7 @@ public class App {
 	 * @return the config file
 	 */
 	public static File getConfigFile() {
-		return new File(App.getAppDirectory(), "config.json");
+		return new File(App.getApplicationDirectory(), "config.json");
 	}
 
 	/**
@@ -91,7 +96,7 @@ public class App {
 	 * @return the styles directory
 	 */
 	public static File getStylesDirectory() {
-		return new File(App.getAppDirectory(), "styles");
+		return new File(App.getApplicationDirectory(), "styles");
 	}
 
 	/**
@@ -99,8 +104,9 @@ public class App {
 	 *
 	 * @return the update downloads directory
 	 */
+	@Deprecated
 	public static File getUpdateDownloadsDirectory() {
-		return new File(App.getAppDirectory(), "updates");
+		return new File(App.getApplicationDirectory(), "updates");
 	}
 
 	/**
