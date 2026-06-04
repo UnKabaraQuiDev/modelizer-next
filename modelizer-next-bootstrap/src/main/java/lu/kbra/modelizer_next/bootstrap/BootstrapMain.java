@@ -95,9 +95,7 @@ public final class BootstrapMain {
 		System.exit(0);
 	}
 
-	/**
-	 * Creates a bootstrap main instance.
-	 */
 	private BootstrapMain() {
 	}
+
 }

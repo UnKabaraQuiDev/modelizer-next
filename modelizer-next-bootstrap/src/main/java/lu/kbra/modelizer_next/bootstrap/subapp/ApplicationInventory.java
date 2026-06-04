@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.Comparator;
 import java.util.Optional;
 import java.util.jar.JarFile;
@@ -13,9 +14,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lu.kbra.modelizer_next.bootstrap.AvailableUpdate;
-import lu.kbra.modelizer_next.bootstrap.ProgressListener;
 import lu.kbra.modelizer_next.bootstrap.UpdateChannel;
 import lu.kbra.modelizer_next.bootstrap.config.BootstrapApp;
+import lu.kbra.modelizer_next.bootstrap.impl.ProgressListener;
 import lu.kbra.modelizer_next.bootstrap.remote.RemoteUpdateService;
 import lu.kbra.modelizer_next.common.VersionComparator;
 
@@ -33,7 +34,7 @@ public final class ApplicationInventory {
 	 * @throws IOException if the operation cannot be completed
 	 */
 	public Optional<InstalledApplication> findLatestInstalled() throws IOException {
-		final Path applicationsDirectory = BootstrapApp.getApplicationsDirectory().toPath();
+		final Path applicationsDirectory = BootstrapApp.getUpdatesDirectory().toPath();
 		if (!Files.isDirectory(applicationsDirectory)) {
 			return Optional.empty();
 		}
@@ -54,7 +55,7 @@ public final class ApplicationInventory {
 	 * @throws IOException if the operation cannot be completed
 	 */
 	public Optional<InstalledApplication> findLatestInstalled(final UpdateChannel wantedChannel) throws IOException {
-		final Path applicationsDirectory = BootstrapApp.getApplicationsDirectory().toPath();
+		final Path applicationsDirectory = BootstrapApp.getUpdatesDirectory().toPath();
 		if (!Files.isDirectory(applicationsDirectory)) {
 			return Optional.empty();
 		}
@@ -78,10 +79,10 @@ public final class ApplicationInventory {
 	 */
 	public InstalledApplication install(final AvailableUpdate update, final ProgressListener listener) throws IOException {
 		final String safeVersion = update.latestVersion().toString().replaceAll("[^A-Za-z0-9._-]", "_");
-		final Path target = BootstrapApp.getApplicationsDirectory().toPath().resolve("modelizer-next-app-" + safeVersion + ".jar");
+		final Path target = BootstrapApp.getUpdatesDirectory().toPath().resolve("modelizer-next-app-" + safeVersion + ".jar");
 		final Path tmp = BootstrapApp.getTempDirectory().toPath().resolve(target.getFileName().toString() + ".part");
 		new RemoteUpdateService().download(update, tmp, listener);
-		Files.move(tmp, target, java.nio.file.StandardCopyOption.REPLACE_EXISTING, java.nio.file.StandardCopyOption.ATOMIC_MOVE);
+		Files.move(tmp, target, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
 		return this.readInstalledApplication(target)
 				.orElseThrow(() -> new IOException("The downloaded application jar is missing app.json metadata."));
 	}

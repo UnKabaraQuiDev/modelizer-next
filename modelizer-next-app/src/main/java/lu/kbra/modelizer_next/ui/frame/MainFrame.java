@@ -32,6 +32,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
 import lu.kbra.modelizer_next.MNMain;
+import lu.kbra.modelizer_next.ModelizerAppEntryPoint;
 import lu.kbra.modelizer_next.bootstrap.AvailableUpdate;
 import lu.kbra.modelizer_next.bootstrap.UpdateRuntime;
 import lu.kbra.modelizer_next.bootstrap.UpdateRuntimes;
@@ -387,19 +388,10 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 	}
 
 	/**
-	 * Returns the update runtime provided by the bootstrap layer.
-	 *
-	 * @return an optional result when a matching value is available
-	 */
-	Optional<UpdateRuntime> bootstrapRuntime() {
-		return UpdateRuntimes.isActive() ? Optional.of(UpdateRuntimes.getInstance()) : Optional.empty();
-	}
-
-	/**
 	 * Checks the for updates manually.
 	 */
 	void checkForUpdatesManually() {
-		final Optional<UpdateRuntime> runtime = this.bootstrapRuntime();
+		final Optional<UpdateRuntime> runtime = ModelizerAppEntryPoint.bootstrapRuntime();
 		if (runtime.isEmpty()) {
 			JOptionPane.showMessageDialog(this,
 					"Updates are only available when the application is launched through the bootstrap launcher.",
@@ -409,6 +401,7 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 		}
 
 		new SwingWorker<AvailableUpdate, Void>() {
+
 			@Override
 			protected AvailableUpdate doInBackground() throws Exception {
 				return runtime.get().checkForUpdates();
@@ -455,6 +448,7 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 							JOptionPane.ERROR_MESSAGE);
 				}
 			}
+
 		}.execute();
 	}
 

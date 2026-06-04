@@ -1,10 +1,15 @@
 package lu.kbra.modelizer_next.bootstrap;
 
+import java.awt.BorderLayout;
 import java.awt.Component;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.StandardCopyOption;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -13,7 +18,12 @@ import java.util.Queue;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JProgressBar;
+import javax.swing.SwingUtilities;
+import javax.swing.WindowConstants;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -39,6 +49,9 @@ import lu.kbra.pclib.PCUtils;
  */
 public class BootstrapRuntime implements UpdateRuntime {
 
+	public static final String SKIP_MOVE_USER_TO_SYSTEM_PROPERTY = BootstrapRuntime.class.getSimpleName() + "skip_move_user_to_system";
+	public static boolean SKIP_MOVE_USER_TO_SYSTEM = Boolean.getBoolean(BootstrapRuntime.SKIP_MOVE_USER_TO_SYSTEM_PROPERTY);
+
 	@Deprecated
 	private static final Pattern VERSION_MINUTES_PATTERN = Pattern.compile("^.+-(RELEASE|SNAPSHOT|NIGHTLY)-(\\d+)$");
 	private static final long UPDATE_EPOCH_SECONDS = Instant.parse("2026-01-01T00:00:00Z").getEpochSecond();
@@ -55,7 +68,11 @@ public class BootstrapRuntime implements UpdateRuntime {
 		BootstrapApp.init();
 
 		System.out.println(BootstrapApp.NAME + " / " + BootstrapApp.VERSION + " [" + BootstrapApp.DISTRIBUTOR + "]");
-		System.out.println("Boostrap dir: " + BootstrapApp.getHomeDirectory());
+		System.out.println("Boostrap dir: " + BootstrapApp.getSharedDirectory());
+
+		if (!BootstrapRuntime.SKIP_MOVE_USER_TO_SYSTEM && BootstrapApp.shouldMoveUserToSystem()) {
+			BootstrapRuntime.migrateFilesWithPopup();
+		}
 
 		final boolean firstLaunch = BootstrapApp.isFirstLaunch();
 		final BootstrapConfiguration configuration = BootstrapApp.loadConfiguration();
@@ -75,6 +92,87 @@ public class BootstrapRuntime implements UpdateRuntime {
 
 		UpdateRuntimes.install(runtime);
 		return runtime;
+	}
+
+	public static void migrateFilesWithPopup() {
+		final JFrame frame = new JFrame("Modelizer Next");
+		final JLabel label = new JLabel("Preparing file migration...");
+		final JProgressBar bar = new JProgressBar();
+		bar.setIndeterminate(true);
+
+		frame.setLayout(new BorderLayout(10, 10));
+		frame.add(label, BorderLayout.CENTER);
+		frame.add(bar, BorderLayout.SOUTH);
+		frame.setSize(400, 120);
+		frame.setLocationRelativeTo(null);
+		frame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+		frame.setVisible(true);
+
+		final Exception[] exceptions = new Exception[1];
+		final Thread thread = new Thread(() -> {
+			try {
+				label.setText("Copying configuration files...");
+
+				BootstrapRuntime.copyDirSafe(BootstrapApp.getOldBootstrapConfigFile().toPath(),
+						BootstrapApp.getBootstrapConfigFile().toPath());
+
+				label.setText("Copying updates directory...");
+
+				BootstrapRuntime.copyDirSafe(BootstrapApp.getOldUpdatesDirectory().toPath(), BootstrapApp.getUpdatesDirectory().toPath());
+
+				SwingUtilities.invokeLater(frame::dispose);
+
+			} catch (final Exception e) {
+				exceptions[0] = e;
+				SwingUtilities.invokeLater(() -> {
+					JOptionPane.showMessageDialog(frame,
+							"Migration failed:\n" + PCUtils.getStackTraceAsString(e),
+							"Error",
+							JOptionPane.ERROR_MESSAGE);
+					frame.dispose();
+				});
+			}
+		});
+		thread.start();
+		try {
+			thread.join();
+			if (exceptions[0] != null) {
+				throw new RuntimeException(exceptions[0]);
+			}
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public static void copyDirSafe(final Path source, final Path target) throws IOException {
+		if (!Files.exists(source)) {
+			return;
+		}
+
+		Files.createDirectories(target);
+
+		Files.walkFileTree(source, new SimpleFileVisitor<>() {
+
+			@Override
+			public FileVisitResult preVisitDirectory(final Path dir, final BasicFileAttributes attrs) throws IOException {
+
+				final Path rel = source.relativize(dir);
+				final Path dest = target.resolve(rel);
+				Files.createDirectories(dest);
+				return FileVisitResult.CONTINUE;
+			}
+
+			@Override
+			public FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs) throws IOException {
+
+				final Path rel = source.relativize(file);
+				final Path dest = target.resolve(rel);
+
+				Files.copy(file, dest, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.COPY_ATTRIBUTES);
+
+				return FileVisitResult.CONTINUE;
+			}
+		});
 	}
 
 	/**
@@ -416,8 +514,8 @@ public class BootstrapRuntime implements UpdateRuntime {
 			loadingFrame.update("Checking installed application...", 0, 0);
 
 			if (this.getForceJarName() != null
-					&& Files.exists(BootstrapApp.getApplicationsDirectory().toPath().resolve(this.getForceJarName()))) {
-				final Path path = BootstrapApp.getApplicationsDirectory().toPath().resolve(this.getForceJarName());
+					&& Files.exists(BootstrapApp.getUpdatesDirectory().toPath().resolve(this.getForceJarName()))) {
+				final Path path = BootstrapApp.getUpdatesDirectory().toPath().resolve(this.getForceJarName());
 				this.currentApplication = this.inventory.readInstalledApplication(path)
 						.orElseThrow(
 								() -> new IllegalArgumentException("File: '" + this.getForceJarName() + "' not found, resolved: " + path));

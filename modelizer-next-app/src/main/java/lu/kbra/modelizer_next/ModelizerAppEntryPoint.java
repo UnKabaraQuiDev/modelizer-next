@@ -12,6 +12,8 @@ import javax.swing.SwingUtilities;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 import lu.kbra.modelizer_next.bootstrap.AppMain;
+import lu.kbra.modelizer_next.bootstrap.UpdateRuntime;
+import lu.kbra.modelizer_next.bootstrap.UpdateRuntimes;
 import lu.kbra.modelizer_next.cmdline.CommandLineExportParser;
 import lu.kbra.modelizer_next.cmdline.CommandLineExporter;
 import lu.kbra.modelizer_next.common.App;
@@ -29,6 +31,9 @@ import lu.kbra.pclib.PCUtils;
  */
 public class ModelizerAppEntryPoint implements AppMain {
 
+	public static final String BOOTSTRAP_VERSION_CHECK_PROPERTY = ModelizerAppEntryPoint.class.getSimpleName() + ".boostrap_version_check";
+	public static boolean BOOSTRAP_VERSION_CHECK = PCUtils.getBoolean(BOOTSTRAP_VERSION_CHECK_PROPERTY, true);
+
 	/**
 	 * Starts the application entry point.
 	 *
@@ -38,17 +43,26 @@ public class ModelizerAppEntryPoint implements AppMain {
 	public void start(final String[] args) {
 		LicensePrinter.print(this.getClass().getClassLoader());
 
-		try {
-			PCUtils.readPackagedBytesFile("/app.json");
-			throw new UnsupportedBootstrapVersionException("Bootstrap loader is too old.");
-		} catch (final Exception e) {
-			// ok
+		if (BOOSTRAP_VERSION_CHECK) {
+			try {
+				PCUtils.readPackagedBytesFile("/app.json");
+				throw new UnsupportedBootstrapVersionException("Bootstrap loader is too old, use >= v8.");
+			} catch (final Exception e) {
+				// ok
+			}
+
+			if (!App.PORTABLE && UpdateRuntimes.isActive()) {
+				final File updatesDir = new File(App.getConfigDirectory(), "updates");
+				if (updatesDir.exists()) {
+					throw new UnsupportedBootstrapVersionException("Bootstrap loader is too old, use >= v10.");
+				}
+			}
 		}
 
 		try {
 			App.init();
 			System.out.println(App.NAME + " / " + App.VERSION + " [" + App.DISTRIBUTOR + "]");
-			System.out.println("App dir: " + App.getAppDirectory());
+			System.out.println("App dir: " + App.getConfigDirectory());
 			System.out.println();
 		} catch (final JsonProcessingException e) {
 			e.printStackTrace();
@@ -102,6 +116,10 @@ public class ModelizerAppEntryPoint implements AppMain {
 				}
 			});
 		});
+	}
+
+	public static Optional<UpdateRuntime> bootstrapRuntime() {
+		return UpdateRuntimes.isActive() ? Optional.of(UpdateRuntimes.getInstance()) : Optional.empty();
 	}
 
 }

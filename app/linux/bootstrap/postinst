@@ -4,9 +4,13 @@ set -e
 APP_BIN_DIR="/opt/modelizer-next/bin"
 TARGET="$APP_BIN_DIR/Modelizer Next"
 LINK="/usr/bin/modelizer-next"
+DATA_DIR="/var/lib/modelizer-next/
 
 DESKTOP_SOURCE="/opt/modelizer-next/lib/modelizer-next-Modelizer_Next.desktop"
 DESKTOP_LINK="/usr/share/applications/modelizer-next.desktop"
+
+mkdir -p $DATA_DIR
+chmod 755 $DATA_DIR
 
 if [ -x "$TARGET" ]; then
     ln -sfn "$TARGET" "$LINK"

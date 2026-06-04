@@ -33,6 +33,7 @@ import lu.kbra.modelizer_next.ui.ThemeMode;
  */
 public class MNMain {
 
+
 	public static final ObjectMapper OBJECT_MAPPER = MNMain.createMapper();
 
 	/**

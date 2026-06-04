@@ -15,6 +15,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JRadioButtonMenuItem;
 
+import lu.kbra.modelizer_next.ModelizerAppEntryPoint;
 import lu.kbra.modelizer_next.bootstrap.BootstrapConfig;
 import lu.kbra.modelizer_next.bootstrap.UpdateChannel;
 import lu.kbra.modelizer_next.bootstrap.UpdateRuntime;
@@ -57,7 +58,7 @@ final class InfoMenu extends JMenu {
 	 * @param frame frame that owns the created UI component
 	 */
 	private void addBootstrapCleanupIfAvailable(final MainFrame frame) {
-		final Optional<UpdateRuntime> bootstrapRuntime = frame.bootstrapRuntime();
+		final Optional<UpdateRuntime> bootstrapRuntime = ModelizerAppEntryPoint.bootstrapRuntime();
 		if (bootstrapRuntime.isEmpty()) {
 			return;
 		}
@@ -98,7 +99,7 @@ final class InfoMenu extends JMenu {
 	 * @param frame frame that owns the created UI component
 	 */
 	private void addBootstrapVersionInfoIfAvailable(final MainFrame frame) {
-		final Optional<UpdateRuntime> bootstrapRuntime = frame.bootstrapRuntime();
+		final Optional<UpdateRuntime> bootstrapRuntime = ModelizerAppEntryPoint.bootstrapRuntime();
 		if (bootstrapRuntime.isEmpty()) {
 			return;
 		}
@@ -126,13 +127,13 @@ final class InfoMenu extends JMenu {
 	 * @return the created auto update item
 	 */
 	private JCheckBoxMenuItem createAutoUpdateItem(final MainFrame frame) {
-		final Optional<UpdateRuntime> bootstrapRuntime = frame.bootstrapRuntime();
+		final Optional<UpdateRuntime> bootstrapRuntime = ModelizerAppEntryPoint.bootstrapRuntime();
 		final boolean updateRuntimeAvailable = bootstrapRuntime.isPresent();
 		final JCheckBoxMenuItem autoCheckUpdates = new JCheckBoxMenuItem("Check for updates on startup",
 				updateRuntimeAvailable && bootstrapRuntime.get().isAutoCheckUpdates());
 		autoCheckUpdates.setEnabled(updateRuntimeAvailable && bootstrapRuntime.get().isAutomaticUpdateChecksEnabledByProperty());
 		autoCheckUpdates
-				.addActionListener(event -> frame.bootstrapRuntime().ifPresent(c -> c.setAutoCheckUpdates(autoCheckUpdates.isSelected())));
+				.addActionListener(event -> ModelizerAppEntryPoint.bootstrapRuntime().ifPresent(c -> c.setAutoCheckUpdates(autoCheckUpdates.isSelected())));
 		return autoCheckUpdates;
 	}
 
@@ -192,7 +193,7 @@ final class InfoMenu extends JMenu {
 	 * @return the created update channel menu
 	 */
 	private JMenu createUpdateChannelMenu(final MainFrame frame) {
-		final Optional<UpdateRuntime> bootstrapRuntime = frame.bootstrapRuntime();
+		final Optional<UpdateRuntime> bootstrapRuntime = ModelizerAppEntryPoint.bootstrapRuntime();
 		final boolean updateRuntimeAvailable = bootstrapRuntime.isPresent();
 		final JMenu channelMenu = new JMenu("Update channel");
 		channelMenu.setEnabled(updateRuntimeAvailable);
@@ -201,7 +202,7 @@ final class InfoMenu extends JMenu {
 		for (final UpdateChannel updateChannel : UpdateChannel.values()) {
 			final JRadioButtonMenuItem item = new JRadioButtonMenuItem(updateChannel.displayName());
 			item.setSelected(updateChannel == selectedChannel);
-			item.addActionListener(event -> frame.bootstrapRuntime().ifPresent(c -> {
+			item.addActionListener(event -> ModelizerAppEntryPoint.bootstrapRuntime().ifPresent(c -> {
 				c.setSelectedChannel(updateChannel);
 				frame.checkForUpdatesManually();
 			}));
@@ -220,7 +221,7 @@ final class InfoMenu extends JMenu {
 	private JMenuItem createVersionInfoItem(final MainFrame frame) {
 		final JMenuItem versionInfo = new JMenuItem("Version: " + App.VERSION + " [" + App.DISTRIBUTOR + "]");
 		versionInfo.setToolTipText("Click to copy version informations.");
-		final Optional<UpdateRuntime> bootstrapRuntime = frame.bootstrapRuntime();
+		final Optional<UpdateRuntime> bootstrapRuntime = ModelizerAppEntryPoint.bootstrapRuntime();
 		final boolean updateRuntimeAvailable = bootstrapRuntime.isPresent();
 		versionInfo
 				.addActionListener(event -> Toolkit.getDefaultToolkit()

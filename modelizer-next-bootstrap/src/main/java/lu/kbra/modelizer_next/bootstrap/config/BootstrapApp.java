@@ -10,6 +10,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import lu.kbra.modelizer_next.bootstrap.BootstrapConfig;
 import lu.kbra.modelizer_next.common.ParsedVersionModule;
+import lu.kbra.modelizer_next.common.Platform;
 import lu.kbra.pclib.PCUtils;
 
 /**
@@ -45,18 +46,23 @@ public final class BootstrapApp {
 	 * @throws IOException if the operation cannot be completed
 	 */
 	public static void ensureDirectories() throws IOException {
-		BootstrapApp.getHomeDirectory().mkdirs();
-		BootstrapApp.getApplicationsDirectory().mkdirs();
-		BootstrapApp.getTempDirectory().mkdirs();
+		BootstrapApp.getSharedDirectory().mkdirs();
+		BootstrapApp.getUpdatesDirectory().mkdirs();
+//		BootstrapApp.getTempDirectory().mkdirs();
 	}
 
 	/**
-	 * Returns the applications directory.
+	 * Returns the updates directory.
 	 *
-	 * @return the applications directory
+	 * @return the updates directory
 	 */
-	public static File getApplicationsDirectory() {
-		return new File(BootstrapApp.getHomeDirectory(), "updates");
+	public static File getUpdatesDirectory() {
+		return new File(BootstrapApp.getSharedDirectory(), "updates");
+	}
+
+	@Deprecated
+	public static File getOldUpdatesDirectory() {
+		return new File(BootstrapApp.getOldSharedDirectory(), "updates");
 	}
 
 	/**
@@ -65,15 +71,42 @@ public final class BootstrapApp {
 	 * @return the bootstrap config file
 	 */
 	public static File getBootstrapConfigFile() {
-		return new File(BootstrapApp.getHomeDirectory(), "bootstrap-config.json");
+		return new File(BootstrapApp.getSharedDirectory(), "bootstrap-config.json");
+	}
+
+	@Deprecated
+	public static File getOldBootstrapConfigFile() {
+		return new File(BootstrapApp.getOldSharedDirectory(), "bootstrap-config.json");
 	}
 
 	/**
-	 * Returns the home directory during bootstrap/update processing.
+	 * Returns the shared file directory, system-wide..
 	 *
-	 * @return the home directory
+	 * @return the shared directory
 	 */
-	public static File getHomeDirectory() {
+	public static File getSharedDirectory() {
+		final String override = System.getProperty(BootstrapApp.APP_DIR_PROPERTY);
+		if (override != null && !override.isBlank()) {
+			return new File(override);
+		}
+
+		return switch (Platform.get()) {
+		case WINDOWS -> {
+			final String programData = System.getenv("ProgramData");
+			if (programData != null && !programData.isBlank()) {
+				yield new File(programData, BootstrapApp.APP_FOLDER_NAME);
+			}
+			yield new File("C:\\ProgramData", BootstrapApp.APP_FOLDER_NAME);
+		}
+		case MACOS -> new File("/Library/Application Support/" + BootstrapApp.APP_FOLDER_NAME);
+		case LINUX -> new File("/var/lib/" + BootstrapApp.APP_FOLDER_NAME);
+		case UNSUPPORTED -> new File("." + File.pathSeparator + BootstrapApp.APP_FOLDER_NAME);
+		default -> throw new IllegalArgumentException("Unexpected value: " + Platform.get());
+		};
+	}
+
+	@Deprecated
+	public static File getOldSharedDirectory() {
 		final String override = System.getProperty(BootstrapApp.APP_DIR_PROPERTY);
 		if (override != null && !override.isBlank()) {
 			return new File(override);
@@ -95,12 +128,35 @@ public final class BootstrapApp {
 	}
 
 	/**
-	 * Returns the temp directory during bootstrap/update processing.
+	 * Returns a temp directory.
 	 *
 	 * @return the temp directory
 	 */
 	public static File getTempDirectory() {
-		return new File(BootstrapApp.getHomeDirectory(), "updates");
+		final String override = System.getProperty(BootstrapApp.APP_DIR_PROPERTY);
+		if (override != null && !override.isBlank()) {
+			return new File(override);
+		}
+
+		return switch (Platform.get()) {
+		case WINDOWS -> {
+			final String temp = System.getenv("TEMP");
+			if (temp != null && !temp.isBlank()) {
+				yield new File(temp, BootstrapApp.APP_FOLDER_NAME);
+			}
+			yield new File("C:\\Windows\\Temp", BootstrapApp.APP_FOLDER_NAME);
+		}
+		case MACOS -> {
+			final String tmp = System.getProperty("java.io.tmpdir");
+			if (tmp != null && !tmp.isBlank()) {
+				yield new File(tmp, BootstrapApp.APP_FOLDER_NAME);
+			}
+			yield new File("/tmp", BootstrapApp.APP_FOLDER_NAME);
+		}
+		case LINUX -> new File("/tmp/" + BootstrapApp.APP_FOLDER_NAME);
+		case UNSUPPORTED -> new File("." + File.pathSeparator + BootstrapApp.APP_FOLDER_NAME);
+		default -> throw new IllegalArgumentException("Unexpected value: " + Platform.get());
+		};
 	}
 
 	/**
@@ -137,7 +193,11 @@ public final class BootstrapApp {
 	 * @return {@code true} if first launch is enabled or applies; otherwise {@code false}
 	 */
 	public static boolean isFirstLaunch() {
-		return !BootstrapApp.getBootstrapConfigFile().isFile();
+		return !BootstrapApp.getBootstrapConfigFile().exists();
+	}
+
+	public static boolean shouldMoveUserToSystem() {
+		return isFirstLaunch() && BootstrapApp.getOldBootstrapConfigFile().exists();
 	}
 
 	/**

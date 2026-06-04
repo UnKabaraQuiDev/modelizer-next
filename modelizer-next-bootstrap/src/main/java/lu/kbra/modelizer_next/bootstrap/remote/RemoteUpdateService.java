@@ -16,9 +16,9 @@ import java.util.Objects;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import lu.kbra.modelizer_next.bootstrap.AvailableUpdate;
-import lu.kbra.modelizer_next.bootstrap.ProgressListener;
 import lu.kbra.modelizer_next.bootstrap.UpdateChannel;
 import lu.kbra.modelizer_next.bootstrap.config.BootstrapApp;
+import lu.kbra.modelizer_next.bootstrap.impl.ProgressListener;
 import lu.kbra.modelizer_next.bootstrap.selfupdate.BootstrapInstallerUpdate;
 import lu.kbra.modelizer_next.common.ChannelComparator;
 import lu.kbra.modelizer_next.common.Platform;

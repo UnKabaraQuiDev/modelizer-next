@@ -35,13 +35,13 @@ public class App {
 
 	public static AppConfig CONFIG;
 
-	private static Set<Consumer<AppConfig>> CONFIG_HOOKS = new HashSet<>();
+	private static final Set<Consumer<AppConfig>> CONFIG_HOOKS = new HashSet<>();
 
 	/**
 	 * Ensures that the dirs exists exists or is up to date.
 	 */
 	public static void ensureDirsExists() {
-		App.getAppDirectory().mkdirs();
+		App.getConfigDirectory().mkdirs();
 		App.getStylesDirectory().mkdirs();
 		App.getUpdateDownloadsDirectory().mkdirs();
 	}
@@ -51,7 +51,8 @@ public class App {
 	 *
 	 * @return the application directory
 	 */
-	public static File getAppDirectory() {
+	@SuppressWarnings("incomplete-switch")
+	public static File getConfigDirectory() {
 		final String override = System.getProperty(App.APP_DIR_PROPERTY);
 		if (override != null && !override.isBlank()) {
 			return new File(override);
@@ -61,16 +62,27 @@ public class App {
 			return new File(".");
 		}
 
-		final String os = System.getProperty("os.name", "").toLowerCase();
 		final String home = System.getProperty("user.home");
 
-		if (os.contains("win")) {
+		switch (Platform.get()) {
+		case WINDOWS -> {
 			final String appData = System.getenv("APPDATA");
 			if (appData != null && !appData.isBlank()) {
 				return new File(appData, App.APP_FOLDER_NAME);
 			}
-		} else if (os.contains("mac")) {
+		}
+		case MACOS -> {
 			return new File(home, "Library/Application Support/" + App.APP_FOLDER_NAME);
+		}
+		case LINUX -> {
+			final String xdgConfigHome = System.getenv("XDG_CONFIG_HOME");
+
+			if (xdgConfigHome != null && !xdgConfigHome.isBlank()) {
+				return new File(xdgConfigHome, App.APP_FOLDER_NAME);
+			}
+
+			return new File(home, ".config/" + App.APP_FOLDER_NAME);
+		}
 		}
 
 		return new File(home, "." + App.APP_FOLDER_NAME);
@@ -82,7 +94,7 @@ public class App {
 	 * @return the config file
 	 */
 	public static File getConfigFile() {
-		return new File(App.getAppDirectory(), "config.json");
+		return new File(App.getConfigDirectory(), "config.json");
 	}
 
 	/**
@@ -91,7 +103,7 @@ public class App {
 	 * @return the styles directory
 	 */
 	public static File getStylesDirectory() {
-		return new File(App.getAppDirectory(), "styles");
+		return new File(App.getConfigDirectory(), "styles");
 	}
 
 	/**
@@ -100,7 +112,7 @@ public class App {
 	 * @return the update downloads directory
 	 */
 	public static File getUpdateDownloadsDirectory() {
-		return new File(App.getAppDirectory(), "updates");
+		return new File(App.getConfigDirectory(), "updates");
 	}
 
 	/**
