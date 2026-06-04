@@ -5,8 +5,11 @@ APP_BIN_DIR="/opt/modelizer-next/bin"
 TARGET="$APP_BIN_DIR/Modelizer Next"
 LINK="/usr/bin/modelizer-next"
 
-DESKTOP_SOURCE="/opt/modelizer-next/lib/modelizer-next-Modelizer_Next.desktop"
+DESKTOP_SOURCE="/opt/modelizer-next/lib/app/modelizer-next.desktop"
 DESKTOP_LINK="/usr/share/applications/modelizer-next.desktop"
+
+MIME_SOURCE="/opt/modelizer-next/lib/modelizer-next-Modelizer_Next-MimeInfo.xml"
+MIME_TARGET="/usr/share/mime/packages/modelizer-next.xml"
 
 if [ -x "$TARGET" ]; then
     ln -sfn "$TARGET" "$LINK"
@@ -14,9 +17,15 @@ fi
 
 if [ -f "$DESKTOP_SOURCE" ]; then
     ln -sfn "$DESKTOP_SOURCE" "$DESKTOP_LINK"
+    chmod +x "$DESKTOP_LINK"
+fi
+
+if [ -f "$MIME_SOURCE" ]; then
+    cp -f "$MIME_SOURCE" "$MIME_TARGET"
 fi
 
 update-desktop-database /usr/share/applications || true
+update-mime-database /usr/share/mime || true
 gtk-update-icon-cache /usr/share/icons/hicolor || true
 
 exit 0
