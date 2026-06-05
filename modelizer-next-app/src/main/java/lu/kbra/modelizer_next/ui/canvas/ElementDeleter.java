@@ -30,22 +30,22 @@ public interface ElementDeleter extends DiagramCanvasExt {
 
 		final Set<LinkModel> tbr = new HashSet<>();
 		if (this.getPanelType().isTechnical()) {
-			this.getDocument()
-					.getModel()
-					.getTechnicalLinks()
-					.parallelStream()
-					.filter(l -> classId.equals(l.getFrom().getClassId()) || classId.equals(l.getTo().getClassId()))
-					.peek(tbr::add)
-					.forEach(c -> this.getDocument().getModel().removeTechnicalLink(c));
+			this.getDocument().getModel().getTechnicalLinks().removeIf(l -> {
+				if (classId.equals(l.getFrom().getClassId()) || classId.equals(l.getTo().getClassId())) {
+					tbr.add(l);
+					return true;
+				}
+				return false;
+			});
 		} else {
-			this.getDocument()
-					.getModel()
-					.getConceptualLinks()
-					.parallelStream()
-					.filter(l -> classId.equals(l.getFrom().getClassId()) || classId.equals(l.getTo().getClassId())
-							|| classId.equals(l.getAssociationClassId()))
-					.peek(tbr::add)
-					.forEach(c -> this.getDocument().getModel().removeConceptualLink(c));
+			this.getDocument().getModel().getConceptualLinks().removeIf(l -> {
+				if (classId.equals(l.getFrom().getClassId()) || classId.equals(l.getTo().getClassId())
+						|| classId.equals(l.getAssociationClassId())) {
+					tbr.add(l);
+					return true;
+				}
+				return false;
+			});
 		}
 
 		tbr.parallelStream()
@@ -77,13 +77,13 @@ public interface ElementDeleter extends DiagramCanvasExt {
 
 		classModel.removeField(fieldModel);
 		final Set<LinkModel> tbr = new HashSet<>();
-		this.getDocument()
-				.getModel()
-				.getTechnicalLinks()
-				.parallelStream()
-				.filter(link -> fieldId.equals(link.getFrom().getFieldId()) || fieldId.equals(link.getTo().getFieldId()))
-				.peek(tbr::add)
-				.forEach(l -> this.getDocument().getModel().removeTechnicalLink(l));
+		this.getDocument().getModel().getTechnicalLinks().removeIf(l -> {
+			if (fieldId.equals(l.getFrom().getFieldId()) || fieldId.equals(l.getTo().getFieldId())) {
+				tbr.add(l);
+				return true;
+			}
+			return false;
+		});
 		tbr.parallelStream()
 				.map(c -> this.getCanvas().findLinkLayout(classId))
 				.filter(Optional::isPresent)

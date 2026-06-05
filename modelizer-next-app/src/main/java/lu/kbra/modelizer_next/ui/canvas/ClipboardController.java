@@ -1,5 +1,9 @@
 package lu.kbra.modelizer_next.ui.canvas;
 
+import java.awt.Toolkit;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.StringSelection;
+import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
@@ -8,8 +12,12 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
+import java.io.IOException;
+
+import lu.kbra.modelizer_next.MNMain;
 import lu.kbra.modelizer_next.common.Size2D;
 import lu.kbra.modelizer_next.domain.ClassModel;
 import lu.kbra.modelizer_next.domain.CommentBinding;
@@ -35,12 +43,24 @@ import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectedElement.SelectedType;
  */
 interface ClipboardController extends DiagramCanvasExt {
 
+	String CLIPBOARD_PREFIX = "MODELIZER_NEXT_CLIPBOARD_SNAPSHOT_V1\n";
+
 	/**
 	 * Copies the selection.
 	 */
-	default void copySelection() {
+	default boolean copySelection() {
+		return this.copySelection(Optional.empty());
+	}
+
+	/**
+	 * Copies the selection.
+	 *
+	 * @param visitor optional visitor that can alter or reject copied elements
+	 * @return {@code true} if a non-empty snapshot was copied; otherwise {@code false}
+	 */
+	default boolean copySelection(final Optional<ElementVisitor> visitor) {
 		if (this.getCanvas().selectedElements.isEmpty()) {
-			return;
+			return false;
 		}
 
 		final List<SelectedElement> snapshot = new ArrayList<>(this.getCanvas().selectedElements);
@@ -138,19 +158,36 @@ interface ClipboardController extends DiagramCanvasExt {
 			}
 		}
 
-		DiagramCanvas.clipboardSnapshot = new ClipboardSnapshot(this.getPanelType(),
+		ClipboardSnapshot clipboardSnapshot = new ClipboardSnapshot(this.getPanelType(),
 				List.copyOf(copiedClasses),
 				List.copyOf(copiedFields),
 				List.copyOf(copiedComments),
 				List.copyOf(copiedLinks));
+
+		clipboardSnapshot = this.getCanvas().applyElementVisitorToCopiedSnapshot(clipboardSnapshot, visitor);
+		if (clipboardSnapshot.isEmpty()) {
+			return false;
+		}
+
+		return ClipboardController.writeClipboardSnapshot(clipboardSnapshot);
 	}
 
 	/**
 	 * Cuts the selection and places it on the clipboard.
 	 */
 	default void cutSelection() {
-		this.copySelection();
-		this.getCanvas().deleteSelection();
+		this.cutSelection(Optional.empty());
+	}
+
+	/**
+	 * Cuts the selection and places it on the clipboard.
+	 *
+	 * @param visitor optional visitor that can alter or reject copied elements
+	 */
+	default void cutSelection(final Optional<ElementVisitor> visitor) {
+		if (this.copySelection(visitor)) {
+			this.getCanvas().deleteSelection();
+		}
 	}
 
 	/**
@@ -374,9 +411,23 @@ interface ClipboardController extends DiagramCanvasExt {
 	 * Pastes the selection from the clipboard.
 	 */
 	default void pasteSelection() {
-		final ClipboardSnapshot clipboard = DiagramCanvas.clipboardSnapshot;
+		this.pasteSelection(Optional.empty());
+	}
 
-		if (clipboard == null || clipboard.isEmpty()) {
+	/**
+	 * Pastes the selection from the clipboard.
+	 *
+	 * @param visitor optional visitor that can alter or reject pasted elements
+	 */
+	default void pasteSelection(final Optional<ElementVisitor> visitor) {
+		ClipboardSnapshot clipboard = ClipboardController.readClipboardSnapshot();
+
+		if (clipboard == null) {
+			return;
+		}
+
+		clipboard = this.getCanvas().applyElementVisitorToCopiedSnapshot(clipboard, visitor);
+		if (clipboard.isEmpty()) {
 			return;
 		}
 
@@ -391,12 +442,17 @@ interface ClipboardController extends DiagramCanvasExt {
 		final Map<String, String> pastedLinkIds = new HashMap<>();
 
 		final LinkedHashSet<SelectedElement> newSelection = new LinkedHashSet<>();
+		final boolean applyDefaultPasteRename = visitor.isEmpty();
 
 		for (final CopiedClass copiedClass : clipboard.classes()) {
 			final ClassModel classCopy = new ClassModel();
 
-			classCopy.setConceptualName(this.getCanvas().appendSuffix(copiedClass.conceptualName(), " Copy"));
-			classCopy.setTechnicalName(this.getCanvas().appendSuffix(copiedClass.technicalName(), "_COPY"));
+			classCopy.setConceptualName(applyDefaultPasteRename
+					? this.getCanvas().appendSuffix(copiedClass.conceptualName(), " Copy")
+					: copiedClass.conceptualName());
+			classCopy.setTechnicalName(applyDefaultPasteRename
+					? this.getCanvas().appendSuffix(copiedClass.technicalName(), "_COPY")
+					: copiedClass.technicalName());
 
 			classCopy.setVisibleInConceptual(copiedClass.visibleInConceptual());
 			classCopy.setVisibleInLogical(copiedClass.visibleInLogical());
@@ -408,16 +464,25 @@ interface ClipboardController extends DiagramCanvasExt {
 
 			for (final CopiedField copiedField : copiedClass.fields()) {
 				final FieldModel fieldCopy = this.getCanvas().createFieldFromClipboard(copiedField, false);
-				classCopy.addField(fieldCopy);
-				pastedFieldIds.put(copiedField.sourceId(), fieldCopy.getId());
+				final Optional<FieldModel> visitedField = this.getCanvas().visitPastedField(fieldCopy, visitor);
+				if (visitedField.isEmpty()) {
+					continue;
+				}
+				classCopy.addField(visitedField.get());
+				pastedFieldIds.put(copiedField.sourceId(), visitedField.get().getId());
 			}
 
-			this.getDocument().getModel().addClass(classCopy);
-			pastedClassIds.put(copiedClass.sourceId(), classCopy.getId());
+			final Optional<ClassModel> visitedClass = this.getCanvas().visitPastedClass(classCopy, visitor);
+			if (visitedClass.isEmpty()) {
+				continue;
+			}
 
-			this.getCanvas().applyNodeLayout(LayoutObjectType.CLASS, classCopy.getId(), copiedClass.layout(), deltaX, deltaY);
+			this.getDocument().getModel().addClass(visitedClass.get());
+			pastedClassIds.put(copiedClass.sourceId(), visitedClass.get().getId());
 
-			newSelection.add(SelectedElement.forClass(classCopy.getId()));
+			this.getCanvas().applyNodeLayout(LayoutObjectType.CLASS, visitedClass.get().getId(), copiedClass.layout(), deltaX, deltaY);
+
+			newSelection.add(SelectedElement.forClass(visitedClass.get().getId()));
 		}
 
 		for (final CopiedField copiedField : clipboard.fields()) {
@@ -434,7 +499,11 @@ interface ClipboardController extends DiagramCanvasExt {
 				continue;
 			}
 
-			final FieldModel fieldCopy = this.getCanvas().createFieldFromClipboard(copiedField, true);
+			final FieldModel fieldCopy = this.getCanvas().createFieldFromClipboard(copiedField, applyDefaultPasteRename);
+			final Optional<FieldModel> visitedField = this.getCanvas().visitPastedField(fieldCopy, visitor);
+			if (visitedField.isEmpty()) {
+				continue;
+			}
 
 //			int insertIndex = -1;
 //			for (int i = 0; i < owner.getFields().size(); i++) {
@@ -445,13 +514,13 @@ interface ClipboardController extends DiagramCanvasExt {
 //			}
 
 //			if (insertIndex < 0) {
-			owner.addField(fieldCopy);
+			owner.addField(visitedField.get());
 //			} else {
 //				owner.addField(insertIndex + 1, fieldCopy);
 //			}
 
-			pastedFieldIds.put(copiedField.sourceId(), fieldCopy.getId());
-			newSelection.add(SelectedElement.forField(owner.getId(), fieldCopy.getId()));
+			pastedFieldIds.put(copiedField.sourceId(), visitedField.get().getId());
+			newSelection.add(SelectedElement.forField(owner.getId(), visitedField.get().getId()));
 		}
 
 		if (clipboard.panelType() == this.getPanelType()) {
@@ -462,12 +531,17 @@ interface ClipboardController extends DiagramCanvasExt {
 					continue;
 				}
 
-				this.getCanvas().getActiveLinks().add(linkCopy);
-				pastedLinkIds.put(copiedLink.sourceId(), linkCopy.getId());
+				final Optional<LinkModel> visitedLink = this.getCanvas().visitPastedLink(linkCopy, visitor);
+				if (visitedLink.isEmpty()) {
+					continue;
+				}
 
-				this.getCanvas().applyLinkLayout(linkCopy.getId(), copiedLink.layout(), deltaX, deltaY);
+				this.getCanvas().getActiveLinks().add(visitedLink.get());
+				pastedLinkIds.put(copiedLink.sourceId(), visitedLink.get().getId());
 
-				newSelection.add(SelectedElement.forLink(linkCopy.getId()));
+				this.getCanvas().applyLinkLayout(visitedLink.get().getId(), copiedLink.layout(), deltaX, deltaY);
+
+				newSelection.add(SelectedElement.forLink(visitedLink.get().getId()));
 			}
 		}
 
@@ -490,10 +564,15 @@ interface ClipboardController extends DiagramCanvasExt {
 				commentCopy.setKind(CommentKind.STANDALONE);
 			}
 
-			this.getDocument().getModel().addComment(commentCopy);
-			this.getCanvas().applyNodeLayout(LayoutObjectType.COMMENT, commentCopy.getId(), copiedComment.layout(), deltaX, deltaY);
+			final Optional<CommentModel> visitedComment = this.getCanvas().visitPastedComment(commentCopy, visitor);
+			if (visitedComment.isEmpty()) {
+				continue;
+			}
 
-			newSelection.add(SelectedElement.forComment(commentCopy.getId()));
+			this.getDocument().getModel().addComment(visitedComment.get());
+			this.getCanvas().applyNodeLayout(LayoutObjectType.COMMENT, visitedComment.get().getId(), copiedComment.layout(), deltaX, deltaY);
+
+			newSelection.add(SelectedElement.forComment(visitedComment.get().getId()));
 		}
 
 		if (newSelection.isEmpty()) {
@@ -508,6 +587,150 @@ interface ClipboardController extends DiagramCanvasExt {
 
 		this.getCanvas().notifySelectionChanged();
 		this.getCanvas().notifyDocumentChanged();
+	}
+
+
+	/**
+	 * Applies a visitor to all copied snapshot elements.
+	 *
+	 * @param snapshot snapshot to visit
+	 * @param visitor  optional visitor to apply
+	 * @return visited snapshot
+	 */
+	default ClipboardSnapshot applyElementVisitorToCopiedSnapshot(
+			final ClipboardSnapshot snapshot,
+			final Optional<ElementVisitor> visitor) {
+
+		if (visitor.isEmpty()) {
+			return snapshot;
+		}
+
+		final ElementVisitor elementVisitor = visitor.get();
+		final ClipboardSnapshot preparedSnapshot = elementVisitor.visitClipboardSnapshot(snapshot);
+		if (preparedSnapshot == null) {
+			return new ClipboardSnapshot(snapshot.panelType(), List.of(), List.of(), List.of(), List.of());
+		}
+
+		final List<CopiedClass> visitedClasses = new ArrayList<>();
+		for (final CopiedClass copiedClass : preparedSnapshot.classes()) {
+			final Optional<CopiedClass> visitedClass = elementVisitor.visitCopiedClass(copiedClass);
+			if (visitedClass.isEmpty()) {
+				continue;
+			}
+
+			final List<CopiedField> visitedClassFields = new ArrayList<>();
+			for (final CopiedField copiedField : visitedClass.get().fields()) {
+				elementVisitor.visitCopiedField(copiedField).ifPresent(visitedClassFields::add);
+			}
+
+			visitedClasses.add(new CopiedClass(visitedClass.get().sourceId(),
+					visitedClass.get().conceptualName(),
+					visitedClass.get().technicalName(),
+					visitedClass.get().visibleInConceptual(),
+					visitedClass.get().visibleInLogical(),
+					visitedClass.get().visibleInPhysical(),
+					visitedClass.get().textColor(),
+					visitedClass.get().backgroundColor(),
+					visitedClass.get().borderColor(),
+					List.copyOf(visitedClassFields),
+					visitedClass.get().layout()));
+		}
+
+		final List<CopiedField> visitedFields = new ArrayList<>();
+		for (final CopiedField copiedField : preparedSnapshot.fields()) {
+			elementVisitor.visitCopiedField(copiedField).ifPresent(visitedFields::add);
+		}
+
+		final List<CopiedComment> visitedComments = new ArrayList<>();
+		for (final CopiedComment copiedComment : preparedSnapshot.comments()) {
+			elementVisitor.visitCopiedComment(copiedComment).ifPresent(visitedComments::add);
+		}
+
+		final List<CopiedLink> visitedLinks = new ArrayList<>();
+		for (final CopiedLink copiedLink : preparedSnapshot.links()) {
+			elementVisitor.visitCopiedLink(copiedLink).ifPresent(visitedLinks::add);
+		}
+
+		return new ClipboardSnapshot(preparedSnapshot.panelType(),
+				List.copyOf(visitedClasses),
+				List.copyOf(visitedFields),
+				List.copyOf(visitedComments),
+				List.copyOf(visitedLinks));
+	}
+
+	/**
+	 * Visits a pasted class model.
+	 *
+	 * @param classModel class to visit
+	 * @param visitor    optional visitor
+	 * @return visited class
+	 */
+	default Optional<ClassModel> visitPastedClass(final ClassModel classModel, final Optional<ElementVisitor> visitor) {
+		return visitor.isEmpty() ? Optional.of(classModel) : visitor.get().visitPastedClass(classModel);
+	}
+
+	/**
+	 * Visits a pasted field model.
+	 *
+	 * @param fieldModel field to visit
+	 * @param visitor    optional visitor
+	 * @return visited field
+	 */
+	default Optional<FieldModel> visitPastedField(final FieldModel fieldModel, final Optional<ElementVisitor> visitor) {
+		return visitor.isEmpty() ? Optional.of(fieldModel) : visitor.get().visitPastedField(fieldModel);
+	}
+
+	/**
+	 * Visits a pasted comment model.
+	 *
+	 * @param commentModel comment to visit
+	 * @param visitor      optional visitor
+	 * @return visited comment
+	 */
+	default Optional<CommentModel> visitPastedComment(final CommentModel commentModel, final Optional<ElementVisitor> visitor) {
+		return visitor.isEmpty() ? Optional.of(commentModel) : visitor.get().visitPastedComment(commentModel);
+	}
+
+	/**
+	 * Visits a pasted link model.
+	 *
+	 * @param linkModel link to visit
+	 * @param visitor   optional visitor
+	 * @return visited link
+	 */
+	default Optional<LinkModel> visitPastedLink(final LinkModel linkModel, final Optional<ElementVisitor> visitor) {
+		return visitor.isEmpty() ? Optional.of(linkModel) : visitor.get().visitPastedLink(linkModel);
+	}
+
+	private static boolean writeClipboardSnapshot(final ClipboardSnapshot clipboardSnapshot) {
+		try {
+			final String json = MNMain.OBJECT_MAPPER.writeValueAsString(clipboardSnapshot);
+			Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(ClipboardController.CLIPBOARD_PREFIX + json), null);
+			return true;
+		} catch (final IllegalStateException | IOException ex) {
+			ex.printStackTrace();
+			return false;
+		}
+	}
+
+	private static ClipboardSnapshot readClipboardSnapshot() {
+		try {
+			final java.awt.datatransfer.Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+			if (!clipboard.isDataFlavorAvailable(DataFlavor.stringFlavor)) {
+				return null;
+			}
+
+			final String text = (String) clipboard.getData(DataFlavor.stringFlavor);
+			if (text == null || !text.startsWith(ClipboardController.CLIPBOARD_PREFIX)) {
+				return null;
+			}
+
+			final String json = text.substring(ClipboardController.CLIPBOARD_PREFIX.length());
+			return MNMain.OBJECT_MAPPER.readValue(json, ClipboardSnapshot.class);
+		} catch (final IllegalStateException | UnsupportedFlavorException | IOException ex) {
+			ex.printStackTrace();
+			return null;
+		}
 	}
 
 }

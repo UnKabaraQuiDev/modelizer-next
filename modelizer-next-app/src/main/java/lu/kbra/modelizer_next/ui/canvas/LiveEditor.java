@@ -13,6 +13,7 @@ import java.awt.event.MouseMotionAdapter;
 import java.awt.geom.Point2D;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -471,10 +472,13 @@ public interface LiveEditor extends DiagramCanvasExt {
 			return;
 		}
 
+		final Optional<ElementVisitor> visitor = Optional.of(new CopyPasteSpecialElementVisitor(copyPasteSpecialData,
+				this.getCanvas().defaultPalette));
+
 		switch (this.getCanvas().copyPasteSpecialState) {
-		case COPY -> this.getCanvas().copySelection();
-		case CUT -> this.getCanvas().cutSelection();
-		case PASTE -> this.getCanvas().pasteSelection();
+		case COPY -> this.getCanvas().copySelection(visitor);
+		case CUT -> this.getCanvas().cutSelection(visitor);
+		case PASTE -> this.getCanvas().pasteSelection(visitor);
 		}
 
 		this.getCanvas().copyPasteSpecialState = CopyPasteSpecialState.NONE;
