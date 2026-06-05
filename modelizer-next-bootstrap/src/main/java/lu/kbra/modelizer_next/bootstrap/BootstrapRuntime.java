@@ -83,6 +83,25 @@ public class BootstrapRuntime implements UpdateRuntime {
 				BootstrapApp.ENABLE_UPDATE,
 				BootstrapApp.FORCE_JAR_NAME);
 
+		final Thread mainThread = Thread.currentThread();
+		Thread.setDefaultUncaughtExceptionHandler((t, e) -> {
+			final String tn = t.getName() + " (in " + (t.getThreadGroup() != null ? t.getThreadGroup().getName() : "none") + ")";
+			System.err.println("Caught in " + tn);
+			e.printStackTrace(System.err);
+
+			if (e instanceof ClassNotFoundException || e instanceof NoClassDefFoundError
+					|| e instanceof UnsupportedBootstrapVersionException) {
+				if (needsBootstrappUpdate(e)) {
+					try {
+						runtime.handleOutdatedBootstrapLauncher(new AppLaunchException("Error in thread: " + tn + ".", e), false);
+					} catch (Exception e1) {
+						e1.printStackTrace();
+						mainThread.interrupt();
+					}
+				}
+			}
+		});
+
 		if (firstLaunch) {
 			runtime.promptForInitialChannelSelection();
 			BootstrapApp.saveConfiguration(configuration);
@@ -611,7 +630,7 @@ public class BootstrapRuntime implements UpdateRuntime {
 	 * @param forced          whether forced is enabled
 	 * @throws Exception if the operation cannot be completed
 	 */
-	private void handleOutdatedBootstrapLauncher(final AppLaunchException launchException, final boolean forced) throws Exception {
+	void handleOutdatedBootstrapLauncher(final AppLaunchException launchException, final boolean forced) throws Exception {
 		final ParsedVersion currentBootstrapVersion = VersionComparator.parse(BootstrapApp.VERSION);
 		final BootstrapLoadingFrame loadingFrame = new BootstrapLoadingFrame();
 		loadingFrame.setVisible(true);
@@ -656,7 +675,7 @@ public class BootstrapRuntime implements UpdateRuntime {
 	 * @param throwable throwable value used by the operation
 	 * @return {@code true} when the condition is met; otherwise {@code false}
 	 */
-	private boolean needsBootstrappUpdate(final Throwable throwable) {
+	private static boolean needsBootstrappUpdate(final Throwable throwable) {
 		for (Throwable current = throwable; current != null; current = current.getCause()) {
 			if (current instanceof ClassNotFoundException || current instanceof NoClassDefFoundError
 					|| current instanceof UnsupportedBootstrapVersionException) {

@@ -63,6 +63,15 @@ public final class BootstrapMain {
 			FileOpenBridge.installFileHandler();
 			final BootstrapRuntime runtime = BootstrapRuntime.bootstrap();
 			runtime.launch(args, FileOpenBridge.TO_BE_OPENED);
+		} catch (final InterruptedException ie) {
+			ie.printStackTrace();
+			SwingUtilities.invokeLater(() -> {
+				JOptionPane.showMessageDialog(null,
+						"An exception occured in the background:\n" + PCUtils.getStackTraceAsString(ie),
+						"Bootstrap error",
+						JOptionPane.ERROR_MESSAGE);
+				System.exit(1);
+			});
 		} catch (final Exception ex) {
 			ex.printStackTrace();
 			SwingUtilities.invokeLater(() -> {
