@@ -1,13 +1,19 @@
 package lu.kbra.modelizer_next.ui.canvas;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.Optional;
+import java.util.Set;
 
+import lu.kbra.modelizer_next.layout.PanelType;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectedElement;
+import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectedElement.SelectedType;
 import lu.kbra.modelizer_next.ui.export.ViewExportScope;
 
 /**
@@ -21,11 +27,16 @@ interface CanvasExportRenderer extends DiagramCanvasExt {
 	 * @param scope export scope to use
 	 * @return the created export image
 	 */
-	default BufferedImage createExportImage(final ViewExportScope scope) {
+	default BufferedImage createExportImage(final ViewExportScope scope, final Optional<Color> backgroundColor) {
 		final Dimension exportSize = this.getCanvas().getExportSize(scope);
 		final BufferedImage image = new BufferedImage(exportSize.width, exportSize.height, BufferedImage.TYPE_INT_ARGB);
 		final Graphics2D g2 = image.createGraphics();
 		try {
+			backgroundColor.ifPresent(c -> {
+				g2.setColor(c);
+				g2.fillRect(0, 0, image.getWidth(), image.getHeight());
+			});
+
 			this.getCanvas().configureGraphics(g2);
 			this.getCanvas().paintExport(g2, scope);
 		} finally {
@@ -42,8 +53,8 @@ interface CanvasExportRenderer extends DiagramCanvasExt {
 	 * @param maxHeight height value
 	 * @return the created export preview image
 	 */
-	default BufferedImage createExportPreviewImage(final ViewExportScope scope, final int maxWidth, final int maxHeight) {
-		final BufferedImage fullSizeImage = this.getCanvas().createExportImage(scope);
+	default BufferedImage createExportPreviewImage(final ViewExportScope scope, final int maxWidth, final int maxHeight, final Optional<Color> backgroundColor) {
+		final BufferedImage fullSizeImage = this.getCanvas().createExportImage(scope, backgroundColor);
 		final Dimension exportSize = new Dimension(fullSizeImage.getWidth(), fullSizeImage.getHeight());
 		final double scale = Math.min(maxWidth / (double) exportSize.width, maxHeight / (double) exportSize.height);
 		final double safeScale = Math.max(0.05, Math.min(1.0, scale));
@@ -93,11 +104,31 @@ interface CanvasExportRenderer extends DiagramCanvasExt {
 
 		this.getCanvas().exportSelectionFilter = scope == ViewExportScope.SELECTION ? new LinkedHashSet<>(this.getCanvas().selectedElements)
 				: null;
+		if (scope == ViewExportScope.SELECTION) {
+			final Set<String> classIds = new HashSet<>();
+			this.getCanvas().exportSelectionFilter.parallelStream()
+					.filter(c -> c.type() == SelectedType.CLASS)
+					.forEach(c -> classIds.add(c.classId()));
+			if (this.getPanelType() == PanelType.CONCEPTUAL) {
+				this.getDocument()
+						.getModel()
+						.getConceptualLinks()
+						.parallelStream()
+						.filter(l -> classIds.contains(l.getFrom().getClassId()) && classIds.contains(l.getTo().getClassId()))
+						.forEach(l -> this.getCanvas().exportSelectionFilter.add(SelectedElement.forLink(l.getId())));
+			} else if (this.getPanelType().isTechnical()) {
+				this.getDocument()
+						.getModel()
+						.getTechnicalLinks()
+						.parallelStream()
+						.filter(l -> classIds.contains(l.getFrom().getClassId()) && classIds.contains(l.getTo().getClassId()))
+						.forEach(l -> this.getCanvas().exportSelectionFilter.add(SelectedElement.forLink(l.getId())));
+			}
+		}
 		this.getCanvas().suppressSelectionDecorations = true;
 		this.getCanvas().suppressInteractiveOverlays = true;
 
 		try {
-//			final Dimension exportSize = this.getCanvas().computeExportSize(graphics, scope);
 			final Rectangle2D.Double worldBounds = this.getCanvas().computeExportWorldBounds(graphics, scope);
 
 			final AffineTransform oldTransform = graphics.getTransform();

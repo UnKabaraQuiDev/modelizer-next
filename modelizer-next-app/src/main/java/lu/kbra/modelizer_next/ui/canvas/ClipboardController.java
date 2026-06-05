@@ -1,9 +1,11 @@
 package lu.kbra.modelizer_next.ui.canvas;
 
+import java.awt.Color;
 import java.awt.Toolkit;
 import java.awt.datatransfer.DataFlavor;
-import java.awt.datatransfer.StringSelection;
+import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
+import java.awt.image.BufferedImage;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
@@ -15,7 +17,11 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+
+import javax.imageio.ImageIO;
 
 import lu.kbra.modelizer_next.MNMain;
 import lu.kbra.modelizer_next.common.Size2D;
@@ -37,6 +43,7 @@ import lu.kbra.modelizer_next.ui.canvas.datastruct.CopiedField;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.CopiedLink;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectedElement;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectedElement.SelectedType;
+import lu.kbra.modelizer_next.ui.export.ViewExportScope;
 
 /**
  * Contains clipboard actions for copying, cutting, duplicating, and pasting canvas selections.
@@ -44,6 +51,12 @@ import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectedElement.SelectedType;
 interface ClipboardController extends DiagramCanvasExt {
 
 	String CLIPBOARD_PREFIX = "MODELIZER_NEXT_CLIPBOARD_SNAPSHOT_V1\n";
+
+	String MODELIZER_CLIPBOARD_MIME_TYPE = "application/x-modelizer-next; class=java.lang.String";
+	String PNG_CLIPBOARD_MIME_TYPE = "image/png; class=java.io.InputStream";
+
+	DataFlavor MODELIZER_CLIPBOARD_FLAVOR = ClipboardController.createDataFlavor(MODELIZER_CLIPBOARD_MIME_TYPE);
+	DataFlavor PNG_IMAGE_FLAVOR = ClipboardController.createDataFlavor(PNG_CLIPBOARD_MIME_TYPE);
 
 	/**
 	 * Copies the selection.
@@ -158,7 +171,7 @@ interface ClipboardController extends DiagramCanvasExt {
 			}
 		}
 
-		ClipboardSnapshot clipboardSnapshot = new ClipboardSnapshot(this.getPanelType(),
+		ClipboardSnapshot clipboardSnapshot = new ClipboardSnapshot(this.getPanelType(),g
 				List.copyOf(copiedClasses),
 				List.copyOf(copiedFields),
 				List.copyOf(copiedComments),
@@ -169,7 +182,8 @@ interface ClipboardController extends DiagramCanvasExt {
 			return false;
 		}
 
-		return ClipboardController.writeClipboardSnapshot(clipboardSnapshot);
+		final BufferedImage image = this.getCanvas().createExportImage(ViewExportScope.SELECTION, Optional.of(Color.WHITE));
+		return ClipboardController.writeClipboardSnapshot(clipboardSnapshot, image);
 	}
 
 	/**
@@ -447,11 +461,9 @@ interface ClipboardController extends DiagramCanvasExt {
 		for (final CopiedClass copiedClass : clipboard.classes()) {
 			final ClassModel classCopy = new ClassModel();
 
-			classCopy.setConceptualName(applyDefaultPasteRename
-					? this.getCanvas().appendSuffix(copiedClass.conceptualName(), " Copy")
+			classCopy.setConceptualName(applyDefaultPasteRename ? this.getCanvas().appendSuffix(copiedClass.conceptualName(), " Copy")
 					: copiedClass.conceptualName());
-			classCopy.setTechnicalName(applyDefaultPasteRename
-					? this.getCanvas().appendSuffix(copiedClass.technicalName(), "_COPY")
+			classCopy.setTechnicalName(applyDefaultPasteRename ? this.getCanvas().appendSuffix(copiedClass.technicalName(), "_COPY")
 					: copiedClass.technicalName());
 
 			classCopy.setVisibleInConceptual(copiedClass.visibleInConceptual());
@@ -570,7 +582,8 @@ interface ClipboardController extends DiagramCanvasExt {
 			}
 
 			this.getDocument().getModel().addComment(visitedComment.get());
-			this.getCanvas().applyNodeLayout(LayoutObjectType.COMMENT, visitedComment.get().getId(), copiedComment.layout(), deltaX, deltaY);
+			this.getCanvas()
+					.applyNodeLayout(LayoutObjectType.COMMENT, visitedComment.get().getId(), copiedComment.layout(), deltaX, deltaY);
 
 			newSelection.add(SelectedElement.forComment(visitedComment.get().getId()));
 		}
@@ -589,7 +602,6 @@ interface ClipboardController extends DiagramCanvasExt {
 		this.getCanvas().notifyDocumentChanged();
 	}
 
-
 	/**
 	 * Applies a visitor to all copied snapshot elements.
 	 *
@@ -597,9 +609,8 @@ interface ClipboardController extends DiagramCanvasExt {
 	 * @param visitor  optional visitor to apply
 	 * @return visited snapshot
 	 */
-	default ClipboardSnapshot applyElementVisitorToCopiedSnapshot(
-			final ClipboardSnapshot snapshot,
-			final Optional<ElementVisitor> visitor) {
+	default ClipboardSnapshot
+			applyElementVisitorToCopiedSnapshot(final ClipboardSnapshot snapshot, final Optional<ElementVisitor> visitor) {
 
 		if (visitor.isEmpty()) {
 			return snapshot;
@@ -702,10 +713,19 @@ interface ClipboardController extends DiagramCanvasExt {
 		return visitor.isEmpty() ? Optional.of(linkModel) : visitor.get().visitPastedLink(linkModel);
 	}
 
-	private static boolean writeClipboardSnapshot(final ClipboardSnapshot clipboardSnapshot) {
+	private static DataFlavor createDataFlavor(final String mimeType) {
+		try {
+			return new DataFlavor(mimeType);
+		} catch (final ClassNotFoundException ex) {
+			throw new ExceptionInInitializerError(ex);
+		}
+	}
+
+	private static boolean writeClipboardSnapshot(final ClipboardSnapshot clipboardSnapshot, final BufferedImage image) {
 		try {
 			final String json = MNMain.OBJECT_MAPPER.writeValueAsString(clipboardSnapshot);
-			Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(ClipboardController.CLIPBOARD_PREFIX + json), null);
+			final byte[] pngBytes = ClipboardController.createPngBytes(image);
+			Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new ModelizerClipboardTransferable(json, image, pngBytes), null);
 			return true;
 		} catch (final IllegalStateException | IOException ex) {
 			ex.printStackTrace();
@@ -716,6 +736,12 @@ interface ClipboardController extends DiagramCanvasExt {
 	private static ClipboardSnapshot readClipboardSnapshot() {
 		try {
 			final java.awt.datatransfer.Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+
+			if (clipboard.isDataFlavorAvailable(ClipboardController.MODELIZER_CLIPBOARD_FLAVOR)) {
+				final String json = (String) clipboard.getData(ClipboardController.MODELIZER_CLIPBOARD_FLAVOR);
+				return MNMain.OBJECT_MAPPER.readValue(json, ClipboardSnapshot.class);
+			}
+
 			if (!clipboard.isDataFlavorAvailable(DataFlavor.stringFlavor)) {
 				return null;
 			}
@@ -730,6 +756,83 @@ interface ClipboardController extends DiagramCanvasExt {
 		} catch (final IllegalStateException | UnsupportedFlavorException | IOException ex) {
 			ex.printStackTrace();
 			return null;
+		}
+	}
+
+	private static byte[] createPngBytes(final BufferedImage image) throws IOException {
+		if (image == null) {
+			return null;
+		}
+
+		final ByteArrayOutputStream output = new ByteArrayOutputStream();
+		ImageIO.write(image, "png", output);
+		return output.toByteArray();
+	}
+
+	/**
+	 * Transferable that exposes the same copied selection in several clipboard formats. Modelizer reads
+	 * the custom JSON flavor; other apps can use the image or plain text.
+	 */
+	final class ModelizerClipboardTransferable implements Transferable {
+
+		private final String json;
+		private final BufferedImage image;
+		private final byte[] pngBytes;
+		private final DataFlavor[] flavors;
+
+		private ModelizerClipboardTransferable(final String json, final BufferedImage image, final byte[] pngBytes) {
+			this.json = json;
+			this.image = image;
+			this.pngBytes = pngBytes == null ? null : pngBytes.clone();
+			this.flavors = image == null || pngBytes == null
+					? new DataFlavor[] { ClipboardController.MODELIZER_CLIPBOARD_FLAVOR, DataFlavor.stringFlavor }
+					: new DataFlavor[] {
+							ClipboardController.MODELIZER_CLIPBOARD_FLAVOR,
+							ClipboardController.PNG_IMAGE_FLAVOR,
+							DataFlavor.imageFlavor,
+							DataFlavor.stringFlavor };
+		}
+
+		@Override
+		public DataFlavor[] getTransferDataFlavors() {
+			return this.flavors.clone();
+		}
+
+		@Override
+		public boolean isDataFlavorSupported(final DataFlavor flavor) {
+			for (final DataFlavor availableFlavor : this.flavors) {
+				if (availableFlavor.equals(flavor)) {
+					return true;
+				}
+			}
+			return false;
+		}
+
+		@Override
+		public Object getTransferData(final DataFlavor flavor) throws UnsupportedFlavorException {
+			if (ClipboardController.MODELIZER_CLIPBOARD_FLAVOR.equals(flavor)) {
+				return this.json;
+			}
+
+			if (ClipboardController.PNG_IMAGE_FLAVOR.equals(flavor)) {
+				if (this.pngBytes == null) {
+					throw new UnsupportedFlavorException(flavor);
+				}
+				return new ByteArrayInputStream(this.pngBytes);
+			}
+
+			if (DataFlavor.imageFlavor.equals(flavor)) {
+				if (this.image == null) {
+					throw new UnsupportedFlavorException(flavor);
+				}
+				return this.image;
+			}
+
+			if (DataFlavor.stringFlavor.equals(flavor)) {
+				return ClipboardController.CLIPBOARD_PREFIX + this.json;
+			}
+
+			throw new UnsupportedFlavorException(flavor);
 		}
 	}
 

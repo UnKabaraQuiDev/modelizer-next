@@ -21,6 +21,7 @@ import java.util.EnumMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
@@ -98,7 +99,7 @@ public class ViewExportDialog extends JDialog {
 				return;
 			}
 
-			this.previewImage = canvas.createExportPreviewImage(scope, 900, 700);
+			this.previewImage = canvas.createExportPreviewImage(scope, 900, 700, Optional.empty());
 			this.repaint();
 		}
 
