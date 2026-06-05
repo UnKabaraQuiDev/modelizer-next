@@ -171,7 +171,7 @@ interface ClipboardController extends DiagramCanvasExt {
 			}
 		}
 
-		ClipboardSnapshot clipboardSnapshot = new ClipboardSnapshot(this.getPanelType(),g
+		ClipboardSnapshot clipboardSnapshot = new ClipboardSnapshot(this.getPanelType(),
 				List.copyOf(copiedClasses),
 				List.copyOf(copiedFields),
 				List.copyOf(copiedComments),
