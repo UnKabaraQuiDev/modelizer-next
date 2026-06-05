@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.util.Iterator;
+import java.util.Optional;
 
 import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;
@@ -102,6 +103,7 @@ public enum ViewExportFormat {
 	 * @param backgroundColor background color to use
 	 * @return an RGB image
 	 */
+	@Deprecated
 	static BufferedImage flattenImage(final BufferedImage image, final Color backgroundColor) {
 		final Color rgbBackground = backgroundColor == null ? Color.WHITE
 				: new Color(backgroundColor.getRed(), backgroundColor.getGreen(), backgroundColor.getBlue());
@@ -154,8 +156,8 @@ public enum ViewExportFormat {
 	 */
 	public void export(final DiagramCanvas canvas, final ViewExportRequest request, final ViewExportContext context, final File outputFile)
 			throws IOException {
-		ViewExportFormat
-				.writeImage(canvas.createExportImage(request.scope()), request, this.extension, outputFile, this.supportsTransparency());
+		ViewExportFormat.writeImage(canvas.createExportImage(request.scope(),
+				Optional.ofNullable(request.backgroundColor())), request, this.extension, outputFile, this.supportsTransparency());
 	}
 
 	/**

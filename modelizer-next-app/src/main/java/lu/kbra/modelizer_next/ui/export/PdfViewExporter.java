@@ -122,7 +122,7 @@ final class PdfViewExporter {
 		final PdfMargins margins = options.margins() == null ? PdfMargins.defaults() : options.margins();
 		final Color backgroundColor = request.backgroundColor() == null ? Color.WHITE : request.backgroundColor();
 
-		final BufferedImage diagramImage = ViewExportFormat.flattenImage(canvas.createExportImage(request.scope()), backgroundColor);
+		final BufferedImage diagramImage = canvas.createExportImage(request.scope(), Optional.ofNullable(backgroundColor));
 		final BufferedImage underTemplateImage = PdfViewExporter.readOptionalTemplate(options.underTemplateFile());
 		final BufferedImage overTemplateImage = PdfViewExporter.readOptionalTemplate(options.overTemplateFile());
 
