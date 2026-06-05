@@ -15,8 +15,8 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.BooleanSupplier;
 import java.util.function.Predicate;
-import java.util.function.Supplier;
 
 import javax.swing.Action;
 import javax.swing.BorderFactory;
@@ -101,7 +101,7 @@ final class MainFrameToolBar extends JToolBar {
 	JButton undoButton;
 	JButton redoButton;
 
-	private final Map<JButton, Supplier<Boolean>> buttonEnabledSuppliers = new LinkedHashMap<>();
+	private final Map<JButton, BooleanSupplier> buttonEnabledSuppliers = new LinkedHashMap<>();
 
 	/**
 	 * Creates a main frame tool bar instance.
@@ -183,11 +183,11 @@ final class MainFrameToolBar extends JToolBar {
 			}
 		}
 
-		for (final Map.Entry<JButton, Supplier<Boolean>> entry : this.buttonEnabledSuppliers.entrySet()) {
+		for (final Map.Entry<JButton, BooleanSupplier> entry : this.buttonEnabledSuppliers.entrySet()) {
 			final JButton button = entry.getKey();
-			final Supplier<Boolean> enabledSupplier = entry.getValue();
+			final BooleanSupplier enabledSupplier = entry.getValue();
 
-			button.setEnabled(Boolean.TRUE.equals(enabledSupplier.get()));
+			button.setEnabled(Boolean.TRUE.equals(enabledSupplier.getAsBoolean()));
 		}
 	}
 
@@ -219,7 +219,7 @@ final class MainFrameToolBar extends JToolBar {
 			final String icon,
 			final String description,
 			final String actionKey,
-			final Supplier<Boolean> enabledSupplier) {
+			final BooleanSupplier enabledSupplier) {
 
 		final JButton button = new JButton();
 		button.setIcon(this.getToolbarIcon(frame, icon));
@@ -295,7 +295,7 @@ final class MainFrameToolBar extends JToolBar {
 			final String icon,
 			final String description,
 			final String actionKey,
-			final Supplier<Boolean> enabledSupplier,
+			final BooleanSupplier enabledSupplier,
 			final List<ToolbarDropdownAction> subActions,
 			final Predicate<String> subActionEnabledProvider) {
 
@@ -423,13 +423,13 @@ final class MainFrameToolBar extends JToolBar {
 		}
 	}
 
-	private void registerButtonEnabledSupplier(final JButton button, final Supplier<Boolean> enabledSupplier) {
+	private void registerButtonEnabledSupplier(final JButton button, final BooleanSupplier enabledSupplier) {
 		if (enabledSupplier == null) {
 			return;
 		}
 
 		this.buttonEnabledSuppliers.put(button, enabledSupplier);
-		button.setEnabled(Boolean.TRUE.equals(enabledSupplier.get()));
+		button.setEnabled(Boolean.TRUE.equals(enabledSupplier.getAsBoolean()));
 	}
 
 }

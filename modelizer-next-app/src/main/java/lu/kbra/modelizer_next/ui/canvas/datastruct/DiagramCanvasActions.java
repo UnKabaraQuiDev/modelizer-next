@@ -2,6 +2,8 @@ package lu.kbra.modelizer_next.ui.canvas.datastruct;
 
 import java.util.function.IntConsumer;
 
+import lu.kbra.pclib.impl.primitive.BooleanConsumer;
+
 /**
  * Runnable actions registered as keyboard shortcuts on the canvas.
  *
@@ -45,6 +47,9 @@ public record DiagramCanvasActions(
 		Runnable copySelection,
 		Runnable cutSelection,
 		Runnable pasteSelection,
+		Runnable copySelectionSpecial,
+		Runnable cutSelectionSpecial,
+		Runnable pasteSelectionSpecial,
 		Runnable undo,
 		Runnable redo,
 		Runnable editStyle,

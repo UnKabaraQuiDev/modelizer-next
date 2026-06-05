@@ -24,6 +24,7 @@ import javax.swing.JList;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
+import javax.swing.LayoutFocusTraversalPolicy;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.border.CompoundBorder;
@@ -42,6 +43,8 @@ import lu.kbra.modelizer_next.layout.LayoutObjectType;
 import lu.kbra.modelizer_next.layout.NodeLayout;
 import lu.kbra.modelizer_next.layout.PanelType;
 import lu.kbra.modelizer_next.style.StylePalette;
+import lu.kbra.modelizer_next.ui.canvas.data.CopyPasteSpecialState;
+import lu.kbra.modelizer_next.ui.canvas.datastruct.CopyPasteSpecialData;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.LinkGeometry;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.LiveEditComponents;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.LiveEditContext;
@@ -49,6 +52,7 @@ import lu.kbra.modelizer_next.ui.canvas.datastruct.LiveEditElement;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.LiveEditElement.LiveEditType;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectedElement;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectedElement.SelectedType;
+import lu.kbra.pclib.PCUtils;
 import lu.kbra.pclib.datastructure.pair.Pair;
 import lu.kbra.pclib.datastructure.pair.Pairs;
 
@@ -423,8 +427,59 @@ public interface LiveEditor extends DiagramCanvasExt {
 		if (!next) {
 			liveEditComponents.setVisible(false);
 			this.getCanvas().liveEditElement = null;
-			SwingUtilities.invokeLater(this.getCanvas()::requestFocusInWindow);
+			SwingUtilities.invokeLater(this.getCanvas()::requestFocus);
 		}
+	}
+
+	default void invokeCopyPasteSpecialElement(final CopyPasteSpecialState state) {
+		if (state == CopyPasteSpecialState.NONE) {
+			this.cancelCopySpecialElement();
+			return;
+		}
+
+		this.getCanvas().copyPasteSpecialState = state;
+
+		final CopyPastePopupMenu copyPastePopupMenu = this.getCanvas().liveEditComponents.copyPastePopupMenu();
+		this.getCanvas().liveEditComponents.copyPastePopupMenu().setVisible(true);
+		final Point2D.Double point = this.getCanvas().getMouseViewportPos();
+		copyPastePopupMenu.setFont(
+				DiagramCanvas.BODY_FONT.deriveFont(DiagramCanvas.BODY_FONT.getSize() * (float) this.getCanvas().getPanelState().getZoom()));
+		final Dimension preferredSize = copyPastePopupMenu.getPreferredSize();
+		copyPastePopupMenu.setBounds((int) point.getX() + DiagramCanvas.COPY_PASTE_SPECIAL_OFFSET_X,
+				(int) point.getY(),
+				(int) preferredSize.getWidth() + DiagramCanvas.TEXT_PADDING,
+				(int) preferredSize.getHeight());
+		copyPastePopupMenu.setActionLabel(PCUtils.capitalize(state.name().toLowerCase()));
+		copyPastePopupMenu.setVisible(true);
+		copyPastePopupMenu.requestFocus();
+		this.getCanvas().repaint();
+	}
+
+	default void cancelCopySpecialElement() {
+		if (this.getCanvas().copyPasteSpecialState == CopyPasteSpecialState.NONE) {
+			return;
+		}
+
+		this.getCanvas().copyPasteSpecialState = CopyPasteSpecialState.NONE;
+		this.getCanvas().liveEditComponents.setVisible(false);
+		SwingUtilities.invokeLater(this.getCanvas()::requestFocus);
+	}
+
+	@SuppressWarnings("incomplete-switch")
+	default void confirmCopySpecialElement(final CopyPasteSpecialData copyPasteSpecialData) {
+		if (this.getCanvas().copyPasteSpecialState == CopyPasteSpecialState.NONE) {
+			return;
+		}
+
+		switch (this.getCanvas().copyPasteSpecialState) {
+		case COPY -> this.getCanvas().copySelection();
+		case CUT -> this.getCanvas().cutSelection();
+		case PASTE -> this.getCanvas().pasteSelection();
+		}
+
+		this.getCanvas().copyPasteSpecialState = CopyPasteSpecialState.NONE;
+		this.getCanvas().liveEditComponents.setVisible(false);
+		SwingUtilities.invokeLater(this.getCanvas()::requestFocus);
 	}
 
 	/**
@@ -432,7 +487,7 @@ public interface LiveEditor extends DiagramCanvasExt {
 	 *
 	 * @return the created renaming field
 	 */
-	default LiveEditComponents createRenamingField() {
+	default LiveEditComponents createLiveEditComponents() {
 		final JTextField textField = new JTextField("editing");
 
 		final JTextArea textArea = new JTextArea("editing");
@@ -499,6 +554,32 @@ public interface LiveEditor extends DiagramCanvasExt {
 			});
 		}
 
+		final CopyPastePopupMenu copyPastePopupMenu = new CopyPastePopupMenu(this::confirmCopySpecialElement);
+
+		copyPastePopupMenu.setVisible(false);
+		copyPastePopupMenu.setFocusCycleRoot(true);
+		copyPastePopupMenu.setFocusTraversalPolicy(new LayoutFocusTraversalPolicy());
+		copyPastePopupMenu.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT)
+				.put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "cancel");
+		copyPastePopupMenu.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT)
+				.put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "submit");
+		copyPastePopupMenu.getActionMap().put("cancel", new AbstractAction() {
+
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				LiveEditor.this.cancelCopySpecialElement();
+			}
+
+		});
+		copyPastePopupMenu.getActionMap().put("submit", new AbstractAction() {
+
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				copyPastePopupMenu.invokeConfirm(e);
+			}
+
+		});
+
 		for (final JComponent component : new JComponent[] { textField, textArea, enumComboBox, stylePaletteList, enumList }) {
 			component.setVisible(false);
 			component.setFocusTraversalKeysEnabled(false);
@@ -509,7 +590,7 @@ public interface LiveEditor extends DiagramCanvasExt {
 					if (!e.isTemporary() && component.isVisible() && e.getOppositeComponent() != component) {
 						SwingUtilities.invokeLater(() -> {
 							if (!component.hasFocus()) {
-								LiveEditor.this.getCanvas().cancelLiveEditElement();
+								LiveEditor.this.cancelLiveEditElement();
 							}
 						});
 					}
@@ -530,7 +611,7 @@ public interface LiveEditor extends DiagramCanvasExt {
 
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					LiveEditor.this.getCanvas().cancelLiveEditElement();
+					LiveEditor.this.cancelLiveEditElement();
 				}
 
 			});
@@ -576,7 +657,7 @@ public interface LiveEditor extends DiagramCanvasExt {
 			});
 		}
 
-		return new LiveEditComponents(textField, textArea, enumComboBox, stylePaletteList, enumList);
+		return new LiveEditComponents(textField, textArea, enumComboBox, stylePaletteList, enumList, copyPastePopupMenu);
 	}
 
 	/**

@@ -1,5 +1,7 @@
 package lu.kbra.modelizer_next.ui.canvas.datastruct;
 
+import java.awt.geom.Point2D;
+
 import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectedElement.SelectedType;
 
 /**
@@ -11,7 +13,7 @@ import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectedElement.SelectedType;
  * @param commentId  id of the comment to look up or modify
  * @param linkId     id of the link to look up or modify
  */
-public record LinkCreationState(SelectedType sourceType, String classId, String fieldId, String commentId, String linkId) {
+public record LinkCreationState(SelectedType sourceType, String classId, String fieldId, String commentId, String linkId, Point2D origin) {
 
 	/**
 	 * Creates a value from the supplied selection.
@@ -19,12 +21,13 @@ public record LinkCreationState(SelectedType sourceType, String classId, String 
 	 * @param selection selection state to read or update
 	 * @return the from selection result
 	 */
-	public static LinkCreationState fromSelection(final SelectedElement selection) {
+	public static LinkCreationState fromSelection(final SelectedElement selection, final Point2D origin) {
 		if (selection == null) {
 			return null;
 		}
 
-		return new LinkCreationState(selection.type(), selection.classId(), selection.fieldId(), selection.commentId(), selection.linkId());
+		return new LinkCreationState(selection
+				.type(), selection.classId(), selection.fieldId(), selection.commentId(), selection.linkId(), origin);
 	}
 
 	/**

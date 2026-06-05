@@ -345,6 +345,14 @@ interface LinkGeometryResolver extends DiagramCanvasExt {
 			return null;
 		}
 
+		if (this.getPanelType() == PanelType.CONCEPTUAL) {
+//			final Point2D reference = this.getCanvas().linkPreviewTarget != null
+//					? this.getCanvas().resolvePreviewTargetAnchor(this.getCanvas().linkPreviewTarget)
+//					: this.getCanvas().linkPreviewMousePoint;
+//			return this.getCanvas().resolveConceptualPreviewAnchor(source.classId(), reference);
+			return getCanvas().linkCreationState.origin();
+		}
+
 		final SelectedElement source = this.getCanvas().getLinkCreationSource();
 		if (source == null) {
 			return null;
@@ -352,13 +360,6 @@ interface LinkGeometryResolver extends DiagramCanvasExt {
 
 		if (source.type() == SelectedType.COMMENT) {
 			return this.getCanvas().resolveCommentCenterAnchor(source.commentId());
-		}
-
-		if (this.getPanelType() == PanelType.CONCEPTUAL) {
-			final Point2D reference = this.getCanvas().linkPreviewTarget != null
-					? this.getCanvas().resolvePreviewTargetAnchor(this.getCanvas().linkPreviewTarget)
-					: this.getCanvas().linkPreviewMousePoint;
-			return this.getCanvas().resolveConceptualPreviewAnchor(source.classId(), reference);
 		}
 
 		final Point2D reference = this.getCanvas().linkPreviewTarget != null

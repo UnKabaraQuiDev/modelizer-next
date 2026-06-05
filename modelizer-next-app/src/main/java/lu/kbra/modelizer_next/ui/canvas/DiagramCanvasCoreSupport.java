@@ -25,6 +25,7 @@ import lu.kbra.modelizer_next.layout.NodeLayout;
 import lu.kbra.modelizer_next.layout.PanelState;
 import lu.kbra.modelizer_next.layout.PanelType;
 import lu.kbra.modelizer_next.ui.canvas.data.AnchorSide;
+import lu.kbra.modelizer_next.ui.canvas.data.CopyPasteSpecialState;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.DiagramCanvasActions;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.FieldAnchor;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.LinkGeometry;
@@ -407,9 +408,12 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 						this.getCanvas()::addLink,
 						this.getCanvas()::selectAll,
 						this.getCanvas()::editSelected,
-						this.getCanvas()::copySelection,
-						this.getCanvas()::cutSelection,
-						this.getCanvas()::pasteSelection,
+						() -> this.getCanvas().copySelection(),
+						() -> this.getCanvas().cutSelection(),
+						() -> this.getCanvas().pasteSelection(),
+						() -> this.getCanvas().invokeCopyPasteSpecialElement(CopyPasteSpecialState.COPY),
+						() -> this.getCanvas().invokeCopyPasteSpecialElement(CopyPasteSpecialState.CUT),
+						() -> this.getCanvas().invokeCopyPasteSpecialElement(CopyPasteSpecialState.PASTE),
 						this.getCanvas().documentEventListener::undo,
 						this.getCanvas().documentEventListener::redo,
 						() -> this.getCanvas().editSelectionStyle(false),

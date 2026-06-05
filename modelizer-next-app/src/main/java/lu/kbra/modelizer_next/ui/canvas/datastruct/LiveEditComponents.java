@@ -9,6 +9,7 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
 import lu.kbra.modelizer_next.style.StylePalette;
+import lu.kbra.modelizer_next.ui.canvas.CopyPastePopupMenu;
 
 /**
  * Swing components used during inline editing on the canvas.
@@ -24,7 +25,8 @@ public record LiveEditComponents(
 		JTextArea textArea,
 		@Deprecated JComboBox<Enum<?>> enumComboBox,
 		JList<StylePalette> paletteList,
-		JList<Enum<?>> enumList) {
+		JList<Enum<?>> enumList,
+		CopyPastePopupMenu copyPastePopupMenu) {
 
 	/**
 	 * Applies the supplied consumer to each live edit Swing component.
@@ -37,6 +39,7 @@ public record LiveEditComponents(
 		consumer.accept(this.enumComboBox);
 		consumer.accept(this.paletteList);
 		consumer.accept(this.enumList);
+		consumer.accept(this.copyPastePopupMenu);
 	}
 
 	/**

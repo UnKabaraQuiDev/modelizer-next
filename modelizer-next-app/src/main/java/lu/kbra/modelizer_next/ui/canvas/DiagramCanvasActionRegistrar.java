@@ -162,6 +162,22 @@ interface DiagramCanvasActionRegistrar extends DiagramCanvasExt {
 
 		this.installKeyBind(inputMap,
 				actionMap,
+				KeyStroke.getKeyStroke(KeyEvent.VK_C, MainFrame.CTRL_MODIFIER | InputEvent.SHIFT_DOWN_MASK),
+				"copySelectionSpecial",
+				actions.copySelectionSpecial());
+		this.installKeyBind(inputMap,
+				actionMap,
+				KeyStroke.getKeyStroke(KeyEvent.VK_X, MainFrame.CTRL_MODIFIER | InputEvent.SHIFT_DOWN_MASK),
+				"cutSelectionSpecial",
+				actions.cutSelectionSpecial());
+		this.installKeyBind(inputMap,
+				actionMap,
+				KeyStroke.getKeyStroke(KeyEvent.VK_V, MainFrame.CTRL_MODIFIER | InputEvent.SHIFT_DOWN_MASK),
+				"pasteSelectionSpecial",
+				actions.pasteSelectionSpecial());
+
+		this.installKeyBind(inputMap,
+				actionMap,
 				KeyStroke.getKeyStroke(KeyEvent.VK_DECIMAL, 0),
 				"focusSelection",
 				actions.focusSelection());

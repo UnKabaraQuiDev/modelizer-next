@@ -27,6 +27,7 @@ import lu.kbra.modelizer_next.domain.ClassModel;
 import lu.kbra.modelizer_next.layout.PanelState;
 import lu.kbra.modelizer_next.layout.PanelType;
 import lu.kbra.modelizer_next.style.StylePalette;
+import lu.kbra.modelizer_next.ui.canvas.data.CopyPasteSpecialState;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.AnchorPair;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.ClassSideKey;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.ClipboardSnapshot;
@@ -100,6 +101,7 @@ public class DiagramCanvas extends JPanel
 	public static final int TEXT_PADDING = 8;
 
 	public static final int LIVE_EDIT_STYLE_OFFSET_X = 20;
+	public static final int COPY_PASTE_SPECIAL_OFFSET_X = 20;
 
 	public static final Color CANVAS_BACKGROUND_COLOR = new Color(0xF2F2F2);
 	public static final Color GRID_COLOR = new Color(0xE4E4E4);
@@ -152,6 +154,7 @@ public class DiagramCanvas extends JPanel
 	LinkCreationState linkCreationState;
 	SelectedElement linkPreviewTarget;
 
+	CopyPasteSpecialState copyPasteSpecialState;
 	LiveEditComponents liveEditComponents;
 	LiveEditElement liveEditElement;
 
@@ -222,7 +225,7 @@ public class DiagramCanvas extends JPanel
 		super.addMouseMotionListener(mouseAdapter);
 		super.addMouseWheelListener(mouseAdapter);
 
-		this.liveEditComponents = this.createRenamingField();
+		this.liveEditComponents = this.createLiveEditComponents();
 		this.liveEditComponents.forEach(super::add);
 		super.setLayout(null);
 

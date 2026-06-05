@@ -176,7 +176,7 @@ interface MouseInteractionController extends DiagramCanvasExt {
 				this.getCanvas().notifySelectionChanged();
 			}
 
-			this.getCanvas().linkCreationState = LinkCreationState.fromSelection(source);
+			this.getCanvas().linkCreationState = LinkCreationState.fromSelection(source, worldPoint);
 			this.getCanvas().linkPreviewTarget = null;
 			this.getCanvas().linkPreviewMousePoint = worldPoint;
 			this.getCanvas().setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
