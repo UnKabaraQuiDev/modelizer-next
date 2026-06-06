@@ -83,7 +83,6 @@ public class DiagramCanvas extends JPanel
 	public static final String DEBUG_DRAW_LINK_ANCHORS_PROPERTY = DiagramCanvas.class.getSimpleName() + ".debug_draw_link_anchors";
 	public static boolean DEBUG_DRAW_LINK_ANCHORS = Boolean.getBoolean(DiagramCanvas.DEBUG_DRAW_LINK_ANCHORS_PROPERTY);
 
-
 	public static final Font TITLE_FONT = new Font(Font.SANS_SERIF, Font.BOLD, 14);
 	public static final Font BODY_FONT = new Font(Font.SANS_SERIF, Font.PLAIN, 12);
 

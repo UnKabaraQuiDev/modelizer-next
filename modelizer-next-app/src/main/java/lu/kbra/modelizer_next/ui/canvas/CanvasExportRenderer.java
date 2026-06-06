@@ -53,7 +53,11 @@ interface CanvasExportRenderer extends DiagramCanvasExt {
 	 * @param maxHeight height value
 	 * @return the created export preview image
 	 */
-	default BufferedImage createExportPreviewImage(final ViewExportScope scope, final int maxWidth, final int maxHeight, final Optional<Color> backgroundColor) {
+	default BufferedImage createExportPreviewImage(
+			final ViewExportScope scope,
+			final int maxWidth,
+			final int maxHeight,
+			final Optional<Color> backgroundColor) {
 		final BufferedImage fullSizeImage = this.getCanvas().createExportImage(scope, backgroundColor);
 		final Dimension exportSize = new Dimension(fullSizeImage.getWidth(), fullSizeImage.getHeight());
 		final double scale = Math.min(maxWidth / (double) exportSize.width, maxHeight / (double) exportSize.height);

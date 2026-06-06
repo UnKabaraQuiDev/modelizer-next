@@ -472,8 +472,8 @@ public interface LiveEditor extends DiagramCanvasExt {
 			return;
 		}
 
-		final Optional<ElementVisitor> visitor = Optional.of(new CopyPasteSpecialElementVisitor(copyPasteSpecialData,
-				this.getCanvas().defaultPalette));
+		final Optional<ElementVisitor> visitor = Optional
+				.of(new CopyPasteSpecialElementVisitor(copyPasteSpecialData, this.getCanvas().defaultPalette));
 
 		switch (this.getCanvas().copyPasteSpecialState) {
 		case COPY -> this.getCanvas().copySelection(visitor);
