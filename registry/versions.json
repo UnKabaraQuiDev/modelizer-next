@@ -8,12 +8,12 @@
     "updatedAt": "2026-06-02T15:16:42Z"
   },
   "snapshot": {
-    "version": "10-SNAPSHOT-311",
-    "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/10-SNAPSHOT-311/modelizer-next-app-10-SNAPSHOT-311.jar",
-    "releaseUrl": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/tag/10-SNAPSHOT-311",
+    "version": "10-SNAPSHOT-312",
+    "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/10-SNAPSHOT-312/modelizer-next-app-10-SNAPSHOT-312.jar",
+    "releaseUrl": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/tag/10-SNAPSHOT-312",
     "notes": "Latest snapshot build.",
-    "tag": "10-SNAPSHOT-311",
-    "updatedAt": "2026-06-06T10:48:49Z"
+    "tag": "10-SNAPSHOT-312",
+    "updatedAt": "2026-06-13T16:09:50Z"
   },
   "nightly": {
     "version": "10-NIGHTLY-311",
