@@ -1,10 +1,10 @@
 {
   "channel": "release",
-  "version": "9-RELEASE-301",
-  "tag": "9-RELEASE-301",
-  "releaseUrl": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/tag/9-RELEASE-301",
-  "assetUrl": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/9-RELEASE-301/modelizer-next-app-9-RELEASE-301.jar",
-  "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/9-RELEASE-301/modelizer-next-app-9-RELEASE-301.jar",
+  "version": "10-RELEASE-314",
+  "tag": "10-RELEASE-314",
+  "releaseUrl": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/tag/10-RELEASE-314",
+  "assetUrl": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/10-RELEASE-314/modelizer-next-app-10-RELEASE-314.jar",
+  "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/10-RELEASE-314/modelizer-next-app-10-RELEASE-314.jar",
   "platforms": [
     "unknown",
     "linux",
@@ -12,8 +12,85 @@
     "windows"
   ],
   "notes": "Latest release build.",
-  "updatedAt": "2026-06-02T15:16:42Z",
+  "updatedAt": "2026-06-13T16:20:47Z",
   "entries": [
+    {
+      "version": "10-RELEASE-314",
+      "tag": "10-RELEASE-314",
+      "releaseUrl": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/tag/10-RELEASE-314",
+      "assetUrl": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/10-RELEASE-314/modelizer-next-app-10-RELEASE-314.jar",
+      "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/10-RELEASE-314/modelizer-next-app-10-RELEASE-314.jar",
+      "platforms": [
+        "unknown",
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "notes": "Latest release build.",
+      "publishedAt": "2026-06-13T16:20:47Z",
+      "assets": [
+        {
+          "name": "modelizer-next-app-10-RELEASE-314.jar",
+          "platform": "unknown",
+          "kind": "app-standalone-jar",
+          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/10-RELEASE-314/modelizer-next-app-10-RELEASE-314.jar"
+        },
+        {
+          "name": "modelizer-next-app-portable-linux-10-RELEASE-314.zip",
+          "platform": "linux",
+          "kind": "app-portable-native",
+          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/10-RELEASE-314/modelizer-next-app-portable-linux-10-RELEASE-314.zip"
+        },
+        {
+          "name": "modelizer-next-app-portable-macos-10-RELEASE-314.zip",
+          "platform": "macos",
+          "kind": "app-portable-native",
+          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/10-RELEASE-314/modelizer-next-app-portable-macos-10-RELEASE-314.zip"
+        },
+        {
+          "name": "modelizer-next-app-portable-windows-10-RELEASE-314.zip",
+          "platform": "windows",
+          "kind": "app-portable-native",
+          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/10-RELEASE-314/modelizer-next-app-portable-windows-10-RELEASE-314.zip"
+        },
+        {
+          "name": "modelizer-next-app-standalone-linux-10-RELEASE-314.deb",
+          "platform": "linux",
+          "kind": "app-standalone-native",
+          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/10-RELEASE-314/modelizer-next-app-standalone-linux-10-RELEASE-314.deb"
+        },
+        {
+          "name": "modelizer-next-app-standalone-macos-10-RELEASE-314.dmg",
+          "platform": "macos",
+          "kind": "app-standalone-native",
+          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/10-RELEASE-314/modelizer-next-app-standalone-macos-10-RELEASE-314.dmg"
+        },
+        {
+          "name": "modelizer-next-app-standalone-windows-10-RELEASE-314.exe",
+          "platform": "windows",
+          "kind": "app-standalone-native",
+          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/10-RELEASE-314/modelizer-next-app-standalone-windows-10-RELEASE-314.exe"
+        },
+        {
+          "name": "modelizer-next-bootstrap-linux-10-RELEASE-314.deb",
+          "platform": "linux",
+          "kind": "bootstrap-native",
+          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/10-RELEASE-314/modelizer-next-bootstrap-linux-10-RELEASE-314.deb"
+        },
+        {
+          "name": "modelizer-next-bootstrap-macos-10-RELEASE-314.dmg",
+          "platform": "macos",
+          "kind": "bootstrap-native",
+          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/10-RELEASE-314/modelizer-next-bootstrap-macos-10-RELEASE-314.dmg"
+        },
+        {
+          "name": "modelizer-next-bootstrap-windows-10-RELEASE-314.exe",
+          "platform": "windows",
+          "kind": "bootstrap-native",
+          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/10-RELEASE-314/modelizer-next-bootstrap-windows-10-RELEASE-314.exe"
+        }
+      ]
+    },
     {
       "version": "9-RELEASE-301",
       "tag": "9-RELEASE-301",

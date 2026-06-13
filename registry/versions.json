@@ -1,11 +1,11 @@
 {
   "release": {
-    "version": "9-RELEASE-301",
-    "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/9-RELEASE-301/modelizer-next-app-9-RELEASE-301.jar",
-    "releaseUrl": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/tag/9-RELEASE-301",
+    "version": "10-RELEASE-314",
+    "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/10-RELEASE-314/modelizer-next-app-10-RELEASE-314.jar",
+    "releaseUrl": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/tag/10-RELEASE-314",
     "notes": "Latest release build.",
-    "tag": "9-RELEASE-301",
-    "updatedAt": "2026-06-02T15:16:42Z"
+    "tag": "10-RELEASE-314",
+    "updatedAt": "2026-06-13T16:20:47Z"
   },
   "snapshot": {
     "version": "10-SNAPSHOT-312",
