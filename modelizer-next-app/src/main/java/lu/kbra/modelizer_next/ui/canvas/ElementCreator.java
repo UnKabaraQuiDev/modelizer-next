@@ -60,7 +60,7 @@ public interface ElementCreator extends DiagramCanvasExt {
 		fieldCopy.setTechnicalOnly(copiedField.notConceptual());
 		fieldCopy.setPrimaryKey(copiedField.primaryKey());
 		fieldCopy.setUnique(copiedField.unique());
-		fieldCopy.setNotNull(copiedField.notNull());
+		fieldCopy.setNonNull(copiedField.notNull());
 		fieldCopy.setType(copiedField.type());
 
 		fieldCopy.setTextColor(copiedField.textColor());

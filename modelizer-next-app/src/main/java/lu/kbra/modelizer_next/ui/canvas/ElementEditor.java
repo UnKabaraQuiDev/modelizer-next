@@ -123,7 +123,7 @@ public interface ElementEditor extends DiagramCanvasExt {
 		fieldModel.setTechnicalName(result.technicalName());
 		fieldModel.setPrimaryKey(result.primaryKey());
 		fieldModel.setUnique(result.unique());
-		fieldModel.setNotNull(result.notNull());
+		fieldModel.setNonNull(result.notNull());
 		fieldModel.setTextColor(result.textColor());
 		fieldModel.setBackgroundColor(result.backgroundColor());
 		fieldModel.setType(result.type());

@@ -282,7 +282,9 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 			this.redoMenuItem.setEnabled(this.session.canRedo());
 		}
 
-		this.toolBar.refreshToolbarState(this);
+		if (toolBar != null) {
+			this.toolBar.refreshToolbarState(this);
+		}
 
 		this.refreshFrameTitle();
 	}
@@ -318,6 +320,11 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 			@Override
 			public void onDocumentChanged() {
 				MainFrame.this.onDocumentChanged();
+			}
+
+			@Override
+			public void cancelDocumentChange() {
+				MainFrame.this.cancelDocumentChange();
 			}
 
 			@Override
@@ -373,6 +380,9 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 		this.refreshToolbarMenuState();
 		this.revalidate();
 		this.repaint();
+
+		// makes the current document (that just got opened) not dirty anymore
+		canvasListener.cancelDocumentChange();
 	}
 
 	/**
@@ -626,6 +636,11 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 	 */
 	void onDocumentChanged() {
 		this.session.markChanged();
+		this.refreshToolbarMenuState();
+	}
+
+	void cancelDocumentChange() {
+		this.session.unmarkChanged();
 		this.refreshToolbarMenuState();
 	}
 

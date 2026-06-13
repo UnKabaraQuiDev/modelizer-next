@@ -89,7 +89,7 @@ public interface CaptureManager extends DiagramCanvasExt {
 				fieldModel.isTechnicalOnly(),
 				fieldModel.isPrimaryKey(),
 				fieldModel.isUnique(),
-				fieldModel.isNotNull(),
+				fieldModel.isNonNull(),
 				fieldModel.getType(),
 				fieldModel.getTextColor(),
 				fieldModel.getBackgroundColor());

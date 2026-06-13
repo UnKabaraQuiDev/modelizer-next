@@ -8,5 +8,5 @@ import lu.kbra.modelizer_next.layout.PanelType;
  * @param panelType diagram panel type whose model or layout should be used
  * @param path      file system path to read or write
  */
-public record SelectionInfo(PanelType panelType, String path) {
+public record SelectionInfo(PanelType panelType, String path, SelectedElement element) {
 }

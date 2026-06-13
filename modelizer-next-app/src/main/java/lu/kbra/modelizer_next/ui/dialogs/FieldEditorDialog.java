@@ -89,7 +89,7 @@ public final class FieldEditorDialog {
 
 		final JCheckBox primaryKeyBox = new JCheckBox("PK", fieldModel.isPrimaryKey());
 		final JCheckBox uniqueBox = new JCheckBox("UQ", fieldModel.isUnique());
-		final JCheckBox notNullBox = new JCheckBox("NN", fieldModel.isNotNull());
+		final JCheckBox notNullBox = new JCheckBox("NN", fieldModel.isNonNull());
 
 		final ColorButton textColorButton = new ColorButton("Text color", fieldModel.getTextColor());
 		final ColorButton backgroundColorButton = new ColorButton("Background color", fieldModel.getBackgroundColor());
@@ -219,7 +219,7 @@ public final class FieldEditorDialog {
 		fieldModel.setTechnicalName(technicalNameField.getText());
 		fieldModel.setPrimaryKey(primaryKeyBox.isSelected());
 		fieldModel.setUnique(uniqueBox.isSelected());
-		fieldModel.setNotNull(notNullBox.isSelected());
+		fieldModel.setNonNull(notNullBox.isSelected());
 		fieldModel.setTextColor(textColorButton.getSelectedColor());
 		fieldModel.setBackgroundColor(backgroundColorButton.getSelectedColor());
 		fieldModel.setType(typeField.getSelectedItem() == null ? null : typeField.getSelectedItem().toString().trim());

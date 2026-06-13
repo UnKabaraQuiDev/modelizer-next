@@ -14,6 +14,7 @@ import java.awt.geom.Point2D;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Consumer;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -46,6 +47,7 @@ import lu.kbra.modelizer_next.layout.PanelType;
 import lu.kbra.modelizer_next.style.StylePalette;
 import lu.kbra.modelizer_next.ui.canvas.data.CopyPasteSpecialState;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.CopyPasteSpecialData;
+import lu.kbra.modelizer_next.ui.canvas.datastruct.FieldTags;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.LinkGeometry;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.LiveEditComponents;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.LiveEditContext;
@@ -479,11 +481,64 @@ public interface LiveEditor extends DiagramCanvasExt {
 		case COPY -> this.getCanvas().copySelection(visitor);
 		case CUT -> this.getCanvas().cutSelection(visitor);
 		case PASTE -> this.getCanvas().pasteSelection(visitor);
+		case DUPLICATE -> this.getCanvas().duplicateSelection(visitor);
 		}
 
 		this.getCanvas().copyPasteSpecialState = CopyPasteSpecialState.NONE;
 		this.getCanvas().liveEditComponents.setVisible(false);
 		SwingUtilities.invokeLater(this.getCanvas()::requestFocus);
+	}
+
+	default void confirmFieldTagsElement(final FieldTags fieldTagsData) {
+		if (!this.isLiveEditingElement() || getCanvas().liveEditElement.type() != LiveEditType.CLASS_FIELD) {
+			this.getCanvas().liveEditComponents.setVisible(false);
+			return;
+		}
+
+		final LiveEditElement liveEditElement = getCanvas().liveEditElement;
+		final FieldModel fieldModel = getCanvas().findFieldById(liveEditElement.classId(), liveEditElement.fieldId());
+		fieldModel.setTags(fieldTagsData);
+
+		this.getCanvas().notifyDocumentChanged();
+
+		this.getCanvas().liveEditElement = null;
+		this.getCanvas().liveEditComponents.setVisible(false);
+		SwingUtilities.invokeLater(this.getCanvas()::requestFocus);
+	}
+
+	default void toggleFieldPrimaryKey() {
+		this.ifFieldSelected(fieldModel -> {
+			fieldModel.setPrimaryKey(!fieldModel.isPrimaryKey());
+			this.getCanvas().notifyDocumentChanged();
+		});
+	}
+
+	default void toggleFieldUnique() {
+		this.ifFieldSelected(fieldModel -> {
+			fieldModel.setUnique(!fieldModel.isUnique());
+			this.getCanvas().notifyDocumentChanged();
+		});
+	}
+
+	default void toggleFieldNonNull() {
+		this.ifFieldSelected(fieldModel -> {
+			fieldModel.setNonNull(!fieldModel.isNonNull());
+			this.getCanvas().notifyDocumentChanged();
+		});
+	}
+
+	default void ifFieldSelected(Consumer<FieldModel> consumer) {
+		if (!getCanvas().hasSelection() || getCanvas().selectedElement.type() != SelectedType.FIELD) {
+			return;
+		}
+
+		final FieldModel fieldModel = getCanvas().findFieldById(getCanvas().selectedElement.classId(),
+				getCanvas().selectedElement.fieldId());
+		if (fieldModel == null) {
+			return;
+		}
+
+		consumer.accept(fieldModel);
 	}
 
 	/**
@@ -559,30 +614,33 @@ public interface LiveEditor extends DiagramCanvasExt {
 		}
 
 		final CopyPastePopupMenu copyPastePopupMenu = new CopyPastePopupMenu(this::confirmCopySpecialElement);
+		final FieldTagsPopupMenu fieldTagsPopupMenu = new FieldTagsPopupMenu(this::confirmFieldTagsElement);
 
-		copyPastePopupMenu.setVisible(false);
-		copyPastePopupMenu.setFocusCycleRoot(true);
-		copyPastePopupMenu.setFocusTraversalPolicy(new LayoutFocusTraversalPolicy());
-		copyPastePopupMenu.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT)
-				.put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "cancel");
-		copyPastePopupMenu.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT)
-				.put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "submit");
-		copyPastePopupMenu.getActionMap().put("cancel", new AbstractAction() {
+		for (LivePopupMenu popupMenu : new LivePopupMenu[] { copyPastePopupMenu, fieldTagsPopupMenu }) {
+			popupMenu.setVisible(false);
+			popupMenu.setFocusCycleRoot(true);
+			popupMenu.setFocusTraversalPolicy(new LayoutFocusTraversalPolicy());
+			popupMenu.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT)
+					.put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "cancel");
+			popupMenu.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT)
+					.put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "submit");
+			popupMenu.getActionMap().put("cancel", new AbstractAction() {
 
-			@Override
-			public void actionPerformed(final ActionEvent e) {
-				LiveEditor.this.cancelCopySpecialElement();
-			}
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					LiveEditor.this.cancelCopySpecialElement();
+				}
 
-		});
-		copyPastePopupMenu.getActionMap().put("submit", new AbstractAction() {
+			});
+			popupMenu.getActionMap().put("submit", new AbstractAction() {
 
-			@Override
-			public void actionPerformed(final ActionEvent e) {
-				copyPastePopupMenu.invokeConfirm(e);
-			}
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					popupMenu.invokeConfirm(e);
+				}
 
-		});
+			});
+		}
 
 		for (final JComponent component : new JComponent[] { textField, textArea, enumComboBox, stylePaletteList, enumList }) {
 			component.setVisible(false);
@@ -661,7 +719,13 @@ public interface LiveEditor extends DiagramCanvasExt {
 			});
 		}
 
-		return new LiveEditComponents(textField, textArea, enumComboBox, stylePaletteList, enumList, copyPastePopupMenu);
+		return new LiveEditComponents(textField,
+				textArea,
+				enumComboBox,
+				stylePaletteList,
+				enumList,
+				copyPastePopupMenu,
+				fieldTagsPopupMenu);
 	}
 
 	/**
@@ -676,6 +740,15 @@ public interface LiveEditor extends DiagramCanvasExt {
 
 		this.invokeStyleEditingElement(this.getCanvas().selectedElement.asStyleEditElement(alternative,
 				this.getStyleObject(this.getCanvas().selectedElement, alternative)));
+	}
+
+	default void editSelectionFieldTags() {
+		if (this.getCanvas().selectedElement == null || this.getCanvas().selectedElement.type() == SelectedType.NONE
+				|| this.getCanvas().selectedElement.type() != SelectedType.FIELD) {
+			return;
+		}
+
+		this.invokeFieldTagsEditingElement(getCanvas().selectedElement.asLiveEditElement(false));
 	}
 
 	/**
@@ -769,6 +842,42 @@ public interface LiveEditor extends DiagramCanvasExt {
 
 			list.setVisible(true);
 			list.requestFocus();
+			canvas.repaint();
+		});
+	}
+
+	default void invokeFieldTagsEditingElement(final LiveEditElement element) {
+		if (this.isLiveEditingElement()) {
+			this.cancelLiveEditElement();
+		}
+		if (element.type() != LiveEditType.CLASS_FIELD) {
+			return;
+		}
+
+		final DiagramCanvas canvas = this.getCanvas();
+
+		canvas.liveEditElement = element;
+		canvas.select(canvas.selectedElement);
+		final FieldModel fieldModel = canvas.findFieldById(canvas.selectedElement.classId(), canvas.selectedElement.fieldId());
+
+		final FieldTagsPopupMenu fieldTagsPopupMenu = canvas.liveEditComponents.fieldTagsPopupMenu();
+
+		SwingUtilities.invokeLater(() -> {
+			fieldTagsPopupMenu.apply(fieldModel.getTags());
+
+			fieldTagsPopupMenu.setFont(DiagramCanvas.BODY_FONT
+					.deriveFont(DiagramCanvas.BODY_FONT.getSize() * (float) this.getCanvas().getPanelState().getZoom()));
+
+			final Dimension preferredSize = fieldTagsPopupMenu.getPreferredSize();
+			final Point2D.Double point = this.getCanvas().getMouseViewportPos();
+
+			fieldTagsPopupMenu.setBounds((int) point.getX() + DiagramCanvas.LIVE_EDIT_STYLE_OFFSET_X,
+					(int) point.getY(),
+					(int) preferredSize.getWidth() + DiagramCanvas.TEXT_PADDING,
+					(int) preferredSize.getHeight());
+
+			fieldTagsPopupMenu.setVisible(true);
+			fieldTagsPopupMenu.requestFocus();
 			canvas.repaint();
 		});
 	}

@@ -48,6 +48,7 @@ public record DiagramCanvasActions(
 		Runnable copySelectionSpecial,
 		Runnable cutSelectionSpecial,
 		Runnable pasteSelectionSpecial,
+		Runnable duplicateSelectionSpecial,
 		Runnable undo,
 		Runnable redo,
 		Runnable editStyle,
@@ -61,6 +62,10 @@ public record DiagramCanvasActions(
 		Runnable syncSelectionPositionPrevious,
 		Runnable syncSelectionPositionConceptual,
 		Runnable syncSelectionPositionLogical,
-		Runnable syncSelectionPositionPhysical) {
+		Runnable syncSelectionPositionPhysical,
+		Runnable editFieldTags,
+		Runnable toggleFieldPrimaryKey,
+		Runnable toggleFieldUnique,
+		Runnable toggleFieldNonNull) {
 
 }

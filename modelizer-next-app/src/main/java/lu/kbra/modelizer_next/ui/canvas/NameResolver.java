@@ -103,7 +103,7 @@ interface NameResolver extends DiagramCanvasExt {
 //		if (fieldModel.isUnique()) {
 //			flags.add("UQ");
 //		}
-//		if (fieldModel.isNotNull()) {
+//		if (fieldModel.isNonNull()) {
 //			flags.add("NN");
 //		}
 //

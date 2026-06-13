@@ -46,7 +46,7 @@ interface SelectionController extends DiagramCanvasExt {
 	 * @return the selection info
 	 */
 	default SelectionInfo getSelectionInfo() {
-		return new SelectionInfo(this.getPanelType(), this.getCanvas().buildSelectionPath());
+		return new SelectionInfo(this.getPanelType(), this.getCanvas().buildSelectionPath(), this.getCanvas().selectedElement);
 	}
 
 	/**

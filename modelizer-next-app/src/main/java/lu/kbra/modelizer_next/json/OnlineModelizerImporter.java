@@ -249,7 +249,7 @@ public final class OnlineModelizerImporter {
 				fieldModel.setTechnicalOnly(!attributeNode.path("visibility").path("conceptual").asBoolean(true));
 				fieldModel.setPrimaryKey(attributeNode.path("primaryKey").asBoolean(false));
 				fieldModel.setUnique(attributeNode.path("unique").asBoolean(false));
-				fieldModel.setNotNull(!attributeNode.path("nullable").asBoolean(true));
+				fieldModel.setNonNull(!attributeNode.path("nullable").asBoolean(true));
 				fieldModel.setTextColor(Color.BLACK);
 				fieldModel.setBackgroundColor(Color.WHITE);
 

@@ -136,6 +136,11 @@ interface DiagramCanvasActionRegistrar extends DiagramCanvasExt {
 				KeyStroke.getKeyStroke(KeyEvent.VK_D, MainFrame.CTRL_MODIFIER),
 				"duplicateSelection",
 				actions.duplicateSelection());
+		this.installKeyBind(inputMap,
+				actionMap,
+				KeyStroke.getKeyStroke(KeyEvent.VK_D, MainFrame.CTRL_MODIFIER | InputEvent.SHIFT_DOWN_MASK),
+				"duplicateSelectionSpecial",
+				actions.duplicateSelectionSpecial());
 
 		this.installKeyBind(inputMap, actionMap, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "clearSelection", actions.clearSelection());
 		this.installKeyBind(inputMap,
@@ -201,6 +206,15 @@ interface DiagramCanvasActionRegistrar extends DiagramCanvasExt {
 		this.installActionBind(inputMap, actionMap, "syncSelectionPositionConceptual", actions.syncSelectionPositionConceptual());
 		this.installActionBind(inputMap, actionMap, "syncSelectionPositionLogical", actions.syncSelectionPositionLogical());
 		this.installActionBind(inputMap, actionMap, "syncSelectionPositionPhysical", actions.syncSelectionPositionPhysical());
+
+		this.installKeyBind(inputMap,
+				actionMap,
+				KeyStroke.getKeyStroke(KeyEvent.VK_T, InputEvent.SHIFT_DOWN_MASK),
+				"editFieldTags",
+				actions.editFieldTags());
+		this.installActionBind(inputMap, actionMap, "toggleFieldPrimaryKey", actions.toggleFieldPrimaryKey());
+		this.installActionBind(inputMap, actionMap, "toggleFieldUnique", actions.toggleFieldUnique());
+		this.installActionBind(inputMap, actionMap, "toggleFieldNonNull", actions.toggleFieldNonNull());
 	}
 
 	/**

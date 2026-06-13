@@ -1,39 +1,33 @@
 package lu.kbra.modelizer_next.domain;
 
 import java.awt.Color;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lu.kbra.modelizer_next.domain.impl.IdOwner;
 import lu.kbra.modelizer_next.domain.impl.NamesOwner;
 import lu.kbra.modelizer_next.domain.impl.StyleOwner;
 import lu.kbra.modelizer_next.domain.shared.ElementNames;
 import lu.kbra.modelizer_next.domain.shared.ElementStyle;
+import lu.kbra.modelizer_next.ui.canvas.datastruct.FieldTags;
 
 /**
  * Persistent model of a class field or table column, including names, data type, keys, cardinality,
  * style, and visibility.
  */
-public class FieldModel implements NamesOwner, IdOwner, StyleOwner {
+public class FieldModel implements NamesOwner, IdOwner, StyleOwner, TagsOwner {
 
 	public static final String[] SQL_TYPES = { null, "INT", "BIGINT", "TEXT", "BOOLEAN", "TINYINT", "DATE", "TIMESTAMP" };
-
-	public static final String NOT_NULL_FLAG = "NN";
-	public static final String PRIMARY_KEY_FLAG = "PK";
-	public static final String UNIQUE_FLAG = "UQ";
 
 	private String id;
 	private ElementNames names;
 	@JsonAlias("notConceptual")
 	private boolean technicalOnly;
 	private ElementStyle style;
-	private boolean primaryKey;
-	private boolean unique;
-	private boolean notNull;
+	private FieldTags tags;
 	private String type;
 
 	@JsonIgnore
@@ -45,11 +39,9 @@ public class FieldModel implements NamesOwner, IdOwner, StyleOwner {
 	public FieldModel() {
 		this.id = UUID.randomUUID().toString();
 		this.names = new ElementNames();
+		this.tags = new FieldTags();
 		this.technicalOnly = false;
 		this.style = ElementStyle.forField();
-		this.primaryKey = false;
-		this.unique = false;
-		this.notNull = false;
 		this.type = null;
 	}
 
@@ -62,25 +54,6 @@ public class FieldModel implements NamesOwner, IdOwner, StyleOwner {
 	@Override
 	public Color getBorderColor() {
 		return StyleOwner.super.getBorderColor();
-	}
-
-	/**
-	 * Returns the flags.
-	 *
-	 * @return the flags
-	 */
-	public List<String> getFlags() {
-		final List<String> ll = new ArrayList<>();
-		if (this.primaryKey) {
-			ll.add(FieldModel.PRIMARY_KEY_FLAG);
-		}
-		if (this.notNull) {
-			ll.add(FieldModel.NOT_NULL_FLAG);
-		}
-		if (this.unique) {
-			ll.add(FieldModel.UNIQUE_FLAG);
-		}
-		return ll;
 	}
 
 	/**
@@ -118,6 +91,11 @@ public class FieldModel implements NamesOwner, IdOwner, StyleOwner {
 		return this.style;
 	}
 
+	@Override
+	public FieldTags getTags() {
+		return this.tags;
+	}
+
 	/**
 	 * Returns the type.
 	 *
@@ -128,59 +106,12 @@ public class FieldModel implements NamesOwner, IdOwner, StyleOwner {
 	}
 
 	/**
-	 * Checks whether this object has a flags.
-	 *
-	 * @return {@code true} if flags exists; otherwise {@code false}
-	 */
-	public boolean hasFlags() {
-		return this.primaryKey || this.notNull || this.unique;
-	}
-
-	/**
-	 * Checks whether not null is enabled or applies.
-	 *
-	 * @return {@code true} if not null is enabled or applies; otherwise {@code false}
-	 */
-	public boolean isNotNull() {
-		return this.notNull;
-	}
-
-	/**
-	 * Checks whether primary key is enabled or applies.
-	 *
-	 * @return {@code true} if primary key is enabled or applies; otherwise {@code false}
-	 */
-	public boolean isPrimaryKey() {
-		return this.primaryKey;
-	}
-
-	/**
 	 * Checks whether technical only is enabled or applies.
 	 *
 	 * @return {@code true} if technical only is enabled or applies; otherwise {@code false}
 	 */
 	public boolean isTechnicalOnly() {
 		return this.technicalOnly;
-	}
-
-	/**
-	 * Checks whether unique is enabled or applies.
-	 *
-	 * @return {@code true} if unique is enabled or applies; otherwise {@code false}
-	 */
-	public boolean isUnique() {
-		return this.unique;
-	}
-
-	/**
-	 * Sets the border color.
-	 *
-	 * @param c c value used by the operation
-	 */
-	@Deprecated
-	@Override
-	public void setBorderColor(final Color c) {
-		StyleOwner.super.setBorderColor(c);
 	}
 
 	/**
@@ -208,22 +139,16 @@ public class FieldModel implements NamesOwner, IdOwner, StyleOwner {
 		this.names = names;
 	}
 
-	/**
-	 * Sets the not null.
-	 *
-	 * @param notNull whether not null is enabled
-	 */
-	public void setNotNull(final boolean notNull) {
-		this.notNull = notNull;
+	@JsonProperty("notNull")
+	@Deprecated
+	public void setNotNullLegacy(final boolean notNull) {
+		this.setNonNull(notNull);
 	}
 
-	/**
-	 * Sets the primary key.
-	 *
-	 * @param primaryKey whether primary key is enabled
-	 */
-	public void setPrimaryKey(final boolean primaryKey) {
-		this.primaryKey = primaryKey;
+	@JsonProperty("primaryKey")
+	@Deprecated
+	public void setPrimaryKeyLegacy(final boolean primaryKey) {
+		this.setPrimaryKey(primaryKey);
 	}
 
 	/**
@@ -234,6 +159,11 @@ public class FieldModel implements NamesOwner, IdOwner, StyleOwner {
 	@Override
 	public void setStyle(final ElementStyle style) {
 		this.style = style;
+	}
+
+	@Override
+	public void setTags(final FieldTags fieldTagsData) {
+		this.tags = fieldTagsData;
 	}
 
 	/**
@@ -254,25 +184,16 @@ public class FieldModel implements NamesOwner, IdOwner, StyleOwner {
 		this.type = type;
 	}
 
-	/**
-	 * Sets the unique.
-	 *
-	 * @param unique whether unique is enabled
-	 */
-	public void setUnique(final boolean unique) {
-		this.unique = unique;
+	@JsonProperty("unique")
+	@Deprecated
+	public void setUniqueLegacy(final boolean unique) {
+		this.setUnique(unique);
 	}
 
-	/**
-	 * Builds a debug string for this field model.
-	 *
-	 * @return a debug string for this object
-	 */
 	@Override
 	public String toString() {
-		return "FieldModel@" + System.identityHashCode(this) + " [id=" + this.id + ", names=" + this.names + ", notConceptual="
-				+ this.technicalOnly + ", style=" + this.style + ", primaryKey=" + this.primaryKey + ", unique=" + this.unique
-				+ ", notNull=" + this.notNull + ", type=" + this.type + "]";
+		return "FieldModel [id=" + this.id + ", names=" + this.names + ", technicalOnly=" + this.technicalOnly + ", style=" + this.style
+				+ ", tags=" + this.tags + ", type=" + this.type + ", lastPaletteName=" + this.lastPaletteName + "]";
 	}
 
 }

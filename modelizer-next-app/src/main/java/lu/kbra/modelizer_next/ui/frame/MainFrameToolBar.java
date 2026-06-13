@@ -22,6 +22,7 @@ import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
@@ -29,8 +30,11 @@ import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
+import lu.kbra.modelizer_next.domain.FieldModel;
 import lu.kbra.modelizer_next.layout.PanelType;
 import lu.kbra.modelizer_next.ui.canvas.DiagramCanvas;
+import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectedElement.SelectedType;
+import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectionInfo;
 import lu.kbra.pclib.PCUtils;
 
 /**
@@ -39,7 +43,9 @@ import lu.kbra.pclib.PCUtils;
 final class MainFrameToolBar extends JToolBar {
 
 	public record ToolbarDropdownAction(String text, String actionKey, int mnemonic, String mnemonicIndex) {
-
+		public ToolbarDropdownAction(String text, String actionKey, int mnemonic) {
+			this(text, actionKey, mnemonic, null);
+		}
 	}
 
 	private static final long serialVersionUID = 1L;
@@ -164,6 +170,38 @@ final class MainFrameToolBar extends JToolBar {
 								"Physical")),
 				actionKey -> PanelType.valueOf(actionKey.replace("syncSelectionPosition", "").toUpperCase()) != frame.getActiveCanvas()
 						.getPanelType()));
+
+		buttons.add(this.createToolbarDropdownButtonCheckbox(frame, "edit-field-tags.png", "Edit field tags", "editFieldTags", () -> {
+			final DiagramCanvas canvas = frame.getActiveCanvas();
+			final SelectionInfo selectionInfo = canvas.getSelectionInfo();
+			if (selectionInfo == null || selectionInfo.element() == null || selectionInfo.element().type() != SelectedType.FIELD) {
+				return false;
+			}
+			final FieldModel fieldModel = canvas.findFieldById(selectionInfo.element().classId(), selectionInfo.element().fieldId());
+			return fieldModel != null;
+		},
+				true,
+				List.of(new ToolbarDropdownAction("Primary Key", "toggleFieldPrimaryKey", KeyEvent.VK_P, "Primary"),
+						new ToolbarDropdownAction("Unique", "toggleFieldUnique", KeyEvent.VK_U, "Unique"),
+						new ToolbarDropdownAction("Non Null", "toggleFieldNonNull", KeyEvent.VK_N, "Non")),
+				actionKey -> {
+					final DiagramCanvas canvas = frame.getActiveCanvas();
+					final SelectionInfo selectionInfo = canvas.getSelectionInfo();
+					if (selectionInfo == null || selectionInfo.element() == null || selectionInfo.element().type() != SelectedType.FIELD) {
+						return false;
+					}
+					final FieldModel fieldModel = canvas.findFieldById(selectionInfo.element().classId(),
+							selectionInfo.element().fieldId());
+					if (fieldModel == null) {
+						return false;
+					}
+					return switch (actionKey) {
+					case "toggleFieldPrimaryKey" -> fieldModel.isPrimaryKey();
+					case "toggleFieldUnique" -> fieldModel.isUnique();
+					case "toggleFieldNonNull" -> fieldModel.isNonNull();
+					default -> false;
+					};
+				}));
 
 		this.add(buttons, BorderLayout.WEST);
 	}
@@ -310,11 +348,9 @@ final class MainFrameToolBar extends JToolBar {
 		mainButton.putClientProperty("baseText", description);
 		mainButton.putClientProperty("actionKey", actionKey);
 		mainButton.setPreferredSize(new Dimension(40, 40));
-//		mainButton.setFocusable(false);
 
 		final JButton dropdownButton = new JButton("▾");
 		dropdownButton.setPreferredSize(new Dimension(18, 40));
-//		dropdownButton.setFocusable(false);
 		dropdownButton.setMargin(new Insets(0, 0, 0, 0));
 		dropdownButton.setBorder(BorderFactory.createMatteBorder(0, 1, 0, 0, UIManager.getColor("Separator.foreground")));
 
@@ -389,6 +425,132 @@ final class MainFrameToolBar extends JToolBar {
 		wrapper.add(dropdownButton, BorderLayout.EAST);
 
 		this.registerButtonEnabledSupplier(mainButton, enabledSupplier);
+
+		return wrapper;
+	}
+
+	/**
+	 * Creates a toolbar button with a separated dropdown area. Dropdown entries behave like checkboxes
+	 * (checked / unchecked state).
+	 *
+	 * @param frame                    frame that owns the created UI component
+	 * @param icon                     text value for icon
+	 * @param description              text value for description
+	 * @param actionKey                key under which the main action is registered
+	 * @param enabledSupplier          determines if the main button should be enabled or not
+	 * @param lockDropdownWhenDisabled if true, the dropdown button is also disabled whenever the main
+	 *                                 button is disabled
+	 * @param subActions               dropdown actions, mapped as display text -> action key
+	 * @param subActionCheckedProvider provider that defines if a dropdown action is checked
+	 * @return the created toolbar button component
+	 */
+	private JPanel createToolbarDropdownButtonCheckbox(
+			final MainFrame frame,
+			final String icon,
+			final String description,
+			final String actionKey,
+			final BooleanSupplier enabledSupplier,
+			final boolean lockDropdownWhenDisabled,
+			final List<ToolbarDropdownAction> subActions,
+			final Predicate<String> subActionCheckedProvider) {
+
+		final JPanel wrapper = new JPanel(new BorderLayout());
+		wrapper.setPreferredSize(new Dimension(58, 40));
+		wrapper.setMaximumSize(new Dimension(58, 40));
+		wrapper.setOpaque(false);
+
+		final JButton mainButton = new JButton();
+		mainButton.setIcon(this.getToolbarIcon(frame, icon));
+		mainButton.setToolTipText(description);
+		mainButton.putClientProperty("baseText", description);
+		mainButton.putClientProperty("actionKey", actionKey);
+		mainButton.setPreferredSize(new Dimension(40, 40));
+
+		final JButton dropdownButton = new JButton("▾");
+		dropdownButton.setPreferredSize(new Dimension(18, 40));
+		dropdownButton.setMargin(new Insets(0, 0, 0, 0));
+		dropdownButton.setBorder(BorderFactory.createMatteBorder(0, 1, 0, 0, UIManager.getColor("Separator.foreground")));
+
+		final JPopupMenu popupMenu = new JPopupMenu();
+		final Map<JMenuItem, String> menuItems = new LinkedHashMap<>();
+
+		for (final ToolbarDropdownAction entry : subActions) {
+			final String subDescription = entry.text();
+			final String subActionKey = entry.actionKey();
+			final Integer mnemonic = entry.mnemonic();
+			final String mnemonicIndex = entry.mnemonicIndex();
+
+			final JCheckBoxMenuItem item = new JCheckBoxMenuItem(subDescription);
+
+			if (mnemonic != null && mnemonic.intValue() != 0) {
+				item.setMnemonic(mnemonic);
+
+				final int index = subDescription.toUpperCase()
+						.indexOf((mnemonicIndex == null ? KeyEvent.getKeyText(mnemonic) : mnemonicIndex).toUpperCase());
+
+				if (index >= 0) {
+					item.setDisplayedMnemonicIndex(index);
+				}
+			}
+
+			final DiagramCanvas canvas = frame.getActiveCanvas();
+			if (canvas != null) {
+				final String shortcutText = frame.findShortcutText(canvas, subActionKey);
+				if (!shortcutText.isBlank()) {
+					item.setText(subDescription + " (" + shortcutText + ")");
+				}
+			}
+
+			item.addActionListener(event -> this.performCanvasAction(frame, subActionKey));
+
+			menuItems.put(item, subActionKey);
+			popupMenu.add(item);
+		}
+
+		mainButton.addActionListener(event -> this.performCanvasAction(frame, actionKey));
+
+		dropdownButton.addActionListener(event -> {
+			if (lockDropdownWhenDisabled && !enabledSupplier.getAsBoolean()) {
+				return;
+			}
+
+			for (final Map.Entry<JMenuItem, String> entry : menuItems.entrySet()) {
+				final JCheckBoxMenuItem item = (JCheckBoxMenuItem) entry.getKey();
+				final String subActionKey = entry.getValue();
+
+				item.setSelected(subActionCheckedProvider.test(subActionKey));
+			}
+
+			dropdownButton.requestFocusInWindow();
+			popupMenu.show(dropdownButton, 0, dropdownButton.getHeight());
+
+			SwingUtilities.invokeLater(() -> {
+				popupMenu.requestFocusInWindow();
+
+				for (final JMenuItem item : menuItems.keySet()) {
+					if (item.isSelected()) {
+						item.requestFocusInWindow();
+						break;
+					}
+				}
+			});
+		});
+
+		final DiagramCanvas canvas = frame.getActiveCanvas();
+		if (canvas != null) {
+			final String shortcutText = frame.findShortcutText(canvas, actionKey);
+			if (!shortcutText.isBlank()) {
+				mainButton.setToolTipText(description + " (" + shortcutText + ")");
+			}
+		}
+
+		wrapper.add(mainButton, BorderLayout.CENTER);
+		wrapper.add(dropdownButton, BorderLayout.EAST);
+
+		this.registerButtonEnabledSupplier(mainButton, enabledSupplier);
+		if (lockDropdownWhenDisabled) {
+			this.registerButtonEnabledSupplier(dropdownButton, enabledSupplier);
+		}
 
 		return wrapper;
 	}

@@ -15,7 +15,7 @@ import javax.swing.border.LineBorder;
 
 import lu.kbra.modelizer_next.ui.canvas.datastruct.CopyPasteSpecialData;
 
-public class CopyPastePopupMenu extends JPanel {
+public class CopyPastePopupMenu extends LivePopupMenu {
 
 	private static final long serialVersionUID = 8880719050925219141L;
 
@@ -44,24 +44,16 @@ public class CopyPastePopupMenu extends JPanel {
 		namePanel.add(this.nameLabel = new JLabel("Edit name:  "), BorderLayout.WEST);
 		namePanel.add(this.nameField = new JTextField("%% Copy", 15), BorderLayout.CENTER);
 
+		this.actionItem = new JMenuItem("Paste");
+		this.actionItem.addActionListener(this::invokeConfirm);
+
 		super.add(this.keepOutgoingLinks);
 		super.add(this.keepInternalLinks);
 		super.add(this.keepLinks);
 		super.add(this.withDefaultStyle);
 		super.add(namePanel);
-
-		this.actionItem = new JMenuItem("Paste");
-//		pasteItem.addActionListener(e -> {
-//			final boolean noOutgoing = this.withoutOutgoingLinks.isSelected();
-//			final boolean noInternal = this.withoutInternalLinks.isSelected();
-//			final boolean noLinks = this.withoutLinks.isSelected();
-//			final boolean defaultStyle = this.withDefaultStyle.isSelected();
-//			final String editName = this.nameField.getText();
-//			this.actionPerformed(noOutgoing, noInternal, noLinks, defaultStyle, editName);
-//		});
-		this.actionItem.addActionListener(this::invokeConfirm);
-
 		super.add(this.actionItem);
+
 	}
 
 	public JCheckBoxMenuItem getKeepOutgoingLinks() {
@@ -116,6 +108,7 @@ public class CopyPastePopupMenu extends JPanel {
 		this.actionItem.setText(l);
 	}
 
+	@Override
 	public void invokeConfirm(final ActionEvent e) {
 		this.confirm.accept(new CopyPasteSpecialData(this.isKeepOutgoingLinks(),
 				this.isKeepInternalLinks(),

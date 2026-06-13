@@ -606,7 +606,7 @@ public interface ElementRenderer extends DiagramCanvasExt {
 					g2.drawString(FieldModel.PRIMARY_KEY_FLAG, x, y);
 				}
 				x += this.getCanvas().stringWidth(DiagramCanvas.BODY_FONT, FieldModel.PRIMARY_KEY_FLAG) + DiagramCanvas.TEXT_PADDING;
-				if (fieldModel.isNotNull()) {
+				if (fieldModel.isNonNull()) {
 					g2.drawString(FieldModel.NOT_NULL_FLAG, x, y);
 				}
 				x += this.getCanvas().stringWidth(DiagramCanvas.BODY_FONT, FieldModel.NOT_NULL_FLAG) + DiagramCanvas.TEXT_PADDING;

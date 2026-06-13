@@ -5,6 +5,7 @@ public enum CopyPasteSpecialState {
 	NONE,
 	COPY,
 	CUT,
-	PASTE;
+	PASTE,
+	DUPLICATE;
 
 }

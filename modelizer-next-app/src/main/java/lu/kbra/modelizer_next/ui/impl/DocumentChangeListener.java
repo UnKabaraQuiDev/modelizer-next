@@ -15,6 +15,11 @@ public interface DocumentChangeListener {
 		}
 
 		@Override
+		public void cancelDocumentChange() {
+
+		}
+
+		@Override
 		public void onSelectionChanged(final SelectionInfo selectionInfo) {
 
 		}
@@ -35,6 +40,11 @@ public interface DocumentChangeListener {
 	 * Handles the document changed event.
 	 */
 	void onDocumentChanged();
+
+	/**
+	 * Cancels the document changed event, marks it as clean.
+	 */
+	void cancelDocumentChange();
 
 	/**
 	 * Handles the selection changed event.

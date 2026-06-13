@@ -252,7 +252,7 @@ public class LegacyModelizerImporter {
 				fieldModel.setTechnicalOnly(fieldNode.path("noConceptual").asBoolean(false));
 				fieldModel.setPrimaryKey(fieldNode.path("primary").asBoolean(false));
 				fieldModel.setUnique(fieldNode.path("unique").asBoolean(false));
-				fieldModel.setNotNull(!fieldNode.path("null").asBoolean(true));
+				fieldModel.setNonNull(!fieldNode.path("null").asBoolean(true));
 				fieldModel.setTextColor(LegacyModelizerImporter.parseColor(fieldNode.get("foreground"), Color.BLACK));
 				fieldModel.setBackgroundColor(LegacyModelizerImporter.parseColor(fieldNode.get("background"), Color.WHITE));
 

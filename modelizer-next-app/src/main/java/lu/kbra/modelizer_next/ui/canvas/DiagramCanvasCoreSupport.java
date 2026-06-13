@@ -14,6 +14,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
 import lu.kbra.modelizer_next.domain.ClassModel;
 import lu.kbra.modelizer_next.domain.CommentModel;
@@ -151,7 +152,7 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 			fieldModel.setTechnicalOnly(true);
 			fieldModel.setPrimaryKey(false);
 			fieldModel.setUnique(false);
-			fieldModel.setNotNull(false);
+			fieldModel.setNonNull(false);
 			fieldModel.setType(targetField.getType());
 			this.getCanvas().applyDefaultPaletteToField(fieldModel);
 			sourceClass.addField(fieldModel);
@@ -403,7 +404,7 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 						this.getCanvas()::addField,
 						this.getCanvas()::addComment,
 						this.getCanvas()::deleteSelection,
-						this.getCanvas()::duplicateSelection,
+						() -> this.getCanvas().duplicateSelection(Optional.empty()),
 						this.getCanvas()::clearSelection,
 						this.getCanvas()::addLink,
 						this.getCanvas()::selectAll,
@@ -414,6 +415,7 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 						() -> this.getCanvas().invokeCopyPasteSpecialElement(CopyPasteSpecialState.COPY),
 						() -> this.getCanvas().invokeCopyPasteSpecialElement(CopyPasteSpecialState.CUT),
 						() -> this.getCanvas().invokeCopyPasteSpecialElement(CopyPasteSpecialState.PASTE),
+						() -> this.getCanvas().invokeCopyPasteSpecialElement(CopyPasteSpecialState.DUPLICATE),
 						this.getCanvas().documentEventListener::undo,
 						this.getCanvas().documentEventListener::redo,
 						() -> this.getCanvas().editSelectionStyle(false),
@@ -427,7 +429,11 @@ interface DiagramCanvasCoreSupport extends DiagramCanvasExt {
 						() -> this.getCanvas().synchronizePosition(true, this.getPanelType().previous()),
 						() -> this.getCanvas().synchronizePosition(true, PanelType.CONCEPTUAL),
 						() -> this.getCanvas().synchronizePosition(true, PanelType.LOGICAL),
-						() -> this.getCanvas().synchronizePosition(true, PanelType.PHYSICAL)));
+						() -> this.getCanvas().synchronizePosition(true, PanelType.PHYSICAL),
+						this.getCanvas()::editSelectionFieldTags,
+						this.getCanvas()::toggleFieldPrimaryKey,
+						this.getCanvas()::toggleFieldUnique,
+						this.getCanvas()::toggleFieldNonNull));
 	}
 
 	/**
