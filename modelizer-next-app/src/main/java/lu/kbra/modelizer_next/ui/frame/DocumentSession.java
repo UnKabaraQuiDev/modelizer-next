@@ -90,7 +90,7 @@ public final class DocumentSession {
 	public void markChanged() {
 		this.undoRedoManager.recordState(this.document);
 	}
-	
+
 	public void unmarkChanged() {
 		undoRedoManager.reset(document);
 		this.savedSnapshot = DocumentSnapshot.from(this.document);

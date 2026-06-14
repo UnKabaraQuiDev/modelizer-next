@@ -23,18 +23,13 @@ import java.util.Set;
 import javax.imageio.ImageIO;
 
 import lu.kbra.modelizer_next.MNMain;
-import lu.kbra.modelizer_next.common.Size2D;
 import lu.kbra.modelizer_next.domain.ClassModel;
 import lu.kbra.modelizer_next.domain.CommentBinding;
 import lu.kbra.modelizer_next.domain.CommentModel;
 import lu.kbra.modelizer_next.domain.FieldModel;
-import lu.kbra.modelizer_next.domain.LinkEnd;
 import lu.kbra.modelizer_next.domain.LinkModel;
-import lu.kbra.modelizer_next.domain.data.BoundTargetType;
 import lu.kbra.modelizer_next.domain.data.CommentKind;
 import lu.kbra.modelizer_next.layout.LayoutObjectType;
-import lu.kbra.modelizer_next.layout.LinkLayout;
-import lu.kbra.modelizer_next.layout.NodeLayout;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.ClipboardSnapshot;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.CopiedClass;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.CopiedComment;
