@@ -45,7 +45,7 @@
   </tr>
   <tr>
     <td>
-      <strong><a href="https://modelizer.kbra.lu/#shortcuts" target="_BLANK">Intuitive controls</a></strong><br>
+      <strong><a href="https://modelizer.kbra.lu/shortcuts.html" target="_BLANK">Intuitive controls</a></strong><br>
       Lots of keyboard shortcuts and mouse gestures
     </td>
   </tr>
