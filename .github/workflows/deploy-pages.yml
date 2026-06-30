@@ -19,24 +19,24 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.PORT }}
           script: |
-          set -e
+            set -e
 
-          mkdir -p /var/www
-          cd /var/www
+            mkdir -p /var/www
+            cd /var/www
 
-          git config --global --add safe.directory /var/www/modelizer-next.kbra.lu
-          if [ ! -d "modelizer-next.kbra.lu/.git" ]; then
-            rm -rf modelizer-next.kbra.lu/*
-            rm -rf modelizer-next.kbra.lu/.[!.]* modelizer-next.kbra.lu/..?* 2>/dev/null || true
+            git config --global --add safe.directory /var/www/modelizer-next.kbra.lu
+            if [ ! -d "modelizer-next.kbra.lu/.git" ]; then
+              rm -rf modelizer-next.kbra.lu/*
+              rm -rf modelizer-next.kbra.lu/.[!.]* modelizer-next.kbra.lu/..?* 2>/dev/null || true
 
-            git clone \
-              --branch pages \
-              https://${{ secrets.GH_PAT }}@github.com/UnKabaraQuiDev/modelizer-next.git \
-              "modelizer-next.kbra.lu"
-          fi
+              git clone \
+                --branch pages \
+                https://${{ secrets.GH_PAT }}@github.com/UnKabaraQuiDev/modelizer-next.git \
+                "modelizer-next.kbra.lu"
+            fi
 
-          cd /var/www/modelizer-next.kbra.lu
+            cd /var/www/modelizer-next.kbra.lu
 
-          git fetch origin
-          git checkout pages
-          git reset --hard origin/pages
+            git fetch origin
+            git checkout pages
+            git reset --hard origin/pages
