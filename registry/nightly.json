@@ -1,10 +1,10 @@
 {
   "channel": "nightly",
-  "version": "10-NIGHTLY-316",
-  "tag": "10-NIGHTLY-316",
-  "releaseUrl": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/tag/10-NIGHTLY-316",
-  "assetUrl": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/10-NIGHTLY-316/modelizer-next-app-10-NIGHTLY-316.jar",
-  "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/10-NIGHTLY-316/modelizer-next-app-10-NIGHTLY-316.jar",
+  "version": "10-NIGHTLY-318",
+  "tag": "10-NIGHTLY-318",
+  "releaseUrl": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/tag/10-NIGHTLY-318",
+  "assetUrl": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/10-NIGHTLY-318/modelizer-next-app-10-NIGHTLY-318.jar",
+  "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/10-NIGHTLY-318/modelizer-next-app-10-NIGHTLY-318.jar",
   "platforms": [
     "unknown",
     "linux",
@@ -12,8 +12,85 @@
     "windows"
   ],
   "notes": "Latest nightly build.",
-  "updatedAt": "2026-06-15T06:39:12Z",
+  "updatedAt": "2026-07-01T05:35:48Z",
   "entries": [
+    {
+      "version": "10-NIGHTLY-318",
+      "tag": "10-NIGHTLY-318",
+      "releaseUrl": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/tag/10-NIGHTLY-318",
+      "assetUrl": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/10-NIGHTLY-318/modelizer-next-app-10-NIGHTLY-318.jar",
+      "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/10-NIGHTLY-318/modelizer-next-app-10-NIGHTLY-318.jar",
+      "platforms": [
+        "unknown",
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "notes": "Latest nightly build.",
+      "publishedAt": "2026-07-01T05:35:48Z",
+      "assets": [
+        {
+          "name": "modelizer-next-app-10-NIGHTLY-318.jar",
+          "platform": "unknown",
+          "kind": "app-standalone-jar",
+          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/10-NIGHTLY-318/modelizer-next-app-10-NIGHTLY-318.jar"
+        },
+        {
+          "name": "modelizer-next-app-portable-linux-10-NIGHTLY-318.zip",
+          "platform": "linux",
+          "kind": "app-portable-native",
+          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/10-NIGHTLY-318/modelizer-next-app-portable-linux-10-NIGHTLY-318.zip"
+        },
+        {
+          "name": "modelizer-next-app-portable-macos-10-NIGHTLY-318.zip",
+          "platform": "macos",
+          "kind": "app-portable-native",
+          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/10-NIGHTLY-318/modelizer-next-app-portable-macos-10-NIGHTLY-318.zip"
+        },
+        {
+          "name": "modelizer-next-app-portable-windows-10-NIGHTLY-318.zip",
+          "platform": "windows",
+          "kind": "app-portable-native",
+          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/10-NIGHTLY-318/modelizer-next-app-portable-windows-10-NIGHTLY-318.zip"
+        },
+        {
+          "name": "modelizer-next-app-standalone-linux-10-NIGHTLY-318.deb",
+          "platform": "linux",
+          "kind": "app-standalone-native",
+          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/10-NIGHTLY-318/modelizer-next-app-standalone-linux-10-NIGHTLY-318.deb"
+        },
+        {
+          "name": "modelizer-next-app-standalone-macos-10-NIGHTLY-318.dmg",
+          "platform": "macos",
+          "kind": "app-standalone-native",
+          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/10-NIGHTLY-318/modelizer-next-app-standalone-macos-10-NIGHTLY-318.dmg"
+        },
+        {
+          "name": "modelizer-next-app-standalone-windows-10-NIGHTLY-318.exe",
+          "platform": "windows",
+          "kind": "app-standalone-native",
+          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/10-NIGHTLY-318/modelizer-next-app-standalone-windows-10-NIGHTLY-318.exe"
+        },
+        {
+          "name": "modelizer-next-bootstrap-linux-10-NIGHTLY-318.deb",
+          "platform": "linux",
+          "kind": "bootstrap-native",
+          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/10-NIGHTLY-318/modelizer-next-bootstrap-linux-10-NIGHTLY-318.deb"
+        },
+        {
+          "name": "modelizer-next-bootstrap-macos-10-NIGHTLY-318.dmg",
+          "platform": "macos",
+          "kind": "bootstrap-native",
+          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/10-NIGHTLY-318/modelizer-next-bootstrap-macos-10-NIGHTLY-318.dmg"
+        },
+        {
+          "name": "modelizer-next-bootstrap-windows-10-NIGHTLY-318.exe",
+          "platform": "windows",
+          "kind": "bootstrap-native",
+          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/10-NIGHTLY-318/modelizer-next-bootstrap-windows-10-NIGHTLY-318.exe"
+        }
+      ]
+    },
     {
       "version": "10-NIGHTLY-316",
       "tag": "10-NIGHTLY-316",
@@ -1474,83 +1551,6 @@
           "platform": "windows",
           "kind": "bootstrap-native",
           "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/9-NIGHTLY-266/modelizer-next-bootstrap-windows-9-NIGHTLY-266.exe"
-        }
-      ]
-    },
-    {
-      "version": "9-NIGHTLY-260",
-      "tag": "9-NIGHTLY-260",
-      "releaseUrl": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/tag/9-NIGHTLY-260",
-      "assetUrl": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/9-NIGHTLY-260/modelizer-next-app-9-NIGHTLY-260.jar",
-      "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/9-NIGHTLY-260/modelizer-next-app-9-NIGHTLY-260.jar",
-      "platforms": [
-        "unknown",
-        "linux",
-        "macos",
-        "windows"
-      ],
-      "notes": "Latest nightly build.",
-      "publishedAt": "2026-05-12T04:48:53Z",
-      "assets": [
-        {
-          "name": "modelizer-next-app-9-NIGHTLY-260.jar",
-          "platform": "unknown",
-          "kind": "app-standalone-jar",
-          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/9-NIGHTLY-260/modelizer-next-app-9-NIGHTLY-260.jar"
-        },
-        {
-          "name": "modelizer-next-app-portable-linux-9-NIGHTLY-260.zip",
-          "platform": "linux",
-          "kind": "app-portable-native",
-          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/9-NIGHTLY-260/modelizer-next-app-portable-linux-9-NIGHTLY-260.zip"
-        },
-        {
-          "name": "modelizer-next-app-portable-macos-9-NIGHTLY-260.zip",
-          "platform": "macos",
-          "kind": "app-portable-native",
-          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/9-NIGHTLY-260/modelizer-next-app-portable-macos-9-NIGHTLY-260.zip"
-        },
-        {
-          "name": "modelizer-next-app-portable-windows-9-NIGHTLY-260.zip",
-          "platform": "windows",
-          "kind": "app-portable-native",
-          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/9-NIGHTLY-260/modelizer-next-app-portable-windows-9-NIGHTLY-260.zip"
-        },
-        {
-          "name": "modelizer-next-app-standalone-linux-9-NIGHTLY-260.deb",
-          "platform": "linux",
-          "kind": "app-standalone-native",
-          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/9-NIGHTLY-260/modelizer-next-app-standalone-linux-9-NIGHTLY-260.deb"
-        },
-        {
-          "name": "modelizer-next-app-standalone-macos-9-NIGHTLY-260.dmg",
-          "platform": "macos",
-          "kind": "app-standalone-native",
-          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/9-NIGHTLY-260/modelizer-next-app-standalone-macos-9-NIGHTLY-260.dmg"
-        },
-        {
-          "name": "modelizer-next-app-standalone-windows-9-NIGHTLY-260.exe",
-          "platform": "windows",
-          "kind": "app-standalone-native",
-          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/9-NIGHTLY-260/modelizer-next-app-standalone-windows-9-NIGHTLY-260.exe"
-        },
-        {
-          "name": "modelizer-next-bootstrap-linux-9-NIGHTLY-260.deb",
-          "platform": "linux",
-          "kind": "bootstrap-native",
-          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/9-NIGHTLY-260/modelizer-next-bootstrap-linux-9-NIGHTLY-260.deb"
-        },
-        {
-          "name": "modelizer-next-bootstrap-macos-9-NIGHTLY-260.dmg",
-          "platform": "macos",
-          "kind": "bootstrap-native",
-          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/9-NIGHTLY-260/modelizer-next-bootstrap-macos-9-NIGHTLY-260.dmg"
-        },
-        {
-          "name": "modelizer-next-bootstrap-windows-9-NIGHTLY-260.exe",
-          "platform": "windows",
-          "kind": "bootstrap-native",
-          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/9-NIGHTLY-260/modelizer-next-bootstrap-windows-9-NIGHTLY-260.exe"
         }
       ]
     }
