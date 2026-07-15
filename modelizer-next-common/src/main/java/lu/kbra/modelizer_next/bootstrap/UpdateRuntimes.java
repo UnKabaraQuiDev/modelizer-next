@@ -3,7 +3,9 @@ package lu.kbra.modelizer_next.bootstrap;
 import java.awt.Component;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.time.LocalDateTime;
 import java.util.Objects;
+import java.util.Optional;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -183,6 +185,15 @@ public final class UpdateRuntimes {
 		 */
 		@Override
 		public void setSelectedChannel(final UpdateChannel updateChannel) {
+		}
+
+		@Override
+		public Optional<LocalDateTime> getLastUpdateCheckTime() {
+			return Optional.empty();
+		}
+
+		@Override
+		public void setLastUpdateCheckTime() {
 		}
 
 	}
