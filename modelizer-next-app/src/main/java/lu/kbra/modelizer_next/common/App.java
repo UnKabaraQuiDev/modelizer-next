@@ -10,6 +10,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import lu.kbra.modelizer_next.MNMain;
+import lu.kbra.modelizer_next.common.AppConfig.AppConfigEditor;
 import lu.kbra.pclib.PCUtils;
 
 /**
@@ -176,8 +177,8 @@ public class App {
 		return App.NAME + " - " + title;
 	}
 
-	public static void editConfig(final Consumer<AppConfig> configEditor) {
-		configEditor.accept(App.CONFIG);
+	public static void editConfig(final Consumer<AppConfigEditor> configEditor) {
+		App.CONFIG.edit(configEditor);
 		try {
 			CONFIG_HOOKS.parallelStream().forEach(v -> v.accept(App.CONFIG));
 		} catch (Exception e) {

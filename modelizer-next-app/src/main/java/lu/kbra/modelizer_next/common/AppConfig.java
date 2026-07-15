@@ -1,14 +1,26 @@
 package lu.kbra.modelizer_next.common;
 
-import java.awt.event.KeyEvent;
+import java.awt.event.InputEvent;
+import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.function.Consumer;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 import lu.kbra.modelizer_next.ui.ThemeMode;
+import lu.kbra.pclib.PCUtils;
 
 /**
  * User configuration loaded from and saved to the application configuration file.
  */
+@Getter
+@ToString
+@NoArgsConstructor
+@AllArgsConstructor
 public class AppConfig {
 
 	private ThemeMode themeMode = ThemeMode.SYSTEM;
@@ -19,21 +31,113 @@ public class AppConfig {
 	private String skippedUpdateVersion;
 	private boolean emulateMiddleClick = false;
 	private Integer alternativeLiveEditKey;
+	private int maxRecentFileCount = 15;
+	private LinkedHashSet<Path> recentFiles = new LinkedHashSet<>();
 
-	/**
-	 * Returns the default palette name.
-	 *
-	 * @return the default palette name
-	 */
-	public String getDefaultPaletteName() {
-		return this.defaultPaletteName;
+	public class AppConfigEditor {
+
+		protected AppConfigEditor() {
+		}
+
+		public void setThemeMode(final ThemeMode themeMode) {
+			AppConfig.this.themeMode = themeMode;
+		}
+
+		public void setSelectedPaletteName(final String selectedPaletteName) {
+			AppConfig.this.selectedPaletteName = selectedPaletteName;
+		}
+
+		public void setDefaultPaletteName(final String defaultPaletteName) {
+			AppConfig.this.defaultPaletteName = defaultPaletteName;
+		}
+
+		public void setPinnedPaletteNames(final List<String> pinnedPaletteNames) {
+			AppConfig.this.pinnedPaletteNames = pinnedPaletteNames;
+		}
+
+		public void setAutoCheckUpdates(final boolean autoCheckUpdates) {
+			AppConfig.this.autoCheckUpdates = autoCheckUpdates;
+		}
+
+		public void setSkippedUpdateVersion(final String skippedUpdateVersion) {
+			AppConfig.this.skippedUpdateVersion = skippedUpdateVersion;
+		}
+
+		public void setEmulateMiddleClick(final boolean emulateMiddleClick) {
+			AppConfig.this.emulateMiddleClick = emulateMiddleClick;
+		}
+
+		public void setMaxRecentFileCount(final int maxRecentFileCount) {
+			AppConfig.this.maxRecentFileCount = maxRecentFileCount;
+		}
+
+		public void setRecentFiles(final LinkedHashSet<Path> recentFiles) {
+			AppConfig.this.recentFiles = recentFiles;
+		}
+
+		public void addRecentFile(final Path p) {
+			AppConfig.this.recentFiles.remove(p);
+			AppConfig.this.recentFiles.add(p);
+			AppConfig.this.limitRecentFileCount();
+		}
+
+		public void setAlternativeLiveEditKey(final Integer alternativeLiveEditKey) {
+			AppConfig.this.alternativeLiveEditKey = alternativeLiveEditKey == null || alternativeLiveEditKey == 0 ? null
+					: alternativeLiveEditKey;
+		}
+
+		public List<String> getPinnedPaletteNames() {
+			if (AppConfig.this.pinnedPaletteNames == null) {
+				AppConfig.this.pinnedPaletteNames = new ArrayList<>();
+			}
+			return AppConfig.this.pinnedPaletteNames;
+		}
+
+		public int getAlternativeLiveEditKey() {
+			return AppConfig.this.alternativeLiveEditKey == null ? InputEvent.ALT_DOWN_MASK : AppConfig.this.alternativeLiveEditKey;
+		}
+
+		public boolean hasAlternativeLiveEditKey() {
+			return AppConfig.this.alternativeLiveEditKey != null;
+		}
+
+		public LinkedHashSet<Path> getRecentFiles() {
+			if (AppConfig.this.recentFiles == null) {
+				AppConfig.this.recentFiles = new LinkedHashSet<>();
+			}
+			return AppConfig.this.recentFiles;
+		}
+
+		public ThemeMode getThemeMode() {
+			return themeMode;
+		}
+
+		public String getSelectedPaletteName() {
+			return selectedPaletteName;
+		}
+
+		public String getDefaultPaletteName() {
+			return defaultPaletteName;
+		}
+
+		public boolean isAutoCheckUpdates() {
+			return autoCheckUpdates;
+		}
+
+		public String getSkippedUpdateVersion() {
+			return skippedUpdateVersion;
+		}
+
+		public boolean isEmulateMiddleClick() {
+			return emulateMiddleClick;
+		}
+
+		public int getMaxRecentFileCount() {
+			return maxRecentFileCount;
+		}
+
 	}
 
-	/**
-	 * Returns the pinned palette names.
-	 *
-	 * @return the pinned palette names
-	 */
 	public List<String> getPinnedPaletteNames() {
 		if (this.pinnedPaletteNames == null) {
 			this.pinnedPaletteNames = new ArrayList<>();
@@ -41,122 +145,29 @@ public class AppConfig {
 		return this.pinnedPaletteNames;
 	}
 
-	/**
-	 * Returns the selected palette name.
-	 *
-	 * @return the selected palette name
-	 */
-	public String getSelectedPaletteName() {
-		return this.selectedPaletteName;
-	}
-
-	/**
-	 * Returns the skipped update version.
-	 *
-	 * @return the skipped update version
-	 */
-	public String getSkippedUpdateVersion() {
-		return this.skippedUpdateVersion;
-	}
-
-	/**
-	 * Returns the theme mode.
-	 *
-	 * @return the theme mode
-	 */
-	public ThemeMode getThemeMode() {
-		return this.themeMode;
-	}
-
-	/**
-	 * Checks whether auto check updates is enabled or applies.
-	 *
-	 * @return {@code true} if auto check updates is enabled or applies; otherwise {@code false}
-	 */
-	public boolean isAutoCheckUpdates() {
-		return this.autoCheckUpdates;
-	}
-
-	/**
-	 * Sets the auto check updates.
-	 *
-	 * @param autoCheckUpdates whether auto check updates is enabled
-	 */
-	public void setAutoCheckUpdates(final boolean autoCheckUpdates) {
-		this.autoCheckUpdates = autoCheckUpdates;
-	}
-
-	/**
-	 * Sets the default palette name.
-	 *
-	 * @param defaultPaletteName name value to use
-	 */
-	public void setDefaultPaletteName(final String defaultPaletteName) {
-		this.defaultPaletteName = defaultPaletteName;
-	}
-
-	/**
-	 * Sets the pinned palette names.
-	 *
-	 * @param pinnedPaletteNames name values to use
-	 */
-	public void setPinnedPaletteNames(final List<String> pinnedPaletteNames) {
-		this.pinnedPaletteNames = pinnedPaletteNames == null ? new ArrayList<>() : new ArrayList<>(pinnedPaletteNames);
-	}
-
-	/**
-	 * Sets the selected palette name.
-	 *
-	 * @param selectedPaletteName name value to use
-	 */
-	public void setSelectedPaletteName(final String selectedPaletteName) {
-		this.selectedPaletteName = selectedPaletteName;
-	}
-
-	/**
-	 * Sets the skipped update version.
-	 *
-	 * @param skippedUpdateVersion text value for skipped update version
-	 */
-	public void setSkippedUpdateVersion(final String skippedUpdateVersion) {
-		this.skippedUpdateVersion = skippedUpdateVersion;
-	}
-
-	/**
-	 * Sets the theme mode.
-	 *
-	 * @param themeMode theme mode value used by the operation
-	 */
-	public void setThemeMode(final ThemeMode themeMode) {
-		this.themeMode = themeMode;
-	}
-
-	public boolean isEmulateMiddleClick() {
-		return emulateMiddleClick;
-	}
-
-	public void setEmulateMiddleClick(boolean emulateMiddleClick) {
-		this.emulateMiddleClick = emulateMiddleClick;
-	}
-
 	public int getAlternativeLiveEditKey() {
-		return alternativeLiveEditKey == null ? KeyEvent.ALT_DOWN_MASK : alternativeLiveEditKey;
-	}
-
-	public void setAlternativeLiveEditKey(Integer alternativeLiveEditKey) {
-		this.alternativeLiveEditKey = alternativeLiveEditKey == null || alternativeLiveEditKey == 0 ? null : alternativeLiveEditKey;
+		return this.alternativeLiveEditKey == null ? InputEvent.ALT_DOWN_MASK : this.alternativeLiveEditKey;
 	}
 
 	public boolean hasAlternativeLiveEditKey() {
-		return alternativeLiveEditKey != null;
+		return this.alternativeLiveEditKey != null;
 	}
 
-	@Override
-	public String toString() {
-		return "AppConfig@" + System.identityHashCode(this) + " [themeMode=" + themeMode + ", selectedPaletteName=" + selectedPaletteName
-				+ ", defaultPaletteName=" + defaultPaletteName + ", pinnedPaletteNames=" + pinnedPaletteNames + ", autoCheckUpdates="
-				+ autoCheckUpdates + ", skippedUpdateVersion=" + skippedUpdateVersion + ", emulateMiddleClick=" + emulateMiddleClick
-				+ ", alternativeLiveEditKey=" + alternativeLiveEditKey + "]";
+	public LinkedHashSet<Path> getRecentFiles() {
+		if (this.recentFiles == null) {
+			this.recentFiles = new LinkedHashSet<>();
+		}
+		return this.recentFiles;
+	}
+
+	public AppConfig limitRecentFileCount() {
+		// remove start because those are the older files
+		PCUtils.limitSize(this.recentFiles, this.maxRecentFileCount, false);
+		return this;
+	}
+
+	public void edit(final Consumer<AppConfigEditor> configEditor) {
+		configEditor.accept(this.new AppConfigEditor());
 	}
 
 }

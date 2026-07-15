@@ -2,13 +2,14 @@ package lu.kbra.modelizer_next.bootstrap.config;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.function.Consumer;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
-import lu.kbra.modelizer_next.bootstrap.BootstrapConfig;
+import lu.kbra.modelizer_next.bootstrap.BootstrapInfo;
 import lu.kbra.modelizer_next.common.ParsedVersionModule;
 import lu.kbra.pclib.PCUtils;
 
@@ -37,7 +38,8 @@ public final class BootstrapApp {
 	public static String DISTRIBUTOR;
 	public static String RELEASES_MANIFEST_URL;
 
-	public static BootstrapConfig BOOTSTRAP_CONFIG;
+	public static BootstrapInfo BOOTSTRAP_INFO;
+	public static BootstrapConfig CONFIG;
 
 	/**
 	 * Ensures that the directories exists or is up to date during bootstrap/update processing.
@@ -153,7 +155,7 @@ public final class BootstrapApp {
 		BootstrapApp.RELEASES_MANIFEST_URL = BootstrapApp.JSON.path("releasesManifestUrl")
 				.asText("https://raw.githubusercontent.com/UnKabaraQuiDev/modelizer-next/refs/heads/registry/registry/release.json");
 
-		BootstrapApp.BOOTSTRAP_CONFIG = new BootstrapConfig(BootstrapApp.NAME,
+		BootstrapApp.BOOTSTRAP_INFO = new BootstrapInfo(BootstrapApp.NAME,
 				BootstrapApp.VERSION,
 				BootstrapApp.REPOSITORY_URL,
 				BootstrapApp.RELEASES_URL,
@@ -177,16 +179,24 @@ public final class BootstrapApp {
 	 *
 	 * @return the load configuration result
 	 */
-	public static BootstrapConfiguration loadConfiguration() {
+	public static BootstrapConfig loadConfiguration() {
 		final File file = BootstrapApp.getBootstrapConfigFile();
 		if (!file.isFile()) {
-			return new BootstrapConfiguration();
+			return new BootstrapConfig();
 		}
 		try {
-			return BootstrapApp.MAPPER.readValue(file, BootstrapConfiguration.class);
+			return BootstrapApp.CONFIG = BootstrapApp.MAPPER.readValue(file, BootstrapConfig.class);
 		} catch (final IOException ex) {
-			return new BootstrapConfiguration();
+			return new BootstrapConfig();
 		}
+	}
+
+	public static void editConfiguration(final Consumer<BootstrapConfig> c) {
+		if (BootstrapApp.CONFIG == null) {
+			BootstrapApp.loadConfiguration();
+		}
+		c.accept(BootstrapApp.CONFIG);
+		BootstrapApp.saveConfiguration();
 	}
 
 	/**
@@ -194,10 +204,10 @@ public final class BootstrapApp {
 	 *
 	 * @param configuration configuration value used by the operation
 	 */
-	public static void saveConfiguration(final BootstrapConfiguration configuration) {
+	public static void saveConfiguration() {
 		try {
 			BootstrapApp.ensureDirectories();
-			BootstrapApp.MAPPER.writerWithDefaultPrettyPrinter().writeValue(BootstrapApp.getBootstrapConfigFile(), configuration);
+			BootstrapApp.MAPPER.writerWithDefaultPrettyPrinter().writeValue(BootstrapApp.getBootstrapConfigFile(), BootstrapApp.CONFIG);
 		} catch (final IOException ex) {
 			ex.printStackTrace();
 		}
