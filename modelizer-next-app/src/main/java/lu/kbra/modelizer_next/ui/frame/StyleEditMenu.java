@@ -45,12 +45,11 @@ final class StyleEditMenu extends JMenu {
 		if (!oldName.equals(edited.getName())) {
 			StylePaletteService.deleteByName(oldName);
 			if (oldName.equals(App.CONFIG.getDefaultPaletteName())) {
-				App.CONFIG.setDefaultPaletteName(edited.getName());
+				App.editConfig(c -> c.setDefaultPaletteName(edited.getName()));
 			}
 			if (oldName.equals(App.CONFIG.getSelectedPaletteName())) {
-				App.CONFIG.setSelectedPaletteName(edited.getName());
+				App.editConfig(c -> c.setSelectedPaletteName(edited.getName()));
 			}
-			App.saveConfig();
 		}
 
 		StylePaletteService.save(edited);

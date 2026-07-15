@@ -47,7 +47,13 @@ public final class UpdateRuntimes {
 		 * @return the bootstrap config
 		 */
 		@Override
-		public BootstrapConfig getBootstrapConfig() {
+		@Deprecated
+		public BootstrapInfo getBootstrapConfig() {
+			return null;
+		}
+
+		@Override
+		public BootstrapInfo getBootstrapInfo() {
 			return null;
 		}
 

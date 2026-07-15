@@ -48,7 +48,10 @@ public interface UpdateRuntime {
 	 *
 	 * @return the bootstrap config
 	 */
-	BootstrapConfig getBootstrapConfig();
+	@Deprecated
+	BootstrapInfo getBootstrapConfig();
+
+	BootstrapInfo getBootstrapInfo();
 
 	/**
 	 * Returns the bootstrap JSON.

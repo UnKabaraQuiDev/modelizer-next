@@ -28,7 +28,7 @@ import javax.swing.WindowConstants;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import lu.kbra.modelizer_next.bootstrap.config.BootstrapApp;
-import lu.kbra.modelizer_next.bootstrap.config.BootstrapConfiguration;
+import lu.kbra.modelizer_next.bootstrap.config.BootstrapConfig;
 import lu.kbra.modelizer_next.bootstrap.remote.RemoteUpdateService;
 import lu.kbra.modelizer_next.bootstrap.selfupdate.BootstrapInstallerLauncher;
 import lu.kbra.modelizer_next.bootstrap.selfupdate.BootstrapInstallerUpdate;
@@ -73,10 +73,8 @@ public class BootstrapRuntime implements UpdateRuntime {
 		}
 
 		final boolean firstLaunch = BootstrapApp.isFirstLaunch();
-		final BootstrapConfiguration configuration = BootstrapApp.loadConfiguration();
 
-		final BootstrapRuntime runtime = new BootstrapRuntime(configuration,
-				new ApplicationInventory(),
+		final BootstrapRuntime runtime = new BootstrapRuntime(new ApplicationInventory(),
 				new RemoteUpdateService(),
 				new JarApplicationLauncher(),
 				new ApplicationUpdateStorage(),
@@ -104,7 +102,6 @@ public class BootstrapRuntime implements UpdateRuntime {
 
 		if (firstLaunch) {
 			runtime.promptForInitialChannelSelection();
-			BootstrapApp.saveConfiguration(configuration);
 		}
 
 		UpdateRuntimes.install(runtime);
@@ -312,7 +309,6 @@ public class BootstrapRuntime implements UpdateRuntime {
 		}
 	}
 
-	private final BootstrapConfiguration configuration;
 	private final ApplicationInventory inventory;
 	private final RemoteUpdateService remoteUpdateService;
 	private final JarApplicationLauncher applicationLauncher;
@@ -334,14 +330,12 @@ public class BootstrapRuntime implements UpdateRuntime {
 	 * @param forceJarName            name value to use
 	 */
 	private BootstrapRuntime(
-			final BootstrapConfiguration configuration,
 			final ApplicationInventory inventory,
 			final RemoteUpdateService remoteUpdateService,
 			final JarApplicationLauncher applicationLauncher,
 			final ApplicationUpdateStorage updateStorage,
 			final boolean automaticUpdatesEnabled,
 			final String forceJarName) {
-		this.configuration = configuration;
 		this.inventory = inventory;
 		this.remoteUpdateService = remoteUpdateService;
 		this.applicationLauncher = applicationLauncher;
@@ -359,9 +353,10 @@ public class BootstrapRuntime implements UpdateRuntime {
 	@Override
 	public AvailableUpdate checkForUpdates() throws IOException {
 		try {
+			final BootstrapConfig configuration = BootstrapApp.CONFIG;
 			final ParsedVersion currentVersion = this.currentApplication == null ? null : this.currentApplication.version();
-			System.out.println("Comparing " + currentVersion + " on " + this.configuration.getUpdateChannel());
-			return this.remoteUpdateService.findLatest(this.configuration.getUpdateChannel(), currentVersion);
+			System.out.println("Comparing " + currentVersion + " on " + configuration.getUpdateChannel());
+			return this.remoteUpdateService.findLatest(configuration.getUpdateChannel(), currentVersion);
 		} catch (final InterruptedException ex) {
 			Thread.currentThread().interrupt();
 			throw new IOException("Interrupted while checking for updates.", ex);
@@ -376,7 +371,7 @@ public class BootstrapRuntime implements UpdateRuntime {
 	 */
 	@Override
 	public long freeUnusedInstalledUpdates() throws IOException {
-		return this.updateStorage.freeUnusedUpdates(this.configuration.getUpdateChannel(), this.currentApplication);
+		return this.updateStorage.freeUnusedUpdates(BootstrapApp.CONFIG.getUpdateChannel(), this.currentApplication);
 	}
 
 	/**
@@ -385,8 +380,14 @@ public class BootstrapRuntime implements UpdateRuntime {
 	 * @return the bootstrap config
 	 */
 	@Override
-	public BootstrapConfig getBootstrapConfig() {
-		return BootstrapApp.BOOTSTRAP_CONFIG;
+	@Deprecated
+	public BootstrapInfo getBootstrapConfig() {
+		return BootstrapApp.BOOTSTRAP_INFO;
+	}
+
+	@Override
+	public BootstrapInfo getBootstrapInfo() {
+		return BootstrapApp.BOOTSTRAP_INFO;
 	}
 
 	/**
@@ -457,7 +458,7 @@ public class BootstrapRuntime implements UpdateRuntime {
 	 */
 	@Override
 	public UpdateChannel getSelectedChannel() {
-		return this.configuration.getUpdateChannel();
+		return BootstrapApp.CONFIG.getUpdateChannel();
 	}
 
 	/**
@@ -519,7 +520,7 @@ public class BootstrapRuntime implements UpdateRuntime {
 	 */
 	@Override
 	public boolean isAutoCheckUpdates() {
-		return this.configuration.isAutoCheckUpdates();
+		return BootstrapApp.CONFIG.isAutoCheckUpdates();
 	}
 
 	/**
@@ -554,6 +555,7 @@ public class BootstrapRuntime implements UpdateRuntime {
 	public void launch(final String[] args, final Queue<File> toBeOpened) throws Exception {
 		final BootstrapLoadingFrame loadingFrame = new BootstrapLoadingFrame();
 		loadingFrame.setVisible(true);
+		final BootstrapConfig configuration = BootstrapApp.CONFIG;
 		try {
 			loadingFrame.update("Checking installed application...", 0, 0);
 
@@ -564,17 +566,17 @@ public class BootstrapRuntime implements UpdateRuntime {
 						.orElseThrow(
 								() -> new IllegalArgumentException("File: '" + this.getForceJarName() + "' not found, resolved: " + path));
 			} else {
-				this.currentApplication = this.inventory.findLatestInstalled(this.configuration.getUpdateChannel()).orElse(null);
+				this.currentApplication = this.inventory.findLatestInstalled(configuration.getUpdateChannel()).orElse(null);
 			}
 
 			if (this.currentApplication == null) {
-				final AvailableUpdate bootstrapInstall = this.requireInstallableUpdate(this.configuration.getUpdateChannel(), null);
+				final AvailableUpdate bootstrapInstall = this.requireInstallableUpdate(configuration.getUpdateChannel(), null);
 				loadingFrame.update("Installing " + bootstrapInstall.latestVersion() + "...", 0, 1);
 				this.currentApplication = this.inventory.install(bootstrapInstall, loadingFrame::update);
-			} else if (this.automaticUpdatesEnabled && this.configuration.isAutoCheckUpdates()) {
+			} else if (this.automaticUpdatesEnabled && configuration.isAutoCheckUpdates()) {
 				try {
 					this.promptForBootstrapReinstallIfRequired();
-					final AvailableUpdate update = this.remoteUpdateService.findLatest(this.configuration.getUpdateChannel(),
+					final AvailableUpdate update = this.remoteUpdateService.findLatest(configuration.getUpdateChannel(),
 							this.currentApplication.version());
 					if (update.isUpdateAvailable()) {
 						loadingFrame.update("Updating to " + update.latestVersion() + "...", 0, 1);
@@ -608,8 +610,7 @@ public class BootstrapRuntime implements UpdateRuntime {
 	 */
 	@Override
 	public void setAutoCheckUpdates(final boolean enabled) {
-		this.configuration.setAutoCheckUpdates(enabled);
-		BootstrapApp.saveConfiguration(this.configuration);
+		BootstrapApp.editConfiguration(c -> c.setAutoCheckUpdates(enabled));
 	}
 
 	/**
@@ -619,8 +620,7 @@ public class BootstrapRuntime implements UpdateRuntime {
 	 */
 	@Override
 	public void setSelectedChannel(final UpdateChannel updateChannel) {
-		this.configuration.setUpdateChannel(updateChannel);
-		BootstrapApp.saveConfiguration(this.configuration);
+		BootstrapApp.editConfiguration(c -> c.setUpdateChannel(updateChannel));
 	}
 
 	/**
@@ -637,7 +637,7 @@ public class BootstrapRuntime implements UpdateRuntime {
 		try {
 			loadingFrame.update("Checking bootstrap launcher update...", 0, 0);
 			final BootstrapInstallerUpdate update = this.remoteUpdateService
-					.findLatestBootstrapInstaller(this.configuration.getUpdateChannel(), currentBootstrapVersion);
+					.findLatestBootstrapInstaller(BootstrapApp.CONFIG.getUpdateChannel(), currentBootstrapVersion);
 			if (!update.isUpdateAvailable() && !forced) {
 				throw new AppLaunchException("The application needs a newer bootstrap launcher, but no bootstrap update is available.",
 						launchException);
@@ -752,7 +752,7 @@ public class BootstrapRuntime implements UpdateRuntime {
 			throw new IOException("Initial setup was cancelled.");
 		}
 
-		this.configuration.setUpdateChannel(selectedChannel);
+		BootstrapApp.editConfiguration(c -> c.setUpdateChannel(selectedChannel));
 	}
 
 	/**
