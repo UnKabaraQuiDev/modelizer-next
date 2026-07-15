@@ -7,13 +7,18 @@ import java.io.IOException;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.StandardCopyOption;
+import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.Queue;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -87,15 +92,13 @@ public class BootstrapRuntime implements UpdateRuntime {
 			System.err.println("Caught in " + tn);
 			e.printStackTrace(System.err);
 
-			if (e instanceof ClassNotFoundException || e instanceof NoClassDefFoundError
-					|| e instanceof UnsupportedBootstrapVersionException) {
-				if (needsBootstrappUpdate(e)) {
-					try {
-						runtime.handleOutdatedBootstrapLauncher(new AppLaunchException("Error in thread: " + tn + ".", e), false);
-					} catch (Exception e1) {
-						e1.printStackTrace();
-						mainThread.interrupt();
-					}
+			if ((e instanceof ClassNotFoundException || e instanceof NoClassDefFoundError
+					|| e instanceof UnsupportedBootstrapVersionException) && BootstrapRuntime.needsBootstrappUpdate(e)) {
+				try {
+					runtime.handleOutdatedBootstrapLauncher(new AppLaunchException("Error in thread: " + tn + ".", e), false);
+				} catch (final Exception e1) {
+					e1.printStackTrace();
+					mainThread.interrupt();
 				}
 			}
 		});
@@ -553,21 +556,37 @@ public class BootstrapRuntime implements UpdateRuntime {
 	 * @throws Exception if the operation cannot be completed
 	 */
 	public void launch(final String[] args, final Queue<File> toBeOpened) throws Exception {
+		if (this.getForceJarName() != null && Files.exists(BootstrapApp.getUpdatesDirectory().toPath().resolve(this.getForceJarName()))) {
+			final Path path = BootstrapApp.getUpdatesDirectory().toPath().resolve(this.getForceJarName());
+			this.currentApplication = this.inventory.readInstalledApplication(path)
+					.orElseThrow(() -> new IllegalArgumentException("File: '" + this.getForceJarName() + "' not found, resolved: " + path));
+		} else {
+			this.currentApplication = this.inventory.findLatestInstalled(this.configuration.getUpdateChannel()).orElse(null);
+		}
+
+		if (this.requiresUpdateToday()) {
+			this.doUpdate();
+		}
+
+		try {
+			if (BootstrapApp.FORCE_BOOTSTRAP_UPDATE) {
+				this.handleOutdatedBootstrapLauncher(null, true);
+			}
+			this.applicationLauncher.launch(args, toBeOpened, this.currentApplication);
+		} catch (final AppLaunchException ex) {
+			if (!BootstrapRuntime.needsBootstrappUpdate(ex)) {
+				throw ex;
+			}
+			this.handleOutdatedBootstrapLauncher(ex, false);
+		}
+	}
+
+	protected void doUpdate() throws IOException {
 		final BootstrapLoadingFrame loadingFrame = new BootstrapLoadingFrame();
 		loadingFrame.setVisible(true);
 		final BootstrapConfig configuration = BootstrapApp.CONFIG;
 		try {
 			loadingFrame.update("Checking installed application...", 0, 0);
-
-			if (this.getForceJarName() != null
-					&& Files.exists(BootstrapApp.getupdatesDirectory().toPath().resolve(this.getForceJarName()))) {
-				final Path path = BootstrapApp.getupdatesDirectory().toPath().resolve(this.getForceJarName());
-				this.currentApplication = this.inventory.readInstalledApplication(path)
-						.orElseThrow(
-								() -> new IllegalArgumentException("File: '" + this.getForceJarName() + "' not found, resolved: " + path));
-			} else {
-				this.currentApplication = this.inventory.findLatestInstalled(configuration.getUpdateChannel()).orElse(null);
-			}
 
 			if (this.currentApplication == null) {
 				final AvailableUpdate bootstrapInstall = this.requireInstallableUpdate(configuration.getUpdateChannel(), null);
@@ -586,21 +605,15 @@ public class BootstrapRuntime implements UpdateRuntime {
 					ex.printStackTrace();
 				}
 			}
+
+			this.setLastUpdateCheckTime();
 		} finally {
 			loadingFrame.dispose();
 		}
+	}
 
-		try {
-			if (BootstrapApp.FORCE_BOOTSTRAP_UPDATE) {
-				this.handleOutdatedBootstrapLauncher(null, true);
-			}
-			this.applicationLauncher.launch(args, toBeOpened, this.currentApplication);
-		} catch (final AppLaunchException ex) {
-			if (!this.needsBootstrappUpdate(ex)) {
-				throw ex;
-			}
-			this.handleOutdatedBootstrapLauncher(ex, false);
-		}
+	public boolean requiresUpdateToday() {
+		return this.getLastUpdateCheckTime().map(date -> !date.toLocalDate().equals(LocalDate.now())).orElse(true);
 	}
 
 	/**
@@ -774,6 +787,30 @@ public class BootstrapRuntime implements UpdateRuntime {
 		} catch (final InterruptedException ex) {
 			Thread.currentThread().interrupt();
 			throw new IOException("Interrupted while checking for updates.", ex);
+		}
+	}
+
+	@Override
+	public Optional<LocalDateTime> getLastUpdateCheckTime() {
+		if (!BootstrapApp.getLastCheckFile().exists()) {
+			return Optional.empty();
+		}
+		try {
+			final String content = Files.readString(Paths.get(BootstrapApp.getLastCheckFile().getPath()));
+			return Optional.of(LocalDateTime.parse(content));
+		} catch (final Exception e) {
+			return Optional.empty();
+		}
+	}
+
+	@Override
+	public void setLastUpdateCheckTime() {
+		final File file = BootstrapApp.getLastCheckFile();
+		file.getParentFile().mkdirs();
+		try {
+			Files.writeString(Paths.get(file.getPath()), LocalDateTime.now().toString(), StandardOpenOption.CREATE);
+		} catch (final IOException e) {
+			e.printStackTrace();
 		}
 	}
 
