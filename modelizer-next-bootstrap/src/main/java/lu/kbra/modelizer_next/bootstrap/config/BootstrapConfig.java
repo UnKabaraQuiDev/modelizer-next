@@ -5,7 +5,7 @@ import lu.kbra.modelizer_next.bootstrap.UpdateChannel;
 /**
  * Persisted bootstrap configuration, including the selected update channel and installed app state.
  */
-public class BootstrapConfiguration {
+public class BootstrapConfig {
 
 	private UpdateChannel updateChannel = UpdateChannel.RELEASE;
 	private boolean autoCheckUpdates = true;

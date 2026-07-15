@@ -5,6 +5,7 @@ import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
@@ -175,6 +176,7 @@ public interface MainFrameDocumentController {
 
 		final Optional<DocumentSession> model = DocumentSessionLoader.createDocument((Component) this, selectedFile);
 		model.ifPresent(this::openInFrame);
+		model.ifPresent(m -> App.editConfig(c -> c.addRecentFile(Paths.get(m.getCurrentFile().getPath()))));
 		return model.isPresent();
 	}
 
@@ -210,6 +212,7 @@ public interface MainFrameDocumentController {
 		if (this.getSession().getCurrentFile() == null) {
 			return this.saveDocumentAs();
 		}
+		App.editConfig(c -> c.addRecentFile(Paths.get(this.getSession().getCurrentFile().getPath())));
 		return this.writeDocument(this.getSession().getCurrentFile());
 	}
 
@@ -228,10 +231,14 @@ public interface MainFrameDocumentController {
 			return false;
 		}
 
-		File selectedFile = chooser.getSelectedFile();
+		final File selectedFile = chooser.getSelectedFile(), file;
 		if (!selectedFile.getName().toLowerCase().endsWith(".mn")) {
-			selectedFile = new File(selectedFile.getParentFile(), selectedFile.getName() + ".mn");
+			file = new File(selectedFile.getParentFile(), selectedFile.getName() + ".mn");
+		} else {
+			file = selectedFile;
 		}
+
+		App.editConfig(c -> c.addRecentFile(Paths.get(selectedFile.getPath())));
 
 		return this.writeDocument(selectedFile);
 	}

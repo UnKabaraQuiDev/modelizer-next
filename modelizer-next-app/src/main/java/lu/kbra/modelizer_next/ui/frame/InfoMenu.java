@@ -15,7 +15,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JRadioButtonMenuItem;
 
-import lu.kbra.modelizer_next.bootstrap.BootstrapConfig;
+import lu.kbra.modelizer_next.bootstrap.BootstrapInfo;
 import lu.kbra.modelizer_next.bootstrap.UpdateChannel;
 import lu.kbra.modelizer_next.bootstrap.UpdateRuntime;
 import lu.kbra.modelizer_next.common.App;
@@ -103,7 +103,7 @@ final class InfoMenu extends JMenu {
 			return;
 		}
 
-		final BootstrapConfig bootstrapConfig = bootstrapRuntime.get().getBootstrapConfig();
+		final BootstrapInfo bootstrapConfig = bootstrapRuntime.get().getBootstrapConfig();
 		final JMenuItem bootstrapVersionInfo = new JMenuItem(
 				"Bootstrap Version: " + bootstrapConfig.version() + " [" + bootstrapConfig.distributor() + "]");
 		bootstrapVersionInfo.setToolTipText("Click to copy bootstrap version informations.");

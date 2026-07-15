@@ -27,8 +27,7 @@ final class StyleApplyMenu extends JMenu {
 				final DiagramCanvas canvas = frame.getActiveCanvas();
 				if (canvas != null) {
 					canvas.applyPaletteToSelection(palette);
-					App.CONFIG.setSelectedPaletteName(palette.getName());
-					App.saveConfig();
+					App.editConfig(c -> c.setSelectedPaletteName(palette.getName()));
 				}
 			});
 			this.add(item);

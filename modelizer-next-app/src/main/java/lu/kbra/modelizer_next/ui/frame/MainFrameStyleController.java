@@ -31,8 +31,7 @@ public interface MainFrameStyleController {
 			final JRadioButtonMenuItem item = new JRadioButtonMenuItem(palette.getName());
 			item.setSelected(palette.getName().equals(App.CONFIG.getDefaultPaletteName()));
 			item.addActionListener(event -> {
-				App.CONFIG.setDefaultPaletteName(palette.getName());
-				App.saveConfig();
+				App.editConfig(c -> c.setDefaultPaletteName(palette.getName()));
 				this.setDefaultPaletteToCanvases();
 			});
 			defaultGroup.add(item);

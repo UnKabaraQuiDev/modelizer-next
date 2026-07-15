@@ -391,8 +391,7 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 	 * @param mode mode value used by the operation
 	 */
 	void applyThemeAndReopen(final ThemeMode mode) {
-		App.CONFIG.setThemeMode(mode);
-		App.saveConfig();
+		App.editConfig(c -> c.setThemeMode(mode));
 		this.reopenWithCurrentDocument();
 	}
 
