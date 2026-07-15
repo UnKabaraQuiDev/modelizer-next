@@ -46,7 +46,7 @@ public final class BootstrapApp {
 	 */
 	public static void ensureDirectories() throws IOException {
 		BootstrapApp.getApplicationDirectory().mkdirs();
-		BootstrapApp.getupdatesDirectory().mkdirs();
+		BootstrapApp.getUpdatesDirectory().mkdirs();
 		BootstrapApp.getTempDirectory().mkdirs();
 	}
 
@@ -55,7 +55,7 @@ public final class BootstrapApp {
 	 *
 	 * @return the applications directory
 	 */
-	public static File getupdatesDirectory() {
+	public static File getUpdatesDirectory() {
 		return new File(BootstrapApp.getApplicationDirectory(), "updates");
 	}
 
@@ -66,6 +66,15 @@ public final class BootstrapApp {
 	 */
 	public static File getBootstrapConfigFile() {
 		return new File(BootstrapApp.getApplicationDirectory(), "bootstrap-config.json");
+	}
+	
+	/**
+	 * Returns the bootstrap config file.
+	 *
+	 * @return the bootstrap config file
+	 */
+	public static File getLastCheckFile() {
+		return new File(BootstrapApp.getApplicationDirectory(), "last-check.date");
 	}
 
 	/**
