@@ -15,7 +15,7 @@ jobs:
       release_tag: ${{ steps.meta.outputs.release_tag }}
       prerelease: ${{ steps.meta.outputs.prerelease }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
       - id: meta
@@ -30,7 +30,7 @@ jobs:
     env:
       VERSION_OVERRIDE: ${{ needs.prepare.outputs.version }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: actions/setup-java@v5
         with:
           distribution: temurin
@@ -51,7 +51,7 @@ jobs:
       RELEASE_TAG: ${{ needs.prepare.outputs.release_tag }}
       APP_VERSION: ${{ needs.prepare.outputs.app_version }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
           ref: registry
