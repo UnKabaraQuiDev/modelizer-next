@@ -18,8 +18,8 @@ import lu.kbra.modelizer_next.cmdline.CommandLineExportParser.InvalidArgumentExc
 import lu.kbra.modelizer_next.layout.PanelType;
 import lu.kbra.modelizer_next.ui.canvas.DiagramCanvas;
 import lu.kbra.pclib.PCUtils;
-import lu.kbra.pclib.datastructure.triplet.Triplet;
-import lu.kbra.pclib.datastructure.triplet.Triplets;
+import lu.kbra.pclib.datastructure.tuple.Triplet;
+import lu.kbra.pclib.datastructure.tuple.Triplets;
 
 /**
  * Exports one or more document views to image files.

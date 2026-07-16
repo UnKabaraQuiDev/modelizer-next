@@ -59,7 +59,7 @@ jobs:
           distribution: temurin
           java-version: 21
       - name: Apply formatting
-        run: mvn -B -Pformat clean compile spotless:apply
+        run: mvn -B -Pformat initialize spotless:apply
       - name: Commit & push if needed
         run: |
           git config user.name "github-actions"

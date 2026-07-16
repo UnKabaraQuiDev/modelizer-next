@@ -31,7 +31,7 @@ import lu.kbra.modelizer_next.ui.export.ViewExporter;
 import lu.kbra.modelizer_next.ui.frame.DocumentSession;
 import lu.kbra.modelizer_next.ui.frame.MainFrame;
 import lu.kbra.modelizer_next.ui.impl.DocumentChangeListener;
-import lu.kbra.pclib.datastructure.triplet.Triplet;
+import lu.kbra.pclib.datastructure.tuple.Triplet;
 import lu.kbra.pclib.pointer.prim.IntPointer;
 
 /**
