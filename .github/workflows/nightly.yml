@@ -322,7 +322,7 @@ jobs:
 
           git checkout origin/main -- script .gitignore
 
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           path: collected
 
