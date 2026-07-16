@@ -334,7 +334,7 @@ jobs:
           cp collected/snapshot-macos-portable/* release-assets/
 
       - name: Create or update snapshot release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           tag_name: ${{ env.RELEASE_TAG }}
           name: ${{ env.RELEASE_TAG }}
