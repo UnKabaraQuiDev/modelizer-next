@@ -23,10 +23,10 @@ import lu.kbra.modelizer_next.ui.canvas.data.AnchorSide;
 import lu.kbra.modelizer_next.ui.canvas.data.Direction2D;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.LinkGeometry;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectedElement;
-import lu.kbra.pclib.datastructure.pair.Pair;
-import lu.kbra.pclib.datastructure.pair.Pairs;
-import lu.kbra.pclib.datastructure.triplet.Triplet;
-import lu.kbra.pclib.datastructure.triplet.Triplets;
+import lu.kbra.pclib.datastructure.tuple.Pair;
+import lu.kbra.pclib.datastructure.tuple.Pairs;
+import lu.kbra.pclib.datastructure.tuple.Triplet;
+import lu.kbra.pclib.datastructure.tuple.Triplets;
 
 /**
  * Contains drawing helpers for classes, comments, fields, links, and overlays.
