@@ -84,7 +84,7 @@ jobs:
           java-version: 21
       - name: Build shared release artifacts
         run: bash ./script/build-release-shared.sh
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: release-shared
           path: artifacts/release/shared/*
@@ -103,7 +103,7 @@ jobs:
           java-version: 21
       - name: Build Linux bootstrap installer
         run: bash ./script/build-release-linux.sh
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: release-linux-bootstrap
           path: artifacts/release/linux-bootstrap/*
@@ -122,7 +122,7 @@ jobs:
           java-version: 21
       - name: Build Linux standalone app installer
         run: bash ./script/build-release-linux-standalone.sh
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: release-linux-standalone
           path: artifacts/release/linux-standalone/*
@@ -141,7 +141,7 @@ jobs:
           java-version: 21
       - name: Build Linux portable app
         run: bash ./script/build-release-linux-portable.sh
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: release-linux-portable
           path: artifacts/release/linux-portable/*
@@ -163,7 +163,7 @@ jobs:
           java-version: 21
       - name: Build Windows bootstrap installer
         run: bash ./script/build-release-windows.sh
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: release-windows-bootstrap
           path: artifacts/release/windows-bootstrap/*
@@ -185,7 +185,7 @@ jobs:
           java-version: 21
       - name: Build Windows standalone app installer
         run: bash ./script/build-release-windows-standalone.sh
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: release-windows-standalone
           path: artifacts/release/windows-standalone/*
@@ -207,7 +207,7 @@ jobs:
           java-version: 21
       - name: Build Windows portable app
         run: bash ./script/build-release-windows-portable.sh
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: release-windows-portable
           path: artifacts/release/windows-portable/*
@@ -234,7 +234,7 @@ jobs:
           mvn -v
       - name: Build macos bootstrap installer
         run: bash ./script/build-release-macos.sh
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: release-macos-bootstrap
           path: artifacts/release/macos-bootstrap/*
@@ -260,7 +260,7 @@ jobs:
           mvn -v
       - name: Build macos standalone app installer
         run: bash ./script/build-release-macos-standalone.sh
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: release-macos-standalone
           path: artifacts/release/macos-standalone/*
@@ -286,7 +286,7 @@ jobs:
           mvn -v
       - name: Build macos portable app
         run: bash ./script/build-release-macos-portable.sh
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: release-macos-portable
           path: artifacts/release/macos-portable/*

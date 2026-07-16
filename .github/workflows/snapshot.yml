@@ -84,7 +84,7 @@ jobs:
           java-version: 21
       - name: Build shared snapshot artifacts
         run: bash ./script/build-snapshot-shared.sh
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: snapshot-shared
           path: artifacts/snapshot/shared/*
@@ -103,7 +103,7 @@ jobs:
           java-version: 21
       - name: Build Linux bootstrap installer
         run: bash ./script/build-snapshot-linux.sh
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: snapshot-linux-bootstrap
           path: artifacts/snapshot/linux-bootstrap/*
@@ -122,7 +122,7 @@ jobs:
           java-version: 21
       - name: Build Linux standalone app installer
         run: bash ./script/build-snapshot-linux-standalone.sh
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: snapshot-linux-standalone
           path: artifacts/snapshot/linux-standalone/*
@@ -141,7 +141,7 @@ jobs:
           java-version: 21
       - name: Build Linux portable app
         run: bash ./script/build-snapshot-linux-portable.sh
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: snapshot-linux-portable
           path: artifacts/snapshot/linux-portable/*
@@ -163,7 +163,7 @@ jobs:
           java-version: 21
       - name: Build Windows bootstrap installer
         run: bash ./script/build-snapshot-windows.sh
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: snapshot-windows-bootstrap
           path: artifacts/snapshot/windows-bootstrap/*
@@ -185,7 +185,7 @@ jobs:
           java-version: 21
       - name: Build Windows standalone app installer
         run: bash ./script/build-snapshot-windows-standalone.sh
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: snapshot-windows-standalone
           path: artifacts/snapshot/windows-standalone/*
@@ -207,7 +207,7 @@ jobs:
           java-version: 21
       - name: Build Windows portable app
         run: bash ./script/build-snapshot-windows-portable.sh
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: snapshot-windows-portable
           path: artifacts/snapshot/windows-portable/*
@@ -234,7 +234,7 @@ jobs:
           mvn -v
       - name: Build macos bootstrap installer
         run: bash ./script/build-snapshot-macos.sh
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: snapshot-macos-bootstrap
           path: artifacts/snapshot/macos-bootstrap/*
@@ -260,7 +260,7 @@ jobs:
           mvn -v
       - name: Build macos standalone app installer
         run: bash ./script/build-snapshot-macos-standalone.sh
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: snapshot-macos-standalone
           path: artifacts/snapshot/macos-standalone/*
@@ -286,7 +286,7 @@ jobs:
           mvn -v
       - name: Build macos portable app
         run: bash ./script/build-snapshot-macos-portable.sh
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: snapshot-macos-portable
           path: artifacts/snapshot/macos-portable/*
