@@ -30,6 +30,8 @@ updates:
       - "UnKabaraQuiDev"
     pull-request-branch-name:
       separator: "/"
+    commit-message:
+      prefix: "dependabot: "
     labels:
       - "ci"
       - "dependencies"
