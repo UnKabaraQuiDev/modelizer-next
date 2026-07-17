@@ -23,7 +23,7 @@ jobs:
       prerelease: ${{ steps.meta.outputs.prerelease }}
       should_format: ${{ steps.decide.outputs.should_format }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - id: meta
         env:
           VERSION_OVERRIDE: ${{ github.event_name == 'push' && github.ref_name || inputs.version }}
@@ -54,7 +54,7 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           ref: ${{ github.event.inputs.tag || github.ref }}
       - uses: actions/setup-java@v5
@@ -77,14 +77,14 @@ jobs:
     env:
       VERSION_OVERRIDE: ${{ needs.prepare.outputs.version }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: 21
       - name: Build shared release artifacts
         run: bash ./script/build-release-shared.sh
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: release-shared
           path: artifacts/release/shared/*
@@ -96,14 +96,14 @@ jobs:
     env:
       VERSION_OVERRIDE: ${{ needs.prepare.outputs.version }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: 21
       - name: Build Linux bootstrap installer
         run: bash ./script/build-release-linux.sh
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: release-linux-bootstrap
           path: artifacts/release/linux-bootstrap/*
@@ -115,14 +115,14 @@ jobs:
     env:
       VERSION_OVERRIDE: ${{ needs.prepare.outputs.version }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: 21
       - name: Build Linux standalone app installer
         run: bash ./script/build-release-linux-standalone.sh
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: release-linux-standalone
           path: artifacts/release/linux-standalone/*
@@ -134,14 +134,14 @@ jobs:
     env:
       VERSION_OVERRIDE: ${{ needs.prepare.outputs.version }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: 21
       - name: Build Linux portable app
         run: bash ./script/build-release-linux-portable.sh
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: release-linux-portable
           path: artifacts/release/linux-portable/*
@@ -156,14 +156,14 @@ jobs:
       run:
         shell: bash
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: 21
       - name: Build Windows bootstrap installer
         run: bash ./script/build-release-windows.sh
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: release-windows-bootstrap
           path: artifacts/release/windows-bootstrap/*
@@ -178,14 +178,14 @@ jobs:
       run:
         shell: bash
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: 21
       - name: Build Windows standalone app installer
         run: bash ./script/build-release-windows-standalone.sh
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: release-windows-standalone
           path: artifacts/release/windows-standalone/*
@@ -200,14 +200,14 @@ jobs:
       run:
         shell: bash
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: 21
       - name: Build Windows portable app
         run: bash ./script/build-release-windows-portable.sh
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: release-windows-portable
           path: artifacts/release/windows-portable/*
@@ -220,7 +220,7 @@ jobs:
     env:
       VERSION_OVERRIDE: ${{ needs.prepare.outputs.version }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: actions/setup-java@v5
         with:
           distribution: temurin
@@ -234,7 +234,7 @@ jobs:
           mvn -v
       - name: Build macos bootstrap installer
         run: bash ./script/build-release-macos.sh
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: release-macos-bootstrap
           path: artifacts/release/macos-bootstrap/*
@@ -246,7 +246,7 @@ jobs:
     env:
       VERSION_OVERRIDE: ${{ needs.prepare.outputs.version }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: actions/setup-java@v5
         with:
           distribution: temurin
@@ -260,7 +260,7 @@ jobs:
           mvn -v
       - name: Build macos standalone app installer
         run: bash ./script/build-release-macos-standalone.sh
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: release-macos-standalone
           path: artifacts/release/macos-standalone/*
@@ -272,7 +272,7 @@ jobs:
     env:
       VERSION_OVERRIDE: ${{ needs.prepare.outputs.version }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: actions/setup-java@v5
         with:
           distribution: temurin
@@ -286,7 +286,7 @@ jobs:
           mvn -v
       - name: Build macos portable app
         run: bash ./script/build-release-macos-portable.sh
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: release-macos-portable
           path: artifacts/release/macos-portable/*
@@ -300,7 +300,7 @@ jobs:
       RELEASE_TAG: ${{ needs.prepare.outputs.release_tag }}
       APP_VERSION: ${{ needs.prepare.outputs.app_version }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
           ref: registry
@@ -317,7 +317,7 @@ jobs:
 
           git checkout origin/main -- script .gitignore
 
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           path: collected
 
@@ -338,7 +338,7 @@ jobs:
           cp collected/release-macos-portable/* release-assets/
 
       - name: Create or update release release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           tag_name: ${{ env.RELEASE_TAG }}
           name: ${{ env.RELEASE_TAG }}
