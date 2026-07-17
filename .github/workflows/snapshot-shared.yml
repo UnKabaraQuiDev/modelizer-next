@@ -37,7 +37,7 @@ jobs:
           java-version: 21
       - name: Build shared snapshot artifacts
         run: bash ./script/build-snapshot-shared.sh
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: snapshot-shared
           path: artifacts/snapshot/shared/*
