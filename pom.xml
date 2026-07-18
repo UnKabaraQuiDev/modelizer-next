@@ -375,36 +375,14 @@
 			<build>
 				<plugins>
 					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-antrun-plugin</artifactId>
-						<executions>
-							<execution>
-								<phase>initialize</phase>
-								<goals>
-									<goal>run</goal>
-								</goals>
-								<configuration>
-									<target>
-										<mkdir
-											dir="${maven.multiModuleProjectDirectory}/.local" />
-										<get
-											src="https://raw.githubusercontent.com/UnKabaraQuiDev/PCLib/main/eclipse-format.xml"
-											dest="${maven.multiModuleProjectDirectory}/.local/eclipse-format.xml"
-											usetimestamp="true" />
-									</target>
-								</configuration>
-							</execution>
-
-						</executions>
-					</plugin>
-					<plugin>
 						<groupId>com.diffplug.spotless</groupId>
 						<artifactId>spotless-maven-plugin</artifactId>
 						<configuration>
 							<java>
 								<eclipse>
 									<file>
-										${maven.multiModuleProjectDirectory}/.local/eclipse-format.xml</file>
+										https://raw.githubusercontent.com/UnKabaraQuiDev/PCLib/main/eclipse-format.xml
+									</file>
 								</eclipse>
 								<removeUnusedImports />
 								<importOrder>
