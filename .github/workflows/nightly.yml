@@ -59,7 +59,7 @@ jobs:
           distribution: temurin
           java-version: 21
       - name: Apply formatting
-        run: mvn -B -Pformat initialize spotless:apply
+        run: mvn -B -Pformat spotless:apply
       - name: Commit & push if needed
         run: |
           git config user.name "github-actions"
@@ -88,67 +88,34 @@ jobs:
           path: artifacts/nightly/shared/*
           if-no-files-found: error
 
-  build-linux-bootstrap:
+  build-linux:
     needs: [prepare, format]
     if: needs.prepare.outputs.should_run == 'true'
     runs-on: [self-hosted, linux]
     env:
       VERSION_OVERRIDE: ${{ needs.prepare.outputs.version }}
+    strategy:
+      fail-fast: false
+      matrix:
+        type: [bootstrap, standalone, portable]
     steps:
       - uses: actions/checkout@v7
+
       - uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: 21
-      - name: Build Linux bootstrap installer
-        run: bash ./script/build-nightly-linux.sh
+
+      - name: Build Linux ${{ matrix.type }}
+        run: bash ./script/build-nightly-linux${{ matrix.type == 'bootstrap' && '' || format('-{0}', matrix.type) }}.sh
+
       - uses: actions/upload-artifact@v7
         with:
-          name: nightly-linux-bootstrap
-          path: artifacts/nightly/linux-bootstrap/*
+          name: nightly-linux-${{ matrix.type }}
+          path: artifacts/nightly/linux-${{ matrix.type }}/*
           if-no-files-found: error
 
-  build-linux-standalone:
-    needs: [prepare, format]
-    if: needs.prepare.outputs.should_run == 'true'
-    runs-on: [self-hosted, linux]
-    env:
-      VERSION_OVERRIDE: ${{ needs.prepare.outputs.version }}
-    steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-java@v5
-        with:
-          distribution: temurin
-          java-version: 21
-      - name: Build Linux standalone app installer
-        run: bash ./script/build-nightly-linux-standalone.sh
-      - uses: actions/upload-artifact@v7
-        with:
-          name: nightly-linux-standalone
-          path: artifacts/nightly/linux-standalone/*
-          if-no-files-found: error
-
-  build-linux-portable:
-    needs: [prepare, format]
-    if: needs.prepare.outputs.should_run == 'true'
-    runs-on: [self-hosted, linux]
-    env:
-      VERSION_OVERRIDE: ${{ needs.prepare.outputs.version }}
-    steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-java@v5
-        with:
-          distribution: temurin
-          java-version: 21
-      - name: Build Linux portable app
-        run: bash ./script/build-nightly-linux-portable.sh
-      - uses: actions/upload-artifact@v7
-        with:
-          name: nightly-linux-portable
-          path: artifacts/nightly/linux-portable/*
-          if-no-files-found: error
-
-  build-windows-bootstrap:
+  build-windows:
     needs: [prepare, format]
     if: needs.prepare.outputs.should_run == 'true'
     runs-on: [self-hosted, windows]
@@ -157,149 +124,64 @@ jobs:
     defaults:
       run:
         shell: bash
+    strategy:
+      fail-fast: false
+      matrix:
+        type: [bootstrap, standalone, portable]
     steps:
       - uses: actions/checkout@v7
+
       - uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: 21
-      - name: Build Windows bootstrap installer
-        run: bash ./script/build-nightly-windows.sh
+
+      - name: Build Windows ${{ matrix.type }}
+        run: bash ./script/build-nightly-windows${{ matrix.type == 'bootstrap' && '' || format('-{0}', matrix.type) }}.sh
+
       - uses: actions/upload-artifact@v7
         with:
-          name: nightly-windows-bootstrap
-          path: artifacts/nightly/windows-bootstrap/*
+          name: nightly-windows-${{ matrix.type }}
+          path: artifacts/nightly/windows-${{ matrix.type }}/*
           if-no-files-found: error
 
-  build-windows-standalone:
+  build-macos:
     needs: [prepare, format]
     if: needs.prepare.outputs.should_run == 'true'
-    runs-on: [self-hosted, windows]
+    runs-on: macos-latest
     env:
       VERSION_OVERRIDE: ${{ needs.prepare.outputs.version }}
-    defaults:
-      run:
-        shell: bash
+    strategy:
+      fail-fast: false
+      matrix:
+        type: [bootstrap, standalone, portable]
     steps:
       - uses: actions/checkout@v7
+
       - uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: 21
-      - name: Build Windows standalone app installer
-        run: bash ./script/build-nightly-windows-standalone.sh
-      - uses: actions/upload-artifact@v7
-        with:
-          name: nightly-windows-standalone
-          path: artifacts/nightly/windows-standalone/*
-          if-no-files-found: error
 
-  build-windows-portable:
-    needs: [prepare, format]
-    if: needs.prepare.outputs.should_run == 'true'
-    runs-on: [self-hosted, windows]
-    env:
-      VERSION_OVERRIDE: ${{ needs.prepare.outputs.version }}
-    defaults:
-      run:
-        shell: bash
-    steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-java@v5
-        with:
-          distribution: temurin
-          java-version: 21
-      - name: Build Windows portable app
-        run: bash ./script/build-nightly-windows-portable.sh
-      - uses: actions/upload-artifact@v7
-        with:
-          name: nightly-windows-portable
-          path: artifacts/nightly/windows-portable/*
-          if-no-files-found: error
-
-  build-macos-bootstrap:
-    needs: [prepare, format]
-    if: needs.prepare.outputs.should_run == 'true'
-    runs-on: [macos-latest]
-    env:
-      VERSION_OVERRIDE: ${{ needs.prepare.outputs.version }}
-    steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-java@v5
-        with:
-          distribution: temurin
-          java-version: 21
       - name: Install coreutils (gdate) and Maven
-        run: |
-          brew install coreutils maven
+        run: brew install coreutils maven
+
       - name: Verify
         run: |
           gdate --version
           mvn -v
-      - name: Build macos bootstrap installer
-        run: bash ./script/build-nightly-macos.sh
-      - uses: actions/upload-artifact@v7
-        with:
-          name: nightly-macos-bootstrap
-          path: artifacts/nightly/macos-bootstrap/*
-          if-no-files-found: error
 
-  build-macos-standalone:
-    needs: [prepare, format]
-    if: needs.prepare.outputs.should_run == 'true'
-    runs-on: [macos-latest]
-    env:
-      VERSION_OVERRIDE: ${{ needs.prepare.outputs.version }}
-    steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-java@v5
-        with:
-          distribution: temurin
-          java-version: 21
-      - name: Install coreutils (gdate) and Maven
-        run: |
-          brew install coreutils maven
-      - name: Verify
-        run: |
-          gdate --version
-          mvn -v
-      - name: Build macos standalone app installer
-        run: bash ./script/build-nightly-macos-standalone.sh
-      - uses: actions/upload-artifact@v7
-        with:
-          name: nightly-macos-standalone
-          path: artifacts/nightly/macos-standalone/*
-          if-no-files-found: error
+      - name: Build macOS ${{ matrix.type }}
+        run: bash ./script/build-nightly-macos${{ matrix.type == 'bootstrap' && '' || format('-{0}', matrix.type) }}.sh
 
-  build-macos-portable:
-    needs: [prepare, format]
-    if: needs.prepare.outputs.should_run == 'true'
-    runs-on: [macos-latest]
-    env:
-      VERSION_OVERRIDE: ${{ needs.prepare.outputs.version }}
-    steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-java@v5
-        with:
-          distribution: temurin
-          java-version: 21
-      - name: Install coreutils (gdate) and Maven
-        run: |
-          brew install coreutils maven
-      - name: Verify
-        run: |
-          gdate --version
-          mvn -v
-      - name: Build macos portable app
-        run: bash ./script/build-nightly-macos-portable.sh
       - uses: actions/upload-artifact@v7
         with:
-          name: nightly-macos-portable
-          path: artifacts/nightly/macos-portable/*
+          name: nightly-macos-${{ matrix.type }}
+          path: artifacts/nightly/macos-${{ matrix.type }}/*
           if-no-files-found: error
 
   publish:
-    needs: [prepare, build-shared, build-linux-bootstrap, build-linux-standalone, build-linux-portable, build-windows-bootstrap, build-windows-standalone, build-windows-portable, build-macos-bootstrap, build-macos-standalone, build-macos-portable]
+    needs: [prepare, build-shared, build-linux, build-windows, build-macos]
     if: needs.prepare.outputs.should_run == 'true'
     runs-on: [self-hosted, linux]
     env:

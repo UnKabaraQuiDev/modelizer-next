@@ -69,7 +69,7 @@ public final class BootstrapApp {
 	public static File getBootstrapConfigFile() {
 		return new File(BootstrapApp.getApplicationDirectory(), "bootstrap-config.json");
 	}
-	
+
 	/**
 	 * Returns the bootstrap config file.
 	 *

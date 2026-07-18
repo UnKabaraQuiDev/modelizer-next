@@ -106,6 +106,7 @@
 				<scope>import</scope>
 				<type>pom</type>
 			</dependency>
+
 			<dependency>
 				<groupId>lu.kbra</groupId>
 				<artifactId>modelizer-next-bootstrap</artifactId>
@@ -121,6 +122,7 @@
 				<artifactId>modelizer-next-common</artifactId>
 				<version>${revision}</version>
 			</dependency>
+
 			<dependency>
 				<groupId>io.github.andrewauclair</groupId>
 				<artifactId>modern-docking-single-app</artifactId>
