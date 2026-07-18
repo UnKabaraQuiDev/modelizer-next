@@ -107,7 +107,7 @@ jobs:
           java-version: 21
 
       - name: Build Linux ${{ matrix.type }}
-        run: bash ./script/build-nightly-linux-${{ matrix.type) }}.sh
+        run: bash ./script/build-nightly-linux-${{ matrix.type }}.sh
 
       - uses: actions/upload-artifact@v7
         with:
@@ -137,7 +137,7 @@ jobs:
           java-version: 21
 
       - name: Build Windows ${{ matrix.type }}
-        run: bash ./script/build-nightly-windows-${{ matrix.type) }}.sh
+        run: bash ./script/build-nightly-windows-${{ matrix.type }}.sh
 
       - uses: actions/upload-artifact@v7
         with:
@@ -172,7 +172,7 @@ jobs:
           mvn -v
 
       - name: Build macOS ${{ matrix.type }}
-        run: bash ./script/build-nightly-macos-${{ matrix.type) }}.sh
+        run: bash ./script/build-nightly-macos-${{ matrix.type }}.sh
 
       - uses: actions/upload-artifact@v7
         with:
