@@ -106,3 +106,6 @@ artifacts/
 # pom.xml
 #pages/
 #registry/
+
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.jar
