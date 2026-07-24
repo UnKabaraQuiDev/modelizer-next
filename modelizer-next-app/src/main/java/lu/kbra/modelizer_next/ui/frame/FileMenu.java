@@ -1,6 +1,5 @@
 package lu.kbra.modelizer_next.ui.frame;
 
-import java.awt.MenuItem;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.net.URI;
@@ -59,8 +58,6 @@ final class FileMenu extends JMenu {
 		for (final OpenedFile f : App.CONFIG.getRecentFiles()) {
 			final JMenuItem item = new JMenuItem(
 					f.source() != null && !f.source().isBlank() ? f.source() : Paths.get(f.file()).toFile().getName());
-			System.err.println((f.source() != null && !f.source().isBlank() ? f.source() : Paths.get(f.file()).toFile().getName())
-					+ " becomes: " + item.getText());
 			item.putClientProperty("URI", f.file());
 			item.addActionListener(this.recentFileOpenAction);
 			this.recentItem.add(item, 0);

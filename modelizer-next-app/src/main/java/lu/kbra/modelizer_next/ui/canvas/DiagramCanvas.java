@@ -101,6 +101,7 @@ public class DiagramCanvas extends JPanel
 	public static final int COPY_PASTE_SPECIAL_OFFSET_X = 20;
 
 	public static final Color CANVAS_BACKGROUND_COLOR = new Color(0xF2F2F2);
+	public static final Color DUPLICATE_FIELD_COLOR = PCUtils.setAlpha(Color.RED, 60);
 	public static final Color GRID_COLOR = new Color(0xE4E4E4);
 	public static final Color SELECTION_COLOR = new Color(0x2F7DFF);
 	public static final Color SELECTION_FILL_COLOR = PCUtils.setAlpha(DiagramCanvas.SELECTION_COLOR, 60);

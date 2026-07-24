@@ -10,6 +10,7 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import lu.kbra.modelizer_next.domain.ClassModel;
 import lu.kbra.modelizer_next.domain.CommentModel;
@@ -211,13 +212,23 @@ public interface ElementRenderer extends DiagramCanvasExt {
 			double rowY = bounds.getY() + DiagramCanvas.CLASS_HEADER_HEIGHT;
 			final List<FieldModel> visibleFields = classModel.getFields(this.getPanelType());
 
-			final Pair<Triplet<Double, Double, Double>, Pair<Boolean, Boolean>> columnProps = this.resolveClassFieldProps(visibleFields);
+			final Set<String> duplicatedFieldIds = classModel.getDuplicatedFields(getPanelType());
 
 			for (final FieldModel fieldModel : visibleFields) {
+				final boolean isDuplicate = duplicatedFieldIds.contains(fieldModel.getId());
 				if (this.getPanelType() == PanelType.CONCEPTUAL || this.getPanelType() == PanelType.LOGICAL) {
-					this.drawConceptualLogicalClassField(g2, bounds, rowY, classModel, fieldModel);
+					this.drawConceptualLogicalClassField(g2, bounds, rowY, classModel, fieldModel, isDuplicate);
 				} else {
-					this.drawPhysicalClassField(g2, bounds, rowY, columnProps.getKey(), classModel, fieldModel, columnProps.getValue());
+					final Pair<Triplet<Double, Double, Double>, Pair<Boolean, Boolean>> columnProps = this
+							.resolveClassFieldProps(visibleFields);
+					this.drawPhysicalClassField(g2,
+							bounds,
+							rowY,
+							columnProps.getKey(),
+							classModel,
+							fieldModel,
+							columnProps.getValue(),
+							isDuplicate);
 				}
 
 				rowY += DiagramCanvas.CLASS_ROW_HEIGHT;
@@ -313,19 +324,24 @@ public interface ElementRenderer extends DiagramCanvasExt {
 	/**
 	 * Draws the conceptual logical class field.
 	 *
-	 * @param g2         graphics context used for drawing
-	 * @param bounds     bounds used for layout or hit testing
-	 * @param rowY       numeric row y value
-	 * @param classModel class model affected by the operation
-	 * @param fieldModel field model affected by the operation
+	 * @param g2          graphics context used for drawing
+	 * @param bounds      bounds used for layout or hit testing
+	 * @param rowY        numeric row y value
+	 * @param classModel  class model affected by the operation
+	 * @param fieldModel  field model affected by the operation
+	 * @param isDuplicate
 	 */
 	default void drawConceptualLogicalClassField(
 			final Graphics2D g2,
 			final Rectangle2D bounds,
 			final double rowY,
 			final ClassModel classModel,
-			final FieldModel fieldModel) {
-		final Rectangle2D fieldBounds = new Rectangle2D.Double(bounds.getX(), rowY, bounds.getWidth(), DiagramCanvas.CLASS_ROW_HEIGHT);
+			final FieldModel fieldModel,
+			boolean isDuplicate) {
+		final Rectangle2D.Double fieldBounds = new Rectangle2D.Double(bounds.getX(),
+				rowY,
+				bounds.getWidth(),
+				DiagramCanvas.CLASS_ROW_HEIGHT);
 
 		g2.setColor(fieldModel.getBackgroundColor());
 		g2.fill(fieldBounds);
@@ -337,6 +353,11 @@ public interface ElementRenderer extends DiagramCanvasExt {
 
 		g2.setColor(classModel.getBorderColor());
 		g2.draw(new Line2D.Double(bounds.getX(), rowY, bounds.getMaxX(), rowY));
+
+		if (isDuplicate) {
+			g2.setColor(DiagramCanvas.DUPLICATE_FIELD_COLOR);
+			g2.fill(fieldBounds);
+		}
 
 		g2.setColor(fieldModel.getTextColor());
 		g2.drawString(this.getCanvas().resolveFieldName(fieldModel), (float) bounds.getX() + DiagramCanvas.TEXT_PADDING, (float) rowY + 15);
@@ -566,6 +587,7 @@ public interface ElementRenderer extends DiagramCanvasExt {
 	 * @param classModel    class model affected by the operation
 	 * @param fieldModel    field model affected by the operation
 	 * @param anyFlagsTypes whether any flags types is enabled
+	 * @param isDuplicate
 	 */
 	default void drawPhysicalClassField(
 			final Graphics2D g2,
@@ -574,7 +596,8 @@ public interface ElementRenderer extends DiagramCanvasExt {
 			final Triplet<Double, Double, Double> columnWidths,
 			final ClassModel classModel,
 			final FieldModel fieldModel,
-			final Pair<Boolean, Boolean> anyFlagsTypes) {
+			final Pair<Boolean, Boolean> anyFlagsTypes,
+			boolean isDuplicate) {
 		final Rectangle2D fieldBounds = new Rectangle2D.Double(bounds.getX(), rowY, bounds.getWidth(), DiagramCanvas.CLASS_ROW_HEIGHT);
 
 		g2.setColor(fieldModel.getBackgroundColor());
@@ -587,6 +610,11 @@ public interface ElementRenderer extends DiagramCanvasExt {
 
 		g2.setColor(classModel.getBorderColor());
 		g2.draw(new Line2D.Double(bounds.getX(), rowY, bounds.getMaxX(), rowY));
+
+		if (isDuplicate) {
+			g2.setColor(DiagramCanvas.DUPLICATE_FIELD_COLOR);
+			g2.fill(fieldBounds);
+		}
 
 		g2.setColor(fieldModel.getTextColor());
 
