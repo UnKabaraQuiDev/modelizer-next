@@ -11,8 +11,6 @@ import java.util.UUID;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import lombok.Data;
-import lombok.ToString;
 import lu.kbra.modelizer_next.domain.impl.IdOwner;
 import lu.kbra.modelizer_next.domain.impl.NamesOwner;
 import lu.kbra.modelizer_next.domain.impl.StyleOwner;
@@ -21,6 +19,9 @@ import lu.kbra.modelizer_next.domain.shared.ElementNames;
 import lu.kbra.modelizer_next.domain.shared.ElementStyle;
 import lu.kbra.modelizer_next.domain.shared.LayerVisibility;
 import lu.kbra.modelizer_next.layout.PanelType;
+
+import lombok.Data;
+import lombok.ToString;
 
 /**
  * Persistent model of a diagram class/table. It owns display names, style, visibility, and the

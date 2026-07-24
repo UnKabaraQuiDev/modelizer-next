@@ -24,7 +24,6 @@ import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 
-import lu.kbra.modelizer_next.domain.ClassModel;
 import lu.kbra.modelizer_next.domain.FieldModel;
 import lu.kbra.modelizer_next.ui.component.ColorButton;
 
