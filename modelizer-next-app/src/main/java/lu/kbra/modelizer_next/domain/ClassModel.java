@@ -11,6 +11,8 @@ import java.util.UUID;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import lombok.Data;
+import lombok.ToString;
 import lu.kbra.modelizer_next.domain.impl.IdOwner;
 import lu.kbra.modelizer_next.domain.impl.NamesOwner;
 import lu.kbra.modelizer_next.domain.impl.StyleOwner;
@@ -24,6 +26,8 @@ import lu.kbra.modelizer_next.layout.PanelType;
  * Persistent model of a diagram class/table. It owns display names, style, visibility, and the
  * ordered list of fields.
  */
+@Data
+@ToString
 public class ClassModel implements VisibilityOwner, IdOwner, StyleOwner, NamesOwner {
 
 	private String id;
@@ -38,6 +42,8 @@ public class ClassModel implements VisibilityOwner, IdOwner, StyleOwner, NamesOw
 	private Set<String> primaryKeyFieldIds = new HashSet<>();
 	@JsonIgnore
 	private String lastPaletteName;
+	@JsonIgnore
+	private Map<PanelType, Set<String>> duplicatedFields = new HashMap<>();
 
 	/**
 	 * Creates a class model instance.
@@ -94,10 +100,6 @@ public class ClassModel implements VisibilityOwner, IdOwner, StyleOwner, NamesOw
 		}
 
 		return null;
-	}
-
-	public Map<String, FieldModel> getFieldById() {
-		return this.fieldById;
 	}
 
 	/**
@@ -163,15 +165,6 @@ public class ClassModel implements VisibilityOwner, IdOwner, StyleOwner, NamesOw
 	/**
 	 * Returns the fields.
 	 *
-	 * @return the fields
-	 */
-	public List<FieldModel> getFields() {
-		return this.fields;
-	}
-
-	/**
-	 * Returns the fields.
-	 *
 	 * @param panelType diagram panel type whose model or layout should be used
 	 * @return the fields
 	 */
@@ -185,55 +178,6 @@ public class ClassModel implements VisibilityOwner, IdOwner, StyleOwner, NamesOw
 		}
 
 		return result;
-	}
-
-	/**
-	 * Returns the ID.
-	 *
-	 * @return the ID
-	 */
-	@Override
-	public String getId() {
-		return this.id;
-	}
-
-	@Override
-	public String getLastPaletteName() {
-		return this.lastPaletteName;
-	}
-
-	/**
-	 * Returns the names.
-	 *
-	 * @return the names
-	 */
-	@Override
-	public ElementNames getNames() {
-		return this.names;
-	}
-
-	public Set<String> getPrimaryKeyFieldIds() {
-		return this.primaryKeyFieldIds;
-	}
-
-	/**
-	 * Returns the style.
-	 *
-	 * @return the style
-	 */
-	@Override
-	public ElementStyle getStyle() {
-		return this.style;
-	}
-
-	/**
-	 * Returns the visibility.
-	 *
-	 * @return the visibility
-	 */
-	@Override
-	public LayerVisibility getVisibility() {
-		return this.visibility;
 	}
 
 	public void removeField(final FieldModel fieldModel) {
@@ -257,62 +201,6 @@ public class ClassModel implements VisibilityOwner, IdOwner, StyleOwner, NamesOw
 		this.buildPrimaryKeyFieldIdsIndex();
 	}
 
-	/**
-	 * Sets the ID.
-	 *
-	 * @param id stable id of the model element
-	 */
-	@Override
-	public void setId(final String id) {
-		this.id = id;
-	}
-
-	@Override
-	public void setLastPaletteName(final String lastPaletteName) {
-		this.lastPaletteName = lastPaletteName;
-	}
-
-	/**
-	 * Sets the names.
-	 *
-	 * @param names name values to use
-	 */
-	@Override
-	public void setNames(final ElementNames names) {
-		this.names = names;
-	}
-
-	public void setPrimaryKeyFieldIds(final Set<String> primaryKeyFieldIds) {
-		this.primaryKeyFieldIds = primaryKeyFieldIds;
-	}
-
-	/**
-	 * Sets the style.
-	 *
-	 * @param style style value used by the operation
-	 */
-	@Override
-	public void setStyle(final ElementStyle style) {
-		this.style = style;
-	}
-
-	/**
-	 * Sets the visibility.
-	 *
-	 * @param visibility visibility value used by the operation
-	 */
-	@Override
-	public void setVisibility(final LayerVisibility visibility) {
-		this.visibility = visibility;
-	}
-
-	@Override
-	public String toString() {
-		return "ClassModel@" + System.identityHashCode(this) + " [id=" + this.id + ", names=" + this.names + ", visibility="
-				+ this.visibility + ", style=" + this.style + ", fields=" + this.fields + ", fieldById=" + this.fieldById
-				+ ", primaryKeyFieldIds=" + this.primaryKeyFieldIds + ", lastPaletteName=" + this.lastPaletteName + "]";
-	}
-
 	public Map<String, FieldModel> validateFieldByIdIndex() {
 		if (this.fieldById == null) {
 			this.fieldById = new HashMap<>();
@@ -329,6 +217,35 @@ public class ClassModel implements VisibilityOwner, IdOwner, StyleOwner, NamesOw
 		}
 		this.buildFieldByIdIndex();
 		return this.primaryKeyFieldIds;
+	}
+
+	public Map<PanelType, Set<String>> validateDuplicatedFields() {
+		for (final PanelType pt : PanelType.values()) {
+			this.validateDuplicatedFields(pt);
+		}
+		return this.duplicatedFields;
+	}
+
+	public Set<String> validateDuplicatedFields(final PanelType pt) {
+		if (this.duplicatedFields == null) {
+			this.duplicatedFields = new HashMap<>();
+		}
+		final Set<String> set = this.duplicatedFields.computeIfAbsent(pt, k -> new HashSet<>());
+		set.clear();
+		final Set<String> currentNames = new HashSet<>();
+		for (final FieldModel f : this.fields) {
+			if (!currentNames.add(f.getName(pt))) {
+				set.add(f.getId());
+			}
+		}
+		return set;
+	}
+
+	public Set<String> getDuplicatedFields(final PanelType pt) {
+		if (this.duplicatedFields == null || !this.duplicatedFields.containsKey(pt)) {
+			this.validateDuplicatedFields(pt);
+		}
+		return this.duplicatedFields.get(pt);
 	}
 
 }

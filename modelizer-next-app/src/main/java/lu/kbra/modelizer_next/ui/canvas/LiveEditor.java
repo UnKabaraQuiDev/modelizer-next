@@ -34,6 +34,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.text.JTextComponent;
 
+import lu.kbra.modelizer_next.common.WordSelectionSupport;
 import lu.kbra.modelizer_next.domain.ClassModel;
 import lu.kbra.modelizer_next.domain.CommentModel;
 import lu.kbra.modelizer_next.domain.FieldModel;
@@ -357,6 +358,7 @@ public interface LiveEditor extends DiagramCanvasExt {
 			case CLASS_FIELD -> {
 				final FieldModel fieldModel = this.getCanvas().findFieldById(liveEditElement.classId(), liveEditElement.fieldId());
 				fieldModel.setName(this.getPanelType(), liveEditElement.forceAlternative(), liveEditComponents.textField().getText());
+				classModel.validateDuplicatedFields(this.getPanelType());
 
 				if (next) {
 					final int idx = classModel.getFieldIndex(fieldModel.getId(), this.getPanelType());
@@ -490,13 +492,13 @@ public interface LiveEditor extends DiagramCanvasExt {
 	}
 
 	default void confirmFieldTagsElement(final FieldTags fieldTagsData) {
-		if (!this.isLiveEditingElement() || getCanvas().liveEditElement.type() != LiveEditType.CLASS_FIELD) {
+		if (!this.isLiveEditingElement() || this.getCanvas().liveEditElement.type() != LiveEditType.CLASS_FIELD) {
 			this.getCanvas().liveEditComponents.setVisible(false);
 			return;
 		}
 
-		final LiveEditElement liveEditElement = getCanvas().liveEditElement;
-		final FieldModel fieldModel = getCanvas().findFieldById(liveEditElement.classId(), liveEditElement.fieldId());
+		final LiveEditElement liveEditElement = this.getCanvas().liveEditElement;
+		final FieldModel fieldModel = this.getCanvas().findFieldById(liveEditElement.classId(), liveEditElement.fieldId());
 		fieldModel.setTags(fieldTagsData);
 
 		this.getCanvas().notifyDocumentChanged();
@@ -527,13 +529,13 @@ public interface LiveEditor extends DiagramCanvasExt {
 		});
 	}
 
-	default void ifFieldSelected(Consumer<FieldModel> consumer) {
-		if (!getCanvas().hasSelection() || getCanvas().selectedElement.type() != SelectedType.FIELD) {
+	default void ifFieldSelected(final Consumer<FieldModel> consumer) {
+		if (!this.getCanvas().hasSelection() || this.getCanvas().selectedElement.type() != SelectedType.FIELD) {
 			return;
 		}
 
-		final FieldModel fieldModel = getCanvas().findFieldById(getCanvas().selectedElement.classId(),
-				getCanvas().selectedElement.fieldId());
+		final FieldModel fieldModel = this.getCanvas()
+				.findFieldById(this.getCanvas().selectedElement.classId(), this.getCanvas().selectedElement.fieldId());
 		if (fieldModel == null) {
 			return;
 		}
@@ -548,8 +550,10 @@ public interface LiveEditor extends DiagramCanvasExt {
 	 */
 	default LiveEditComponents createLiveEditComponents() {
 		final JTextField textField = new JTextField("editing");
+		WordSelectionSupport.install(textField);
 
 		final JTextArea textArea = new JTextArea("editing");
+		WordSelectionSupport.install(textArea);
 		textArea.setLineWrap(true);
 		textArea.setWrapStyleWord(true);
 
@@ -616,7 +620,7 @@ public interface LiveEditor extends DiagramCanvasExt {
 		final CopyPastePopupMenu copyPastePopupMenu = new CopyPastePopupMenu(this::confirmCopySpecialElement);
 		final FieldTagsPopupMenu fieldTagsPopupMenu = new FieldTagsPopupMenu(this::confirmFieldTagsElement);
 
-		for (LivePopupMenu popupMenu : new LivePopupMenu[] { copyPastePopupMenu, fieldTagsPopupMenu }) {
+		for (final LivePopupMenu popupMenu : new LivePopupMenu[] { copyPastePopupMenu, fieldTagsPopupMenu }) {
 			popupMenu.setVisible(false);
 			popupMenu.setFocusCycleRoot(true);
 			popupMenu.setFocusTraversalPolicy(new LayoutFocusTraversalPolicy());
@@ -624,6 +628,20 @@ public interface LiveEditor extends DiagramCanvasExt {
 					.put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "cancel");
 			popupMenu.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT)
 					.put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "submit");
+			popupMenu.addFocusListener(new FocusAdapter() {
+
+				@Override
+				public void focusLost(final FocusEvent e) {
+					if (!e.isTemporary() && popupMenu.isVisible() && e.getOppositeComponent() != popupMenu) {
+						SwingUtilities.invokeLater(() -> {
+							if (!popupMenu.hasFocus()) {
+								LiveEditor.this.cancelLiveEditElement();
+							}
+						});
+					}
+				}
+
+			});
 			popupMenu.getActionMap().put("cancel", new AbstractAction() {
 
 				@Override
@@ -748,7 +766,7 @@ public interface LiveEditor extends DiagramCanvasExt {
 			return;
 		}
 
-		this.invokeFieldTagsEditingElement(getCanvas().selectedElement.asLiveEditElement(false));
+		this.invokeFieldTagsEditingElement(this.getCanvas().selectedElement.asLiveEditElement(false));
 	}
 
 	/**

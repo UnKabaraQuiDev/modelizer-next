@@ -129,6 +129,10 @@ public interface ElementEditor extends DiagramCanvasExt {
 		fieldModel.setType(result.type());
 		fieldModel.setTechnicalOnly(result.technicalOnly());
 
+		System.err.println("validating after edit");
+		final ClassModel classModel = this.getCanvas().findClassById(classId);
+		classModel.validateDuplicatedFields();
+
 		this.getCanvas().notifySelectionChanged();
 		this.getCanvas().notifyDocumentChanged();
 	}
