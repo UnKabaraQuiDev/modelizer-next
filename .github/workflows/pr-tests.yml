@@ -9,7 +9,7 @@ jobs:
   format:
     runs-on: [self-hosted, linux]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
       - uses: actions/setup-java@v5
@@ -17,12 +17,12 @@ jobs:
           distribution: temurin
           java-version: 21
       - name: Apply formatting
-        run: mvn -B -Pformat initialize compile spotless:check
+        run: mvn -B -Pformat spotless:check
 
   test:
     runs-on: [self-hosted, linux]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: actions/setup-java@v5
         with:
           distribution: temurin

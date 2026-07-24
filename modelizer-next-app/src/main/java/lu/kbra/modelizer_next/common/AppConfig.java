@@ -6,12 +6,13 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.function.Consumer;
 
+import lu.kbra.modelizer_next.ui.ThemeMode;
+import lu.kbra.pclib.PCUtils;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-import lu.kbra.modelizer_next.ui.ThemeMode;
-import lu.kbra.pclib.PCUtils;
 
 /**
  * User configuration loaded from and saved to the application configuration file.
