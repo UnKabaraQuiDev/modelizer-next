@@ -5,8 +5,10 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -373,8 +375,8 @@ final class PdfViewExporter {
 			final int pages) {
 
 		String value = rawValue == null ? "" : rawValue;
-		final Optional<File> sourceFile = context == null || context.sourceFile() == null ? Optional.empty() : context.sourceFile();
-		final String fileName = sourceFile.map(File::getName)
+		final Optional<URI> sourceFile = context == null || context.sourceFile() == null ? Optional.empty() : context.sourceFile();
+		final String fileName = sourceFile.map(c -> Paths.get(c).toFile().getName())
 				.orElse(context == null || context.outputFile() == null ? "Untitled" : context.outputFile().getName());
 		final PanelType panelType = context == null ? null : context.panelType();
 		value = value.replace("%FILENAME%", ViewExporter.baseName(fileName));

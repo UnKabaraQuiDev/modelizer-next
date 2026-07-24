@@ -9,6 +9,7 @@ import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -31,6 +32,9 @@ import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
+import io.github.andrewauclair.moderndocking.DockingRegion;
+import io.github.andrewauclair.moderndocking.app.Docking;
+import io.github.andrewauclair.moderndocking.app.RootDockingPanel;
 import lu.kbra.modelizer_next.MNMain;
 import lu.kbra.modelizer_next.bootstrap.AvailableUpdate;
 import lu.kbra.modelizer_next.bootstrap.UpdateRuntime;
@@ -51,10 +55,6 @@ import lu.kbra.modelizer_next.ui.impl.DocumentLoadHandler;
 import lu.kbra.pclib.PCUtils;
 import lu.kbra.pclib.datastructure.tuple.Pair;
 import lu.kbra.pclib.datastructure.tuple.Triplet;
-
-import io.github.andrewauclair.moderndocking.DockingRegion;
-import io.github.andrewauclair.moderndocking.app.Docking;
-import io.github.andrewauclair.moderndocking.app.RootDockingPanel;
 
 /**
  * Main Swing window for editing Modelizer Next documents.
@@ -113,7 +113,7 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 	 * @param selectedFile file to read or write
 	 * @return the created document
 	 */
-	public static Optional<DocumentSession> createDocument(final Component parent, final File selectedFile) {
+	public static Optional<DocumentSession> createDocument(final Component parent, final URI selectedFile) {
 		return DocumentSessionLoader.createDocument(parent, selectedFile);
 	}
 
@@ -124,7 +124,7 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 	 * @param handler      handler value used by the operation
 	 * @return the created document
 	 */
-	public static Optional<DocumentSession> createDocument(final File selectedFile, final DocumentLoadHandler handler) {
+	public static Optional<DocumentSession> createDocument(final URI selectedFile, final DocumentLoadHandler handler) {
 		return DocumentSessionLoader.createDocument(selectedFile, handler);
 	}
 
@@ -241,16 +241,6 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 	}
 
 	/**
-	 * Loads the document from a file.
-	 *
-	 * @param selectedFile file to read or write
-	 * @return {@code true} if the document was successfully loaded; otherwise {@code false}
-	 */
-	public boolean loadDocument(final File selectedFile) {
-		return this.loadDocumentFromFile(selectedFile);
-	}
-
-	/**
 	 * Overwrites the frame content with the new document session.
 	 *
 	 * @param session document session to read or modify
@@ -265,9 +255,10 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 	 */
 	@Override
 	public void refreshFrameTitle() {
-		final String source = this.document.getSource() == null || this.document.getSource().isBlank() ? "Untitled"
+		final String source = this.document.getSource() == null || this.document.getSource().isBlank()
+				? (getSession() != null && getSession().getCurrentFile() != null ? getSession().getCurrentFile().getName() : "?")
 				: this.document.getSource();
-		this.setTitle(App.title(source + (this.session.isDirty() ? " *" : "")));
+		super.setTitle(App.title(source + (this.session.isDirty() ? " *" : "")));
 	}
 
 	/**
@@ -282,7 +273,7 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 			this.redoMenuItem.setEnabled(this.session.canRedo());
 		}
 
-		if (toolBar != null) {
+		if (this.toolBar != null) {
 			this.toolBar.refreshToolbarState(this);
 		}
 
@@ -296,6 +287,7 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 	 * @param session document session to read or modify
 	 */
 	protected void setContent(final DocumentSession session) {
+		System.out.println("setting content");
 		Docking.deregisterAllDockables();
 		Docking.deregisterAllDockingPanels();
 
@@ -383,6 +375,8 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 
 		// makes the current document (that just got opened) not dirty anymore
 		canvasListener.cancelDocumentChange();
+
+		this.refreshFrameTitle();
 	}
 
 	/**
@@ -518,8 +512,8 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 		}
 
 		try {
-			final List<Triplet<Optional<File>, PanelType, File>> exportedFiles = ViewExporter
-					.exportViews(this.getCanvasesByPanelType(), request, this.getExportSourceFile(), null);
+			final List<Triplet<Optional<URI>, PanelType, File>> exportedFiles = ViewExporter
+					.exportViews(this.getCanvasesByPanelType(), request, this.getExportSourceFile().map(File::toURI), null);
 
 			if (exportedFiles.isEmpty()) {
 				JOptionPane.showMessageDialog(this, "Nothing was exported.", "Export", JOptionPane.WARNING_MESSAGE);
@@ -683,7 +677,7 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 	 * @param listeners values for listeners
 	 * @param remove    remove value used by the operation
 	 */
-	<T extends EventListener> void removeListener(final T[] listeners, final Consumer<T> remove) {
+	static <T extends EventListener> void removeListener(final T[] listeners, final Consumer<T> remove) {
 		for (final T t : listeners) {
 			remove.accept(t);
 		}

@@ -2,7 +2,9 @@ package lu.kbra.modelizer_next.ui.export;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.text.Normalizer;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -53,11 +55,11 @@ public final class ViewExporter {
 	 * @return an optional result when a matching value is available
 	 * @throws IOException if the operation cannot be completed
 	 */
-	public static List<Triplet<Optional<File>, PanelType, File>> exportViews(
+	public static List<Triplet<Optional<URI>, PanelType, File>> exportViews(
 			final Map<PanelType, DiagramCanvas> canvases,
 			final ViewExportRequest request,
-			final Optional<File> sourceFileName,
-			final Consumer<Triplet<Optional<File>, PanelType, File>> callback)
+			final Optional<URI> sourceFileName,
+			final Consumer<Triplet<Optional<URI>, PanelType, File>> callback)
 			throws IOException {
 
 		if (request == null || request.panelTypes() == null || request.panelTypes().isEmpty()) {
@@ -73,11 +75,11 @@ public final class ViewExporter {
 			throw new InvalidArgumentException("The selected output path is not a directory.");
 		}
 
-		final List<Triplet<Optional<File>, PanelType, File>> exportedFiles = new ArrayList<>();
+		final List<Triplet<Optional<URI>, PanelType, File>> exportedFiles = new ArrayList<>();
 		final Set<String> usedPaths = new HashSet<>();
 
 		final String baseFileName = ViewExporter
-				.sanitizeFileName(PCUtils.removeFileExtension(sourceFileName.map(File::getName).orElse("Untitled")));
+				.sanitizeFileName(PCUtils.removeFileExtension(sourceFileName.map(c -> Paths.get(c).toFile().getName()).orElse("Untitled")));
 
 		for (final PanelType panelType : request.panelTypes()) {
 			final DiagramCanvas canvas = canvases.get(panelType);
@@ -94,7 +96,7 @@ public final class ViewExporter {
 			final ViewExportContext context = new ViewExportContext(sourceFileName, panelType, outputFile);
 			request.format().export(canvas, request, context, outputFile);
 
-			final Triplet<Optional<File>, PanelType, File> data = Triplets.readOnly(sourceFileName, panelType, outputFile);
+			final Triplet<Optional<URI>, PanelType, File> data = Triplets.readOnly(sourceFileName, panelType, outputFile);
 			if (callback != null) {
 				callback.accept(data);
 			}
@@ -102,7 +104,6 @@ public final class ViewExporter {
 		}
 
 		return exportedFiles;
-
 	}
 
 	/**

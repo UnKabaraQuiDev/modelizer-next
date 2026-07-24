@@ -5,6 +5,8 @@ import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
+import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.Instant;
 import java.util.List;
@@ -18,6 +20,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 import lu.kbra.modelizer_next.MNMain;
 import lu.kbra.modelizer_next.common.App;
+import lu.kbra.modelizer_next.common.OpenedFile;
 import lu.kbra.modelizer_next.document.ModelDocument;
 
 /**
@@ -125,7 +128,7 @@ public interface MainFrameDocumentController {
 					}
 
 					for (final File file : files) {
-						if (frame.loadDocument(file)) {
+						if (frame.loadDocument(file.toURI()).isPresent()) {
 							return true;
 						}
 					}
@@ -155,7 +158,7 @@ public interface MainFrameDocumentController {
 			return;
 		}
 
-		if (!((MainFrame) this).loadDocument(chooser.getSelectedFile())) {
+		if (!this.loadDocument(chooser.getSelectedFile().toURI()).isPresent()) {
 			JOptionPane.showMessageDialog((Component) this,
 					"Failed to load document:\n" + chooser.getSelectedFile().getPath(),
 					"Error during load",
@@ -166,18 +169,21 @@ public interface MainFrameDocumentController {
 	/**
 	 * Loads the document from file.
 	 *
-	 * @param selectedFile file to read or write
+	 * @param uri file to read or write
 	 * @return {@code true} when the condition is met; otherwise {@code false}
 	 */
-	default boolean loadDocumentFromFile(final File selectedFile) {
-		if (selectedFile == null || !selectedFile.isFile()) {
-			return false;
+	default Optional<DocumentSession> loadDocument(final URI uri) {
+		System.out.println("Loading: " + uri);
+		if (uri == null || !Files.exists(Paths.get(uri))) {
+			System.out.println("Doesn't exist: " + uri);
+			return Optional.empty();
 		}
 
-		final Optional<DocumentSession> model = DocumentSessionLoader.createDocument((Component) this, selectedFile);
+		final Optional<DocumentSession> model = DocumentSessionLoader.createDocument((Component) this, uri);
 		model.ifPresent(this::openInFrame);
-		model.ifPresent(m -> App.editConfig(c -> c.addRecentFile(Paths.get(m.getCurrentFile().getPath()))));
-		return model.isPresent();
+		model.ifPresent(m -> App.editConfig(
+				c -> c.addRecentFile(new OpenedFile(Paths.get(m.getCurrentFile().getPath()).toUri(), m.getDocument().getSource()))));
+		return model;
 	}
 
 	/**
@@ -212,7 +218,9 @@ public interface MainFrameDocumentController {
 		if (this.getSession().getCurrentFile() == null) {
 			return this.saveDocumentAs();
 		}
-		App.editConfig(c -> c.addRecentFile(Paths.get(this.getSession().getCurrentFile().getPath())));
+		App.editConfig(c -> c.addRecentFile(new OpenedFile(Paths.get(this.getSession().getCurrentFile().getPath()).toUri(),
+				this.getSession().getDocument().getSource())));
+		this.refreshFrameTitle();
 		return this.writeDocument(this.getSession().getCurrentFile());
 	}
 
@@ -231,16 +239,21 @@ public interface MainFrameDocumentController {
 			return false;
 		}
 
-		final File selectedFile = chooser.getSelectedFile(), file;
+		final File selectedFile = chooser.getSelectedFile();
+		final File file;
 		if (!selectedFile.getName().toLowerCase().endsWith(".mn")) {
 			file = new File(selectedFile.getParentFile(), selectedFile.getName() + ".mn");
 		} else {
 			file = selectedFile;
 		}
 
-		App.editConfig(c -> c.addRecentFile(Paths.get(selectedFile.getPath())));
+		this.getSession().getDocument().setSource(file.getName());
+		this.refreshFrameTitle();
 
-		return this.writeDocument(selectedFile);
+		App.editConfig(
+				c -> c.addRecentFile(new OpenedFile(Paths.get(file.getPath()).toUri(), this.getSession().getDocument().getSource())));
+
+		return this.writeDocument(file);
 	}
 
 	/**
