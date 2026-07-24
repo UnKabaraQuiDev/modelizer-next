@@ -3,6 +3,7 @@ package lu.kbra.modelizer_next;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Optional;
 
@@ -73,7 +74,7 @@ public class ModelizerAppEntryPoint implements AppMain {
 			Optional<DocumentSession> document = Optional.empty();
 
 			if (args.length > 0) {
-				final Path file = Path.of(args[0]);
+				final Path file = Paths.get(args[0]);
 
 				if (Files.exists(file)) {
 					document = MainFrame.createDocument(null, file.toUri());
