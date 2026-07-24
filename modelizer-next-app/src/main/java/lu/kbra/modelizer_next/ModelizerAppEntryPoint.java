@@ -76,7 +76,7 @@ public class ModelizerAppEntryPoint implements AppMain {
 				final Path file = Path.of(args[0]);
 
 				if (Files.exists(file)) {
-					document = MainFrame.createDocument(null, file.toFile());
+					document = MainFrame.createDocument(null, file.toUri());
 				}
 			}
 
@@ -95,7 +95,7 @@ public class ModelizerAppEntryPoint implements AppMain {
 					} else if (!f.exists()) {
 						continue;
 					}
-					if (frame.loadDocument(f)) {
+					if (frame.loadDocument(f.toURI()).isPresent()) {
 						FileOpenBridge.TO_BE_OPENED.clear();
 						FileOpenBridge.clearCallback();
 					}

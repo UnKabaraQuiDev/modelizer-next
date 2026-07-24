@@ -2,6 +2,8 @@ package lu.kbra.modelizer_next.cmdline;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
@@ -55,6 +57,10 @@ public final class CommandLineExporter {
 			super("Export aborted for input file: " + inputFile);
 		}
 
+		private ExportAbortedException(final URI inputFile) {
+			super("Export aborted for input file: " + inputFile);
+		}
+
 	}
 
 	/**
@@ -62,7 +68,7 @@ public final class CommandLineExporter {
 	 */
 	private static final class InputFileDocumentProducer implements ModelDocumentProducer {
 
-		private final Iterator<File> inputFiles;
+		private final Iterator<URI> inputFiles;
 		private final ConsoleDocumentLoadHandler loadHandler;
 
 		/**
@@ -71,7 +77,7 @@ public final class CommandLineExporter {
 		 * @param inputFiles values for input files
 		 * @param force      whether force is enabled
 		 */
-		private InputFileDocumentProducer(final List<File> inputFiles, final boolean force) {
+		private InputFileDocumentProducer(final List<URI> inputFiles, final boolean force) {
 			this.inputFiles = inputFiles.iterator();
 			this.loadHandler = new ConsoleDocumentLoadHandler(force);
 		}
@@ -88,7 +94,7 @@ public final class CommandLineExporter {
 				return Optional.empty();
 			}
 
-			final File inputFile = this.inputFiles.next();
+			final URI inputFile = this.inputFiles.next();
 			final Optional<DocumentSession> session = MainFrame.createDocument(inputFile, this.loadHandler);
 
 			if (session.isEmpty()) {
@@ -106,7 +112,7 @@ public final class CommandLineExporter {
 	 * @param sourceFile file to read or write
 	 * @param document   document to read or modify
 	 */
-	private record LoadedDocument(File sourceFile, ModelDocument document) {
+	private record LoadedDocument(URI sourceFile, ModelDocument document) {
 	}
 
 	/**
@@ -136,8 +142,7 @@ public final class CommandLineExporter {
 
 		try {
 			final CommandLineExportOptions options = CommandLineExportParser.parse(args);
-			final List<File> inputFiles = CommandLineExporter
-					.resolveInputFiles(options.inputFile(), options.multiple(), options.wildcard());
+			final List<URI> inputFiles = CommandLineExporter.resolveInputFiles(options.inputFile(), options.multiple(), options.wildcard());
 			final ModelDocumentProducer documentProducer = new InputFileDocumentProducer(inputFiles, options.force());
 			final ViewExportRequest request = new ViewExportRequest(options
 					.format(), options.scope(), options.panelTypes(), options.outputDirectory(), options.fileNamePattern(), false, false);
@@ -161,11 +166,11 @@ public final class CommandLineExporter {
 							return;
 						}
 
-						final List<Triplet<Optional<File>, PanelType, File>> exportedFiles = ViewExporter.exportViews(canvases,
+						final List<Triplet<Optional<URI>, PanelType, File>> exportedFiles = ViewExporter.exportViews(canvases,
 								request,
 								Optional.of(doc.sourceFile()),
-								triplet -> System.out.println("" + triplet.getFirst().map(File::getPath).orElse("?") + "\t"
-										+ triplet.getSecond().name() + "\t" + triplet.getThird().getPath()));
+								triplet -> System.out.println("" + triplet.getFirst().map(c -> Paths.get(c).toFile().getName()).orElse("?")
+										+ "\t" + triplet.getSecond().name() + "\t" + triplet.getThird().getPath()));
 
 						exportedFileCount.add(exportedFiles.size());
 					} catch (final Exception e) {
@@ -211,7 +216,7 @@ public final class CommandLineExporter {
 	 * @param usedPaths  used paths value used by the operation
 	 * @param inputFile  file to read or write
 	 */
-	private static void addInputFile(final List<File> inputFiles, final Set<Path> usedPaths, final File inputFile) {
+	private static void addInputFile(final List<URI> inputFiles, final Set<Path> usedPaths, final URI inputFile) {
 		final Path inputPath = CommandLineExporter.toNormalizedAbsolutePath(inputFile);
 
 		if (!Files.exists(inputPath)) {
@@ -223,7 +228,7 @@ public final class CommandLineExporter {
 		}
 
 		if (usedPaths.add(inputPath)) {
-			inputFiles.add(inputPath.toFile());
+			inputFiles.add(inputPath.toUri());
 		}
 	}
 
@@ -324,12 +329,13 @@ public final class CommandLineExporter {
 	 *
 	 * @param pattern pattern used for matching or formatting
 	 * @return the matching wildcard search root, or {@code null} when no match exists
+	 * @throws URISyntaxException
 	 */
-	private static Path findWildcardSearchRoot(final String pattern) {
+	private static Path findWildcardSearchRoot(final String pattern) throws URISyntaxException {
 		final int firstWildcardIndex = CommandLineExporter.firstWildcardIndex(pattern);
 
 		if (firstWildcardIndex < 0) {
-			return CommandLineExporter.toNormalizedAbsolutePath(new File(pattern));
+			return CommandLineExporter.toNormalizedAbsolutePath(new URI(pattern));
 		}
 
 		final int lastSeparatorBeforeWildcard = pattern.lastIndexOf(File.separatorChar, firstWildcardIndex);
@@ -343,7 +349,7 @@ public final class CommandLineExporter {
 			rootText = pattern.substring(0, lastSeparatorBeforeWildcard);
 		}
 
-		return CommandLineExporter.toNormalizedAbsolutePath(new File(rootText));
+		return CommandLineExporter.toNormalizedAbsolutePath(new URI(rootText));
 	}
 
 	/**
@@ -407,10 +413,12 @@ public final class CommandLineExporter {
 	 * @param multiple     whether multiple input files are allowed
 	 * @param wildcard     whether wildcard path matching is enabled
 	 * @return the resolved input files
-	 * @throws IOException if the operation cannot be completed
+	 * @throws IOException        if the operation cannot be completed
+	 * @throws URISyntaxException
 	 */
-	private static List<File> resolveInputFiles(final String rawInputFile, final boolean multiple, final boolean wildcard)
-			throws IOException {
+	private static List<URI> resolveInputFiles(final String rawInputFile, final boolean multiple, final boolean wildcard)
+			throws IOException,
+				URISyntaxException {
 		final String rawInput = rawInputFile == null ? "" : rawInputFile.trim();
 
 		if (rawInput.isBlank()) {
@@ -426,7 +434,7 @@ public final class CommandLineExporter {
 		}
 
 		final Set<Path> usedPaths = new LinkedHashSet<>();
-		final List<File> inputFiles = new ArrayList<>();
+		final List<URI> inputFiles = new ArrayList<>();
 
 		for (final String entry : entries) {
 			if (wildcard && CommandLineExporter.containsWildcard(entry)) {
@@ -437,10 +445,10 @@ public final class CommandLineExporter {
 				}
 
 				for (final Path matchedPath : matchedPaths) {
-					CommandLineExporter.addInputFile(inputFiles, usedPaths, matchedPath.toFile());
+					CommandLineExporter.addInputFile(inputFiles, usedPaths, matchedPath.toUri());
 				}
 			} else {
-				CommandLineExporter.addInputFile(inputFiles, usedPaths, CommandLineExportParser.resolveHome(entry).toFile());
+				CommandLineExporter.addInputFile(inputFiles, usedPaths, CommandLineExportParser.resolveHome(entry).toUri());
 			}
 		}
 
@@ -456,9 +464,10 @@ public final class CommandLineExporter {
 	 *
 	 * @param rawPattern text value for raw pattern
 	 * @return the resolved wildcard input files
-	 * @throws IOException if the operation cannot be completed
+	 * @throws IOException        if the operation cannot be completed
+	 * @throws URISyntaxException
 	 */
-	private static List<Path> resolveWildcardInputFiles(final String rawPattern) throws IOException {
+	private static List<Path> resolveWildcardInputFiles(final String rawPattern) throws IOException, URISyntaxException {
 		final String pattern = CommandLineExporter.normalizeWildcardSeparators(CommandLineExportParser.resolveHome(rawPattern).toString());
 		final Path searchRoot = CommandLineExporter.findWildcardSearchRoot(pattern);
 
@@ -484,9 +493,9 @@ public final class CommandLineExporter {
 	 * @param file file to read or write
 	 * @return the to normalized absolute path result
 	 */
-	private static Path toNormalizedAbsolutePath(final File file) {
+	private static Path toNormalizedAbsolutePath(final URI file) {
 		try {
-			return file.toPath().toAbsolutePath().normalize();
+			return Paths.get(file).normalize();
 		} catch (final InvalidPathException ex) {
 			throw new CommandLineExportParser.InvalidArgumentException("Invalid input path: " + file, ex);
 		}

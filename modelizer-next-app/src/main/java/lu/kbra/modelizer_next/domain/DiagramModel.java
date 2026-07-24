@@ -49,6 +49,7 @@ public class DiagramModel implements PostConstructOwner, PreDeconstructOwner {
 		this.conceptualLinks = new ArrayList<>();
 		this.technicalLinks = new ArrayList<>();
 		this.comments = new ArrayList<>();
+		this.postConstruct();
 	}
 
 	public void addClass(final ClassModel classModel) {

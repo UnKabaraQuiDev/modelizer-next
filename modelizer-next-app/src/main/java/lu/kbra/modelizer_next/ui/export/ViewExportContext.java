@@ -1,6 +1,7 @@
 package lu.kbra.modelizer_next.ui.export;
 
 import java.io.File;
+import java.net.URI;
 import java.util.Optional;
 
 import lu.kbra.modelizer_next.layout.PanelType;
@@ -12,6 +13,6 @@ import lu.kbra.modelizer_next.layout.PanelType;
  * @param panelType  exported panel type
  * @param outputFile file being written
  */
-public record ViewExportContext(Optional<File> sourceFile, PanelType panelType, File outputFile) {
+public record ViewExportContext(Optional<URI> sourceFile, PanelType panelType, File outputFile) {
 
 }

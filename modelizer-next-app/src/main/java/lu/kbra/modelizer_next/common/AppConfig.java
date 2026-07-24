@@ -1,7 +1,6 @@
 package lu.kbra.modelizer_next.common;
 
 import java.awt.event.InputEvent;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -32,7 +31,7 @@ public class AppConfig {
 	private boolean emulateMiddleClick = false;
 	private Integer alternativeLiveEditKey;
 	private int maxRecentFileCount = 15;
-	private LinkedHashSet<Path> recentFiles = new LinkedHashSet<>();
+	private LinkedHashSet<OpenedFile> recentFiles = new LinkedHashSet<>();
 
 	public class AppConfigEditor {
 
@@ -71,12 +70,12 @@ public class AppConfig {
 			AppConfig.this.maxRecentFileCount = maxRecentFileCount;
 		}
 
-		public void setRecentFiles(final LinkedHashSet<Path> recentFiles) {
+		public void setRecentFiles(final LinkedHashSet<OpenedFile> recentFiles) {
 			AppConfig.this.recentFiles = recentFiles;
 		}
 
-		public void addRecentFile(final Path p) {
-			AppConfig.this.recentFiles.remove(p);
+		public void addRecentFile(final OpenedFile p) {
+			AppConfig.this.recentFiles.removeIf(c -> c.file().equals(p.file()));
 			AppConfig.this.recentFiles.add(p);
 			AppConfig.this.limitRecentFileCount();
 		}
@@ -101,7 +100,7 @@ public class AppConfig {
 			return AppConfig.this.alternativeLiveEditKey != null;
 		}
 
-		public LinkedHashSet<Path> getRecentFiles() {
+		public LinkedHashSet<OpenedFile> getRecentFiles() {
 			if (AppConfig.this.recentFiles == null) {
 				AppConfig.this.recentFiles = new LinkedHashSet<>();
 			}
@@ -153,7 +152,7 @@ public class AppConfig {
 		return this.alternativeLiveEditKey != null;
 	}
 
-	public LinkedHashSet<Path> getRecentFiles() {
+	public LinkedHashSet<OpenedFile> getRecentFiles() {
 		if (this.recentFiles == null) {
 			this.recentFiles = new LinkedHashSet<>();
 		}

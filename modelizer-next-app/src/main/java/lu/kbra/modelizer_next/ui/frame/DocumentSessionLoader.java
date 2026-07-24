@@ -3,6 +3,8 @@ package lu.kbra.modelizer_next.ui.frame;
 import java.awt.Component;
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
+import java.nio.file.Paths;
 import java.util.Optional;
 
 import javax.swing.JOptionPane;
@@ -73,7 +75,7 @@ public final class DocumentSessionLoader {
 	 * @param selectedFile file to read or write
 	 * @return the created document
 	 */
-	public static Optional<DocumentSession> createDocument(final Component parent, final File selectedFile) {
+	public static Optional<DocumentSession> createDocument(final Component parent, final URI selectedFile) {
 		return DocumentSessionLoader.createDocument(selectedFile, new SwingDocumentLoadHandler(parent));
 	}
 
@@ -84,7 +86,8 @@ public final class DocumentSessionLoader {
 	 * @param handler      handler value used by the operation
 	 * @return the created document
 	 */
-	public static Optional<DocumentSession> createDocument(final File selectedFile, final DocumentLoadHandler handler) {
+	public static Optional<DocumentSession> createDocument(final URI selectedFilePath, final DocumentLoadHandler handler) {
+		final File selectedFile = Paths.get(selectedFilePath).toFile();
 		final String extension = PCUtils.getFileExtension(selectedFile.getName());
 
 		try {
