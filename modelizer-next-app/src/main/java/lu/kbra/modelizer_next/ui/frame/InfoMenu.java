@@ -103,7 +103,7 @@ final class InfoMenu extends JMenu {
 			return;
 		}
 
-		final BootstrapInfo bootstrapConfig = bootstrapRuntime.get().getBootstrapConfig();
+		final BootstrapInfo bootstrapConfig = bootstrapRuntime.get().getBootstrapInfo();
 		final JMenuItem bootstrapVersionInfo = new JMenuItem(
 				"Bootstrap Version: " + bootstrapConfig.version() + " [" + bootstrapConfig.distributor() + "]");
 		bootstrapVersionInfo.setToolTipText("Click to copy bootstrap version informations.");

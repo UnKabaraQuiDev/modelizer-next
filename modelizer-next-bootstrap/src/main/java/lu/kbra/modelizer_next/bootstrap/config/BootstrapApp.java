@@ -172,6 +172,8 @@ public final class BootstrapApp {
 				BootstrapApp.DISTRIBUTOR);
 
 		BootstrapApp.ensureDirectories();
+		
+		BootstrapApp.loadConfiguration();
 	}
 
 	/**
