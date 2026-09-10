@@ -16,14 +16,19 @@ permissions:
 jobs:
   prepare:
     runs-on: [self-hosted, linux]
+    
     outputs:
       version: ${{ steps.meta.outputs.version }}
       app_version: ${{ steps.meta.outputs.app_version }}
       release_tag: ${{ steps.meta.outputs.release_tag }}
       prerelease: ${{ steps.meta.outputs.prerelease }}
       should_format: ${{ steps.decide.outputs.should_format }}
+
     steps:
       - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
       - id: meta
         env:
           VERSION_OVERRIDE: ${{ github.event_name == 'push' && github.ref_name || inputs.version }}
@@ -236,6 +241,13 @@ jobs:
           make_latest: true
           generate_release_notes: true
           files: release-assets/*
+
+      - name: Upload to APT
+        env:
+          NEXUS_USER: ${{ secrets.NEXUS_USERNAME }}
+          NEXUS_PASSWORD: ${{ secrets.NEXUS_PASSWORD }}
+          NEXUS_URL: ${{ vars.NEXUS_APT_URL }}
+        run: bash scripts/upload-apt.sh
 
       - name: Update registry
         env:

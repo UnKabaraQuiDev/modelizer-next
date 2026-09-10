@@ -118,7 +118,8 @@ compute_build_metadata() {
     raw_base_version="$(mvn -B help:evaluate -Dexpression=project.version -q -DforceStdout)"
     base_version="$(sanitize_base_for_public_version "${raw_base_version}")"
 
-    commit_count="$(git rev-list --count HEAD)"
+    release_tag="$(git describe --tags --match='*-RELEASE-*' --abbrev=0)" || exit 1
+    commit_count="$(git rev-list --count "$release_tag"..HEAD)"
 
     version_override="${base_version}-${channel_name}-${commit_count}"
   fi

@@ -9,15 +9,18 @@ permissions:
 jobs:
   prepare:
     runs-on: [self-hosted, linux]
+
     outputs:
       version: ${{ steps.meta.outputs.version }}
       app_version: ${{ steps.meta.outputs.app_version }}
       release_tag: ${{ steps.meta.outputs.release_tag }}
       prerelease: ${{ steps.meta.outputs.prerelease }}
+
     steps:
       - uses: actions/checkout@v7
         with:
           fetch-depth: 0
+
       - id: meta
         run: |
           source ./script/common.sh
@@ -27,16 +30,21 @@ jobs:
   build-shared:
     needs: [prepare]
     runs-on: [self-hosted, linux]
+
     env:
       VERSION_OVERRIDE: ${{ needs.prepare.outputs.version }}
+
     steps:
       - uses: actions/checkout@v7
+
       - uses: actions/setup-java@v6
         with:
           distribution: temurin
           java-version: 21
+
       - name: Build shared nightly artifacts
         run: bash ./script/build-nightly-shared.sh
+
       - uses: actions/upload-artifact@v7
         with:
           name: nightly-shared
@@ -46,14 +54,15 @@ jobs:
   publish:
     needs: [prepare, build-shared]
     runs-on: [self-hosted, linux]
+
     env:
       VERSION: ${{ needs.prepare.outputs.version }}
       RELEASE_TAG: ${{ needs.prepare.outputs.release_tag }}
       APP_VERSION: ${{ needs.prepare.outputs.app_version }}
+
     steps:
       - uses: actions/checkout@v7
         with:
-          fetch-depth: 0
           ref: registry
 
       - name: Sync script files and .gitignore from main into registry

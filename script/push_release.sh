@@ -11,9 +11,7 @@ if [[ "$MVN_VERSION" == *-SNAPSHOT ]]; then
   exit 1
 fi
 
-COMMIT_COUNT="$(git rev-list --count HEAD)"
-
-TAG="${MVN_VERSION}-RELEASE-${COMMIT_COUNT}"
+TAG="${MVN_VERSION}-RELEASE-0"
 
 echo "Using tag: $TAG"
 

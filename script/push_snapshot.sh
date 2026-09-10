@@ -7,7 +7,8 @@ MVN_VERSION=$(mvn -B help:evaluate -Dexpression=project.version -q -DforceStdout
 MVN_VERSION=$(echo "$MVN_VERSION" | tr -d '\r\n')
 MVN_VERSION="${MVN_VERSION%-SNAPSHOT}"
 
-COMMIT_COUNT="$(git rev-list --count HEAD)"
+RELEASE_TAG="$(git describe --tags --match='*-RELEASE-*' --abbrev=0)" || exit 1
+COMMIT_COUNT="$(git rev-list --count "$RELEASE_TAG"..HEAD)"
 
 TAG="${MVN_VERSION}-SNAPSHOT-${COMMIT_COUNT}"
 
