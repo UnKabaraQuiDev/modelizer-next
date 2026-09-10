@@ -64,12 +64,15 @@ jobs:
       - uses: actions/checkout@v7
         with:
           ref: ${{ github.event.inputs.tag || github.ref }}
+
       - uses: actions/setup-java@v6
         with:
           distribution: temurin
           java-version: 21
+
       - name: Apply formatting
         run: mvn -B -Pformat spotless:apply
+
       - name: Commit & push if needed
         run: |
           git config user.name "github-actions"
@@ -135,7 +138,7 @@ jobs:
 
   build-windows:
     needs: [prepare, format]
-    runs-on: [self-hosted, windows]
+    runs-on: windows-latest
     if: always() && needs.prepare.result == 'success' && (needs.format.result == 'success' || needs.format.result == 'skipped')
 
     env:
@@ -206,9 +209,8 @@ jobs:
           if-no-files-found: error
 
   publish:
-    needs: [prepare, build-shared, build-linux, build-windows, build-macos]
+    needs: [build-shared, build-linux, build-windows, build-macos]
     runs-on: [self-hosted, linux]
-    if: always() && needs.prepare.result == 'success' && (needs.format.result == 'success' || needs.format.result == 'skipped')
 
     env:
       VERSION: ${{ needs.prepare.outputs.version }}

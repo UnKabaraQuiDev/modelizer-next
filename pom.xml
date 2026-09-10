@@ -353,23 +353,6 @@
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-javadoc-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>attach-javadocs</id>
-						<goals>
-							<goal>jar</goal>
-						</goals>
-					</execution>
-				</executions>
-				<configuration>
-					<failOnError>false</failOnError>
-					<doclint>all,-reference,-missing,-accessibility</doclint>
-					<outputDirectory>${project.build.directory}/site</outputDirectory>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-deploy-plugin</artifactId>
 				<configuration>
 					<skip>true</skip>
@@ -400,6 +383,31 @@
 								<trimTrailingWhitespace />
 								<endWithNewline />
 							</java>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+
+		<profile>
+			<id>javadoc</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-javadoc-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>attach-javadocs</id>
+								<goals>
+									<goal>jar</goal>
+								</goals>
+							</execution>
+						</executions>
+						<configuration>
+							<failOnError>false</failOnError>
+							<doclint>all,-reference,-missing,-accessibility</doclint>
+							<outputDirectory>${project.build.directory}/site</outputDirectory>
 						</configuration>
 					</plugin>
 				</plugins>
