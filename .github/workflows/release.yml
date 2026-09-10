@@ -286,8 +286,8 @@ jobs:
 
       - name: Upload to APT
         env:
-          NEXUS_USER: ${{ secrets.NEXUS_USERNAME }}
-          NEXUS_PASSWORD: ${{ secrets.NEXUS_PASSWORD }}
+          NEXUS_USER: ${{ secrets.NEXUS_APT_USERNAME }}
+          NEXUS_PASSWORD: ${{ secrets.NEXUS_APT_PASSWORD }}
           NEXUS_URL: ${{ vars.NEXUS_APT_URL }}
         run: bash $GITHUB_WORKSPACE/script/upload-apt.sh
 
