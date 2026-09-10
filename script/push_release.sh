@@ -11,9 +11,21 @@ if [[ "$MVN_VERSION" == *-SNAPSHOT ]]; then
   exit 1
 fi
 
-TAG="${MVN_VERSION}-RELEASE-0"
+TAG_PREFIX="${MVN_VERSION}-RELEASE"
 
-echo "Using tag: $TAG"
+LAST_TAG=$(git tag -l "${TAG_PREFIX}-0" --sort=-version:refname | head -n1)
+
+if [[ -z "$LAST_TAG" ]]; then
+  COMMIT_COUNT=0
+else
+  COMMIT_COUNT=$(git rev-list --count "${LAST_TAG}..HEAD")
+fi
+
+TAG="${TAG_PREFIX}-${COMMIT_COUNT}"
+
+echo "Last release tag: ${LAST_TAG:-none}"
+echo "Commits since last release: $COMMIT_COUNT"
+echo "Release tag: $TAG"
 
 git fetch "$REMOTE" --tags
 
@@ -23,6 +35,7 @@ if [[ -n "$(git status --porcelain)" ]]; then
 fi
 
 git tag -f -a "$TAG" -m "$TAG"
+git push "$REMOTE"
 git push "$REMOTE" "$TAG" --force
 
 echo "Tag pushed (force): $TAG"

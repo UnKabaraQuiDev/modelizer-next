@@ -7,12 +7,21 @@ MVN_VERSION=$(mvn -B help:evaluate -Dexpression=project.version -q -DforceStdout
 MVN_VERSION=$(echo "$MVN_VERSION" | tr -d '\r\n')
 MVN_VERSION="${MVN_VERSION%-SNAPSHOT}"
 
-RELEASE_TAG="$(git describe --tags --match='*-RELEASE-*' --abbrev=0)" || exit 1
-COMMIT_COUNT="$(git rev-list --count "$RELEASE_TAG"..HEAD)"
+TAG_PREFIX="${MVN_VERSION}-SNAPSHOT"
 
-TAG="${MVN_VERSION}-SNAPSHOT-${COMMIT_COUNT}"
+LAST_TAG=$(git tag -l "${TAG_PREFIX}-0" --sort=-version:refname | head -n1)
 
-echo "Using tag: $TAG"
+if [[ -z "$LAST_TAG" ]]; then
+  COMMIT_COUNT=0
+else
+  COMMIT_COUNT=$(git rev-list --count "${LAST_TAG}..HEAD")
+fi
+
+TAG="${TAG_PREFIX}-${COMMIT_COUNT}"
+
+echo "Last release tag: ${LAST_TAG:-none}"
+echo "Commits since last release: $COMMIT_COUNT"
+echo "Snapshot tag: $TAG"
 
 git fetch "$REMOTE" --tags
 
@@ -22,6 +31,7 @@ if [[ -n "$(git status --porcelain)" ]]; then
 fi
 
 git tag -f -a "$TAG" -m "$TAG"
+git push "$REMOTE"
 git push "$REMOTE" "$TAG" --force
 
 echo "Tag pushed (force): $TAG"

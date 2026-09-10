@@ -193,7 +193,7 @@ public final class BootstrapApp {
 	public static BootstrapConfig loadConfiguration() {
 		final File file = BootstrapApp.getBootstrapConfigFile();
 		if (!file.isFile()) {
-			return new BootstrapConfig();
+			return BootstrapApp.CONFIG = new BootstrapConfig();
 		}
 		try {
 			return BootstrapApp.CONFIG = BootstrapApp.MAPPER.readValue(file, BootstrapConfig.class);
