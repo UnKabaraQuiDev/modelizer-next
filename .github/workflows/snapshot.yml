@@ -15,7 +15,7 @@ permissions:
 
 jobs:
   prepare:
-    runs-on: [self-hosted, linux]
+    runs-on: ubuntu-latest
 
     outputs:
       version: ${{ steps.meta.outputs.version }}
@@ -54,7 +54,7 @@ jobs:
 
   format:
     needs: prepare
-    runs-on: [self-hosted, linux]
+    runs-on: ubuntu-latest
     if: needs.prepare.outputs.should_format == 'true'
 
     permissions:
@@ -83,7 +83,7 @@ jobs:
 
   build-shared:
     needs: [prepare, format]
-    runs-on: [self-hosted, linux]
+    runs-on: ubuntu-latest
     if: always() && needs.prepare.result == 'success' && (needs.format.result == 'success' || needs.format.result == 'skipped')
 
     env:
@@ -108,7 +108,7 @@ jobs:
 
   build-linux:
     needs: [prepare, format]
-    runs-on: [self-hosted, linux]
+    runs-on: ubuntu-latest
     if: always() && needs.prepare.result == 'success' && (needs.format.result == 'success' || needs.format.result == 'skipped')
 
     env:
@@ -138,7 +138,7 @@ jobs:
 
   build-windows:
     needs: [prepare, format]
-    runs-on: [self-hosted, windows]
+    runs-on: windows-latest
     if: always() && needs.prepare.result == 'success' && (needs.format.result == 'success' || needs.format.result == 'skipped')
 
     env:
@@ -210,7 +210,7 @@ jobs:
 
   publish:
     needs: [prepare, build-shared, build-linux, build-windows, build-macos]
-    runs-on: [self-hosted, linux]
+    runs-on: ubuntu-latest
 
     env:
       VERSION: ${{ needs.prepare.outputs.version }}
