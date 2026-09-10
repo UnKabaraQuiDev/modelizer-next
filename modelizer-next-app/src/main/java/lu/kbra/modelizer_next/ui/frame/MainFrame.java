@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.EventListener;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,6 +24,7 @@ import java.util.stream.Collectors;
 
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
@@ -32,18 +34,25 @@ import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
+import io.github.andrewauclair.moderndocking.DockingRegion;
+import io.github.andrewauclair.moderndocking.app.Docking;
+import io.github.andrewauclair.moderndocking.app.RootDockingPanel;
+import lombok.Getter;
+import lu.kbra.code_exporter.api.CodeExporter;
+import lu.kbra.code_exporter.api.ui.ExporterOptions;
 import lu.kbra.modelizer_next.MNMain;
 import lu.kbra.modelizer_next.bootstrap.AvailableUpdate;
 import lu.kbra.modelizer_next.bootstrap.UpdateRuntime;
 import lu.kbra.modelizer_next.bootstrap.UpdateRuntimes;
 import lu.kbra.modelizer_next.common.App;
 import lu.kbra.modelizer_next.document.ModelDocument;
-import lu.kbra.modelizer_next.layout.PanelType;
+import lu.kbra.modelizer_next.domain.data.PanelType;
 import lu.kbra.modelizer_next.style.StylePalette;
 import lu.kbra.modelizer_next.style.StylePaletteService;
 import lu.kbra.modelizer_next.ui.ThemeMode;
 import lu.kbra.modelizer_next.ui.canvas.DiagramCanvas;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectionInfo;
+import lu.kbra.modelizer_next.ui.dialogs.CodeExportDialog;
 import lu.kbra.modelizer_next.ui.dialogs.ViewExportDialog;
 import lu.kbra.modelizer_next.ui.export.ViewExportRequest;
 import lu.kbra.modelizer_next.ui.export.ViewExporter;
@@ -51,11 +60,8 @@ import lu.kbra.modelizer_next.ui.impl.DocumentChangeListener;
 import lu.kbra.modelizer_next.ui.impl.DocumentLoadHandler;
 import lu.kbra.pclib.PCUtils;
 import lu.kbra.pclib.datastructure.tuple.Pair;
+import lu.kbra.pclib.datastructure.tuple.Pairs;
 import lu.kbra.pclib.datastructure.tuple.Triplet;
-
-import io.github.andrewauclair.moderndocking.DockingRegion;
-import io.github.andrewauclair.moderndocking.app.Docking;
-import io.github.andrewauclair.moderndocking.app.RootDockingPanel;
 
 /**
  * Main Swing window for editing Modelizer Next documents.
@@ -147,6 +153,9 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 	JLabel selectionPathLabel;
 	JMenuItem undoMenuItem;
 	JMenuItem redoMenuItem;
+
+	@Getter
+	Map<String, Pair<File, ExporterOptions>> loadedExporterOptions = new HashMap<>();
 
 	public MainFrame(final DocumentSession session) {
 		super("Modelizer Next");
@@ -257,7 +266,8 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 	@Override
 	public void refreshFrameTitle() {
 		final String source = this.document.getSource() == null || this.document.getSource().isBlank()
-				? (getSession() != null && getSession().getCurrentFile() != null ? getSession().getCurrentFile().getName() : "?")
+				? this.getSession() != null && this.getSession().getCurrentFile() != null ? this.getSession().getCurrentFile().getName()
+						: "?"
 				: this.document.getSource();
 		super.setTitle(App.title(source + (this.session.isDirty() ? " *" : "")));
 	}
@@ -466,20 +476,20 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 	 * Clears the frame listeners.
 	 */
 	void clearListeners() {
-		this.removeListener(this.getComponentListeners(), this::removeComponentListener);
-		this.removeListener(this.getContainerListeners(), this::removeContainerListener);
-		this.removeListener(this.getFocusListeners(), this::removeFocusListener);
-		this.removeListener(this.getWindowFocusListeners(), this::removeWindowFocusListener);
-		this.removeListener(this.getWindowListeners(), this::removeWindowListener);
-		this.removeListener(this.getWindowStateListeners(), this::removeWindowStateListener);
-		this.removeListener(this.getHierarchyBoundsListeners(), this::removeHierarchyBoundsListener);
-		this.removeListener(this.getHierarchyListeners(), this::removeHierarchyListener);
-		this.removeListener(this.getInputMethodListeners(), this::removeInputMethodListener);
-		this.removeListener(this.getKeyListeners(), this::removeKeyListener);
-		this.removeListener(this.getMouseListeners(), this::removeMouseListener);
-		this.removeListener(this.getMouseMotionListeners(), this::removeMouseMotionListener);
-		this.removeListener(this.getMouseWheelListeners(), this::removeMouseWheelListener);
-		this.removeListener(this.getPropertyChangeListeners(), this::removePropertyChangeListener);
+		MainFrame.removeListener(this.getComponentListeners(), this::removeComponentListener);
+		MainFrame.removeListener(this.getContainerListeners(), this::removeContainerListener);
+		MainFrame.removeListener(this.getFocusListeners(), this::removeFocusListener);
+		MainFrame.removeListener(this.getWindowFocusListeners(), this::removeWindowFocusListener);
+		MainFrame.removeListener(this.getWindowListeners(), this::removeWindowListener);
+		MainFrame.removeListener(this.getWindowStateListeners(), this::removeWindowStateListener);
+		MainFrame.removeListener(this.getHierarchyBoundsListeners(), this::removeHierarchyBoundsListener);
+		MainFrame.removeListener(this.getHierarchyListeners(), this::removeHierarchyListener);
+		MainFrame.removeListener(this.getInputMethodListeners(), this::removeInputMethodListener);
+		MainFrame.removeListener(this.getKeyListeners(), this::removeKeyListener);
+		MainFrame.removeListener(this.getMouseListeners(), this::removeMouseListener);
+		MainFrame.removeListener(this.getMouseMotionListeners(), this::removeMouseMotionListener);
+		MainFrame.removeListener(this.getMouseWheelListeners(), this::removeMouseWheelListener);
+		MainFrame.removeListener(this.getPropertyChangeListeners(), this::removePropertyChangeListener);
 	}
 
 	/**
@@ -548,6 +558,12 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 		} catch (final IOException ex) {
 			JOptionPane.showMessageDialog(this, "Failed to export view:\n" + ex.getMessage(), "Export error", JOptionPane.ERROR_MESSAGE);
 		}
+	}
+
+	void exportcode(final CodeExporter service) {
+		final JDialog dialog = new CodeExportDialog(this,
+				service,
+				this.loadedExporterOptions.computeIfAbsent(service.getExporterId(), k -> Pairs.pair(null, null)).getValue());
 	}
 
 	/**

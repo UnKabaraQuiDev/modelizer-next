@@ -2,7 +2,7 @@ package lu.kbra.modelizer_next.ui.canvas.datastruct;
 
 import java.util.List;
 
-import lu.kbra.modelizer_next.layout.PanelType;
+import lu.kbra.modelizer_next.domain.data.PanelType;
 
 /**
  * Serializable snapshot of copied classes, comments, links, fields, and layout data.

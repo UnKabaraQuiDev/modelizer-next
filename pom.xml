@@ -14,6 +14,8 @@
 		<module>modelizer-next-common</module>
 		<module>modelizer-next-app</module>
 		<module>modelizer-next-bootstrap</module>
+		<module>modelizer-next-datastruct</module>
+		<module>code-exporter</module>
 	</modules>
 
 	<properties>
@@ -120,6 +122,17 @@
 			<dependency>
 				<groupId>lu.kbra</groupId>
 				<artifactId>modelizer-next-common</artifactId>
+				<version>${revision}</version>
+			</dependency>
+			<dependency>
+				<groupId>lu.kbra</groupId>
+				<artifactId>modelizer-next-datastruct</artifactId>
+				<version>${revision}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>lu.kbra</groupId>
+				<artifactId>code-exporter-api</artifactId>
 				<version>${revision}</version>
 			</dependency>
 

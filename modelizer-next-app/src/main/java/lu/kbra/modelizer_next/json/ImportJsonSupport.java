@@ -6,10 +6,10 @@ import java.util.Map;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
-import lu.kbra.modelizer_next.common.Size2D;
 import lu.kbra.modelizer_next.layout.LayoutObjectType;
 import lu.kbra.modelizer_next.layout.NodeLayout;
 import lu.kbra.modelizer_next.layout.PanelState;
+import lu.kbra.modelizer_next.layout.Size2D;
 
 /**
  * Shared JSON helper methods used by document importers.

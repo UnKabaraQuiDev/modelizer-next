@@ -59,7 +59,10 @@ public interface MainFrameDocumentController {
 	 */
 	default JFileChooser createOpenFileChooser() {
 		final JFileChooser chooser = new JFileChooser();
-		chooser.setFileFilter(new FileNameExtensionFilter("Model files (*.mn, *.mod, *.mdlz)", "mn", "mod", "mdlz"));
+		chooser.addChoosableFileFilter(new FileNameExtensionFilter("Legacy Modelizer files (*.mod)", "mod"));
+		chooser.addChoosableFileFilter(new FileNameExtensionFilter("Modelizer.lu files (*.mdlz)", "mdlz"));
+		chooser.addChoosableFileFilter(new FileNameExtensionFilter("Modelizer Next files (*.mn)", "mn"));
+		chooser.addChoosableFileFilter(new FileNameExtensionFilter("All supported files", "mn", "mod", "mdlz"));
 		return chooser;
 	}
 

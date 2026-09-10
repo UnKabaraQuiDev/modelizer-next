@@ -2,8 +2,6 @@ package lu.kbra.modelizer_next.layout;
 
 import java.awt.geom.Point2D;
 
-import lu.kbra.modelizer_next.common.Size2D;
-
 /**
  * Persistent layout information for a class or comment node on the canvas.
  */

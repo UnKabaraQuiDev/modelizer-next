@@ -24,7 +24,39 @@
 			${user.home}/.modelizer-next/updates/${project.build.finalName}.jar</update.path>
 	</properties>
 
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>lu.kbra</groupId>
+				<artifactId>code-exporter</artifactId>
+				<version>${revision}</version>
+				<scope>import</scope>
+				<type>pom</type>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
 	<dependencies>
+		<dependency>
+			<groupId>lu.kbra</groupId>
+			<artifactId>modelizer-next-common</artifactId>
+			<scope>${common.scope}</scope>
+		</dependency>
+		<dependency>
+			<groupId>lu.kbra</groupId>
+			<artifactId>modelizer-next-datastruct</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>lu.kbra</groupId>
+			<artifactId>code-exporter-api</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>lu.kbra</groupId>
+			<artifactId>code-exporter-java-pclib</artifactId>
+		</dependency>
+
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-databind</artifactId>
@@ -32,11 +64,6 @@
 		<dependency>
 			<groupId>com.fasterxml.jackson.datatype</groupId>
 			<artifactId>jackson-datatype-jsr310</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>lu.kbra</groupId>
-			<artifactId>modelizer-next-common</artifactId>
-			<scope>${common.scope}</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.formdev</groupId>
@@ -56,6 +83,7 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
+
 		<dependency>
 			<groupId>lu.kbra</groupId>
 			<artifactId>pclib-common</artifactId>
@@ -68,6 +96,7 @@
 			<groupId>lu.kbra</groupId>
 			<artifactId>pclib-concurrency</artifactId>
 		</dependency>
+
 		<dependency>
 			<groupId>io.github.andrewauclair</groupId>
 			<artifactId>modern-docking-single-app</artifactId>

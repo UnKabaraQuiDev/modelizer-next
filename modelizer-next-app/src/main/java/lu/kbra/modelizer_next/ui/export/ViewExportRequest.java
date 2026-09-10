@@ -4,7 +4,7 @@ import java.awt.Color;
 import java.io.File;
 import java.util.List;
 
-import lu.kbra.modelizer_next.layout.PanelType;
+import lu.kbra.modelizer_next.domain.data.PanelType;
 
 /**
  * Immutable request object passed to the exporter.

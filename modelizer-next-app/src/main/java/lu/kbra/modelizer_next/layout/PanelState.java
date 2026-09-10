@@ -9,8 +9,8 @@ import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import lu.kbra.modelizer_next.ui.impl.PostConstructOwner;
-import lu.kbra.modelizer_next.ui.impl.PreDeconstructOwner;
+import lu.kbra.modelizer_next.impl.PostConstructOwner;
+import lu.kbra.modelizer_next.impl.PreDeconstructOwner;
 
 /**
  * Persistent state for one workspace panel.

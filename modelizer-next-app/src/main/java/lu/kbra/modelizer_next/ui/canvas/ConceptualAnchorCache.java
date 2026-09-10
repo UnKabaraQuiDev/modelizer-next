@@ -10,9 +10,9 @@ import java.util.Map;
 
 import lu.kbra.modelizer_next.domain.ClassModel;
 import lu.kbra.modelizer_next.domain.LinkModel;
+import lu.kbra.modelizer_next.domain.data.PanelType;
 import lu.kbra.modelizer_next.layout.LayoutObjectType;
 import lu.kbra.modelizer_next.layout.NodeLayout;
-import lu.kbra.modelizer_next.layout.PanelType;
 import lu.kbra.modelizer_next.ui.canvas.data.AnchorSide;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.AnchorPair;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.AnchorSidePair;

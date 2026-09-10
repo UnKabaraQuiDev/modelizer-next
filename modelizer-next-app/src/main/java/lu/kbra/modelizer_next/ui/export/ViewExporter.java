@@ -17,7 +17,7 @@ import java.util.Set;
 import java.util.function.Consumer;
 
 import lu.kbra.modelizer_next.cmdline.CommandLineExportParser.InvalidArgumentException;
-import lu.kbra.modelizer_next.layout.PanelType;
+import lu.kbra.modelizer_next.domain.data.PanelType;
 import lu.kbra.modelizer_next.ui.canvas.DiagramCanvas;
 import lu.kbra.pclib.PCUtils;
 import lu.kbra.pclib.datastructure.tuple.Triplet;

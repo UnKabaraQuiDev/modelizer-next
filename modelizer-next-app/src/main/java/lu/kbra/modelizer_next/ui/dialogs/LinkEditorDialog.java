@@ -30,7 +30,7 @@ import lu.kbra.modelizer_next.domain.ClassModel;
 import lu.kbra.modelizer_next.domain.FieldModel;
 import lu.kbra.modelizer_next.domain.LinkModel;
 import lu.kbra.modelizer_next.domain.data.Cardinality;
-import lu.kbra.modelizer_next.layout.PanelType;
+import lu.kbra.modelizer_next.domain.data.PanelType;
 import lu.kbra.modelizer_next.ui.component.ColorButton;
 
 /**
