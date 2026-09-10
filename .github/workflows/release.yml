@@ -125,12 +125,12 @@ jobs:
           java-version: 21
 
       - name: Build Linux ${{ matrix.type }}
-        run: bash ./script/build-nightly-linux-${{ matrix.type }}.sh
+        run: bash ./script/build-release-linux-${{ matrix.type }}.sh
 
       - uses: actions/upload-artifact@v7
         with:
-          name: nightly-linux-${{ matrix.type }}
-          path: artifacts/nightly/linux-${{ matrix.type }}/*
+          name: release-linux-${{ matrix.type }}
+          path: artifacts/release/linux-${{ matrix.type }}/*
           if-no-files-found: error
 
   build-windows:
@@ -159,12 +159,12 @@ jobs:
           java-version: 21
 
       - name: Build Windows ${{ matrix.type }}
-        run: bash ./script/build-nightly-windows-${{ matrix.type }}.sh
+        run: bash ./script/build-release-windows-${{ matrix.type }}.sh
 
       - uses: actions/upload-artifact@v7
         with:
-          name: nightly-windows-${{ matrix.type }}
-          path: artifacts/nightly/windows-${{ matrix.type }}/*
+          name: release-windows-${{ matrix.type }}
+          path: artifacts/release/windows-${{ matrix.type }}/*
           if-no-files-found: error
 
   build-macos:
@@ -197,12 +197,12 @@ jobs:
           mvn -v
 
       - name: Build macOS ${{ matrix.type }}
-        run: bash ./script/build-nightly-macos-${{ matrix.type }}.sh
+        run: bash ./script/build-release-macos-${{ matrix.type }}.sh
 
       - uses: actions/upload-artifact@v7
         with:
-          name: nightly-macos-${{ matrix.type }}
-          path: artifacts/nightly/macos-${{ matrix.type }}/*
+          name: release-macos-${{ matrix.type }}
+          path: artifacts/release/macos-${{ matrix.type }}/*
           if-no-files-found: error
 
   publish:
@@ -286,7 +286,7 @@ jobs:
 
           [ -f registry/release.json ] || echo '{"channel":"release","entries":[]}' > registry/release.json
           [ -f registry/snapshot.json ] || echo '{"channel":"snapshot","entries":[]}' > registry/snapshot.json
-          [ -f registry/nightly.json ] || echo '{"channel":"nightly","entries":[]}' > registry/nightly.json
+          [ -f registry/release.json ] || echo '{"channel":"release","entries":[]}' > registry/release.json
 
           bash "$GITHUB_WORKSPACE/script/update-channel-registry.sh" registry/release.json release "$VERSION" "$RELEASE_TAG" \
             "https://github.com/${{ github.repository }}/releases/tag/$RELEASE_TAG" \
@@ -295,7 +295,7 @@ jobs:
 
           bash "$GITHUB_WORKSPACE/script/rebuild-versions-manifest.sh" registry registry/versions.json
 
-          git add -A -f script .gitignore registry/release.json registry/snapshot.json registry/nightly.json registry/versions.json
+          git add -A -f script .gitignore registry/release.json registry/snapshot.json registry/release.json registry/versions.json
           git commit -m "[bot] Sync scripts from main and update release registry to $VERSION" || exit 0
           git push origin HEAD:registry
 
