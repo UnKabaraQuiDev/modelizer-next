@@ -55,8 +55,10 @@ jobs:
     runs-on: [self-hosted, linux]
     needs: [prepare]
     if: github.event_name == 'workflow_dispatch' || needs.prepare.outputs.should_run == 'true'
+
     permissions:
       contents: write
+      
     steps:
       - uses: actions/checkout@v7
 

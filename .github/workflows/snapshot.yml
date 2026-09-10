@@ -84,6 +84,7 @@ jobs:
   build-shared:
     needs: [prepare, format]
     runs-on: [self-hosted, linux]
+    if: always() && needs.prepare.result == 'success' && (needs.format.result == 'success' || needs.format.result == 'skipped')
 
     env:
       VERSION_OVERRIDE: ${{ needs.prepare.outputs.version }}
@@ -107,8 +108,8 @@ jobs:
 
   build-linux:
     needs: [prepare, format]
-    if: needs.prepare.outputs.should_run == 'true'
     runs-on: [self-hosted, linux]
+    if: always() && needs.prepare.result == 'success' && (needs.format.result == 'success' || needs.format.result == 'skipped')
 
     env:
       VERSION_OVERRIDE: ${{ needs.prepare.outputs.version }}
@@ -137,8 +138,8 @@ jobs:
 
   build-windows:
     needs: [prepare, format]
-    if: needs.prepare.outputs.should_run == 'true'
     runs-on: [self-hosted, windows]
+    if: always() && needs.prepare.result == 'success' && (needs.format.result == 'success' || needs.format.result == 'skipped')
 
     env:
       VERSION_OVERRIDE: ${{ needs.prepare.outputs.version }}
@@ -171,8 +172,8 @@ jobs:
 
   build-macos:
     needs: [prepare, format]
-    if: needs.prepare.outputs.should_run == 'true'
     runs-on: macos-latest
+    if: always() && needs.prepare.result == 'success' && (needs.format.result == 'success' || needs.format.result == 'skipped')
 
     env:
       VERSION_OVERRIDE: ${{ needs.prepare.outputs.version }}
