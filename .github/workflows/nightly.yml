@@ -58,7 +58,7 @@ jobs:
 
     permissions:
       contents: write
-      
+
     steps:
       - uses: actions/checkout@v7
 
@@ -206,7 +206,7 @@ jobs:
   publish:
     needs: [prepare, build-shared, build-linux, build-windows, build-macos]
     if: needs.prepare.outputs.should_run == 'true'
-    runs-on: [self-hosted, linux]
+    runs-on: ubuntu-latest
 
     env:
       VERSION: ${{ needs.prepare.outputs.version }}

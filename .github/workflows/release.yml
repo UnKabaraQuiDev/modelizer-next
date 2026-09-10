@@ -289,7 +289,7 @@ jobs:
           NEXUS_USER: ${{ secrets.NEXUS_USERNAME }}
           NEXUS_PASSWORD: ${{ secrets.NEXUS_PASSWORD }}
           NEXUS_URL: ${{ vars.NEXUS_APT_URL }}
-        run: bash scripts/upload-apt.sh
+        run: bash $GITHUB_WORKSPACE/script/upload-apt.sh
 
       - name: Update registry
         env:
