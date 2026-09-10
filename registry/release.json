@@ -12,7 +12,7 @@
     "windows"
   ],
   "notes": "Latest release build.",
-  "updatedAt": "2026-09-10T18:31:03Z",
+  "updatedAt": "2026-09-10T18:49:38Z",
   "entries": [
     {
       "version": "10-RELEASE-0",
@@ -27,7 +27,7 @@
         "windows"
       ],
       "notes": "Latest release build.",
-      "publishedAt": "2026-09-10T18:31:03Z",
+      "publishedAt": "2026-09-10T18:49:38Z",
       "assets": [
         {
           "name": "modelizer-next-app-10-RELEASE-0.jar",
