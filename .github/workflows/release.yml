@@ -160,6 +160,20 @@ jobs:
         with:
           distribution: temurin
           java-version: 21
+            
+      - name: Install build tools
+        shell: powershell
+        run: |
+          choco install zip -y
+          choco install wixtoolset -y
+
+      - name: Verify build tools
+        run: |
+          java --version
+          jpackage --version
+          zip --version
+          light.exe -?
+          candle.exe -?
 
       - name: Build Windows ${{ matrix.type }}
         run: bash ./script/build-release-windows-${{ matrix.type }}.sh
