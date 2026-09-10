@@ -556,6 +556,8 @@ public class BootstrapRuntime implements UpdateRuntime {
 	 * @throws Exception if the operation cannot be completed
 	 */
 	public void launch(final String[] args, final Queue<File> toBeOpened) throws Exception {
+		BootstrapApp.loadConfiguration();
+		
 		if (this.getForceJarName() != null && Files.exists(BootstrapApp.getUpdatesDirectory().toPath().resolve(this.getForceJarName()))) {
 			final Path path = BootstrapApp.getUpdatesDirectory().toPath().resolve(this.getForceJarName());
 			this.currentApplication = this.inventory.readInstalledApplication(path)
