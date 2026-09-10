@@ -160,7 +160,7 @@ jobs:
         with:
           distribution: temurin
           java-version: 21
-            
+
       - name: Install build tools
         shell: powershell
         run: |
@@ -225,6 +225,11 @@ jobs:
   publish:
     needs: [build-shared, build-linux, build-windows, build-macos]
     runs-on: [self-hosted, linux]
+
+    if: >
+      always() &&
+      !contains(needs.*.result, 'failure') &&
+      !contains(needs.*.result, 'cancelled')
 
     env:
       VERSION: ${{ needs.prepare.outputs.version }}
