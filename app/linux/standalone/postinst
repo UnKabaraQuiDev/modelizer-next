@@ -1,0 +1,36 @@
+#!/bin/sh
+set -e
+
+APP_BIN_DIR="/opt/modelizer-next-app/bin"
+TARGET="$APP_BIN_DIR/Modelizer Next App"
+LINK="/usr/bin/modelizer-next-app"
+OPTIONAL_LINK="/usr/bin/modelizer-next"
+
+DESKTOP_SOURCE="/opt/modelizer-next-app/lib/app/modelizer-next-app.desktop"
+DESKTOP_LINK="/usr/share/applications/modelizer-next-app.desktop"
+
+MIME_SOURCE="/opt/modelizer-next-app/lib/modelizer-next-app-Modelizer_Next_App-MimeInfo.xml"
+MIME_TARGET="/usr/share/mime/packages/modelizer-next-app.xml"
+
+if [ -x "$TARGET" ]; then
+    ln -sfn "$TARGET" "$LINK"
+    
+    if [ ! -e "$OPTIONAL_LINK" ]; then
+	    ln -sfn "$TARGET" "$OPTIONAL_LINK"
+	fi
+fi
+
+if [ -f "$DESKTOP_SOURCE" ]; then
+    ln -sfn "$DESKTOP_SOURCE" "$DESKTOP_LINK"
+    chmod +x "$DESKTOP_LINK"
+fi
+
+if [ -f "$MIME_SOURCE" ]; then
+    cp -f "$MIME_SOURCE" "$MIME_TARGET"
+fi
+
+update-desktop-database /usr/share/applications || true
+update-mime-database /usr/share/mime || true
+gtk-update-icon-cache /usr/share/icons/hicolor || true
+
+exit 0

@@ -885,6 +885,13 @@
 			</properties>
 		</profile>
 
+		<profile>
+			<id>standalone</id>
+			<properties>
+				<jpackage.resourceDir>${jpackage.add}/standalone</jpackage.resourceDir>
+			</properties>
+		</profile>
+
 	</profiles>
 
 </project>

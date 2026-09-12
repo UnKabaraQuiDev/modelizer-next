@@ -90,3 +90,29 @@
     </td>
   </tr>
 </table>
+
+### APT Distribution
+1. Install the signing key:
+```sh
+sudo mkdir -p /etc/apt/keyrings \
+  && curl -fsSL \
+  https://raw.githubusercontent.com/UnKabaraQuiDev/modelizer-next/refs/heads/main/nexus-apt.asc \
+  | sudo gpg --dearmor -o /etc/apt/keyrings/nexus.kbra.lu.gpg
+```
+
+2. Register the repository:
+```sh
+echo "deb [signed-by=/etc/apt/keyrings/nexus.kbra.lu.gpg] https://nexus.kbra.lu/repository/apt-hosted/ stable main" \
+  | sudo tee /etc/apt/sources.list.d/nexus.kbra.lu.list \
+  && sudo apt update
+```
+
+3. Install
+<u>Updater support (allows you to switch to nightly/snapshot/release branches):</u>
+```sh
+sudo apt install modelizer-next
+```
+<u>Fixed version (latest release only):</u>
+```sh
+sudo apt install modelizer-next-app
+```

@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=Modelizer Next (Standalone)
+Exec=/usr/bin/modelizer-next-app %f
+Type=Application
+Terminal=false
+MimeType=application/x-modelizer;application/x-modelizer-next;application/x-modelizer;application/x-modelizer-lu;
+Categories=Development;IDE;
+Icon=/opt/modelizer-next-app/lib/Modelizer_Next_App.png
