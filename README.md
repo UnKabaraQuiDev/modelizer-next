@@ -74,7 +74,7 @@
 </table>
 
 ### Platforms
-<table align="left">
+<table>
   <tr>
     <td align="center">
       <img src="https://modelizer.kbra.lu/img/windows.svg" width="80"><br>
@@ -90,6 +90,8 @@
     </td>
   </tr>
 </table>
+
+<div style="clear: both;"></div>
 
 ### APT Distribution
 1. Install the signing key:
