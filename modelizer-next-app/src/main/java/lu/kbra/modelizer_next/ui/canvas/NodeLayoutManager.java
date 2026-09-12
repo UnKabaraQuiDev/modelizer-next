@@ -4,12 +4,12 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.List;
 
-import lu.kbra.modelizer_next.common.Size2D;
 import lu.kbra.modelizer_next.domain.ClassModel;
 import lu.kbra.modelizer_next.domain.FieldModel;
+import lu.kbra.modelizer_next.domain.data.PanelType;
 import lu.kbra.modelizer_next.layout.LayoutObjectType;
 import lu.kbra.modelizer_next.layout.NodeLayout;
-import lu.kbra.modelizer_next.layout.PanelType;
+import lu.kbra.modelizer_next.layout.Size2D;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.ClipboardSnapshot;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.CopiedClass;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.CopiedComment;

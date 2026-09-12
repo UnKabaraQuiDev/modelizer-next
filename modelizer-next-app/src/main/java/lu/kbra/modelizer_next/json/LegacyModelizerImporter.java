@@ -12,7 +12,6 @@ import java.util.Set;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import lu.kbra.modelizer_next.MNMain;
-import lu.kbra.modelizer_next.common.Size2D;
 import lu.kbra.modelizer_next.document.ModelDocument;
 import lu.kbra.modelizer_next.domain.ClassModel;
 import lu.kbra.modelizer_next.domain.CommentModel;
@@ -20,10 +19,11 @@ import lu.kbra.modelizer_next.domain.FieldModel;
 import lu.kbra.modelizer_next.domain.LinkEnd;
 import lu.kbra.modelizer_next.domain.LinkModel;
 import lu.kbra.modelizer_next.domain.data.Cardinality;
+import lu.kbra.modelizer_next.domain.data.PanelType;
 import lu.kbra.modelizer_next.layout.LayoutObjectType;
 import lu.kbra.modelizer_next.layout.NodeLayout;
 import lu.kbra.modelizer_next.layout.PanelState;
-import lu.kbra.modelizer_next.layout.PanelType;
+import lu.kbra.modelizer_next.layout.Size2D;
 
 /**
  * Imports diagrams from the legacy Modelizer JSON structure into the current domain model.

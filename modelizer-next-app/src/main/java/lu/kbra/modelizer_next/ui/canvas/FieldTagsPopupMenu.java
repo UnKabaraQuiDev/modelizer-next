@@ -9,7 +9,7 @@ import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenuItem;
 import javax.swing.border.LineBorder;
 
-import lu.kbra.modelizer_next.ui.canvas.datastruct.FieldTags;
+import lu.kbra.modelizer_next.domain.FieldTags;
 
 public class FieldTagsPopupMenu extends LivePopupMenu {
 

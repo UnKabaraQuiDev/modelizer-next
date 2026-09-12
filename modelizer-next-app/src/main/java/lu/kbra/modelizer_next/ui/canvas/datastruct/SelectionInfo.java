@@ -1,6 +1,6 @@
 package lu.kbra.modelizer_next.ui.canvas.datastruct;
 
-import lu.kbra.modelizer_next.layout.PanelType;
+import lu.kbra.modelizer_next.domain.data.PanelType;
 
 /**
  * Detailed selection information used by menus and style actions.

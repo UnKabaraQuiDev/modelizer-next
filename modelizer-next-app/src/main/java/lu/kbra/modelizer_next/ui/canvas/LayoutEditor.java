@@ -2,9 +2,9 @@ package lu.kbra.modelizer_next.ui.canvas;
 
 import lu.kbra.modelizer_next.domain.ClassModel;
 import lu.kbra.modelizer_next.domain.CommentModel;
+import lu.kbra.modelizer_next.domain.data.PanelType;
 import lu.kbra.modelizer_next.layout.LayoutObjectType;
 import lu.kbra.modelizer_next.layout.NodeLayout;
-import lu.kbra.modelizer_next.layout.PanelType;
 
 public interface LayoutEditor extends DiagramCanvasExt {
 

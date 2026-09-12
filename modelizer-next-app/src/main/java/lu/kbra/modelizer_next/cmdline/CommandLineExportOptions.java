@@ -3,7 +3,7 @@ package lu.kbra.modelizer_next.cmdline;
 import java.io.File;
 import java.util.List;
 
-import lu.kbra.modelizer_next.layout.PanelType;
+import lu.kbra.modelizer_next.domain.data.PanelType;
 import lu.kbra.modelizer_next.ui.export.ViewExportFormat;
 import lu.kbra.modelizer_next.ui.export.ViewExportScope;
 

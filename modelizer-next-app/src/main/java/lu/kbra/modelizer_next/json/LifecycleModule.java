@@ -16,8 +16,8 @@ import com.fasterxml.jackson.databind.deser.std.DelegatingDeserializer;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.BeanSerializerModifier;
 
-import lu.kbra.modelizer_next.ui.impl.PostConstructOwner;
-import lu.kbra.modelizer_next.ui.impl.PreDeconstructOwner;
+import lu.kbra.modelizer_next.impl.PostConstructOwner;
+import lu.kbra.modelizer_next.impl.PreDeconstructOwner;
 
 public class LifecycleModule extends SimpleModule {
 

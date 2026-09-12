@@ -17,7 +17,7 @@ import java.util.zip.DeflaterOutputStream;
 
 import javax.imageio.ImageIO;
 
-import lu.kbra.modelizer_next.layout.PanelType;
+import lu.kbra.modelizer_next.domain.data.PanelType;
 import lu.kbra.modelizer_next.ui.canvas.DiagramCanvas;
 
 /**

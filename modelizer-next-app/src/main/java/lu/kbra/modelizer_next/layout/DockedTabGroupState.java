@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import lu.kbra.modelizer_next.domain.data.PanelType;
+
 /**
  * Persistent state of one docked tab group and the panels it contains.
  */

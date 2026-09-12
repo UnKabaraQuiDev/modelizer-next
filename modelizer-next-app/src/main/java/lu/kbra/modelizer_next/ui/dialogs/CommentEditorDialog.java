@@ -38,7 +38,7 @@ import lu.kbra.modelizer_next.domain.CommentModel;
 import lu.kbra.modelizer_next.domain.LinkModel;
 import lu.kbra.modelizer_next.domain.data.BoundTargetType;
 import lu.kbra.modelizer_next.domain.data.CommentKind;
-import lu.kbra.modelizer_next.layout.PanelType;
+import lu.kbra.modelizer_next.domain.data.PanelType;
 import lu.kbra.modelizer_next.ui.component.ColorButton;
 
 /**

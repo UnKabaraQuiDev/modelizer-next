@@ -3,6 +3,8 @@ package lu.kbra.modelizer_next.layout;
 import java.util.EnumMap;
 import java.util.Map;
 
+import lu.kbra.modelizer_next.domain.data.PanelType;
+
 /**
  * Persistent state of the visible workspace, including active panels and docking layout.
  */

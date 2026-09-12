@@ -31,7 +31,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
 import lu.kbra.modelizer_next.domain.FieldModel;
-import lu.kbra.modelizer_next.layout.PanelType;
+import lu.kbra.modelizer_next.domain.data.PanelType;
 import lu.kbra.modelizer_next.ui.canvas.DiagramCanvas;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectedElement.SelectedType;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectionInfo;

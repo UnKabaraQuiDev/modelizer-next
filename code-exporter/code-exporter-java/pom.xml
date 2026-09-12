@@ -1,0 +1,53 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>lu.kbra</groupId>
+		<artifactId>code-exporter</artifactId>
+		<version>${revision}</version>
+		<relativePath>../</relativePath>
+	</parent>
+
+	<artifactId>code-exporter-java</artifactId>
+	<packaging>pom</packaging>
+
+	<name>Code Exporter Java Parent</name>
+
+	<modules>
+		<module>code-exporter-java-pclib</module>
+	</modules>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>com.squareup</groupId>
+				<artifactId>javapoet</artifactId>
+				<version>1.13.0</version>
+			</dependency>
+			<dependency>
+				<groupId>com.github.javaparser</groupId>
+				<artifactId>javaparser-core</artifactId>
+				<version>3.28.0</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
+	<dependencies>
+		<dependency>
+			<groupId>lu.kbra</groupId>
+			<artifactId>code-exporter-api</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.squareup</groupId>
+			<artifactId>javapoet</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.github.javaparser</groupId>
+			<artifactId>javaparser-core</artifactId>
+		</dependency>
+	</dependencies>
+
+</project>

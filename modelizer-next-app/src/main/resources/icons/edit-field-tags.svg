@@ -48,9 +48,9 @@
        transform="translate(337.46622,318.31964)"><tspan
          x="6803.1191"
          y="136.333"
-         id="tspan2"><tspan
+         id="tspan8"><tspan
            style="font-size:120px;fill:#000000;stroke:none"
-           id="tspan1">NN</tspan></tspan></text>
+           id="tspan7">NN</tspan></tspan></text>
     <text
        xml:space="preserve"
        id="text14"
@@ -58,9 +58,9 @@
        transform="translate(10.392176,15.148391)"><tspan
          x="6803.1191"
          y="136.333"
-         id="tspan4"><tspan
+         id="tspan10"><tspan
            style="font-stretch:normal;font-size:120px;-inkscape-font-specification:'Impact, Normal';fill:#000000;stroke:none"
-           id="tspan3">PK</tspan></tspan></text>
+           id="tspan9">PK</tspan></tspan></text>
     <text
        xml:space="preserve"
        id="text17"
@@ -68,8 +68,8 @@
        transform="translate(173.10889,162.35257)"><tspan
          x="6803.1191"
          y="136.333"
-         id="tspan6"><tspan
+         id="tspan12"><tspan
            style="font-stretch:normal;font-size:120px;-inkscape-font-specification:'Impact, Normal';fill:#000000;stroke:none"
-           id="tspan5">UQ</tspan></tspan></text>
+           id="tspan11">UQ</tspan></tspan></text>
   </g>
 </svg>

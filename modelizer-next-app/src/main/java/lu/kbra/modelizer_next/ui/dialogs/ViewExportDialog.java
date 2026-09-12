@@ -42,7 +42,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
-import lu.kbra.modelizer_next.layout.PanelType;
+import lu.kbra.modelizer_next.domain.data.PanelType;
 import lu.kbra.modelizer_next.ui.canvas.DiagramCanvas;
 import lu.kbra.modelizer_next.ui.component.ColorButton;
 import lu.kbra.modelizer_next.ui.export.ImageViewExportOptions;
