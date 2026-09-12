@@ -1,10 +1,10 @@
 {
   "channel": "release",
-  "version": "10-RELEASE-1",
-  "tag": "10-RELEASE-1",
-  "releaseUrl": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/tag/10-RELEASE-1",
-  "assetUrl": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/10-RELEASE-1/modelizer-next-app-10-RELEASE-1.jar",
-  "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/10-RELEASE-1/modelizer-next-app-10-RELEASE-1.jar",
+  "version": "10-RELEASE-7",
+  "tag": "10-RELEASE-7",
+  "releaseUrl": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/tag/10-RELEASE-7",
+  "assetUrl": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/10-RELEASE-7/modelizer-next-app-10-RELEASE-7.jar",
+  "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/10-RELEASE-7/modelizer-next-app-10-RELEASE-7.jar",
   "platforms": [
     "unknown",
     "linux",
@@ -12,8 +12,85 @@
     "windows"
   ],
   "notes": "Latest release build.",
-  "updatedAt": "2026-09-10T19:00:05Z",
+  "updatedAt": "2026-09-12T11:38:14Z",
   "entries": [
+    {
+      "version": "10-RELEASE-7",
+      "tag": "10-RELEASE-7",
+      "releaseUrl": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/tag/10-RELEASE-7",
+      "assetUrl": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/10-RELEASE-7/modelizer-next-app-10-RELEASE-7.jar",
+      "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/10-RELEASE-7/modelizer-next-app-10-RELEASE-7.jar",
+      "platforms": [
+        "unknown",
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "notes": "Latest release build.",
+      "publishedAt": "2026-09-12T11:38:14Z",
+      "assets": [
+        {
+          "name": "modelizer-next-app-10-RELEASE-7.jar",
+          "platform": "unknown",
+          "kind": "app-standalone-jar",
+          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/10-RELEASE-7/modelizer-next-app-10-RELEASE-7.jar"
+        },
+        {
+          "name": "modelizer-next-app-portable-linux-10-RELEASE-7.zip",
+          "platform": "linux",
+          "kind": "app-portable-native",
+          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/10-RELEASE-7/modelizer-next-app-portable-linux-10-RELEASE-7.zip"
+        },
+        {
+          "name": "modelizer-next-app-portable-macos-10-RELEASE-7.zip",
+          "platform": "macos",
+          "kind": "app-portable-native",
+          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/10-RELEASE-7/modelizer-next-app-portable-macos-10-RELEASE-7.zip"
+        },
+        {
+          "name": "modelizer-next-app-portable-windows-10-RELEASE-7.zip",
+          "platform": "windows",
+          "kind": "app-portable-native",
+          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/10-RELEASE-7/modelizer-next-app-portable-windows-10-RELEASE-7.zip"
+        },
+        {
+          "name": "modelizer-next-app-standalone-linux-10-RELEASE-7.deb",
+          "platform": "linux",
+          "kind": "app-standalone-native",
+          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/10-RELEASE-7/modelizer-next-app-standalone-linux-10-RELEASE-7.deb"
+        },
+        {
+          "name": "modelizer-next-app-standalone-macos-10-RELEASE-7.dmg",
+          "platform": "macos",
+          "kind": "app-standalone-native",
+          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/10-RELEASE-7/modelizer-next-app-standalone-macos-10-RELEASE-7.dmg"
+        },
+        {
+          "name": "modelizer-next-app-standalone-windows-10-RELEASE-7.exe",
+          "platform": "windows",
+          "kind": "app-standalone-native",
+          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/10-RELEASE-7/modelizer-next-app-standalone-windows-10-RELEASE-7.exe"
+        },
+        {
+          "name": "modelizer-next-bootstrap-linux-10-RELEASE-7.deb",
+          "platform": "linux",
+          "kind": "bootstrap-native",
+          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/10-RELEASE-7/modelizer-next-bootstrap-linux-10-RELEASE-7.deb"
+        },
+        {
+          "name": "modelizer-next-bootstrap-macos-10-RELEASE-7.dmg",
+          "platform": "macos",
+          "kind": "bootstrap-native",
+          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/10-RELEASE-7/modelizer-next-bootstrap-macos-10-RELEASE-7.dmg"
+        },
+        {
+          "name": "modelizer-next-bootstrap-windows-10-RELEASE-7.exe",
+          "platform": "windows",
+          "kind": "bootstrap-native",
+          "url": "https://github.com/UnKabaraQuiDev/modelizer-next/releases/download/10-RELEASE-7/modelizer-next-bootstrap-windows-10-RELEASE-7.exe"
+        }
+      ]
+    },
     {
       "version": "10-RELEASE-1",
       "tag": "10-RELEASE-1",
