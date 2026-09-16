@@ -1,134 +1,212 @@
-const root = document.documentElement;
-const themeButton = document.getElementById('themeButton');
-const themeLabel = themeButton?.querySelector('.theme-label');
-const savedTheme = localStorage.getItem('theme');
-let downloadMetadata = null;
-if (savedTheme) root.dataset.theme = savedTheme;
+const root = document.documentElement
+const themeButton = document.getElementById('themeButton')
+const themeLabel = themeButton?.querySelector('.theme-label')
+const savedTheme = localStorage.getItem('theme')
+let downloadMetadata = null
+if (savedTheme) root.dataset.theme = savedTheme
 
-function syncTheme() {
-  const dark = root.dataset.theme === 'dark';
-  if (themeLabel) themeLabel.textContent = dark ? 'Dark' : 'Light';
-  document.querySelector('meta[name="theme-color"]').setAttribute('content', dark ? '#08111f' : '#f8fafc');
+function syncTheme () {
+  const dark = root.dataset.theme === 'dark'
+  if (themeLabel) themeLabel.textContent = dark ? 'Dark' : 'Light'
+  document
+    .querySelector('meta[name="theme-color"]')
+    .setAttribute('content', dark ? '#08111f' : '#f8fafc')
 }
-if (themeButton) themeButton.addEventListener('click', () => {
-  root.dataset.theme = root.dataset.theme === 'dark' ? 'light' : 'dark';
-  localStorage.setItem('theme', root.dataset.theme);
-  syncTheme();
-});
+if (themeButton)
+  themeButton.addEventListener('click', () => {
+    root.dataset.theme = root.dataset.theme === 'dark' ? 'light' : 'dark'
+    localStorage.setItem('theme', root.dataset.theme)
+    syncTheme()
+  })
 
-function selectedButton(groupId) {
-  return document.querySelector(`#${groupId} .choice[aria-pressed="true"]`);
+function selectedButton (groupId) {
+  return document.querySelector(`#${groupId} .choice[aria-pressed="true"]`)
 }
 
-function selectedKey(groupId) {
-  return selectedButton(groupId)?.dataset.key || "";
+function selectedKey (groupId) {
+  return selectedButton(groupId)?.dataset.key || ''
 }
 
-function setupChoices(groupId, outputId) {
-  const group = document.getElementById(groupId);
-  if (!group) return;
-  const initial = selectedButton(groupId);
+function setupChoices (groupId, outputId) {
+  const group = document.getElementById(groupId)
+  if (!group) return
+  const initial = selectedButton(groupId)
   group.addEventListener('click', event => {
-    const button = event.target.closest('.choice');
-    if (!button) return;
-    group.querySelectorAll('.choice').forEach(choice => choice.setAttribute('aria-pressed', 'false'));
-    button.setAttribute('aria-pressed', 'true');
-    updateDownloadFromMetadata();
-  });
+    const button = event.target.closest('.choice')
+    if (!button) return
+    group
+      .querySelectorAll('.choice')
+      .forEach(choice => choice.setAttribute('aria-pressed', 'false'))
+    button.setAttribute('aria-pressed', 'true')
+    updateDownloadFromMetadata()
+  })
 }
-async function loadDownloadMetadata() {
+async function loadDownloadMetadata () {
   try {
-    const response = await fetch('https://raw.githubusercontent.com/UnKabaraQuiDev/modelizer-next/refs/heads/pages/metadata.json', {
-      cache: 'no-store'
-    });
-    if (!response.ok) throw new Error(`metadata.json returned ${response.status}`);
-    downloadMetadata = await response.json();
+    const response = await fetch(
+      'https://raw.githubusercontent.com/UnKabaraQuiDev/modelizer-next/refs/heads/pages/metadata.json',
+      {
+        cache: 'no-store'
+      }
+    )
+    if (!response.ok)
+      throw new Error(`metadata.json returned ${response.status}`)
+    downloadMetadata = await response.json()
   } catch (error) {
-    downloadMetadata = null;
+    downloadMetadata = null
   }
-  updateDownloadFromMetadata();
-} 
-
-function findAsset(osKey, buildKey) {
-  if (!downloadMetadata || !downloadMetadata.assets) return null;
-  return downloadMetadata.assets?.[osKey]?.[buildKey] || null;
+  updateDownloadFromMetadata()
 }
 
-function setDownloadUnavailable() {
-  const errorMessage = document.getElementById('errorMessage');
-  if (!errorMessage) return;
-  errorMessage.style = "display: block;";
-  errorMessage.textContent = 'An error occured, please download manually below.';
-  const button = document.getElementById('downloadButton');
-  if (!button) return;
-  button.href = 'https://github.com/UnKabaraQuiDev/modelizer-next/releases';
-  button.textContent = 'Open releases';
+function findAsset (osKey, buildKey) {
+  if (!downloadMetadata || !downloadMetadata.assets) return null
+  return downloadMetadata.assets?.[osKey]?.[buildKey] || null
 }
 
-function updateDownloadFromMetadata() {
-  if (!document.getElementById('osChoices') || !document.getElementById('buildChoices')) return;
-  const osKey = selectedKey('osChoices');
-  const buildKey = selectedKey('buildChoices');
-  const asset = findAsset(osKey, buildKey);
+function setDownloadUnavailable () {
+  const errorMessage = document.getElementById('errorMessage')
+  if (!errorMessage) return
+  errorMessage.style = 'display: block;'
+  errorMessage.textContent = 'An error occured, please download manually below.'
+  const button = document.getElementById('downloadButton')
+  if (!button) return
+  button.href = 'https://github.com/UnKabaraQuiDev/modelizer-next/releases'
+  button.textContent = 'Open releases'
+}
+
+function updateDownloadFromMetadata () {
+  if (
+    !document.getElementById('osChoices') ||
+    !document.getElementById('buildChoices')
+  )
+    return
+  let osKey = selectedKey('osChoices')
+  let buildKey = selectedKey('buildChoices')
+  console.log(osKey, buildKey)
+  if (osKey == 'linux') {
+    document.querySelector('.build-list').style['grid-template-columns'] =
+      'repeat(4, minmax(0, 1fr))'
+    document
+      .querySelector("#buildChoices>.choice[data-key='apt']")
+      .setAttribute('style', 'display: grid;')
+    document
+      .querySelector("#buildChoices>.choice[data-key='updater']")
+      .classList.remove('recommended')
+    document
+      .querySelector("#buildChoices>.choice[data-key='apt']")
+      .setAttribute('aria-pressed', 'true')
+    document
+      .querySelector("#buildChoices>.choice[data-key='updater']")
+      .setAttribute('aria-pressed', 'false')
+  } else {
+    document.querySelector('.build-list').style['grid-template-columns'] =
+      'repeat(3, minmax(0, 1fr))'
+    document
+      .querySelector("#buildChoices>.choice[data-key='apt']")
+      .setAttribute('style', 'display: none;')
+    document
+      .querySelector("#buildChoices>.choice[data-key='updater']")
+      .classList.add('recommended')
+    if (buildKey == 'apt') {
+      document
+        .querySelector("#buildChoices>.choice[data-key='apt']")
+        .setAttribute('aria-pressed', 'false')
+      document
+        .querySelector("#buildChoices>.choice[data-key='updater']")
+        .setAttribute('aria-pressed', 'true')
+      buildKey = 'updater'
+    }
+  }
+  if (osKey == 'linux' && buildKey == 'apt') {
+    document.getElementById('downloadCmd').style.display = 'grid'
+    document.getElementById('downloadBtn').style.display = 'none'
+    return
+  } else {
+    document.getElementById('downloadCmd').style.display = 'none'
+    document.getElementById('downloadBtn').style.display = 'flex'
+  }
+  const asset = findAsset(osKey, buildKey)
   if (!asset) {
     console.log(`Asset not found for: ${osKey} ${buildKey}`)
-    setDownloadUnavailable();
-    return;
+    setDownloadUnavailable()
+    return
+  } else {
+    document.getElementById('errorMessage').style.display = 'none'
   }
-  const button = document.getElementById('downloadButton');
-  if (!button) return;
-  button.href = asset.url;
-  button.textContent = 'Download selected build';
-  document.querySelector("#current-version").textContent = downloadMetadata["releaseTag"];
+  const button = document.getElementById('downloadButton')
+  if (!button) return
+  button.href = asset.url
+  button.textContent = 'Download selected build'
+  document.querySelector('#current-version').textContent =
+    downloadMetadata['releaseTag']
 }
 
-function selectSystemBuild() {
-  const ua = navigator.userAgent.toLowerCase();
-  let os = "windows";
-  if (ua.includes("mac")) {
-      os = "macos";
-  } else if (ua.includes("linux")) {
-      os = "linux";
-  } else if (ua.includes("win")) {
-      os = "windows";
+function selectSystemBuild () {
+  const ua = navigator.userAgent.toLowerCase()
+  let os = 'windows'
+  if (ua.includes('mac')) {
+    os = 'macos'
+  } else if (ua.includes('linux')) {
+    os = 'linux'
+  } else if (ua.includes('win')) {
+    os = 'windows'
   }
-  const osChoices = document.getElementById('osChoices');
-  if (!osChoices) return;
-  const button = document.querySelector(
-      `#osChoices>.choice[data-key="${os}"]`
-  );
+  const osChoices = document.getElementById('osChoices')
+  if (!osChoices) return
+  const button = document.querySelector(`#osChoices>.choice[data-key="${os}"]`)
   if (button) {
-      document.querySelectorAll("#osChoices>.choice").forEach(b => {
-          b.setAttribute("aria-pressed", "false");
-      });
+    document.querySelectorAll('#osChoices>.choice').forEach(b => {
+      b.setAttribute('aria-pressed', 'false')
+    })
 
-      button.setAttribute("aria-pressed", "true");
+    button.setAttribute('aria-pressed', 'true')
   }
 }
 
-function selectBuildType() {
-      if (!document.getElementById('buildChoices')) return;
-      document.querySelectorAll("#buildChoices>.choice").forEach(b => {
-          b.setAttribute("aria-pressed", "false");
-      });
+function selectBuildType () {
+  if (!document.getElementById('buildChoices')) return
+  document.querySelectorAll('#buildChoices>.choice').forEach(b => {
+    b.setAttribute('aria-pressed', 'false')
+  })
 
-      document.querySelector("#buildChoices>.choice[data-key='updater']").setAttribute("aria-pressed", "true");
+  const osKey = selectedKey('osChoices')
+  if (osKey == 'linux') {
+    document
+      .querySelector("#buildChoices>.choice[data-key='apt']")
+      .setAttribute('aria-pressed', 'true')
+    document
+      .querySelector("#buildChoices>.choice[data-key='apt']")
+      .setAttribute('style', 'display: grid;')
+    document
+      .querySelector("#buildChoices>.choice[data-key='updater']")
+      .classList.remove('recommended')
+  } else {
+    document
+      .querySelector("#buildChoices>.choice[data-key='updater']")
+      .setAttribute('aria-pressed', 'true')
+    document
+      .querySelector("#buildChoices>.choice[data-key='apt']")
+      .setAttribute('style', 'display: none;')
+    document
+      .querySelector("#buildChoices>.choice[data-key='updater']")
+      .classList.add('recommended')
+  }
 }
 
-selectSystemBuild();
-selectBuildType();
-setupChoices('osChoices');
-setupChoices('buildChoices');
+selectSystemBuild()
+selectBuildType()
+setupChoices('osChoices')
+setupChoices('buildChoices')
 
-const yearElement = document.getElementById('year');
-if (yearElement) yearElement.textContent = new Date().getFullYear();
-syncTheme();
-loadDownloadMetadata();
-
+const yearElement = document.getElementById('year')
+if (yearElement) yearElement.textContent = new Date().getFullYear()
+syncTheme()
+loadDownloadMetadata()
 
 // source section
 
-const versionsUrl = 'https://raw.githubusercontent.com/UnKabaraQuiDev/modelizer-next/refs/heads/registry/registry/versions.json';
+const versionsUrl =
+  'https://raw.githubusercontent.com/UnKabaraQuiDev/modelizer-next/refs/heads/registry/registry/versions.json'
 
 const channelInfo = {
   release: {
@@ -146,25 +224,27 @@ const channelInfo = {
     label: 'Latest',
     icon: '✦'
   }
-};
+}
 
-function formatBuildDate(value) {
-  if (!value) return 'Date unavailable';
+function formatBuildDate (value) {
+  if (!value) return 'Date unavailable'
 
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return 'Date unavailable';
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) return 'Date unavailable'
 
   return new Intl.DateTimeFormat(undefined, {
     dateStyle: 'medium',
     timeStyle: 'short'
-  }).format(date);
+  }).format(date)
 }
 
-function renderChannelRows(channels) {
-  const container = document.getElementById('updateChannels');
-  if (!container) return;
+function renderChannelRows (channels) {
+  const container = document.getElementById('updateChannels')
+  if (!container) return
 
-  container.innerHTML = channels.map(channel => `
+  container.innerHTML = channels
+    .map(
+      channel => `
     <article class="channel-row ${channel.key}">
       <div class="channel-icon" aria-hidden="true">${channel.icon}</div>
 
@@ -183,14 +263,18 @@ function renderChannelRows(channels) {
         <strong>${formatBuildDate(channel.buildDate)}</strong>
       </div>
 
-      <a class="btn" href="${channel.releaseUrl}" rel="noopener">View release</a>
+      <a class="btn" href="${
+        channel.releaseUrl
+      }" rel="noopener">View release</a>
     </article>
-  `).join('');
+  `
+    )
+    .join('')
 }
 
-function renderChannelError() {
-  const container = document.getElementById('updateChannels');
-  if (!container) return;
+function renderChannelError () {
+  const container = document.getElementById('updateChannels')
+  if (!container) return
 
   container.innerHTML = `
     <article class="channel-row">
@@ -206,24 +290,25 @@ function renderChannelError() {
 
       <a class="btn" href="https://github.com/UnKabaraQuiDev/modelizer-next/releases" rel="noopener">View releases</a>
     </article>
-  `;
+  `
 }
 
-async function loadUpdateChannels() {
+async function loadUpdateChannels () {
   try {
     const response = await fetch(versionsUrl, {
       cache: 'no-store'
-    });
+    })
 
-    if (!response.ok) throw new Error(`versions.json returned ${response.status}`);
+    if (!response.ok)
+      throw new Error(`versions.json returned ${response.status}`)
 
-    const versions = await response.json();
+    const versions = await response.json()
 
-    const order = ['release', 'snapshot', 'nightly'];
+    const order = ['release', 'snapshot', 'nightly']
 
     const channels = order.map(key => {
-      const version = versions[key];
-      const info = channelInfo[key];
+      const version = versions[key]
+      const info = channelInfo[key]
 
       return {
         key,
@@ -231,62 +316,63 @@ async function loadUpdateChannels() {
         version: version.version,
         releaseUrl: version.releaseUrl,
         buildDate: version.updatedAt
-      };
-    });
+      }
+    })
 
-    renderChannelRows(channels);
+    renderChannelRows(channels)
   } catch (error) {
-    renderChannelError();
+    renderChannelError()
   }
 }
 
-loadUpdateChannels();
+loadUpdateChannels()
 
-const menuButton = document.getElementById('menuButton');
-const navElement = menuButton?.closest('nav');
+const menuButton = document.getElementById('menuButton')
+const navElement = menuButton?.closest('nav')
 if (menuButton && navElement) {
   menuButton.addEventListener('click', () => {
-    const open = navElement.classList.toggle('menu-open');
-    menuButton.setAttribute('aria-expanded', open ? 'true' : 'false');
-  });
+    const open = navElement.classList.toggle('menu-open')
+    menuButton.setAttribute('aria-expanded', open ? 'true' : 'false')
+  })
 
   navElement.querySelectorAll('.links a').forEach(link => {
     link.addEventListener('click', () => {
-      navElement.classList.remove('menu-open');
-      menuButton.setAttribute('aria-expanded', 'false');
-    });
-  });
+      navElement.classList.remove('menu-open')
+      menuButton.setAttribute('aria-expanded', 'false')
+    })
+  })
 }
 
-
-function markCurrentTimelinePage() {
-  const currentPath = window.location.pathname === '/' ? '/index.html' : window.location.pathname;
+function markCurrentTimelinePage () {
+  const currentPath =
+    window.location.pathname === '/' ? '/index.html' : window.location.pathname
   document.querySelectorAll('.side-timeline a').forEach(link => {
-    const path = new URL(link.getAttribute('href'), window.location.origin).pathname;
+    const path = new URL(link.getAttribute('href'), window.location.origin)
+      .pathname
     if (path === currentPath) {
-      link.setAttribute('aria-current', 'page');
+      link.setAttribute('aria-current', 'page')
     }
-  });
+  })
 }
 
-const sponsorPromptKey = 'modelizer-next-sponsor-prompt-dismissed';
-let pendingDownloadUrl = '';
+const sponsorPromptKey = 'modelizer-next-sponsor-prompt-dismissed'
+let pendingDownloadUrl = ''
 
-function sponsorPromptDismissed() {
-  return localStorage.getItem(sponsorPromptKey) === 'true';
+function sponsorPromptDismissed () {
+  return localStorage.getItem(sponsorPromptKey) === 'true'
 }
 
-function ensureSponsorPrompt() {
-  let modal = document.getElementById('sponsorPrompt');
-  if (modal) return modal;
+function ensureSponsorPrompt () {
+  let modal = document.getElementById('sponsorPrompt')
+  if (modal) return modal
 
-  modal = document.createElement('div');
-  modal.className = 'sponsor-modal';
-  modal.id = 'sponsorPrompt';
-  modal.hidden = true;
-  modal.setAttribute('role', 'dialog');
-  modal.setAttribute('aria-modal', 'true');
-  modal.setAttribute('aria-labelledby', 'sponsorPromptTitle');
+  modal = document.createElement('div')
+  modal.className = 'sponsor-modal'
+  modal.id = 'sponsorPrompt'
+  modal.hidden = true
+  modal.setAttribute('role', 'dialog')
+  modal.setAttribute('aria-modal', 'true')
+  modal.setAttribute('aria-labelledby', 'sponsorPromptTitle')
   modal.innerHTML = `
     <div class="sponsor-modal-backdrop" data-sponsor-close></div>
     <div class="sponsor-modal-card">
@@ -298,53 +384,57 @@ function ensureSponsorPrompt() {
       </div>
       <button class="sponsor-modal-muted" type="button" id="dismissSponsorPrompt" style="font-size: 12px;">Do not show again</button>
     </div>
-  `;
-  document.body.appendChild(modal);
+  `
+  document.body.appendChild(modal)
 
   modal.querySelectorAll('[data-sponsor-close]').forEach(element => {
-    element.addEventListener('click', () => closeSponsorPrompt(false));
-  });
+    element.addEventListener('click', () => closeSponsorPrompt(false))
+  })
 
-  modal.querySelector('#dismissSponsorPrompt').addEventListener('click', () => closeSponsorPrompt(true));
+  modal
+    .querySelector('#dismissSponsorPrompt')
+    .addEventListener('click', () => closeSponsorPrompt(true))
 
   document.addEventListener('keydown', event => {
-    if (event.key === 'Escape' && !modal.hidden) closeSponsorPrompt(false);
-  });
+    if (event.key === 'Escape' && !modal.hidden) closeSponsorPrompt(false)
+  })
 
-  return modal;
+  return modal
 }
 
-function showSponsorPrompt(downloadUrl) {
-  pendingDownloadUrl = downloadUrl || pendingDownloadUrl;
-  const modal = ensureSponsorPrompt();
-  modal.hidden = false;
+function showSponsorPrompt (downloadUrl) {
+  pendingDownloadUrl = downloadUrl || pendingDownloadUrl
+  const modal = ensureSponsorPrompt()
+  modal.hidden = false
 }
 
-function closeSponsorPrompt(rememberChoice) {
-  const modal = document.getElementById('sponsorPrompt');
+function closeSponsorPrompt (rememberChoice) {
+  const modal = document.getElementById('sponsorPrompt')
   if (rememberChoice) {
-    localStorage.setItem(sponsorPromptKey, 'true');
+    localStorage.setItem(sponsorPromptKey, 'true')
   }
-  if (modal) modal.hidden = true;
+  if (modal) modal.hidden = true
 }
 
-function setupDownloadSponsorPrompt() {
+function setupDownloadSponsorPrompt () {
   document.querySelectorAll('#downloadButton').forEach(button => {
     button.addEventListener('click', event => {
-      if (sponsorPromptDismissed()) return;
+      if (sponsorPromptDismissed()) return
 
-      event.preventDefault();
-      const downloadUrl = button.href;
-      const opened = window.open(downloadUrl, '_blank', 'noopener');
-      showSponsorPrompt(downloadUrl);
+      event.preventDefault()
+      const downloadUrl = button.href
+      const opened = window.open(downloadUrl, '_blank', 'noopener')
+      showSponsorPrompt(downloadUrl)
 
       if (!opened) {
-        const firstAction = document.querySelector('#sponsorPrompt .sponsor-modal-actions a, #sponsorPrompt .sponsor-modal-actions button');
-        if (firstAction) firstAction.focus();
+        const firstAction = document.querySelector(
+          '#sponsorPrompt .sponsor-modal-actions a, #sponsorPrompt .sponsor-modal-actions button'
+        )
+        if (firstAction) firstAction.focus()
       }
-    });
-  });
+    })
+  })
 }
 
-markCurrentTimelinePage();
-setupDownloadSponsorPrompt();
+markCurrentTimelinePage()
+setupDownloadSponsorPrompt()
