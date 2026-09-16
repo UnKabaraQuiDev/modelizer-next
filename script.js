@@ -92,12 +92,15 @@ function updateDownloadFromMetadata () {
     document
       .querySelector("#buildChoices>.choice[data-key='updater']")
       .classList.remove('recommended')
-    document
-      .querySelector("#buildChoices>.choice[data-key='apt']")
-      .setAttribute('aria-pressed', 'true')
-    document
-      .querySelector("#buildChoices>.choice[data-key='updater']")
-      .setAttribute('aria-pressed', 'false')
+    if (buildKey == 'updater') {
+      document
+        .querySelector("#buildChoices>.choice[data-key='apt']")
+        .setAttribute('aria-pressed', 'true')
+      document
+        .querySelector("#buildChoices>.choice[data-key='updater']")
+        .setAttribute('aria-pressed', 'false')
+      buildKey = 'apt'
+    }
   } else {
     document.querySelector('.build-list').style['grid-template-columns'] =
       'repeat(3, minmax(0, 1fr))'
