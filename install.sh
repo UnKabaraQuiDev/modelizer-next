@@ -41,7 +41,7 @@ if [ -z "$choice" ]; then
 
     while true; do
         printf "Enter your choice [1-2]: "
-        read choice
+        read choice < /dev/tty
 
         case "$choice" in
             1|2)
