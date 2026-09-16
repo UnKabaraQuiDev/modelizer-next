@@ -100,7 +100,7 @@
 > [!NOTE]
 > Use the command
 > 
-> ```curl -fsSL https://raw.githubusercontent.com/UnKabaraQuiDev/modelizer-next/refs/heads/main/README.md | sh```
+> ```curl -fsSL https://raw.githubusercontent.com/UnKabaraQuiDev/modelizer-next/refs/heads/main/install.sh | sh```
 > 
 > to directly install without having to execute the commands below.
 
