@@ -94,6 +94,16 @@
 <div style="clear: both;"></div>
 
 ### APT Distribution
+
+#### Automated install
+
+> [!NOTE]
+> Use the command 
+> ```curl -fsSL https://raw.githubusercontent.com/UnKabaraQuiDev/modelizer-next/refs/heads/main/README.md | sh```
+> to directly install without having to execute the commands below.
+
+#### Manual install
+
 1. Install the signing key:
 ```sh
 sudo mkdir -p /etc/apt/keyrings \
