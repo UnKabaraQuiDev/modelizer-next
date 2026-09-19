@@ -1,4 +1,4 @@
-package lu.kbra.modelizer_next.data;
+package lu.kbra.modelizer_next.common;
 
 import java.io.File;
 

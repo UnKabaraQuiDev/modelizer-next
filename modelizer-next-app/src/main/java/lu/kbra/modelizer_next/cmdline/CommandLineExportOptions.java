@@ -4,8 +4,8 @@ import java.io.File;
 import java.util.List;
 
 import lu.kbra.modelizer_next.domain.data.PanelType;
+import lu.kbra.modelizer_next.domain.data.ViewExportScope;
 import lu.kbra.modelizer_next.ui.export.ViewExportFormat;
-import lu.kbra.modelizer_next.ui.export.ViewExportScope;
 
 /**
  * Parsed command-line export request. It groups the input pattern, export type, output destination,

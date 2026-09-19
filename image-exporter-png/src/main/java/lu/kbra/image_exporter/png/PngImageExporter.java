@@ -4,18 +4,18 @@ import lombok.Getter;
 import lu.kbra.image_exporter.png.ui.PngImageUiProvider;
 import lu.kbra.model_exporter.api.ExporterOptions;
 import lu.kbra.model_exporter.api.ExporterType;
-import lu.kbra.model_exporter.api.ModelExporter;
+import lu.kbra.model_exporter.api.ImageModelExporter;
+import lu.kbra.model_exporter.api.ImageOptionsManager;
 import lu.kbra.model_exporter.api.ModelVisitor;
-import lu.kbra.model_exporter.api.OptionsManager;
 import lu.kbra.model_exporter.api.UiProvider;
 
 @Getter
-public class PngImageExporter implements ModelExporter {
+public class PngImageExporter implements ImageModelExporter {
 
 	public static final String EXPORTER_ID = "png";
 
 	private final UiProvider uiProvider = new PngImageUiProvider();
-	private final OptionsManager optionsManager = new PngImageOptionsManager();
+	private final ImageOptionsManager optionsManager = new PngImageOptionsManager();
 
 	@Override
 	public ModelVisitor buildModelVisitor(final ExporterOptions options) {

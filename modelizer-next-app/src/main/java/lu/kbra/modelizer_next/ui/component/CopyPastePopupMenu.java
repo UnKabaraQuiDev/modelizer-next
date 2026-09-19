@@ -1,4 +1,4 @@
-package lu.kbra.modelizer_next.ui.canvas;
+package lu.kbra.modelizer_next.ui.component;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -13,6 +13,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.LineBorder;
 
+import lu.kbra.modelizer_next.ui.canvas.LivePopupMenu;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.CopyPasteSpecialData;
 
 public class CopyPastePopupMenu extends LivePopupMenu {

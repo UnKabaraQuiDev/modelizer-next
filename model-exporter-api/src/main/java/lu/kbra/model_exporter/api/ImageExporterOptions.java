@@ -1,6 +1,8 @@
 package lu.kbra.model_exporter.api;
 
+import java.awt.Color;
 import java.nio.file.Path;
+import java.util.Optional;
 import java.util.Set;
 
 import lu.kbra.modelizer_next.domain.data.PanelType;
@@ -26,6 +28,14 @@ public interface ImageExporterOptions extends ExporterOptions {
 	Set<PanelType> getPanels();
 
 	void setPanels(Set<PanelType> panels);
+
+	Optional<Color> getBackgroundColor();
+
+	void setBackgroundColor(Optional<Color> color);
+
+	boolean isTransparentBackground();
+
+	void setTransparentBackground(boolean selected);
 
 	String getExtension();
 

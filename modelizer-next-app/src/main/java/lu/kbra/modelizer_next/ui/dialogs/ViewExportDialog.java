@@ -42,9 +42,10 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
+import lu.kbra.model_exporter.api.ColorButton;
 import lu.kbra.modelizer_next.domain.data.PanelType;
+import lu.kbra.modelizer_next.domain.data.ViewExportScope;
 import lu.kbra.modelizer_next.ui.canvas.DiagramCanvas;
-import lu.kbra.modelizer_next.ui.component.ColorButton;
 import lu.kbra.modelizer_next.ui.export.ImageViewExportOptions;
 import lu.kbra.modelizer_next.ui.export.PdfMargins;
 import lu.kbra.modelizer_next.ui.export.PdfPageFormat;
@@ -53,7 +54,6 @@ import lu.kbra.modelizer_next.ui.export.PdfViewExportOptions;
 import lu.kbra.modelizer_next.ui.export.ViewExportFormat;
 import lu.kbra.modelizer_next.ui.export.ViewExportOptions;
 import lu.kbra.modelizer_next.ui.export.ViewExportRequest;
-import lu.kbra.modelizer_next.ui.export.ViewExportScope;
 import lu.kbra.modelizer_next.ui.export.ViewExporter;
 import lu.kbra.modelizer_next.ui.frame.MainFrame;
 

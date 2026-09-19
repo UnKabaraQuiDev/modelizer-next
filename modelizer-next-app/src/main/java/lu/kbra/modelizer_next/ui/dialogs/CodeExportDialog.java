@@ -2,7 +2,7 @@ package lu.kbra.modelizer_next.ui.dialogs;
 
 import lu.kbra.model_exporter.api.ExporterType;
 import lu.kbra.model_exporter.api.ModelExporter;
-import lu.kbra.modelizer_next.data.ExporterOptionRef;
+import lu.kbra.modelizer_next.common.ExporterOptionRef;
 import lu.kbra.modelizer_next.ui.frame.MainFrame;
 
 public class CodeExportDialog extends ModelExportDialog {

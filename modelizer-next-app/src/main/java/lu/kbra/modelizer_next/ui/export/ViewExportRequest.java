@@ -5,6 +5,7 @@ import java.io.File;
 import java.util.List;
 
 import lu.kbra.modelizer_next.domain.data.PanelType;
+import lu.kbra.modelizer_next.domain.data.ViewExportScope;
 
 /**
  * Immutable request object passed to the exporter.

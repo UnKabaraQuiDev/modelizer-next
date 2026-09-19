@@ -43,7 +43,7 @@ import lu.kbra.modelizer_next.bootstrap.AvailableUpdate;
 import lu.kbra.modelizer_next.bootstrap.UpdateRuntime;
 import lu.kbra.modelizer_next.bootstrap.UpdateRuntimes;
 import lu.kbra.modelizer_next.common.App;
-import lu.kbra.modelizer_next.data.ExporterOptionRef;
+import lu.kbra.modelizer_next.common.ExporterOptionRef;
 import lu.kbra.modelizer_next.document.ModelDocument;
 import lu.kbra.modelizer_next.domain.data.PanelType;
 import lu.kbra.modelizer_next.style.StylePalette;

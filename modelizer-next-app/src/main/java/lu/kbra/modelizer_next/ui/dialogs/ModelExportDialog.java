@@ -18,12 +18,14 @@ import javax.swing.WindowConstants;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import lombok.Getter;
+import lu.kbra.model_exporter.api.ExportContext;
+import lu.kbra.model_exporter.api.ExportFailedException;
 import lu.kbra.model_exporter.api.ExporterApiContext;
 import lu.kbra.model_exporter.api.ExporterOptions;
 import lu.kbra.model_exporter.api.ModelExporter;
 import lu.kbra.model_exporter.api.SimpleExporterOptions;
 import lu.kbra.modelizer_next.MNMain;
-import lu.kbra.modelizer_next.data.ExporterOptionRef;
+import lu.kbra.modelizer_next.common.ExporterOptionRef;
 import lu.kbra.modelizer_next.ui.frame.MainFrame;
 import lu.kbra.pclib.PCUtils;
 
@@ -108,12 +110,14 @@ public abstract class ModelExportDialog extends JDialog {
 			@Override
 			public void windowClosing(final WindowEvent e) {
 				ModelExportDialog.this.options = ModelExportDialog.this.parsePanelOptions();
+				ref.setOptions(options);
 				if (ModelExportDialog.this.promptSaveCurrent(mainFrame)) {
 					ModelExportDialog.this.dispose();
 				}
 			}
 
 		});
+		btnExport.addActionListener(this::export);
 	}
 
 	protected ExporterOptions parsePanelOptions() {
@@ -142,7 +146,8 @@ public abstract class ModelExportDialog extends JDialog {
 		}
 
 		this.options = this.parsePanelOptions();
-
+		editingRef.setOptions(options);
+		
 		if (Objects.equals(this.options, this.original)) {
 			return true;
 		}
@@ -251,8 +256,8 @@ public abstract class ModelExportDialog extends JDialog {
 //			return;
 //		}
 		this.options = this.parsePanelOptions();
-		this.saveTo(this.mainFrame, this.editingRef.getFile(), this.options);
 		this.editingRef.setOptions(this.options);
+		this.saveTo(this.mainFrame, this.editingRef.getFile(), this.options);
 	}
 
 	protected void saveConfigAs(final ActionEvent actionevent1) {
@@ -261,8 +266,8 @@ public abstract class ModelExportDialog extends JDialog {
 //			return;
 //		}
 		this.options = this.parsePanelOptions();
+		this.editingRef.setOptions(this.options);
 		this.saveAs(this.mainFrame, this.editingRef.getFile(), this.options);
-		this.restorePanelOption(this.options);
 	}
 
 	protected void loadConfig(final ActionEvent actionevent1) {
@@ -281,7 +286,7 @@ public abstract class ModelExportDialog extends JDialog {
 			if (!Objects.equals(simple.getExporterId(), this.service.getExporterId())) {
 				final int result = JOptionPane.showConfirmDialog(this,
 						"It looks like that export configuration is for: " + simple.getExporterId()
-								+ ".\nDo you want to open that export dialog ?",
+								+ ".\nDo you want to open it anyways ?",
 						"Error",
 						JOptionPane.YES_NO_OPTION,
 						JOptionPane.WARNING_MESSAGE);
@@ -289,9 +294,10 @@ public abstract class ModelExportDialog extends JDialog {
 				if (result == JOptionPane.YES_OPTION) {
 					this.mainFrame.getLoadedExporterOptions().put(simple.getExporterId(), new ExporterOptionRef(importFile, null));
 					this.mainFrame.export(simple.getExporterId());
-				} else {
-					return;
+					this.dispose();
 				}
+				return;
+
 			} else {
 				this.options = MNMain.OBJECT_MAPPER.readValue(importFile, this.service.getOptionsManager().getClassType());
 			}
@@ -308,6 +314,19 @@ public abstract class ModelExportDialog extends JDialog {
 		this.editingRef.setFile(importFile);
 		this.editingRef.setOptions(this.options);
 		this.restorePanelOption(this.options);
+	}
+
+	private void export(ActionEvent actionevent1) {
+		try {
+			ExporterApiContext.getApiContext().setContext(ExportContext.COMMAND_LINE);
+			ExporterApiContext.getApiContext().setCurrentConfig(editingRef.getFile());
+			ExporterApiContext.getApiContext().setCurrentDocument(mainFrame.getSession().getCurrentFile());
+			ExporterApiContext.getApiContext().setRenderers(pts -> mainFrame.getCanvasesByPanelType());
+
+			service.buildModelVisitor(parsePanelOptions()).visitDiagram(mainFrame.getSession().getDocument().getModel());
+		} catch (ExportFailedException e) {
+			e.printStackTrace();
+		}
 	}
 
 }

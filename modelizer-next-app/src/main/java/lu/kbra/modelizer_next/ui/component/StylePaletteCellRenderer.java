@@ -1,4 +1,4 @@
-package lu.kbra.modelizer_next.ui.canvas;
+package lu.kbra.modelizer_next.ui.component;
 
 import java.awt.BorderLayout;
 import java.awt.Component;

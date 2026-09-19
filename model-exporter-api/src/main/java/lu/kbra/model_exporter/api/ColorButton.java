@@ -1,4 +1,4 @@
-package lu.kbra.modelizer_next.ui.component;
+package lu.kbra.model_exporter.api;
 
 import java.awt.Color;
 import java.awt.Dimension;
