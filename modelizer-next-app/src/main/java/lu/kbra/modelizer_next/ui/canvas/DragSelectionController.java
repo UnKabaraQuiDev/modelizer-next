@@ -8,8 +8,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import lu.kbra.modelizer_next.layout.LayoutObjectType;
-import lu.kbra.modelizer_next.layout.NodeLayout;
+import lu.kbra.modelizer_next.domain.layout.LayoutObjectType;
+import lu.kbra.modelizer_next.domain.layout.NodeLayout;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.DraggedLayout;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.DraggedSelection;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectedElement;

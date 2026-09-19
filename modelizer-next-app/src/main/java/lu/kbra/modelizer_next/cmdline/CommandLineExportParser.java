@@ -10,8 +10,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import lu.kbra.modelizer_next.domain.data.PanelType;
+import lu.kbra.modelizer_next.domain.data.ViewExportScope;
 import lu.kbra.modelizer_next.ui.export.ViewExportFormat;
-import lu.kbra.modelizer_next.ui.export.ViewExportScope;
 import lu.kbra.modelizer_next.ui.export.ViewExporter;
 
 /**

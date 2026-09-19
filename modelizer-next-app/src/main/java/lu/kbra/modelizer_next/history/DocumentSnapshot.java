@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 
 import lu.kbra.modelizer_next.MNMain;
-import lu.kbra.modelizer_next.document.ModelDocument;
+import lu.kbra.modelizer_next.domain.document.ModelDocument;
 
 /**
  * Immutable undo/redo snapshot containing a serialized document state and a user-facing

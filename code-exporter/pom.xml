@@ -5,9 +5,9 @@
 
 	<parent>
 		<groupId>lu.kbra</groupId>
-		<artifactId>modelizer-next</artifactId>
+		<artifactId>model-exporter</artifactId>
 		<version>${revision}</version>
-		<relativePath>../</relativePath>
+		<relativePath>../model-exporter/</relativePath>
 	</parent>
 
 	<artifactId>code-exporter</artifactId>
@@ -16,30 +16,13 @@
 	<name>Code Exporter Parent</name>
 
 	<modules>
-		<module>code-exporter-api</module>
-		<module>code-exporter-java</module>
+		<module>../code-exporter-java</module>
 	</modules>
-
-	<dependencyManagement>
-		<dependencies>
-			<dependency>
-				<groupId>lu.kbra</groupId>
-				<artifactId>code-exporter-api</artifactId>
-				<version>${revision}</version>
-			</dependency>
-			<dependency>
-				<groupId>lu.kbra</groupId>
-				<artifactId>code-exporter-java-pclib</artifactId>
-				<version>${revision}</version>
-			</dependency>
-		</dependencies>
-	</dependencyManagement>
 
 	<dependencies>
 		<dependency>
 			<groupId>lu.kbra</groupId>
-			<artifactId>modelizer-next-datastruct</artifactId>
-			<scope>provided</scope>
+			<artifactId>model-exporter-api</artifactId>
 		</dependency>
 	</dependencies>
 

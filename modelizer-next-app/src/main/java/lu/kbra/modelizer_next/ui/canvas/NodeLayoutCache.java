@@ -6,11 +6,11 @@ import java.util.Optional;
 
 import lu.kbra.modelizer_next.domain.ClassModel;
 import lu.kbra.modelizer_next.domain.CommentModel;
-import lu.kbra.modelizer_next.layout.LayoutObjectType;
-import lu.kbra.modelizer_next.layout.LinkLayout;
-import lu.kbra.modelizer_next.layout.NodeLayout;
-import lu.kbra.modelizer_next.layout.PanelState;
-import lu.kbra.modelizer_next.layout.Size2D;
+import lu.kbra.modelizer_next.domain.document.PanelState;
+import lu.kbra.modelizer_next.domain.layout.LayoutObjectType;
+import lu.kbra.modelizer_next.domain.layout.LinkLayout;
+import lu.kbra.modelizer_next.domain.layout.NodeLayout;
+import lu.kbra.modelizer_next.domain.layout.Size2D;
 
 /**
  * Contains node layout lookup, creation, and bounds cache helpers.

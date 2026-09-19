@@ -10,7 +10,7 @@ import java.awt.geom.Rectangle2D;
 import javax.swing.SwingUtilities;
 
 import lu.kbra.modelizer_next.common.App;
-import lu.kbra.modelizer_next.layout.PanelState;
+import lu.kbra.modelizer_next.domain.document.PanelState;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.DraggedLayout;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.HitResult;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.LinkCreationState;

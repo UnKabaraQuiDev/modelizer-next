@@ -4,7 +4,7 @@ import java.io.File;
 import java.io.IOException;
 
 import lu.kbra.modelizer_next.MNMain;
-import lu.kbra.modelizer_next.document.ModelDocument;
+import lu.kbra.modelizer_next.domain.document.ModelDocument;
 
 /**
  * Imports the current Modelizer Next JSON document format.

@@ -1,0 +1,49 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>lu.kbra</groupId>
+		<artifactId>modelizer-next</artifactId>
+		<version>${revision}</version>
+		<relativePath>../</relativePath>
+	</parent>
+
+	<artifactId>model-exporter</artifactId>
+	<packaging>pom</packaging>
+
+	<name>Model Exporter Parent</name>
+
+	<modules>
+		<module>../model-exporters</module>
+		<module>../model-exporter-api</module>
+		<module>../code-exporter</module>
+		<module>../image-exporter</module>
+	</modules>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>lu.kbra</groupId>
+				<artifactId>modelizer-next-datastruct</artifactId>
+				<version>${revision}</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>lu.kbra</groupId>
+				<artifactId>model-exporter-api</artifactId>
+				<version>${revision}</version>
+				<scope>provided</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
+	<dependencies>
+		<dependency>
+			<groupId>lu.kbra</groupId>
+			<artifactId>modelizer-next-datastruct</artifactId>
+		</dependency>
+	</dependencies>
+
+</project>

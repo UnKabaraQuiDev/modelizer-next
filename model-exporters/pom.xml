@@ -1,0 +1,42 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>lu.kbra</groupId>
+		<artifactId>model-exporter</artifactId>
+		<version>${revision}</version>
+		<relativePath>../model-exporter</relativePath>
+	</parent>
+
+	<artifactId>model-exporters</artifactId>
+	<packaging>pom</packaging>
+
+	<name>Model Exporter Aggregate</name>
+
+	<dependencies>
+		<dependency>
+			<groupId>lu.kbra</groupId>
+			<artifactId>code-exporter-java-pclib</artifactId>
+			<version>${revision}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>lu.kbra</groupId>
+			<artifactId>image-exporter-png</artifactId>
+			<version>${revision}</version>
+		</dependency>
+		<dependency>
+			<groupId>lu.kbra</groupId>
+			<artifactId>image-exporter-svg</artifactId>
+			<version>${revision}</version>
+		</dependency>
+		<dependency>
+			<groupId>lu.kbra</groupId>
+			<artifactId>image-exporter-webp</artifactId>
+			<version>${revision}</version>
+		</dependency>
+	</dependencies>
+
+</project>
