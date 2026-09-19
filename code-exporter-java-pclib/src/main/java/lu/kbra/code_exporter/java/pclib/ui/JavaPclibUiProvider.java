@@ -1,20 +1,24 @@
 package lu.kbra.code_exporter.java.pclib.ui;
 
-import java.io.File;
 import java.nio.file.Paths;
 
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 
 import lu.kbra.code_exporter.java.pclib.JavaPclibExporterOptions;
-import lu.kbra.model_exporter.api.ui.ExporterOptions;
-import lu.kbra.model_exporter.api.ui.UIProvider;
+import lu.kbra.model_exporter.api.ExporterOptions;
+import lu.kbra.model_exporter.api.UiProvider;
 
-public class JavaPclibUiProvider implements UIProvider {
+public class JavaPclibUiProvider implements UiProvider {
 
 	@Override
 	public JMenuItem buildMenuItem() {
 		return new JMenuItem("Java > PCLib");
+	}
+
+	@Override
+	public boolean hasCustomUI() {
+		return true;
 	}
 
 	@Override
@@ -51,11 +55,7 @@ public class JavaPclibUiProvider implements UIProvider {
 	}
 
 	@Override
-	public void restoreOptions(
-			final JPanel panel,
-			final File currentDocumentFile,
-			final File currentConfigFile,
-			final ExporterOptions options) {
+	public void restoreOptions(final JPanel panel, final ExporterOptions options) {
 		if (!(panel instanceof final JavaPclibUiPanel optionPanel)) {
 			throw new IllegalArgumentException("Panel type not supported (" + (panel == null ? "null" : panel.getClass().getName()) + ").");
 		}
@@ -64,9 +64,6 @@ public class JavaPclibUiProvider implements UIProvider {
 			throw new IllegalArgumentException(
 					"Options type not supported (" + (options == null ? "null" : options.getClass().getName()) + ").");
 		}
-
-		optionPanel.setCurrentConfigFile(currentConfigFile);
-		optionPanel.setCurrentDocumentFile(currentDocumentFile);
 
 		optionPanel.getDataClassesPackage().setText(pclibOptions.getDataPackage());
 		optionPanel.getTableClassesPackage().setText(pclibOptions.getTablePackage());

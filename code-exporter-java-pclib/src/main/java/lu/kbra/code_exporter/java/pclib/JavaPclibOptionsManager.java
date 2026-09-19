@@ -2,13 +2,13 @@ package lu.kbra.code_exporter.java.pclib;
 
 import java.nio.file.Path;
 
-import lu.kbra.model_exporter.api.ui.ExporterOptions;
-import lu.kbra.model_exporter.api.ui.OptionsManager;
+import lu.kbra.model_exporter.api.ExporterOptions;
+import lu.kbra.model_exporter.api.OptionsManager;
 
 public class JavaPclibOptionsManager implements OptionsManager {
 
 	@Override
-	public ExporterOptions relativizePaths(final ExporterOptions options, final Path path) {
+	public void relativizePaths(final ExporterOptions options, final Path path) {
 		if (!(options instanceof final JavaPclibExporterOptions pclibOptions)) {
 			throw new IllegalArgumentException(
 					"Options type not supported (" + (options == null ? "null" : options.getClass().getName()) + ").");
@@ -37,8 +37,6 @@ public class JavaPclibOptionsManager implements OptionsManager {
 				pclibOptions.setAttachedFile(path.relativize(attachedFile));
 			}
 		}
-
-		return options;
 	}
 
 	@Override

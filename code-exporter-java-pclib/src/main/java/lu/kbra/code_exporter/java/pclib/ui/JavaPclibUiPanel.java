@@ -3,24 +3,18 @@ package lu.kbra.code_exporter.java.pclib.ui;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.io.File;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 import javax.swing.DefaultComboBoxModel;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
-import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import lombok.Getter;
 import lombok.Setter;
-import lu.kbra.model_exporter.api.ui.UIProvider;
-import lu.kbra.pclib.PCUtils;
+import lu.kbra.model_exporter.api.UiProvider;
 
 @Getter
 @Setter
@@ -42,18 +36,12 @@ public class JavaPclibUiPanel extends JPanel {
 	private final JCheckBox chckbxKeepSimpleNames;
 	private final JTextField springDatabaseBean;
 	private final JLabel lblDbms;
-	private final JComboBox comboBoxDbms;
-
-	private File currentDocumentFile;
-	private File currentConfigFile;
+	private final JComboBox<String> comboBoxDbms;
 
 	/**
 	 * Create the panel.
 	 */
 	public JavaPclibUiPanel() {
-		this.currentDocumentFile = null;
-		this.currentConfigFile = null;
-
 		final GridBagLayout gridBagLayout = new GridBagLayout();
 		gridBagLayout.columnWidths = new int[] { 0, 0, 0, 0, 0 };
 		gridBagLayout.rowHeights = new int[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
@@ -80,16 +68,13 @@ public class JavaPclibUiPanel extends JPanel {
 		this.add(this.txtDataPath, gbc_txtDataPath);
 		this.txtDataPath.setColumns(10);
 
-		final ImageIcon openFolderIcon = UIProvider
-				.scaleIcon(new ImageIcon(PCUtils.readPackagedBytesFile(this.getClass(), "/icons/open-folder.png")), 20, 20);
-
-		final JButton btnSelectTablePath = new JButton();
-		btnSelectTablePath.setIcon(openFolderIcon);
+		final JButton btnSelectDataPath = new JButton();
+		btnSelectDataPath.setIcon(UiProvider.OPEN_FOLDER_ICON);
 		final GridBagConstraints gbc_btnSelectTablePath = new GridBagConstraints();
 		gbc_btnSelectTablePath.insets = new Insets(0, 0, 5, 0);
 		gbc_btnSelectTablePath.gridx = 3;
 		gbc_btnSelectTablePath.gridy = 0;
-		this.add(btnSelectTablePath, gbc_btnSelectTablePath);
+		this.add(btnSelectDataPath, gbc_btnSelectTablePath);
 
 		final JLabel lblTablePath = new JLabel("Tables classes path");
 		final GridBagConstraints gbc_lblTablePath = new GridBagConstraints();
@@ -110,13 +95,13 @@ public class JavaPclibUiPanel extends JPanel {
 		this.add(this.txtTablePath, gbc_txtTablePath);
 		this.txtTablePath.setColumns(10);
 
-		final JButton btnSelectDataPath = new JButton();
-		btnSelectDataPath.setIcon(openFolderIcon);
+		final JButton btnSelectTablePath = new JButton();
+		btnSelectTablePath.setIcon(UiProvider.OPEN_FOLDER_ICON);
 		final GridBagConstraints gbc_btnSelectDataPath = new GridBagConstraints();
 		gbc_btnSelectDataPath.insets = new Insets(0, 0, 5, 0);
 		gbc_btnSelectDataPath.gridx = 3;
 		gbc_btnSelectDataPath.gridy = 1;
-		this.add(btnSelectDataPath, gbc_btnSelectDataPath);
+		this.add(btnSelectTablePath, gbc_btnSelectDataPath);
 
 		final JLabel lblDataClassesPackage = new JLabel("Data classes package");
 		final GridBagConstraints gbc_lblDataClassesPackage = new GridBagConstraints();
@@ -171,7 +156,7 @@ public class JavaPclibUiPanel extends JPanel {
 		this.add(this.chckbxExportTableClasses, gbc_chckbxExportTableClasses);
 
 		this.chckbxSplitBySchema = new JCheckBox("Split by schema");
-		chckbxSplitBySchema.setEnabled(false);
+		this.chckbxSplitBySchema.setEnabled(false);
 		final GridBagConstraints gbc_chckbxSplitBySchema = new GridBagConstraints();
 		gbc_chckbxSplitBySchema.insets = new Insets(0, 0, 5, 5);
 		gbc_chckbxSplitBySchema.gridx = 1;
@@ -244,8 +229,8 @@ public class JavaPclibUiPanel extends JPanel {
 		gbc_lblDbms.gridy = 9;
 		this.add(this.lblDbms, gbc_lblDbms);
 
-		this.comboBoxDbms = new JComboBox();
-		comboBoxDbms.setEditable(true);
+		this.comboBoxDbms = new JComboBox<>();
+		this.comboBoxDbms.setEditable(true);
 		this.comboBoxDbms.setModel(new DefaultComboBoxModel(new String[] { "MySQL", "SQLite", "PostgreSQL" }));
 		final GridBagConstraints gbc_comboBoxDbms = new GridBagConstraints();
 		gbc_comboBoxDbms.insets = new Insets(0, 0, 0, 5);
@@ -255,51 +240,11 @@ public class JavaPclibUiPanel extends JPanel {
 		this.add(this.comboBoxDbms, gbc_comboBoxDbms);
 
 		this.chckbxUseSpring.addActionListener(a -> this.springDatabaseBean.setEnabled(this.chckbxUseSpring.isSelected()));
-		btnSelectTablePath.addActionListener(e -> this.selectDir(this.txtTablePath));
-		btnSelectDataPath.addActionListener(e -> this.selectDir(this.txtDataPath));
+		btnSelectDataPath.addActionListener(e -> UiProvider.selectDir(this, this.txtDataPath));
+		btnSelectTablePath.addActionListener(e -> UiProvider.selectDir(this, this.txtTablePath));
 		this.comboBoxDbms.addActionListener(
 				a -> this.chckbxSplitBySchema.setEnabled("PostgreSQL".equals(this.comboBoxDbms.getSelectedItem().toString())));
 	}
 
-	private void selectDir(final JTextField field) {
-		final JFileChooser fileChooser = new JFileChooser();
-
-		final String currentPath = field.getText();
-
-		if (!currentPath.isBlank() && this.currentConfigFile != null) {
-			final Path configDir = this.currentConfigFile.toPath().getParent();
-			final Path selectedPath = Paths.get(currentPath);
-
-			System.err.println(configDir + " " + selectedPath);
-
-			final Path resolvedPath = selectedPath.isAbsolute() ? selectedPath : configDir.resolve(selectedPath);
-
-			System.err.println(resolvedPath);
-
-			File currentDir = resolvedPath.toFile();
-			while (!currentDir.isDirectory() && currentDir.getParentFile() != null) {
-				currentDir = currentDir.getParentFile();
-			}
-
-			if (currentDir.isDirectory()) {
-				fileChooser.setCurrentDirectory(currentDir);
-			}
-		}
-
-		System.err.println(fileChooser.getCurrentDirectory());
-
-		fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-		fileChooser.setAcceptAllFileFilterUsed(false);
-
-		if (fileChooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
-			field.setText(
-					this.currentConfigFile != null
-							? this.currentConfigFile.toPath()
-									.getParent()
-									.relativize(fileChooser.getSelectedFile().toPath().toAbsolutePath())
-									.toString()
-							: fileChooser.getSelectedFile().getAbsolutePath());
-		}
-	}
 
 }

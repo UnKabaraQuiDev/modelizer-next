@@ -11,7 +11,11 @@ public class RelativePathSerializer extends JsonSerializer<Path> {
 
 	@Override
 	public void serialize(final Path value, final JsonGenerator gen, final SerializerProvider serializers) throws IOException {
-		gen.writeString(value.toString());
+		if (value.isAbsolute()) {
+			gen.writeString(value.toAbsolutePath().toString());
+		} else {
+			gen.writeString(value.toString());
+		}
 	}
 
 }

@@ -1,10 +1,10 @@
-package lu.kbra.model_exporter.api.ui;
+package lu.kbra.model_exporter.api;
 
 import java.nio.file.Path;
 
 public interface OptionsManager {
 
-	ExporterOptions relativizePaths(ExporterOptions options, Path path);
+	void relativizePaths(ExporterOptions options, Path path);
 	
 	ExporterOptions blankOptions();
 

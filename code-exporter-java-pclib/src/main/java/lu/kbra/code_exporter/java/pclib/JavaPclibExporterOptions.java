@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lu.kbra.model_exporter.api.ui.ExporterOptions;
+import lu.kbra.model_exporter.api.ExporterOptions;
 import lu.kbra.modelizer_next.utils.RelativePathSerializer;
 import lu.kbra.pclib.PCUtils;
 

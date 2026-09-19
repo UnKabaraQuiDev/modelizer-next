@@ -1,7 +1,7 @@
-package lu.kbra.code_exporter.java.pclib;
+package lu.kbra.image_exporter.png;
 
 import lombok.Getter;
-import lu.kbra.code_exporter.java.pclib.ui.JavaPclibUiProvider;
+import lu.kbra.image_exporter.png.ui.PngImageUiProvider;
 import lu.kbra.model_exporter.api.ExporterOptions;
 import lu.kbra.model_exporter.api.ExporterType;
 import lu.kbra.model_exporter.api.ModelExporter;
@@ -10,31 +10,31 @@ import lu.kbra.model_exporter.api.OptionsManager;
 import lu.kbra.model_exporter.api.UiProvider;
 
 @Getter
-public class JavaPclibCodeExporter implements ModelExporter {
+public class PngImageExporter implements ModelExporter {
 
-	public static final String EXPORTER_ID = "java-pclib";
+	public static final String EXPORTER_ID = "png";
 
-	private final UiProvider uiProvider = new JavaPclibUiProvider();
-	private final OptionsManager optionsManager = new JavaPclibOptionsManager();
+	private final UiProvider uiProvider = new PngImageUiProvider();
+	private final OptionsManager optionsManager = new PngImageOptionsManager();
 
 	@Override
 	public ModelVisitor buildModelVisitor(final ExporterOptions options) {
-		if (!(options instanceof final JavaPclibExporterOptions pclibOptions)) {
+		if (!(options instanceof final PngImageExporterOptions pngOptions)) {
 			throw new IllegalArgumentException(
 					"Options type not supported (" + (options == null ? "null" : options.getClass().getName()) + ").");
 		}
 
-		return new JavaPclibModelVisitor(pclibOptions);
+		return new PngImageModelVisitor(pngOptions);
 	}
 
 	@Override
 	public ExporterType getExporterType() {
-		return ExporterType.CODE;
+		return ExporterType.IMAGE;
 	}
 
 	@Override
 	public String getExporterId() {
-		return JavaPclibCodeExporter.EXPORTER_ID;
+		return PngImageExporter.EXPORTER_ID;
 	}
 
 }
