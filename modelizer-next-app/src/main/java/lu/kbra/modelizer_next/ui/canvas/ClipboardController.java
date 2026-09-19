@@ -30,7 +30,7 @@ import lu.kbra.modelizer_next.domain.FieldModel;
 import lu.kbra.modelizer_next.domain.LinkModel;
 import lu.kbra.modelizer_next.domain.data.CommentKind;
 import lu.kbra.modelizer_next.domain.data.ViewExportScope;
-import lu.kbra.modelizer_next.layout.LayoutObjectType;
+import lu.kbra.modelizer_next.domain.layout.LayoutObjectType;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.ClipboardSnapshot;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.CopiedClass;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.CopiedComment;

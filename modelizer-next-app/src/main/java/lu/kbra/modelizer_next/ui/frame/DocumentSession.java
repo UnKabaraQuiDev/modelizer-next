@@ -2,7 +2,7 @@ package lu.kbra.modelizer_next.ui.frame;
 
 import java.io.File;
 
-import lu.kbra.modelizer_next.document.ModelDocument;
+import lu.kbra.modelizer_next.domain.document.ModelDocument;
 import lu.kbra.modelizer_next.history.DocumentSnapshot;
 import lu.kbra.modelizer_next.history.UndoRedoManager;
 

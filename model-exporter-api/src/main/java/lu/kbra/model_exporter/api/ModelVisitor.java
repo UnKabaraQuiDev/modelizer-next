@@ -1,9 +1,9 @@
 package lu.kbra.model_exporter.api;
 
-import lu.kbra.modelizer_next.domain.DiagramModel;
+import lu.kbra.modelizer_next.domain.document.ModelDocument;
 
 public interface ModelVisitor {
 
-	void visitDiagram(DiagramModel file) throws ExportFailedException;
+	void visitDocument(ModelDocument file) throws ExportFailedException;
 
 }

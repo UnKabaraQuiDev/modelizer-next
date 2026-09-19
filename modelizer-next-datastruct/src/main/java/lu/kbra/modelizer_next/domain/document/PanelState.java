@@ -1,4 +1,4 @@
-package lu.kbra.modelizer_next.layout;
+package lu.kbra.modelizer_next.domain.document;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -9,6 +9,9 @@ import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import lu.kbra.modelizer_next.domain.layout.LayoutObjectType;
+import lu.kbra.modelizer_next.domain.layout.LinkLayout;
+import lu.kbra.modelizer_next.domain.layout.NodeLayout;
 import lu.kbra.modelizer_next.impl.PostConstructOwner;
 import lu.kbra.modelizer_next.impl.PreDeconstructOwner;
 

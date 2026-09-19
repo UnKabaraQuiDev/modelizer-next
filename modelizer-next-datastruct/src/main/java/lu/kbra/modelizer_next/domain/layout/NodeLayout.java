@@ -1,4 +1,4 @@
-package lu.kbra.modelizer_next.layout;
+package lu.kbra.modelizer_next.domain.layout;
 
 import java.awt.geom.Point2D;
 

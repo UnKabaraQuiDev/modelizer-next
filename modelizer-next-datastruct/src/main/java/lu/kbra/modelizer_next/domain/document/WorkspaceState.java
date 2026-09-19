@@ -1,4 +1,4 @@
-package lu.kbra.modelizer_next.layout;
+package lu.kbra.modelizer_next.domain.document;
 
 import java.util.EnumMap;
 import java.util.Map;

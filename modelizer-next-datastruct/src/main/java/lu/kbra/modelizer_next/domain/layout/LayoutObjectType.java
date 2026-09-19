@@ -1,4 +1,4 @@
-package lu.kbra.modelizer_next.layout;
+package lu.kbra.modelizer_next.domain.layout;
 
 /**
  * Kinds of objects that may have layout information on the canvas.

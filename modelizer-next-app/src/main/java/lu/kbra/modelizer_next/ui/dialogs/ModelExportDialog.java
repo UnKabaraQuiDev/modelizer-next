@@ -147,7 +147,7 @@ public abstract class ModelExportDialog extends JDialog {
 
 		this.options = this.parsePanelOptions();
 		editingRef.setOptions(options);
-		
+
 		if (Objects.equals(this.options, this.original)) {
 			return true;
 		}
@@ -285,8 +285,7 @@ public abstract class ModelExportDialog extends JDialog {
 			final SimpleExporterOptions simple = MNMain.OBJECT_MAPPER.readValue(importFile, SimpleExporterOptions.class);
 			if (!Objects.equals(simple.getExporterId(), this.service.getExporterId())) {
 				final int result = JOptionPane.showConfirmDialog(this,
-						"It looks like that export configuration is for: " + simple.getExporterId()
-								+ ".\nDo you want to open it anyways ?",
+						"It looks like that export configuration is for: " + simple.getExporterId() + ".\nDo you want to open it anyways ?",
 						"Error",
 						JOptionPane.YES_NO_OPTION,
 						JOptionPane.WARNING_MESSAGE);
@@ -323,7 +322,7 @@ public abstract class ModelExportDialog extends JDialog {
 			ExporterApiContext.getApiContext().setCurrentDocument(mainFrame.getSession().getCurrentFile());
 			ExporterApiContext.getApiContext().setRenderers(pts -> mainFrame.getCanvasesByPanelType());
 
-			service.buildModelVisitor(parsePanelOptions()).visitDiagram(mainFrame.getSession().getDocument().getModel());
+			service.buildModelVisitor(parsePanelOptions()).visitDocument(mainFrame.getSession().getDocument());
 		} catch (ExportFailedException e) {
 			e.printStackTrace();
 		}

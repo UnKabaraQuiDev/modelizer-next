@@ -1,15 +1,15 @@
-package lu.kbra.modelizer_next.document;
+package lu.kbra.modelizer_next.domain.document;
 
 import java.time.Instant;
 import java.util.UUID;
-
-import lu.kbra.modelizer_next.common.App;
 
 /**
  * Metadata attached to a Modelizer document, such as version information and document-level
  * attributes.
  */
 public class DocumentMeta {
+
+	public static String VERSION = null;
 
 	private String id;
 	@Deprecated
@@ -26,7 +26,11 @@ public class DocumentMeta {
 		this.name = "Untitled";
 		this.createdAt = Instant.now();
 		this.updatedAt = this.createdAt;
-		this.applicationVersion = App.VERSION;
+		this.applicationVersion = VERSION;
+
+		if (VERSION == null) {
+			throw new IllegalStateException("VERSION hasn't been initialized yet.");
+		}
 	}
 
 	/**

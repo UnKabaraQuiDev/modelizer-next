@@ -25,8 +25,8 @@ import lu.kbra.model_exporter.api.CanvasRenderer;
 import lu.kbra.model_exporter.api.ExportFailedException;
 import lu.kbra.model_exporter.api.ExporterApiContext;
 import lu.kbra.model_exporter.api.ModelVisitor;
-import lu.kbra.modelizer_next.domain.DiagramModel;
 import lu.kbra.modelizer_next.domain.data.PanelType;
+import lu.kbra.modelizer_next.domain.document.ModelDocument;
 import lu.kbra.pclib.PCUtils;
 
 @Getter
@@ -41,7 +41,7 @@ public class PngImageModelVisitor implements ModelVisitor {
 	}
 
 	@Override
-	public void visitDiagram(final DiagramModel file) throws ExportFailedException {
+	public void visitDocument(final ModelDocument file) throws ExportFailedException {
 		try {
 			final Map<PanelType, ? extends CanvasRenderer> renderers = ExporterApiContext.getApiContext()
 					.getRenderers()

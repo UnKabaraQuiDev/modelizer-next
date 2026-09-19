@@ -1,9 +1,8 @@
-package lu.kbra.modelizer_next.document;
+package lu.kbra.modelizer_next.domain.document;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lu.kbra.modelizer_next.domain.DiagramModel;
-import lu.kbra.modelizer_next.layout.WorkspaceState;
 
 /**
  * Top-level persistent document that owns the diagram model, metadata, workspace layout, and style
