@@ -28,7 +28,7 @@
 		<dependencies>
 			<dependency>
 				<groupId>lu.kbra</groupId>
-				<artifactId>code-exporter</artifactId>
+				<artifactId>model-exporter</artifactId>
 				<version>${revision}</version>
 				<scope>import</scope>
 				<type>pom</type>
@@ -49,12 +49,13 @@
 
 		<dependency>
 			<groupId>lu.kbra</groupId>
-			<artifactId>code-exporter-api</artifactId>
+			<artifactId>model-exporter-api</artifactId>
 		</dependency>
 
 		<dependency>
 			<groupId>lu.kbra</groupId>
-			<artifactId>code-exporter-java-pclib</artifactId>
+			<artifactId>model-exporters</artifactId>
+			<type>pom</type>
 		</dependency>
 
 		<dependency>

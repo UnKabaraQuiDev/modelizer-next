@@ -5,24 +5,20 @@
 
 	<parent>
 		<groupId>lu.kbra</groupId>
-		<artifactId>model-exporter</artifactId>
+		<artifactId>code-exporter-java</artifactId>
 		<version>${revision}</version>
-		<relativePath>../model-exporter/</relativePath>
+		<relativePath>../code-exporter-java/</relativePath>
 	</parent>
 
-	<artifactId>code-exporter</artifactId>
-	<packaging>pom</packaging>
+	<artifactId>code-exporter-java-pclib</artifactId>
 
-	<name>Code Exporter Parent</name>
-
-	<modules>
-		<module>../code-exporter-java</module>
-	</modules>
-
+	<name>Code Exporter Java PCLib</name>
+	
 	<dependencies>
 		<dependency>
 			<groupId>lu.kbra</groupId>
-			<artifactId>model-exporter-api</artifactId>
+			<artifactId>pclib-db-core</artifactId>
+			<scope>provided</scope>
 		</dependency>
 	</dependencies>
 

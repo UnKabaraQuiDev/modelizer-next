@@ -38,8 +38,8 @@ import io.github.andrewauclair.moderndocking.DockingRegion;
 import io.github.andrewauclair.moderndocking.app.Docking;
 import io.github.andrewauclair.moderndocking.app.RootDockingPanel;
 import lombok.Getter;
-import lu.kbra.code_exporter.api.CodeExporter;
-import lu.kbra.code_exporter.api.ui.ExporterOptions;
+import lu.kbra.model_exporter.api.ModelExporter;
+import lu.kbra.model_exporter.api.ui.ExporterOptions;
 import lu.kbra.modelizer_next.MNMain;
 import lu.kbra.modelizer_next.bootstrap.AvailableUpdate;
 import lu.kbra.modelizer_next.bootstrap.UpdateRuntime;
@@ -560,7 +560,7 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 		}
 	}
 
-	void exportcode(final CodeExporter service) {
+	void exportcode(final ModelExporter service) {
 		final JDialog dialog = new CodeExportDialog(this,
 				service,
 				this.loadedExporterOptions.computeIfAbsent(service.getExporterId(), k -> Pairs.pair(null, null)).getValue());

@@ -10,14 +10,27 @@
 		<relativePath>../model-exporter/</relativePath>
 	</parent>
 
-	<artifactId>code-exporter</artifactId>
+	<artifactId>image-exporter</artifactId>
 	<packaging>pom</packaging>
 
-	<name>Code Exporter Parent</name>
+	<name>Image Exporter Parent</name>
 
 	<modules>
-		<module>../code-exporter-java</module>
+		<module>../image-exporter-png</module>
+		<module>../image-exporter-svg</module>
+		<module>../image-exporter-webp</module>
 	</modules>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>lu.kbra</groupId>
+				<artifactId>model-exporter-api</artifactId>
+				<version>${revision}</version>
+				<scope>provided</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 
 	<dependencies>
 		<dependency>

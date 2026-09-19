@@ -17,8 +17,8 @@ import javax.swing.WindowConstants;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import lombok.Getter;
-import lu.kbra.code_exporter.api.CodeExporter;
-import lu.kbra.code_exporter.api.ui.ExporterOptions;
+import lu.kbra.model_exporter.api.ModelExporter;
+import lu.kbra.model_exporter.api.ui.ExporterOptions;
 import lu.kbra.modelizer_next.MNMain;
 import lu.kbra.modelizer_next.ui.frame.MainFrame;
 
@@ -27,13 +27,13 @@ public class CodeExportDialog extends JDialog {
 
 	private static final long serialVersionUID = 7251302762903132031L;
 
-	private final CodeExporter service;
+	private final ModelExporter service;
 	private ExporterOptions original;
 	private ExporterOptions options;
 
 	private JPanel optionsPanel;
 
-	public CodeExportDialog(final MainFrame mainFrame, final CodeExporter service, final ExporterOptions options) {
+	public CodeExportDialog(final MainFrame mainFrame, final ModelExporter service, final ExporterOptions options) {
 		super(mainFrame);
 
 		optionsPanel = service.getUiProvider().buildUI();

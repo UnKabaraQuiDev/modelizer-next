@@ -16,7 +16,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.KeyStroke;
 
-import lu.kbra.code_exporter.api.CodeExporter;
+import lu.kbra.model_exporter.api.ModelExporter;
 import lu.kbra.modelizer_next.common.App;
 import lu.kbra.modelizer_next.common.OpenedFile;
 
@@ -63,7 +63,7 @@ final class FileMenu extends JMenu {
 		final JMenu menu = new JMenu("Export code");
 
 		final List<JMenuItem> items = new ArrayList<>();
-		for (CodeExporter service : ServiceLoader.load(CodeExporter.class)) {
+		for (ModelExporter service : ServiceLoader.load(ModelExporter.class)) {
 			final JMenuItem item = service.getUiProvider().buildMenuItem();
 			item.addActionListener(a -> {
 				frame.exportcode(service);

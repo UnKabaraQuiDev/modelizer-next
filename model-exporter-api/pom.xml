@@ -10,20 +10,8 @@
 		<relativePath>../model-exporter/</relativePath>
 	</parent>
 
-	<artifactId>code-exporter</artifactId>
-	<packaging>pom</packaging>
+	<artifactId>model-exporter-api</artifactId>
 
-	<name>Code Exporter Parent</name>
-
-	<modules>
-		<module>../code-exporter-java</module>
-	</modules>
-
-	<dependencies>
-		<dependency>
-			<groupId>lu.kbra</groupId>
-			<artifactId>model-exporter-api</artifactId>
-		</dependency>
-	</dependencies>
-
+	<name>Model Exporter API</name>
+	
 </project>
