@@ -17,9 +17,11 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.ServiceLoader;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
@@ -73,6 +75,9 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 	public static final ImageIcon IMAGE_ICON;
 	public static final List<Image> ICON_IMAGES;
 
+	@Getter
+	static final List<ModelExporter> modelExporters;
+
 	static {
 		final Pair<List<Image>, Long> p = PCUtils.millisTime(() -> MainFrame.WINDOW_ICON_SIZES.stream()
 				.sorted(Comparator.naturalOrder())
@@ -83,6 +88,19 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 
 		ICON = MainFrame.ICON_IMAGES.get(MainFrame.ICON_IMAGES.size() - 1);
 		IMAGE_ICON = new ImageIcon(MainFrame.ICON);
+
+		modelExporters = ServiceLoader.load(ModelExporter.class).stream().map(z -> {
+			try {
+				return z.get();
+			} catch (final Exception e) {
+				e.printStackTrace();
+				return null;
+			}
+		}).filter(Objects::nonNull).toList();
+		System.out.println("Found: " + modelExporters.size() + " exporters\n"
+				+ modelExporters.stream()
+						.map(c -> " * [" + c.getExporterType() + "] " + c.getExporterId())
+						.collect(Collectors.joining("\n")));
 	}
 
 	/**
@@ -150,8 +168,6 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 	JMenuItem undoMenuItem;
 	JMenuItem redoMenuItem;
 
-	@Getter
-	List<ModelExporter> modelExporters = ServiceLoader.load(ModelExporter.class).stream().map(ServiceLoader.Provider::get).toList();
 	@Getter
 	Map<String, ExporterOptionRef> loadedExporterOptions = new HashMap<>();
 
@@ -531,7 +547,7 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 	 * @return true if a ModelExporter was found
 	 */
 	public boolean export(final String serviceId) {
-		for (final ModelExporter service : modelExporters) {
+		for (final ModelExporter service : MainFrame.modelExporters) {
 			if (!service.getExporterId().equals(serviceId)) {
 				continue;
 			}
