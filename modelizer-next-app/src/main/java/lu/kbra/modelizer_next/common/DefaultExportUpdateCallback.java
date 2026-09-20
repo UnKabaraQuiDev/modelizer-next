@@ -5,8 +5,9 @@ import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import lombok.Getter;
 import lu.kbra.model_exporter.api.ExportUpdateCallback;
+
+import lombok.Getter;
 
 @Getter
 public class DefaultExportUpdateCallback implements ExportUpdateCallback {
@@ -77,8 +78,8 @@ public class DefaultExportUpdateCallback implements ExportUpdateCallback {
 		this.ensureOpen();
 
 		this.progress = percentage;
-		
-		this.listener.progressUpdated(parent, this);
+
+		this.listener.progressUpdated(this.parent, this);
 	}
 
 	@Override

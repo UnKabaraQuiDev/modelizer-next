@@ -7,14 +7,14 @@ public interface ExportUpdateCallback {
 	String getName();
 
 	void setProgress(float percentage);
-	
+
 	float getProgress();
 
 	/**
 	 * @return returns the parent
 	 */
 	ExportUpdateCallback endSubSection();
-	
+
 	ExportUpdateCallback getParent();
 
 	/**

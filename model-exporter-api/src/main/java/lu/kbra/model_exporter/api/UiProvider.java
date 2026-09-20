@@ -30,11 +30,11 @@ public interface UiProvider {
 
 	void restoreOptions(JPanel panel, ExporterOptions options);
 
-	final ImageIcon OPEN_FOLDER_ICON = UiProvider
+	ImageIcon OPEN_FOLDER_ICON = UiProvider
 			.scaleIcon(new ImageIcon(PCUtils.readPackagedBytesFile(UiProvider.class, "/icons/open-folder.png")), 20, 20);
 
 	static ImageIcon scaleIcon(final ImageIcon icon, final int targetWidth, final int targetHeight) {
-		BufferedImage current = toBufferedImage(icon.getImage());
+		BufferedImage current = UiProvider.toBufferedImage(icon.getImage());
 		int width = current.getWidth();
 		int height = current.getHeight();
 		while (width > targetWidth || height > targetHeight) {

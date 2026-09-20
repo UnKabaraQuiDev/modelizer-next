@@ -34,7 +34,7 @@ public interface ImageExporterOptions extends ExporterOptions {
 	void setBackgroundColor(Optional<Color> color);
 
 	String getExtension();
-	
+
 	@Override
 	ImageExporterOptions clone();
 

@@ -16,6 +16,7 @@ import lu.kbra.modelizer_next.domain.ClassModel;
 import lu.kbra.modelizer_next.domain.CommentModel;
 import lu.kbra.modelizer_next.domain.FieldModel;
 import lu.kbra.modelizer_next.domain.LinkModel;
+import lu.kbra.modelizer_next.domain.TagsOwner;
 import lu.kbra.modelizer_next.domain.data.CommentKind;
 import lu.kbra.modelizer_next.domain.data.PanelType;
 import lu.kbra.modelizer_next.domain.layout.LayoutObjectType;
@@ -212,7 +213,7 @@ public interface ElementRenderer extends DiagramCanvasExt {
 			double rowY = bounds.getY() + DiagramCanvas.CLASS_HEADER_HEIGHT;
 			final List<FieldModel> visibleFields = classModel.getFields(this.getPanelType());
 
-			final Set<String> duplicatedFieldIds = classModel.getDuplicatedFields(getPanelType());
+			final Set<String> duplicatedFieldIds = classModel.getDuplicatedFields(this.getPanelType());
 
 			for (final FieldModel fieldModel : visibleFields) {
 				final boolean isDuplicate = duplicatedFieldIds.contains(fieldModel.getId());
@@ -337,7 +338,7 @@ public interface ElementRenderer extends DiagramCanvasExt {
 			final double rowY,
 			final ClassModel classModel,
 			final FieldModel fieldModel,
-			boolean isDuplicate) {
+			final boolean isDuplicate) {
 		final Rectangle2D.Double fieldBounds = new Rectangle2D.Double(bounds.getX(),
 				rowY,
 				bounds.getWidth(),
@@ -597,7 +598,7 @@ public interface ElementRenderer extends DiagramCanvasExt {
 			final ClassModel classModel,
 			final FieldModel fieldModel,
 			final Pair<Boolean, Boolean> anyFlagsTypes,
-			boolean isDuplicate) {
+			final boolean isDuplicate) {
 		final Rectangle2D fieldBounds = new Rectangle2D.Double(bounds.getX(), rowY, bounds.getWidth(), DiagramCanvas.CLASS_ROW_HEIGHT);
 
 		g2.setColor(fieldModel.getBackgroundColor());
@@ -631,15 +632,15 @@ public interface ElementRenderer extends DiagramCanvasExt {
 
 			if (fieldModel.hasFlags()) {
 				if (fieldModel.isPrimaryKey()) {
-					g2.drawString(FieldModel.PRIMARY_KEY_FLAG, x, y);
+					g2.drawString(TagsOwner.PRIMARY_KEY_FLAG, x, y);
 				}
-				x += this.getCanvas().stringWidth(DiagramCanvas.BODY_FONT, FieldModel.PRIMARY_KEY_FLAG) + DiagramCanvas.TEXT_PADDING;
+				x += this.getCanvas().stringWidth(DiagramCanvas.BODY_FONT, TagsOwner.PRIMARY_KEY_FLAG) + DiagramCanvas.TEXT_PADDING;
 				if (fieldModel.isUnique()) {
-					g2.drawString(FieldModel.UNIQUE_FLAG, x, y);
+					g2.drawString(TagsOwner.UNIQUE_FLAG, x, y);
 				}
-				x += this.getCanvas().stringWidth(DiagramCanvas.BODY_FONT, FieldModel.NOT_NULL_FLAG) + DiagramCanvas.TEXT_PADDING;
+				x += this.getCanvas().stringWidth(DiagramCanvas.BODY_FONT, TagsOwner.NOT_NULL_FLAG) + DiagramCanvas.TEXT_PADDING;
 				if (fieldModel.isNonNull()) {
-					g2.drawString(FieldModel.NOT_NULL_FLAG, x, y);
+					g2.drawString(TagsOwner.NOT_NULL_FLAG, x, y);
 				}
 			}
 		}
@@ -673,9 +674,9 @@ public interface ElementRenderer extends DiagramCanvasExt {
 	default Triplet<Double, Double, Double> resolveClassColumWidths(final List<FieldModel> visibleFields) {
 		double maxStringWidth = 0;
 		final double maxFlagWidth = DiagramCanvas.TEXT_PADDING * 2
-				+ this.getCanvas().stringWidth(DiagramCanvas.BODY_FONT, FieldModel.PRIMARY_KEY_FLAG)
-				+ this.getCanvas().stringWidth(DiagramCanvas.BODY_FONT, FieldModel.NOT_NULL_FLAG)
-				+ this.getCanvas().stringWidth(DiagramCanvas.BODY_FONT, FieldModel.UNIQUE_FLAG);
+				+ this.getCanvas().stringWidth(DiagramCanvas.BODY_FONT, TagsOwner.PRIMARY_KEY_FLAG)
+				+ this.getCanvas().stringWidth(DiagramCanvas.BODY_FONT, TagsOwner.NOT_NULL_FLAG)
+				+ this.getCanvas().stringWidth(DiagramCanvas.BODY_FONT, TagsOwner.UNIQUE_FLAG);
 		boolean hasFlags = false;
 		double maxTypeWidth = 0;
 
@@ -697,9 +698,9 @@ public interface ElementRenderer extends DiagramCanvasExt {
 	default Pair<Triplet<Double, Double, Double>, Pair<Boolean, Boolean>> resolveClassFieldProps(final List<FieldModel> visibleFields) {
 		double maxStringWidth = 0;
 		final double maxFlagWidth = DiagramCanvas.TEXT_PADDING * 2
-				+ this.getCanvas().stringWidth(DiagramCanvas.BODY_FONT, FieldModel.PRIMARY_KEY_FLAG)
-				+ this.getCanvas().stringWidth(DiagramCanvas.BODY_FONT, FieldModel.NOT_NULL_FLAG)
-				+ this.getCanvas().stringWidth(DiagramCanvas.BODY_FONT, FieldModel.UNIQUE_FLAG);
+				+ this.getCanvas().stringWidth(DiagramCanvas.BODY_FONT, TagsOwner.PRIMARY_KEY_FLAG)
+				+ this.getCanvas().stringWidth(DiagramCanvas.BODY_FONT, TagsOwner.NOT_NULL_FLAG)
+				+ this.getCanvas().stringWidth(DiagramCanvas.BODY_FONT, TagsOwner.UNIQUE_FLAG);
 		boolean hasFlags = false;
 		boolean hasType = false;
 		double maxTypeWidth = 0;

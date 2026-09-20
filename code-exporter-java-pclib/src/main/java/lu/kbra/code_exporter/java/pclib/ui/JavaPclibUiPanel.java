@@ -12,9 +12,10 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+import lu.kbra.model_exporter.api.UiProvider;
+
 import lombok.Getter;
 import lombok.Setter;
-import lu.kbra.model_exporter.api.UiProvider;
 
 @Getter
 @Setter
@@ -245,6 +246,5 @@ public class JavaPclibUiPanel extends JPanel {
 		this.comboBoxDbms.addActionListener(
 				a -> this.chckbxSplitBySchema.setEnabled("PostgreSQL".equals(this.comboBoxDbms.getSelectedItem().toString())));
 	}
-
 
 }

@@ -182,15 +182,15 @@ public class App {
 	public static void editConfig(final Consumer<AppConfigEditor> configEditor) {
 		App.CONFIG.edit(configEditor);
 		try {
-			CONFIG_HOOKS.parallelStream().forEach(v -> v.accept(App.CONFIG));
-		} catch (Exception e) {
+			App.CONFIG_HOOKS.parallelStream().forEach(v -> v.accept(App.CONFIG));
+		} catch (final Exception e) {
 			e.printStackTrace();
 		}
 		App.saveConfig();
 	}
 
-	public static void addConfigHook(Consumer<AppConfig> appConfig) {
-		CONFIG_HOOKS.add(appConfig);
+	public static void addConfigHook(final Consumer<AppConfig> appConfig) {
+		App.CONFIG_HOOKS.add(appConfig);
 	}
 
 }

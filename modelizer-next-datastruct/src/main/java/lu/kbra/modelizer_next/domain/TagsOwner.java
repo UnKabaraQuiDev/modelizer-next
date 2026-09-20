@@ -14,15 +14,15 @@ public interface TagsOwner {
 	void setTags(FieldTags tags);
 
 	default boolean isPrimaryKey() {
-		return getTags().isPrimaryKey();
+		return this.getTags().isPrimaryKey();
 	}
 
 	default boolean isNonNull() {
-		return getTags().isNonNull();
+		return this.getTags().isNonNull();
 	}
 
 	default boolean isUnique() {
-		return getTags().isUnique();
+		return this.getTags().isUnique();
 	}
 
 	default void setPrimaryKey(final boolean primaryKey) {
@@ -45,13 +45,13 @@ public interface TagsOwner {
 	default List<String> getFlags() {
 		final List<String> ll = new ArrayList<>();
 		if (this.isPrimaryKey()) {
-			ll.add(FieldModel.PRIMARY_KEY_FLAG);
+			ll.add(TagsOwner.PRIMARY_KEY_FLAG);
 		}
 		if (this.isNonNull()) {
-			ll.add(FieldModel.NOT_NULL_FLAG);
+			ll.add(TagsOwner.NOT_NULL_FLAG);
 		}
 		if (this.isUnique()) {
-			ll.add(FieldModel.UNIQUE_FLAG);
+			ll.add(TagsOwner.UNIQUE_FLAG);
 		}
 		return ll;
 	}

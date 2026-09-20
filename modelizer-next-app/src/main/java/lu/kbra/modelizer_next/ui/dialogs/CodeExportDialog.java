@@ -9,7 +9,7 @@ public class CodeExportDialog extends ModelExportDialog {
 
 	private static final long serialVersionUID = -7781548246931909377L;
 
-	public CodeExportDialog(MainFrame mainFrame, ModelExporter service, ExporterOptionRef ref) {
+	public CodeExportDialog(final MainFrame mainFrame, final ModelExporter service, final ExporterOptionRef ref) {
 		super(mainFrame, service, ref);
 
 		if (service.getExporterType() != ExporterType.CODE) {

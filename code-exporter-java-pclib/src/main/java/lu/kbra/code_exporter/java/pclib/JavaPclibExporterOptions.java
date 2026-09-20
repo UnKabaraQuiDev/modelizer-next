@@ -4,11 +4,12 @@ import java.nio.file.Path;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lu.kbra.model_exporter.api.ExporterOptions;
 import lu.kbra.modelizer_next.utils.RelativePathSerializer;
 import lu.kbra.pclib.PCUtils;
+
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode
@@ -28,16 +29,16 @@ public class JavaPclibExporterOptions implements ExporterOptions {
 
 	private String tablePackage;
 	private String dataPackage;
-	
+
 	private boolean fixNamingConvention = true;
 	private boolean keepSimpleNames = true;
-	
+
 	private boolean useSpring = true;
 	private String springDeatabaseBean;
-	
+
 	private boolean overwriteFiles = false;
 	private boolean mergeFiles = false;
-	
+
 	private String dbms;
 
 	@Override

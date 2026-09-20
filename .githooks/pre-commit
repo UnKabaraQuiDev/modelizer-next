@@ -1,0 +1,19 @@
+#!/bin/sh
+
+echo "Running Spotless..."
+
+staged_files=$(git diff --cached --name-only)
+
+mvn -Pformat initialize spotless:apply
+status=$?
+
+if [ $status -ne 0 ]; then
+    echo "Spotless failed. Commit aborted."
+    exit 1
+fi
+
+if [ -n "$staged_files" ]; then
+    echo "$staged_files" | xargs -r git add --
+fi
+
+exit 0

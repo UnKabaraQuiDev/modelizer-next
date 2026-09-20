@@ -150,7 +150,7 @@ interface MouseInteractionController extends DiagramCanvasExt {
 		this.getCanvas().requestFocusInWindow();
 		this.getCanvas().lastScreenPoint = event.getPoint();
 
-		if (SwingUtilities.isMiddleMouseButton(event) || (App.CONFIG.isEmulateMiddleClick() && SwingUtilities.isLeftMouseButton(event))) {
+		if (SwingUtilities.isMiddleMouseButton(event) || App.CONFIG.isEmulateMiddleClick() && SwingUtilities.isLeftMouseButton(event)) {
 			this.getCanvas().panning = true;
 			this.getCanvas().setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
 			return;

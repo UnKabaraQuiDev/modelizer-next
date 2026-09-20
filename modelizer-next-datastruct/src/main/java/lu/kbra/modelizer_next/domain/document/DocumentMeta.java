@@ -26,9 +26,9 @@ public class DocumentMeta {
 		this.name = "Untitled";
 		this.createdAt = Instant.now();
 		this.updatedAt = this.createdAt;
-		this.applicationVersion = APP_VERSION;
+		this.applicationVersion = DocumentMeta.APP_VERSION;
 
-		if (APP_VERSION == null) {
+		if (DocumentMeta.APP_VERSION == null) {
 			throw new IllegalStateException("VERSION hasn't been initialized yet.");
 		}
 	}

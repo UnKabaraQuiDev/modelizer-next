@@ -350,7 +350,7 @@ interface LinkGeometryResolver extends DiagramCanvasExt {
 //					? this.getCanvas().resolvePreviewTargetAnchor(this.getCanvas().linkPreviewTarget)
 //					: this.getCanvas().linkPreviewMousePoint;
 //			return this.getCanvas().resolveConceptualPreviewAnchor(source.classId(), reference);
-			return getCanvas().linkCreationState.origin();
+			return this.getCanvas().linkCreationState.origin();
 		}
 
 		final SelectedElement source = this.getCanvas().getLinkCreationSource();

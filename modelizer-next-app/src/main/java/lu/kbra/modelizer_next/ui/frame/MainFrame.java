@@ -35,10 +35,6 @@ import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
-import io.github.andrewauclair.moderndocking.DockingRegion;
-import io.github.andrewauclair.moderndocking.app.Docking;
-import io.github.andrewauclair.moderndocking.app.RootDockingPanel;
-import lombok.Getter;
 import lu.kbra.model_exporter.api.ModelExporter;
 import lu.kbra.modelizer_next.MNMain;
 import lu.kbra.modelizer_next.bootstrap.AvailableUpdate;
@@ -60,6 +56,11 @@ import lu.kbra.modelizer_next.ui.impl.DocumentChangeListener;
 import lu.kbra.modelizer_next.ui.impl.DocumentLoadHandler;
 import lu.kbra.pclib.PCUtils;
 import lu.kbra.pclib.datastructure.tuple.Pair;
+
+import io.github.andrewauclair.moderndocking.DockingRegion;
+import io.github.andrewauclair.moderndocking.app.Docking;
+import io.github.andrewauclair.moderndocking.app.RootDockingPanel;
+import lombok.Getter;
 
 /**
  * Main Swing window for editing Modelizer Next documents.
@@ -97,8 +98,8 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 				return null;
 			}
 		}).filter(Objects::nonNull).toList();
-		System.out.println("Found: " + modelExporters.size() + " exporters\n"
-				+ modelExporters.stream()
+		System.out.println("Found: " + MainFrame.modelExporters.size() + " exporters\n"
+				+ MainFrame.modelExporters.stream()
 						.map(c -> " * [" + c.getExporterType() + "] " + c.getExporterId())
 						.collect(Collectors.joining("\n")));
 	}

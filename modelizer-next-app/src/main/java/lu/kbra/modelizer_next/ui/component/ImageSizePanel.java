@@ -24,7 +24,7 @@ public class ImageSizePanel extends JPanel {
 
 	public ImageSizePanel() {
 		final GridBagLayout gridBagLayout = new GridBagLayout();
-		gridBagLayout.columnWidths = new int[] {120, 0, 0, 0, 0, 0};
+		gridBagLayout.columnWidths = new int[] { 120, 0, 0, 0, 0, 0 };
 		gridBagLayout.rowHeights = new int[] { 0, 0, 0 };
 		gridBagLayout.columnWeights = new double[] { 0.0, 1.0, 1.0, 1.0, 1.0, Double.MIN_VALUE };
 		gridBagLayout.rowWeights = new double[] { 0.0, 0.0, Double.MIN_VALUE };
@@ -75,13 +75,13 @@ public class ImageSizePanel extends JPanel {
 		gbc_lblComputedSize.gridx = 0;
 		gbc_lblComputedSize.gridy = 1;
 		this.add(lblComputedSize, gbc_lblComputedSize);
-		
-				this.lblWidth = new JLabel(".");
-				final GridBagConstraints gbc_lblWidth_1 = new GridBagConstraints();
-				gbc_lblWidth_1.insets = new Insets(0, 0, 0, 5);
-				gbc_lblWidth_1.gridx = 1;
-				gbc_lblWidth_1.gridy = 1;
-				this.add(this.lblWidth, gbc_lblWidth_1);
+
+		this.lblWidth = new JLabel(".");
+		final GridBagConstraints gbc_lblWidth_1 = new GridBagConstraints();
+		gbc_lblWidth_1.insets = new Insets(0, 0, 0, 5);
+		gbc_lblWidth_1.gridx = 1;
+		gbc_lblWidth_1.gridy = 1;
+		this.add(this.lblWidth, gbc_lblWidth_1);
 
 		this.lblHeight = new JLabel(".");
 		final GridBagConstraints gbc_lblHeight_1 = new GridBagConstraints();

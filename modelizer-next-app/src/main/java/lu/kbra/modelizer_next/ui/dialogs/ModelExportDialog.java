@@ -19,9 +19,7 @@ import javax.swing.SwingWorker;
 import javax.swing.WindowConstants;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import lombok.Getter;
 import lu.kbra.model_exporter.api.ExportContext;
-import lu.kbra.model_exporter.api.ExportFailedException;
 import lu.kbra.model_exporter.api.ExportUpdateCallback;
 import lu.kbra.model_exporter.api.ExporterApiContext;
 import lu.kbra.model_exporter.api.ExporterOptions;
@@ -32,6 +30,8 @@ import lu.kbra.modelizer_next.common.DefaultExportUpdateCallback;
 import lu.kbra.modelizer_next.common.ExporterOptionRef;
 import lu.kbra.modelizer_next.ui.frame.MainFrame;
 import lu.kbra.pclib.PCUtils;
+
+import lombok.Getter;
 
 @Getter
 public abstract class ModelExportDialog extends JDialog {

@@ -5,7 +5,7 @@ import java.awt.Dimension;
 public interface MaxDimensionOwner {
 
 	Dimension getMaxDimension();
-	
+
 	void setMaxDimension(Dimension maxSize);
-	
+
 }

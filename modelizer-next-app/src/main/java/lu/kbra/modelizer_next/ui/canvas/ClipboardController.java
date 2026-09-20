@@ -49,8 +49,8 @@ interface ClipboardController extends DiagramCanvasExt {
 	String MODELIZER_CLIPBOARD_MIME_TYPE = "application/x-modelizer-next; class=java.lang.String";
 	String PNG_CLIPBOARD_MIME_TYPE = "image/png; class=java.io.InputStream";
 
-	DataFlavor MODELIZER_CLIPBOARD_FLAVOR = ClipboardController.createDataFlavor(MODELIZER_CLIPBOARD_MIME_TYPE);
-	DataFlavor PNG_IMAGE_FLAVOR = ClipboardController.createDataFlavor(PNG_CLIPBOARD_MIME_TYPE);
+	DataFlavor MODELIZER_CLIPBOARD_FLAVOR = ClipboardController.createDataFlavor(ClipboardController.MODELIZER_CLIPBOARD_MIME_TYPE);
+	DataFlavor PNG_IMAGE_FLAVOR = ClipboardController.createDataFlavor(ClipboardController.PNG_CLIPBOARD_MIME_TYPE);
 
 	/**
 	 * Copies the selection.

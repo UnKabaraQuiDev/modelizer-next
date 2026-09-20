@@ -63,7 +63,7 @@ final class FileMenu extends JMenu {
 		final JMenu menu = new JMenu("Export image");
 
 		final List<JMenuItem> items = new ArrayList<>();
-		for (final ModelExporter service : frame.getModelExporters()) {
+		for (final ModelExporter service : MainFrame.getModelExporters()) {
 			if (service.getExporterType() != ExporterType.IMAGE) {
 				continue;
 			}
@@ -81,7 +81,7 @@ final class FileMenu extends JMenu {
 		final JMenu menu = new JMenu("Export code");
 
 		final List<JMenuItem> items = new ArrayList<>();
-		for (final ModelExporter service : frame.getModelExporters()) {
+		for (final ModelExporter service : MainFrame.getModelExporters()) {
 			if (service.getExporterType() != ExporterType.CODE) {
 				continue;
 			}

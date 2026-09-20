@@ -6,12 +6,13 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.function.Consumer;
 
+import lu.kbra.modelizer_next.ui.ThemeMode;
+import lu.kbra.pclib.PCUtils;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-import lu.kbra.modelizer_next.ui.ThemeMode;
-import lu.kbra.pclib.PCUtils;
 
 /**
  * User configuration loaded from and saved to the application configuration file.
@@ -108,31 +109,31 @@ public class AppConfig {
 		}
 
 		public ThemeMode getThemeMode() {
-			return themeMode;
+			return AppConfig.this.themeMode;
 		}
 
 		public String getSelectedPaletteName() {
-			return selectedPaletteName;
+			return AppConfig.this.selectedPaletteName;
 		}
 
 		public String getDefaultPaletteName() {
-			return defaultPaletteName;
+			return AppConfig.this.defaultPaletteName;
 		}
 
 		public boolean isAutoCheckUpdates() {
-			return autoCheckUpdates;
+			return AppConfig.this.autoCheckUpdates;
 		}
 
 		public String getSkippedUpdateVersion() {
-			return skippedUpdateVersion;
+			return AppConfig.this.skippedUpdateVersion;
 		}
 
 		public boolean isEmulateMiddleClick() {
-			return emulateMiddleClick;
+			return AppConfig.this.emulateMiddleClick;
 		}
 
 		public int getMaxRecentFileCount() {
-			return maxRecentFileCount;
+			return AppConfig.this.maxRecentFileCount;
 		}
 
 	}
