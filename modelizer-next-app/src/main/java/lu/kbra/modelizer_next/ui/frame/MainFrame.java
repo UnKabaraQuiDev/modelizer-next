@@ -85,7 +85,7 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 				.map(i -> new ImageIcon(PCUtils.readPackagedBytesFile(MainFrame.class, "/icons/icon-" + i + ".png")).getImage())
 				.toList());
 		ICON_IMAGES = p.getKey();
-//		System.out.println("Scaling icons took: " + (double) p.getValue() / 1_000 + "s");
+		System.out.println("Scaling icons took: " + (double) p.getValue() / 1_000 + "s");
 
 		ICON = MainFrame.ICON_IMAGES.get(MainFrame.ICON_IMAGES.size() - 1);
 		IMAGE_ICON = new ImageIcon(MainFrame.ICON);

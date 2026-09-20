@@ -12,10 +12,11 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-import lombok.Getter;
 import lu.kbra.model_exporter.api.ColorButton;
 import lu.kbra.model_exporter.api.UiProvider;
 import lu.kbra.modelizer_next.domain.data.ViewExportScope;
+
+import lombok.Getter;
 
 @Getter
 public class ImageExportPanel extends JPanel {

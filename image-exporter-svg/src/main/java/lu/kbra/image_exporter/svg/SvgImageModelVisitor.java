@@ -11,7 +11,6 @@ import org.apache.batik.svggen.SVGGraphics2D;
 import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Document;
 
-import lombok.Getter;
 import lu.kbra.model_exporter.api.CanvasRenderer;
 import lu.kbra.model_exporter.api.ExportFailedException;
 import lu.kbra.model_exporter.api.ExportUpdateCallback;
@@ -20,6 +19,8 @@ import lu.kbra.model_exporter.api.ImageModelVisitor;
 import lu.kbra.model_exporter.api.ModelVisitor;
 import lu.kbra.modelizer_next.domain.data.PanelType;
 import lu.kbra.modelizer_next.domain.document.ModelDocument;
+
+import lombok.Getter;
 
 @Getter
 public class SvgImageModelVisitor implements ModelVisitor {
