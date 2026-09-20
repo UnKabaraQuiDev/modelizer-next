@@ -14,4 +14,11 @@
 
 	<name>Image Exporter WEBP</name>
 
+	<dependencies>
+		<dependency>
+			<groupId>com.twelvemonkeys.imageio</groupId>
+			<artifactId>imageio-webp</artifactId>
+		</dependency>
+	</dependencies>
+
 </project>

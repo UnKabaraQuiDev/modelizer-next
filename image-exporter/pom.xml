@@ -19,6 +19,9 @@
 		<module>../image-exporter-png</module>
 		<module>../image-exporter-svg</module>
 		<module>../image-exporter-webp</module>
+		<module>../image-exporter-tif</module>
+		<module>../image-exporter-jpeg</module>
+		<module>../image-exporter-bmp</module>
 	</modules>
 
 	<dependencyManagement>

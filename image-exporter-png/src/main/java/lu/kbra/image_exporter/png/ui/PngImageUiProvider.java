@@ -1,7 +1,5 @@
 package lu.kbra.image_exporter.png.ui;
 
-import java.awt.Dimension;
-
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 

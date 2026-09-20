@@ -1,5 +1,6 @@
 package lu.kbra.image_exporter.png;
 
+import java.awt.image.BufferedImage;
 import java.nio.file.Path;
 
 import lu.kbra.model_exporter.api.ExporterOptions;
@@ -33,6 +34,16 @@ public class PngImageOptionsManager implements ImageOptionsManager {
 	@Override
 	public boolean supportsFixedSize() {
 		return true;
+	}
+
+	@Override
+	public boolean supportCompression() {
+		return true;
+	}
+
+	@Override
+	public int getImageType() {
+		return BufferedImage.TYPE_INT_ARGB;
 	}
 
 	@Override

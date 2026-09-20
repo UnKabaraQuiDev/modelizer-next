@@ -6,6 +6,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import lombok.Getter;
+import lu.kbra.model_exporter.api.ExportUpdateCallback;
 import lu.kbra.model_exporter.api.ModelVisitor;
 import lu.kbra.modelizer_next.domain.ClassModel;
 import lu.kbra.modelizer_next.domain.DiagramModel;
@@ -24,7 +25,7 @@ public class JavaPclibModelVisitor implements ModelVisitor {
 	}
 
 	@Override
-	public void visitDocument(ModelDocument file) {
+	public void visitDocument(ModelDocument file, ExportUpdateCallback callback) {
 		final DiagramModel model = file.getModel();
 		final Map<ClassModel, Pair<File, File>> classes = model.getClasses().stream().collect(Collectors.toMap(Function.identity(), c -> {
 			final String name = options.isFixNamingConvention() ? PCUtils.constantToCamelCase(c.getTechnicalName()) : c.getTechnicalName();

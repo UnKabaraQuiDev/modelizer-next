@@ -17,6 +17,7 @@ import lu.kbra.model_exporter.api.ImageExporterOptions;
 import lu.kbra.model_exporter.api.ImageOptionsManager;
 import lu.kbra.model_exporter.api.MaxDimensionOwner;
 import lu.kbra.model_exporter.api.ModelExporter;
+import lu.kbra.model_exporter.api.TransparencyOwner;
 import lu.kbra.modelizer_next.common.ExporterOptionRef;
 import lu.kbra.modelizer_next.domain.data.PanelType;
 import lu.kbra.modelizer_next.domain.data.ViewExportScope;
@@ -77,7 +78,9 @@ public class ImageExportDialog extends ModelExportDialog {
 		options.setOutputPath(Paths.get(this.imageExportPanel.getTextOutputPath().getText()));
 		options.setScope((ViewExportScope) this.imageExportPanel.getViewScope().getSelectedItem());
 		options.setBackgroundColor(Optional.ofNullable(this.imageExportPanel.getClrbtnColor().getSelectedColor()));
-		options.setTransparentBackground(this.imageExportPanel.getChckbxTransparentBackground().isSelected());
+		if (optionsManager.supportsTransparency()) {
+			((TransparencyOwner) options).setTransparentBackground(this.imageExportPanel.getChckbxTransparentBackground().isSelected());
+		}
 
 		final Set<PanelType> panels = EnumSet.noneOf(PanelType.class);
 		if (this.imageExportPanel.getChckbxConceptual().isSelected()) {
@@ -124,6 +127,13 @@ public class ImageExportDialog extends ModelExportDialog {
 			final Dimension maxDimension = ((MaxDimensionOwner) options).getMaxDimension();
 			this.imageSizePanel.getSpinWidth().setValue(maxDimension.width);
 			this.imageSizePanel.getSpinHeight().setValue(maxDimension.height);
+		}
+
+		if (optionsManager.supportsTransparency()) {
+			this.imageExportPanel.getChckbxTransparentBackground().setSelected(((TransparencyOwner) options2).isTransparentBackground());
+		} else {
+			this.imageExportPanel.getChckbxTransparentBackground().setSelected(false);
+			this.imageExportPanel.getChckbxTransparentBackground().setEnabled(false);
 		}
 	}
 

@@ -37,6 +37,21 @@
 			<artifactId>image-exporter-webp</artifactId>
 			<version>${revision}</version>
 		</dependency>
+		<dependency>
+			<groupId>lu.kbra</groupId>
+			<artifactId>image-exporter-tif</artifactId>
+			<version>${revision}</version>
+		</dependency>
+		<dependency>
+			<groupId>lu.kbra</groupId>
+			<artifactId>image-exporter-jpeg</artifactId>
+			<version>${revision}</version>
+		</dependency>
+		<dependency>
+			<groupId>lu.kbra</groupId>
+			<artifactId>image-exporter-bmp</artifactId>
+			<version>${revision}</version>
+		</dependency>
 	</dependencies>
 
 </project>

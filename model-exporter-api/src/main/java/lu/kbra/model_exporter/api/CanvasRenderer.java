@@ -14,7 +14,7 @@ public interface CanvasRenderer {
 	 * Creates an export image on the active canvas.
 	 *
 	 * @param scope export scope to use
-	 * @return the created export image
+	 * @return the created export image in BufferedImage.TYPE_INT_ARGB format
 	 */
 	BufferedImage createExportImage(final ViewExportScope scope, final Optional<Color> backgroundColor);
 

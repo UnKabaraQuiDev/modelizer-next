@@ -33,10 +33,9 @@ public interface ImageExporterOptions extends ExporterOptions {
 
 	void setBackgroundColor(Optional<Color> color);
 
-	boolean isTransparentBackground();
-
-	void setTransparentBackground(boolean selected);
-
 	String getExtension();
+	
+	@Override
+	ImageExporterOptions clone();
 
 }

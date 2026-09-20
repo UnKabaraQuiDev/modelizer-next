@@ -24,7 +24,7 @@ public class PngImageExporter implements ImageModelExporter {
 					"Options type not supported (" + (options == null ? "null" : options.getClass().getName()) + ").");
 		}
 
-		return new PngImageModelVisitor(pngOptions);
+		return new PngImageModelVisitor(this.optionsManager, pngOptions);
 	}
 
 	@Override

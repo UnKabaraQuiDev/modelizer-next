@@ -14,4 +14,22 @@
 
 	<name>Image Exporter SVG</name>
 
+	<dependencies>
+		<dependency>
+			<groupId>org.apache.xmlgraphics</groupId>
+			<artifactId>batik-svggen</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.xmlgraphics</groupId>
+			<artifactId>batik-dom</artifactId>
+			<exclusions>
+				<exclusion>
+					<groupId>xml-apis</groupId>
+					<artifactId>xml-apis</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+	</dependencies>
+
 </project>
