@@ -7,6 +7,7 @@ import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.Objects;
+import java.util.concurrent.ExecutionException;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -14,17 +15,20 @@ import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.SwingWorker;
 import javax.swing.WindowConstants;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import lombok.Getter;
 import lu.kbra.model_exporter.api.ExportContext;
 import lu.kbra.model_exporter.api.ExportFailedException;
+import lu.kbra.model_exporter.api.ExportUpdateCallback;
 import lu.kbra.model_exporter.api.ExporterApiContext;
 import lu.kbra.model_exporter.api.ExporterOptions;
 import lu.kbra.model_exporter.api.ModelExporter;
 import lu.kbra.model_exporter.api.SimpleExporterOptions;
 import lu.kbra.modelizer_next.MNMain;
+import lu.kbra.modelizer_next.common.DefaultExportUpdateCallback;
 import lu.kbra.modelizer_next.common.ExporterOptionRef;
 import lu.kbra.modelizer_next.ui.frame.MainFrame;
 import lu.kbra.pclib.PCUtils;
@@ -110,7 +114,7 @@ public abstract class ModelExportDialog extends JDialog {
 			@Override
 			public void windowClosing(final WindowEvent e) {
 				ModelExportDialog.this.options = ModelExportDialog.this.parsePanelOptions();
-				ref.setOptions(options);
+				ref.setOptions(ModelExportDialog.this.options);
 				if (ModelExportDialog.this.promptSaveCurrent(mainFrame)) {
 					ModelExportDialog.this.dispose();
 				}
@@ -146,7 +150,7 @@ public abstract class ModelExportDialog extends JDialog {
 		}
 
 		this.options = this.parsePanelOptions();
-		editingRef.setOptions(options);
+		this.editingRef.setOptions(this.options);
 
 		if (Objects.equals(this.options, this.original)) {
 			return true;
@@ -315,17 +319,45 @@ public abstract class ModelExportDialog extends JDialog {
 		this.restorePanelOption(this.options);
 	}
 
-	private void export(ActionEvent actionevent1) {
-		try {
-			ExporterApiContext.getApiContext().setContext(ExportContext.COMMAND_LINE);
-			ExporterApiContext.getApiContext().setCurrentConfig(editingRef.getFile());
-			ExporterApiContext.getApiContext().setCurrentDocument(mainFrame.getSession().getCurrentFile());
-			ExporterApiContext.getApiContext().setRenderers(pts -> mainFrame.getCanvasesByPanelType());
+	private void export(final ActionEvent actionevent1) {
+		final ExportProgressDialog progressDialog = new ExportProgressDialog(this.mainFrame);
 
-			service.buildModelVisitor(parsePanelOptions()).visitDocument(mainFrame.getSession().getDocument());
-		} catch (ExportFailedException e) {
-			e.printStackTrace();
-		}
+		progressDialog.setVisible(true);
+
+		final ExportUpdateCallback callback = DefaultExportUpdateCallback.create(progressDialog);
+
+		final SwingWorker<Void, Void> worker = new SwingWorker<>() {
+
+			@Override
+			protected Void doInBackground() throws Exception {
+				ExporterApiContext.getApiContext().setContext(ExportContext.COMMAND_LINE);
+				ExporterApiContext.getApiContext().setCurrentConfig(ModelExportDialog.this.editingRef.getFile());
+				ExporterApiContext.getApiContext().setCurrentDocument(ModelExportDialog.this.mainFrame.getSession().getCurrentFile());
+				ExporterApiContext.getApiContext().setRenderers(pts -> ModelExportDialog.this.mainFrame.getCanvasesByPanelType());
+
+				ModelExportDialog.this.service.buildModelVisitor(ModelExportDialog.this.parsePanelOptions())
+						.visitDocument(ModelExportDialog.this.mainFrame.getSession().getDocument(), callback);
+
+				return null;
+			}
+
+			@Override
+			protected void done() {
+				try {
+					this.get();
+				} catch (final InterruptedException e) {
+					Thread.currentThread().interrupt();
+				} catch (final ExecutionException e) {
+					final Throwable cause = e.getCause();
+
+					cause.printStackTrace();
+				} finally {
+					progressDialog.dispose();
+				}
+			}
+		};
+
+		worker.execute();
 	}
 
 }

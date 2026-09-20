@@ -23,6 +23,7 @@ import javax.imageio.stream.ImageOutputStream;
 import lombok.Getter;
 import lu.kbra.model_exporter.api.CanvasRenderer;
 import lu.kbra.model_exporter.api.ExportFailedException;
+import lu.kbra.model_exporter.api.ExportUpdateCallback;
 import lu.kbra.model_exporter.api.ExporterApiContext;
 import lu.kbra.model_exporter.api.ModelVisitor;
 import lu.kbra.modelizer_next.domain.data.PanelType;
@@ -41,13 +42,17 @@ public class PngImageModelVisitor implements ModelVisitor {
 	}
 
 	@Override
-	public void visitDocument(final ModelDocument file) throws ExportFailedException {
+	public void visitDocument(final ModelDocument file, ExportUpdateCallback callback) throws ExportFailedException {
+		callback = callback.createSubSection("Export: " + ExporterApiContext.getApiContext().getCurrentDocument() + " as " + format);
 		try {
 			final Map<PanelType, ? extends CanvasRenderer> renderers = ExporterApiContext.getApiContext()
 					.getRenderers()
 					.apply(this.options.getPanels());
 
+			int i = 0;
 			for (final PanelType pt : this.options.getPanels()) {
+				callback = callback.createSubSection(pt.name());
+				callback.setProgress(0);
 				BufferedImage image = renderers.get(pt)
 						.createExportImage(this.options.getScope(),
 								this.options.isTransparentBackground() ? Optional.empty() : this.options.getBackgroundColor());
@@ -110,7 +115,8 @@ public class PngImageModelVisitor implements ModelVisitor {
 
 				final Path outputFile = Paths.get(this
 						.ensureExtension(this.replacePlaceholders((this.options.getOutputPath().isAbsolute() ? this.options.getOutputPath()
-								: ExporterApiContext.getApiContext().getCurrentDocument().toPath().getParent()).resolve(this.options.getNameFormat())
+								: ExporterApiContext.getApiContext().getCurrentDocument().toPath().getParent())
+								.resolve(this.options.getNameFormat())
 								.toString(), pt), "png"));
 
 				try (OutputStream os = Files.newOutputStream(outputFile); ImageOutputStream ios = ImageIO.createImageOutputStream(os)) {
@@ -134,9 +140,20 @@ public class PngImageModelVisitor implements ModelVisitor {
 				} finally {
 					writer.dispose();
 				}
+				Thread.sleep(1000);
+				callback.setProgress(100f);
+				callback = callback.endSubSection();
+				i++;
+				callback.setProgress(100f / this.options.getPanels().size() * i);
 			}
+			callback.setProgress(100f);
 		} catch (final IOException e) {
 			throw new ExportFailedException(e);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} finally {
+			callback.endSubSection();
 		}
 	}
 

@@ -11,6 +11,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 import lu.kbra.modelizer_next.MNMain;
 import lu.kbra.modelizer_next.common.AppConfig.AppConfigEditor;
+import lu.kbra.modelizer_next.domain.document.DocumentMeta;
 import lu.kbra.pclib.PCUtils;
 
 /**
@@ -122,6 +123,7 @@ public class App {
 		App.NAME = App.JSON.path("name").asText();
 		App.DESCRIPTION = App.JSON.path("description").asText();
 		App.VERSION = App.JSON.path("version").asText();
+		DocumentMeta.APP_VERSION = App.VERSION;
 		App.DISTRIBUTOR = App.JSON.path("distributor").asText();
 		App.ISSUES_URL = App.JSON.path("issues").asText();
 		App.ENTRY_POINT = App.JSON.path("entryPoint").asText();

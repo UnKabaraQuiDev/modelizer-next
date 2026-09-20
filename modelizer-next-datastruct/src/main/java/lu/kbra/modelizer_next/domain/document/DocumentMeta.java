@@ -9,7 +9,7 @@ import java.util.UUID;
  */
 public class DocumentMeta {
 
-	public static String VERSION = null;
+	public static String APP_VERSION = null;
 
 	private String id;
 	@Deprecated
@@ -26,9 +26,9 @@ public class DocumentMeta {
 		this.name = "Untitled";
 		this.createdAt = Instant.now();
 		this.updatedAt = this.createdAt;
-		this.applicationVersion = VERSION;
+		this.applicationVersion = APP_VERSION;
 
-		if (VERSION == null) {
+		if (APP_VERSION == null) {
 			throw new IllegalStateException("VERSION hasn't been initialized yet.");
 		}
 	}
