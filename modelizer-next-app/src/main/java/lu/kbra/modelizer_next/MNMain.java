@@ -15,6 +15,7 @@ import com.fasterxml.jackson.core.json.JsonReadFeature;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.formdev.flatlaf.FlatDarkLaf;
 import com.formdev.flatlaf.FlatLightLaf;
@@ -23,6 +24,7 @@ import lu.kbra.modelizer_next.common.App;
 import lu.kbra.modelizer_next.common.AppConfig;
 import lu.kbra.modelizer_next.common.FileOpenBridge;
 import lu.kbra.modelizer_next.common.SystemThemeDetector;
+import lu.kbra.modelizer_next.json.CmdLineModule;
 import lu.kbra.modelizer_next.json.ColorModule;
 import lu.kbra.modelizer_next.json.LifecycleModule;
 import lu.kbra.modelizer_next.ui.ThemeMode;
@@ -121,9 +123,13 @@ public class MNMain {
 				.configure(JsonReadFeature.ALLOW_JAVA_COMMENTS, true)
 				.build());
 
+		mapper.registerModule(new Jdk8Module());
+
 		mapper.registerModule(new LifecycleModule());
 		mapper.registerModule(new JavaTimeModule());
 		mapper.registerModule(new ColorModule());
+
+		mapper.registerModule(new CmdLineModule());
 
 		mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 		mapper.enable(SerializationFeature.INDENT_OUTPUT);

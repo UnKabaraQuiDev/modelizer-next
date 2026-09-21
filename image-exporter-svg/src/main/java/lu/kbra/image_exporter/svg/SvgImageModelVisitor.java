@@ -4,6 +4,10 @@ import java.awt.Dimension;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.batik.dom.GenericDOMImplementation;
@@ -11,16 +15,16 @@ import org.apache.batik.svggen.SVGGraphics2D;
 import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Document;
 
+import lombok.Getter;
 import lu.kbra.model_exporter.api.CanvasRenderer;
 import lu.kbra.model_exporter.api.ExportFailedException;
 import lu.kbra.model_exporter.api.ExportUpdateCallback;
 import lu.kbra.model_exporter.api.ExporterApiContext;
 import lu.kbra.model_exporter.api.ImageModelVisitor;
+import lu.kbra.model_exporter.api.ModelVisitResult;
 import lu.kbra.model_exporter.api.ModelVisitor;
 import lu.kbra.modelizer_next.domain.data.PanelType;
 import lu.kbra.modelizer_next.domain.document.ModelDocument;
-
-import lombok.Getter;
 
 @Getter
 public class SvgImageModelVisitor implements ModelVisitor {
@@ -36,7 +40,8 @@ public class SvgImageModelVisitor implements ModelVisitor {
 	}
 
 	@Override
-	public void visitDocument(final ModelDocument file, ExportUpdateCallback callback) throws ExportFailedException {
+	public ModelVisitResult visitDocument(final ModelDocument file, ExportUpdateCallback callback) throws ExportFailedException {
+		final List<Path> outputFiles = new ArrayList<>(3);
 		callback = callback.createSubSection(
 				"Export: " + ExporterApiContext.getApiContext().getCurrentDocument() + " as " + SvgImageModelVisitor.format);
 		try {
@@ -63,7 +68,7 @@ public class SvgImageModelVisitor implements ModelVisitor {
 						.ensureExtension(
 								ImageModelVisitor
 										.replacePlaceholders((this.options.getOutputPath().isAbsolute() ? this.options.getOutputPath()
-												: ExporterApiContext.getApiContext().getCurrentDocument().toPath().getParent())
+												: Paths.get(ExporterApiContext.getApiContext().getCurrentDocument()).getParent())
 												.resolve(this.options.getNameFormat())
 												.toString(), pt),
 								"svg"));
@@ -71,8 +76,11 @@ public class SvgImageModelVisitor implements ModelVisitor {
 				try (FileWriter writer = new FileWriter(outputFile)) {
 					svgGraphics.stream(writer, true);
 				}
+				outputFiles.add(outputFile.toPath());
+
 				callback.setProgress(100f);
-				callback = callback.endSubSection();
+				callback = callback.endSubSection(
+						"Exported: " + ExporterApiContext.getApiContext().getCurrentDocument() + ":" + pt + " to: " + outputFile);
 				i++;
 				callback.setProgress(100f / this.options.getPanels().size() * i);
 			}
@@ -80,8 +88,10 @@ public class SvgImageModelVisitor implements ModelVisitor {
 		} catch (final IOException e) {
 			throw new ExportFailedException(e);
 		} finally {
-			callback.endSubSection();
+			callback.endSubSection(null);
 		}
+
+		return new ModelVisitResult(outputFiles);
 	}
 
 }

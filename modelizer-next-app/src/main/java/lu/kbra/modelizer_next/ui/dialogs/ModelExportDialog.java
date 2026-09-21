@@ -19,6 +19,7 @@ import javax.swing.SwingWorker;
 import javax.swing.WindowConstants;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import lombok.Getter;
 import lu.kbra.model_exporter.api.ExportContext;
 import lu.kbra.model_exporter.api.ExportUpdateCallback;
 import lu.kbra.model_exporter.api.ExporterApiContext;
@@ -30,8 +31,6 @@ import lu.kbra.modelizer_next.common.DefaultExportUpdateCallback;
 import lu.kbra.modelizer_next.common.ExporterOptionRef;
 import lu.kbra.modelizer_next.ui.frame.MainFrame;
 import lu.kbra.pclib.PCUtils;
-
-import lombok.Getter;
 
 @Getter
 public abstract class ModelExportDialog extends JDialog {
@@ -68,10 +67,6 @@ public abstract class ModelExportDialog extends JDialog {
 			ref.setOptions(this.options);
 			this.original = this.options.clone();
 		}
-
-		ExporterApiContext.clearApiContext();
-		ExporterApiContext.getApiContext().setCurrentDocument(mainFrame.getSession().getCurrentFile());
-		ExporterApiContext.getApiContext().setCurrentConfig(ref.getFile());
 
 		final JPanel contentPane = new JPanel(new BorderLayout());
 		contentPane.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
@@ -330,9 +325,14 @@ public abstract class ModelExportDialog extends JDialog {
 
 			@Override
 			protected Void doInBackground() throws Exception {
-				ExporterApiContext.getApiContext().setContext(ExportContext.COMMAND_LINE);
-				ExporterApiContext.getApiContext().setCurrentConfig(ModelExportDialog.this.editingRef.getFile());
-				ExporterApiContext.getApiContext().setCurrentDocument(ModelExportDialog.this.mainFrame.getSession().getCurrentFile());
+				ExporterApiContext.clearApiContext();
+				ExporterApiContext.getApiContext().setContext(ExportContext.GUI);
+				ExporterApiContext.getApiContext()
+						.setCurrentConfig(ModelExportDialog.this.editingRef.getFile() == null ? null
+								: ModelExportDialog.this.editingRef.getFile().toURI());
+				ExporterApiContext.getApiContext()
+						.setCurrentDocument(ModelExportDialog.this.mainFrame.getSession().getCurrentFile() == null ? null
+								: ModelExportDialog.this.mainFrame.getSession().getCurrentFile().toURI());
 				ExporterApiContext.getApiContext().setRenderers(pts -> ModelExportDialog.this.mainFrame.getCanvasesByPanelType());
 
 				ModelExportDialog.this.service.buildModelVisitor(ModelExportDialog.this.parsePanelOptions())

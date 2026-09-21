@@ -13,6 +13,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -25,15 +26,20 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
+import lu.kbra.model_exporter.api.ExportContext;
+import lu.kbra.model_exporter.api.ExportUpdateCallback;
+import lu.kbra.model_exporter.api.ExporterApiContext;
+import lu.kbra.model_exporter.api.ImageExporterOptions;
+import lu.kbra.model_exporter.api.ModelExporter;
+import lu.kbra.model_exporter.api.ModelVisitResult;
+import lu.kbra.modelizer_next.common.DefaultExportUpdateCallback;
+import lu.kbra.modelizer_next.common.ExportSectionListener;
 import lu.kbra.modelizer_next.domain.data.PanelType;
 import lu.kbra.modelizer_next.domain.document.ModelDocument;
 import lu.kbra.modelizer_next.ui.canvas.DiagramCanvas;
-import lu.kbra.modelizer_next.ui.export.ViewExportRequest;
-import lu.kbra.modelizer_next.ui.export.ViewExporter;
 import lu.kbra.modelizer_next.ui.frame.DocumentSession;
 import lu.kbra.modelizer_next.ui.frame.MainFrame;
 import lu.kbra.modelizer_next.ui.impl.DocumentChangeListener;
-import lu.kbra.pclib.datastructure.tuple.Triplet;
 import lu.kbra.pclib.pointer.prim.IntPointer;
 
 /**
@@ -131,21 +137,16 @@ public final class CommandLineExporter {
 
 	}
 
-	/**
-	 * Runs the full operation represented by this class.
-	 *
-	 * @param args command-line arguments supplied by the launcher
-	 * @return the run result
-	 */
 	public static int run(final String[] args) {
 		System.setProperty("java.awt.headless", "true");
 
 		try {
+			ExporterApiContext.getApiContext().setContext(ExportContext.CLI);
+			Exporters.init();
+
 			final CommandLineExportOptions options = CommandLineExportParser.parse(args);
 			final List<URI> inputFiles = CommandLineExporter.resolveInputFiles(options.inputFile(), options.multiple(), options.wildcard());
 			final ModelDocumentProducer documentProducer = new InputFileDocumentProducer(inputFiles, options.force());
-			final ViewExportRequest request = new ViewExportRequest(options
-					.format(), options.scope(), options.panelTypes(), options.outputDirectory(), options.fileNamePattern(), false, false);
 
 			final IntPointer exportedFileCount = new IntPointer(0);
 
@@ -153,31 +154,57 @@ public final class CommandLineExporter {
 			final ScheduledExecutorService executor = Executors.newScheduledThreadPool(jobCount);
 			final List<Exception> caughtException = Collections.synchronizedList(new ArrayList<>());
 
-			Optional<LoadedDocument> loadedDocument;
-			while ((loadedDocument = documentProducer.next()).isPresent()) {
-				final LoadedDocument doc = loadedDocument.get();
-				executor.submit(() -> {
-					try {
-						final Map<PanelType, DiagramCanvas> canvases = CommandLineExporter.createCanvases(doc.document(),
-								options.panelTypes());
+			final ModelExporter exporter = options.exporter();
 
-						if (canvases.isEmpty()) {
-							System.err.println("Nothing to export for: " + doc.sourceFile().getPath());
-							return;
+			final DefaultExportUpdateCallback updateCallback = DefaultExportUpdateCallback.create(new ExportSectionListener() {
+
+				@Override
+				public void sectionDeleted(ExportUpdateCallback parent, ExportUpdateCallback section) {
+					System.out.println("[V] " + section.getEndMessage());
+				}
+
+				@Override
+				public void sectionCreated(ExportUpdateCallback parent, ExportUpdateCallback section) {
+
+				}
+
+				@Override
+				public void progressUpdated(ExportUpdateCallback parent, ExportUpdateCallback section) {
+
+				}
+
+			});
+
+			System.out.println();
+			switch (exporter.getExporterType()) {
+			case IMAGE -> {
+				final ImageExporterOptions config = (ImageExporterOptions) options.options();
+
+				Optional<LoadedDocument> loadedDocument;
+				while ((loadedDocument = documentProducer.next()).isPresent()) {
+					final LoadedDocument doc = loadedDocument.get();
+					executor.submit(() -> {
+						try {
+							ExporterApiContext.clearApiContext();
+							ExporterApiContext.getApiContext().setContext(ExportContext.CLI);
+							ExporterApiContext.getApiContext().setCurrentConfig(options.configFile());
+							ExporterApiContext.getApiContext().setCurrentDocument(doc.sourceFile());
+							ExporterApiContext.getApiContext().setRenderers(pt -> CommandLineExporter.createCanvases(doc.document(), pt));
+
+							final ModelVisitResult result = exporter.buildModelVisitor(config)
+									.visitDocument(doc.document(), updateCallback);
+
+							exportedFileCount.add(result.exportedFiles().size());
+						} catch (final Exception e) {
+							caughtException.add(e);
+							executor.shutdownNow();
 						}
-
-						final List<Triplet<Optional<URI>, PanelType, File>> exportedFiles = ViewExporter.exportViews(canvases,
-								request,
-								Optional.of(doc.sourceFile()),
-								triplet -> System.out.println("" + triplet.getFirst().map(c -> Paths.get(c).toFile().getName()).orElse("?")
-										+ "\t" + triplet.getSecond().name() + "\t" + triplet.getThird().getPath()));
-
-						exportedFileCount.add(exportedFiles.size());
-					} catch (final Exception e) {
-						caughtException.add(e);
-						executor.shutdownNow();
-					}
-				});
+					});
+				}
+			}
+			case CODE -> {
+				throw new UnsupportedOperationException();
+			}
 			}
 
 			executor.shutdown();
@@ -249,10 +276,10 @@ public final class CommandLineExporter {
 	 * @param requestedPanelTypes values for requested panel types
 	 * @return the created canvases
 	 */
-	private static Map<PanelType, DiagramCanvas> createCanvases(final ModelDocument document, final List<PanelType> requestedPanelTypes) {
+	private static Map<PanelType, DiagramCanvas> createCanvases(final ModelDocument document, final Set<PanelType> requestedPanelTypes) {
 		final Map<PanelType, DiagramCanvas> canvases = new LinkedHashMap<>();
 
-		final List<PanelType> panelTypes = requestedPanelTypes == null || requestedPanelTypes.isEmpty() ? List.of(PanelType.values())
+		final Set<PanelType> panelTypes = requestedPanelTypes == null || requestedPanelTypes.isEmpty() ? EnumSet.allOf(PanelType.class)
 				: requestedPanelTypes;
 
 		for (final PanelType panelType : panelTypes) {

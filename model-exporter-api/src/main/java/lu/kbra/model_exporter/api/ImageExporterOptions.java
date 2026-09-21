@@ -10,6 +10,8 @@ import lu.kbra.modelizer_next.domain.data.ViewExportScope;
 
 public interface ImageExporterOptions extends ExporterOptions {
 
+	String DEFAULT_NAME_FORMAT = "{FILENAME}-{PANEL}.{EXT}";
+
 	String getNameFormat();
 
 	void setNameFormat(String name);

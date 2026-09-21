@@ -1,15 +1,14 @@
 package lu.kbra.model_exporter.api;
 
-import java.io.File;
+import java.net.URI;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 
-import lu.kbra.modelizer_next.domain.data.PanelType;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lu.kbra.modelizer_next.domain.data.PanelType;
 
 @Data
 @NoArgsConstructor
@@ -18,8 +17,8 @@ public final class ExporterApiContext {
 
 	private static final ThreadLocal<ExporterApiContext> API_CONTEXT = ThreadLocal.withInitial(ExporterApiContext::new);
 
-	private File currentDocument;
-	private File currentConfig;
+	private URI currentDocument;
+	private URI currentConfig;
 	private ExportContext context = ExportContext.GUI;
 	private Function<Set<PanelType>, Map<PanelType, ? extends CanvasRenderer>> renderers;
 

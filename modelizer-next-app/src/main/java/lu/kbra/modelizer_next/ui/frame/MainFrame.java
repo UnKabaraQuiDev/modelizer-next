@@ -17,11 +17,8 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
-import java.util.ServiceLoader;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
@@ -35,11 +32,18 @@ import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
+import io.github.andrewauclair.moderndocking.DockingRegion;
+import io.github.andrewauclair.moderndocking.app.Docking;
+import io.github.andrewauclair.moderndocking.app.RootDockingPanel;
+import lombok.Getter;
+import lu.kbra.model_exporter.api.ExportContext;
+import lu.kbra.model_exporter.api.ExporterApiContext;
 import lu.kbra.model_exporter.api.ModelExporter;
 import lu.kbra.modelizer_next.MNMain;
 import lu.kbra.modelizer_next.bootstrap.AvailableUpdate;
 import lu.kbra.modelizer_next.bootstrap.UpdateRuntime;
 import lu.kbra.modelizer_next.bootstrap.UpdateRuntimes;
+import lu.kbra.modelizer_next.cmdline.Exporters;
 import lu.kbra.modelizer_next.common.App;
 import lu.kbra.modelizer_next.common.ExporterOptionRef;
 import lu.kbra.modelizer_next.domain.data.PanelType;
@@ -51,16 +55,10 @@ import lu.kbra.modelizer_next.ui.canvas.DiagramCanvas;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectionInfo;
 import lu.kbra.modelizer_next.ui.dialogs.CodeExportDialog;
 import lu.kbra.modelizer_next.ui.dialogs.ImageExportDialog;
-import lu.kbra.modelizer_next.ui.dialogs.ViewExportDialog;
 import lu.kbra.modelizer_next.ui.impl.DocumentChangeListener;
 import lu.kbra.modelizer_next.ui.impl.DocumentLoadHandler;
 import lu.kbra.pclib.PCUtils;
 import lu.kbra.pclib.datastructure.tuple.Pair;
-
-import io.github.andrewauclair.moderndocking.DockingRegion;
-import io.github.andrewauclair.moderndocking.app.Docking;
-import io.github.andrewauclair.moderndocking.app.RootDockingPanel;
-import lombok.Getter;
 
 /**
  * Main Swing window for editing Modelizer Next documents.
@@ -76,32 +74,24 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 	public static final ImageIcon IMAGE_ICON;
 	public static final List<Image> ICON_IMAGES;
 
-	@Getter
-	static final List<ModelExporter> modelExporters;
-
 	static {
-		final Pair<List<Image>, Long> p = PCUtils.millisTime(() -> MainFrame.WINDOW_ICON_SIZES.stream()
-				.sorted(Comparator.naturalOrder())
-				.map(i -> new ImageIcon(PCUtils.readPackagedBytesFile(MainFrame.class, "/icons/icon-" + i + ".png")).getImage())
-				.toList());
-		ICON_IMAGES = p.getKey();
-		System.out.println("Scaling icons took: " + (double) p.getValue() / 1_000 + "s");
+		if (ExporterApiContext.getApiContext().getContext() == ExportContext.GUI) {
+			final Pair<List<Image>, Long> p = PCUtils.millisTime(() -> MainFrame.WINDOW_ICON_SIZES.stream()
+					.sorted(Comparator.naturalOrder())
+					.map(i -> new ImageIcon(PCUtils.readPackagedBytesFile(MainFrame.class, "/icons/icon-" + i + ".png")).getImage())
+					.toList());
+			ICON_IMAGES = p.getKey();
+			System.out.println("Scaling icons took: " + (double) p.getValue() / 1_000 + "s");
 
-		ICON = MainFrame.ICON_IMAGES.get(MainFrame.ICON_IMAGES.size() - 1);
-		IMAGE_ICON = new ImageIcon(MainFrame.ICON);
+			ICON = MainFrame.ICON_IMAGES.get(MainFrame.ICON_IMAGES.size() - 1);
+			IMAGE_ICON = new ImageIcon(MainFrame.ICON);
+		} else {
+			ICON = null;
+			IMAGE_ICON = null;
+			ICON_IMAGES = null;
+		}
 
-		modelExporters = ServiceLoader.load(ModelExporter.class).stream().map(z -> {
-			try {
-				return z.get();
-			} catch (final Exception e) {
-				e.printStackTrace();
-				return null;
-			}
-		}).filter(Objects::nonNull).toList();
-		System.out.println("Found: " + MainFrame.modelExporters.size() + " exporters\n"
-				+ MainFrame.modelExporters.stream()
-						.map(c -> " * [" + c.getExporterType() + "] " + c.getExporterId())
-						.collect(Collectors.joining("\n")));
+		Exporters.init();
 	}
 
 	/**
@@ -548,7 +538,7 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 	 * @return true if a ModelExporter was found
 	 */
 	public boolean export(final String serviceId) {
-		for (final ModelExporter service : MainFrame.modelExporters) {
+		for (final ModelExporter service : Exporters.getModelExporters()) {
 			if (!service.getExporterId().equals(serviceId)) {
 				continue;
 			}

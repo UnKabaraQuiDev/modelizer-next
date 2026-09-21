@@ -17,6 +17,7 @@ import javax.swing.KeyStroke;
 
 import lu.kbra.model_exporter.api.ExporterType;
 import lu.kbra.model_exporter.api.ModelExporter;
+import lu.kbra.modelizer_next.cmdline.Exporters;
 import lu.kbra.modelizer_next.common.App;
 import lu.kbra.modelizer_next.common.OpenedFile;
 
@@ -63,7 +64,7 @@ final class FileMenu extends JMenu {
 		final JMenu menu = new JMenu("Export image");
 
 		final List<JMenuItem> items = new ArrayList<>();
-		for (final ModelExporter service : MainFrame.getModelExporters()) {
+		for (final ModelExporter service : Exporters.getModelExporters()) {
 			if (service.getExporterType() != ExporterType.IMAGE) {
 				continue;
 			}
@@ -81,7 +82,7 @@ final class FileMenu extends JMenu {
 		final JMenu menu = new JMenu("Export code");
 
 		final List<JMenuItem> items = new ArrayList<>();
-		for (final ModelExporter service : MainFrame.getModelExporters()) {
+		for (final ModelExporter service : Exporters.getModelExporters()) {
 			if (service.getExporterType() != ExporterType.CODE) {
 				continue;
 			}

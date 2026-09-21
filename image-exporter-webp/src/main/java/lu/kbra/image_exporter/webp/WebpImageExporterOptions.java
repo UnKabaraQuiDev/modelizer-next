@@ -8,6 +8,8 @@ import java.util.Set;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lu.kbra.model_exporter.api.ImageExporterOptions;
 import lu.kbra.model_exporter.api.MaxDimensionOwner;
 import lu.kbra.model_exporter.api.TransparencyOwner;
@@ -15,9 +17,6 @@ import lu.kbra.modelizer_next.domain.data.PanelType;
 import lu.kbra.modelizer_next.domain.data.ViewExportScope;
 import lu.kbra.modelizer_next.utils.RelativePathSerializer;
 import lu.kbra.pclib.PCUtils;
-
-import lombok.Data;
-import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode

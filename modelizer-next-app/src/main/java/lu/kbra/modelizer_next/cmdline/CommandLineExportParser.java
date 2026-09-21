@@ -2,17 +2,15 @@ package lu.kbra.modelizer_next.cmdline;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.stream.Collectors;
 
-import lu.kbra.modelizer_next.domain.data.PanelType;
-import lu.kbra.modelizer_next.domain.data.ViewExportScope;
-import lu.kbra.modelizer_next.ui.export.ViewExportFormat;
-import lu.kbra.modelizer_next.ui.export.ViewExporter;
+import lu.kbra.model_exporter.api.ExporterOptions;
+import lu.kbra.model_exporter.api.ModelExporter;
+import lu.kbra.modelizer_next.MNMain;
 
 /**
  * Parses and validates command-line arguments for unattended exports.
@@ -89,6 +87,11 @@ public final class CommandLineExportParser {
 
 	}
 
+	private static final String exporterOptions = Exporters.getModelExporters()
+			.stream()
+			.map(ModelExporter::getExporterId)
+			.collect(Collectors.joining("|"));
+
 	/**
 	 * Checks whether export request is enabled or applies.
 	 *
@@ -108,27 +111,25 @@ public final class CommandLineExportParser {
 	 */
 	public static CommandLineExportOptions parse(final String[] args) throws IOException {
 		String inputFile = null;
-		ViewExportFormat format = null;
-		ViewExportScope scope = ViewExportScope.EVERYTHING;
-		List<PanelType> panelTypes = List.of();
+		ModelExporter exporter = null;
 		File outputDirectory = new File(".");
-		String fileNamePattern = ViewExporter.DEFAULT_FILE_PATTERN;
+		URI configFile = null;
 		boolean force = false;
 		boolean multiple = false;
 		boolean wildcard = false;
 		int jobCount = 1;
 
-		for (int i = 0; i < args.length; i++) {
+		int index = -1;
+		for (int i = 0; i < args.length && index == -1; i++) {
 			final String arg = args[i];
 
 			switch (arg) {
 			case "-e", "--export" -> inputFile = CommandLineExportParser.requireValue(args, ++i, arg);
-			case "-t", "--type" -> format = CommandLineExportParser.parseFormat(CommandLineExportParser.requireValue(args, ++i, arg));
-			case "-s", "--scope" -> scope = CommandLineExportParser.parseScope(CommandLineExportParser.requireValue(args, ++i, arg));
-			case "-p", "--panels" -> panelTypes = CommandLineExportParser.parsePanels(CommandLineExportParser.requireValue(args, ++i, arg));
+			case "-t", "--type" -> exporter = CommandLineExportParser.parseFormat(CommandLineExportParser.requireValue(args, ++i, arg));
 			case "-o", "--out" ->
 				outputDirectory = CommandLineExportParser.resolveHome(CommandLineExportParser.requireValue(args, ++i, arg)).toFile();
-			case "-n", "--pattern" -> fileNamePattern = CommandLineExportParser.requireValue(args, ++i, arg);
+			case "-c", "--config" ->
+				configFile = CommandLineExportParser.resolveHome(CommandLineExportParser.requireValue(args, ++i, arg)).toUri();
 			case "-f", "--force" -> force = true;
 			case "-m", "--multiple" -> multiple = true;
 			case "-w", "--wildcard" -> wildcard = true;
@@ -137,6 +138,7 @@ public final class CommandLineExportParser {
 				CommandLineExportParser.printHelp();
 				throw new HelpRequestedException();
 			}
+			case "--" -> index = i;
 			default -> throw new MissingArgumentException("Unknown argument: " + arg);
 			}
 		}
@@ -145,8 +147,8 @@ public final class CommandLineExportParser {
 			throw new MissingArgumentException("Missing required argument: --export <file>");
 		}
 
-		if (format == null) {
-			throw new MissingArgumentException("Missing required argument: --type <png|jpg|bmp|tiff|webp|pdf>");
+		if (exporter == null) {
+			throw new MissingArgumentException("Missing required argument: --type <" + CommandLineExportParser.exporterOptions + ">");
 		}
 
 		if (!multiple && !wildcard && !CommandLineExportParser.resolveHome(inputFile).toFile().exists()) {
@@ -157,24 +159,27 @@ public final class CommandLineExportParser {
 			throw new MissingArgumentException("Could not create output directory: " + outputDirectory);
 		}
 
-		if (panelTypes.isEmpty()) {
-			throw new MissingArgumentException("Missing required argument: --panels <conceptual,logical,physical>");
+		if (configFile != null && !new File(configFile).exists()) {
+			throw new MissingArgumentException("Configuration file does not exist: " + configFile);
 		}
 
 		if (jobCount <= 0) {
 			throw new IllegalArgumentException("Job count cannot be zero or negative.");
 		}
 
-		return new CommandLineExportOptions(inputFile,
-				format,
-				scope,
-				panelTypes,
-				outputDirectory,
-				fileNamePattern,
-				force,
-				multiple,
-				wildcard,
-				jobCount);
+		final ExporterOptions config;
+		if (configFile != null && index > -1) {
+			throw new IllegalArgumentException("Cannot specify --config and manual -- inline options.");
+		} else if (configFile != null) {
+			config = MNMain.OBJECT_MAPPER.readValue(new File(configFile), exporter.getOptionsManager().getClassType());
+		} else if (index > -1) {
+			config = ArgsMapper
+					.parse(Arrays.copyOfRange(args, index, args.length), exporter.getOptionsManager().getClassType(), MNMain.OBJECT_MAPPER);
+		} else {
+			config = exporter.getOptionsManager().blankOptions();
+		}
+
+		return new CommandLineExportOptions(inputFile, exporter, outputDirectory, force, multiple, wildcard, jobCount, config, configFile);
 	}
 
 	/**
@@ -183,22 +188,24 @@ public final class CommandLineExportParser {
 	public static void printHelp() {
 		System.out.println("""
 				Usage:
-				  modelizer --export <file> --type <png|jpg|bmp|tiff|webp|pdf> [options]
+				  modelizer-next --export <file> --type <%EXPORTERS%> ([other options]) (-- [specific configurations])
 
 				Options:
 				  -e, --export <file>        File to load and export
-				  -t, --type <png|jpg|bmp|tiff|webp|pdf>       Export format
+				  -t, --type <%EXPORTERS%>   Export format
+				  -c, --config <file>        Export configuratio file
 				  -o, --out <directory>      Output directory, default: current directory
-				  -s, --scope <scope>        selection (s), view (v), everything/all (a), default: everything
-				  -p, --panels <list>        Comma-separated PanelType names: conceptual (c), logical (l), physical (p)
-				  -n, --pattern <pattern>    File name pattern, default: '%DEFAULT_FILE_PATTER%', available: %FILE_PATTERN_TOKENS%
 				  -f, --force                Continue on legacy/newer-version warnings
 				  -h, --help                 Print this help
 				  -m, --multiple             Multiple input files, separated by commas "path1,path2,path3..."
 				  -w, --wildcard             Enable wildcard support for input files, supports: *, **, ?
 				  -j, --jobs <count>         Dispatch multiple threads to speed up the export process
-				""".replace("%DEFAULT_FILE_PATTER%", ViewExporter.DEFAULT_FILE_PATTERN)
-				.replace("%FILE_PATTERN_TOKENS%", ViewExporter.FILE_PATTERN_TOKENS.stream().collect(Collectors.joining(", "))));
+
+				Examples:
+				  modelizer-next -e *.mn -w -t png
+				  modelizer-next -e oneFile.mn -t png -c png-export.mnie -- panels=c,l
+				  modelizer-next -e *.mn -w -t svg -- backgroundColor=#aabbcc
+				""".replace("%EXPORTERS%", CommandLineExportParser.exporterOptions));
 	}
 
 	/**
@@ -220,64 +227,14 @@ public final class CommandLineExportParser {
 	 * @param value value to process
 	 * @return the parsed format
 	 */
-	private static ViewExportFormat parseFormat(final String value) {
-		for (final ViewExportFormat format : ViewExportFormat.values()) {
-			if (format.getExtension().equalsIgnoreCase(value) || format.name().equalsIgnoreCase(value)) {
+	private static ModelExporter parseFormat(final String value) {
+		for (final ModelExporter format : Exporters.getModelExporters()) {
+			if (format.getExporterId().equalsIgnoreCase(value)) {
 				return format;
 			}
 		}
 
 		throw new MissingArgumentException("Unsupported export type: " + value);
-	}
-
-	/**
-	 * Parses the panels from the supplied input.
-	 *
-	 * @param value value to process
-	 * @return the parsed panels
-	 */
-	private static List<PanelType> parsePanels(final String value) {
-		if (value == null || value.isBlank()) {
-			return List.of();
-		}
-
-		final List<PanelType> result = new ArrayList<>();
-
-		for (final String rawPanel : value.split(",")) {
-			final String panel = rawPanel.trim().toUpperCase();
-
-			try {
-				if (panel.length() == 1) {
-					result.add(switch (panel.charAt(0)) {
-					case 'C' -> PanelType.CONCEPTUAL;
-					case 'L' -> PanelType.LOGICAL;
-					case 'P' -> PanelType.PHYSICAL;
-					default -> throw new InvalidArgumentException("Unsupported panel type: " + panel);
-					});
-				} else {
-					result.add(PanelType.valueOf(panel));
-				}
-			} catch (final IllegalArgumentException ex) {
-				throw new InvalidArgumentException("Unsupported panel type: " + panel, ex);
-			}
-		}
-
-		return result.stream().distinct().toList();
-	}
-
-	/**
-	 * Parses the scope from the supplied input.
-	 *
-	 * @param value value to process
-	 * @return the parsed scope
-	 */
-	private static ViewExportScope parseScope(final String value) {
-		return switch (value.toLowerCase()) {
-		case "selection", "e" -> ViewExportScope.SELECTION;
-		case "view", "v" -> ViewExportScope.VIEW;
-		case "everything", "all", "a" -> ViewExportScope.EVERYTHING;
-		default -> throw new MissingArgumentException("Unsupported export scope: " + value);
-		};
 	}
 
 	/**

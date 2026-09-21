@@ -1,5 +1,6 @@
 package lu.kbra.code_exporter.java.pclib;
 
+import lombok.Getter;
 import lu.kbra.code_exporter.java.pclib.ui.JavaPclibUiProvider;
 import lu.kbra.model_exporter.api.ExporterOptions;
 import lu.kbra.model_exporter.api.ExporterType;
@@ -7,8 +8,6 @@ import lu.kbra.model_exporter.api.ModelExporter;
 import lu.kbra.model_exporter.api.ModelVisitor;
 import lu.kbra.model_exporter.api.OptionsManager;
 import lu.kbra.model_exporter.api.UiProvider;
-
-import lombok.Getter;
 
 @Getter
 public class JavaPclibCodeExporter implements ModelExporter {

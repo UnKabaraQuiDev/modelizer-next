@@ -6,6 +6,7 @@ import java.awt.Image;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.net.URI;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -76,10 +77,10 @@ public interface UiProvider {
 
 		final String currentPath = field.getText();
 
-		final File currentDocumentFile = ExporterApiContext.getApiContext().getCurrentDocument();
+		final URI currentDocumentFile = ExporterApiContext.getApiContext().getCurrentDocument();
 
 		if (!currentPath.isBlank() && currentDocumentFile != null) {
-			final Path configDir = currentDocumentFile.toPath().getParent();
+			final Path configDir = Paths.get(currentDocumentFile).getParent();
 			final Path selectedPath = Paths.get(currentPath);
 
 			final Path resolvedPath = selectedPath.isAbsolute() ? selectedPath : configDir.resolve(selectedPath);
@@ -99,7 +100,7 @@ public interface UiProvider {
 
 		if (fileChooser.showOpenDialog(parent) == JFileChooser.APPROVE_OPTION) {
 			final String newPath = currentDocumentFile != null
-					? currentDocumentFile.toPath()
+					? Paths.get(currentDocumentFile)
 							.getParent()
 							.relativize(fileChooser.getSelectedFile().toPath().toAbsolutePath())
 							.toString()

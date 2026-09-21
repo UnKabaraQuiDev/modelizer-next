@@ -5,6 +5,8 @@ public interface ExportUpdateCallback {
 	ExportUpdateCallback createSubSection(String name);
 
 	String getName();
+	
+	String getEndMessage();
 
 	void setProgress(float percentage);
 
@@ -13,7 +15,7 @@ public interface ExportUpdateCallback {
 	/**
 	 * @return returns the parent
 	 */
-	ExportUpdateCallback endSubSection();
+	ExportUpdateCallback endSubSection(String message);
 
 	ExportUpdateCallback getParent();
 

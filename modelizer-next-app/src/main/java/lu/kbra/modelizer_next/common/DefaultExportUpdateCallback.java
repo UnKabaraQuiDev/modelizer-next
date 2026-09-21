@@ -16,6 +16,7 @@ public class DefaultExportUpdateCallback implements ExportUpdateCallback {
 	private final String name;
 	private final int depth;
 	private final ExportSectionListener listener;
+	private String endMessage;
 
 	/*
 	 * Only accessed while holding childrenLock.
@@ -83,13 +84,15 @@ public class DefaultExportUpdateCallback implements ExportUpdateCallback {
 	}
 
 	@Override
-	public ExportUpdateCallback endSubSection() {
+	public ExportUpdateCallback endSubSection(String endMessage) {
 		/*
 		 * close() is idempotent. This prevents two threads from deleting the same section twice.
 		 */
 		if (!this.closed.compareAndSet(false, true)) {
 			return this.parent;
 		}
+
+		this.endMessage = endMessage;
 
 		/*
 		 * The root has no parent. Ending it closes the entire transaction.

@@ -5,12 +5,15 @@ import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -26,7 +29,7 @@ import lu.kbra.pclib.PCUtils;
 
 public final class ImageModelVisitor {
 
-	public static void export(
+	public static ModelVisitResult export(
 			final ModelDocument file,
 			final ImageOptionsManager optionsManager,
 			final ImageExporterOptions options,
@@ -34,6 +37,7 @@ public final class ImageModelVisitor {
 			final String format,
 			final String extension)
 			throws ExportFailedException {
+		final List<Path> outputs = new ArrayList<>(3);
 		callback = callback.createSubSection("Export: " + ExporterApiContext.getApiContext().getCurrentDocument() + " as " + format);
 		try {
 			final Map<PanelType, ? extends CanvasRenderer> renderers = ExporterApiContext.getApiContext()
@@ -113,7 +117,7 @@ public final class ImageModelVisitor {
 								.ensureExtension(
 										ImageModelVisitor
 												.replacePlaceholders((options.getOutputPath().isAbsolute() ? options.getOutputPath()
-														: ExporterApiContext.getApiContext().getCurrentDocument().toPath().getParent())
+														: Paths.get(ExporterApiContext.getApiContext().getCurrentDocument()).getParent())
 														.resolve(options.getNameFormat())
 														.toString(), pt),
 										extension));
@@ -140,12 +144,14 @@ public final class ImageModelVisitor {
 					}
 
 					writer.write(null, new IIOImage(image, null, null), param);
+					outputs.add(outputFile);
 				} finally {
 					writer.dispose();
 				}
 
 				callback.setProgress(100f);
-				callback = callback.endSubSection();
+				callback = callback.endSubSection(
+						"Exported: " + ExporterApiContext.getApiContext().getCurrentDocument() + ":" + pt + " to: " + outputFile);
 				i++;
 				callback.setProgress(100f / options.getPanels().size() * i);
 			}
@@ -153,8 +159,10 @@ public final class ImageModelVisitor {
 		} catch (final IOException e) {
 			throw new ExportFailedException(e);
 		} finally {
-			callback.endSubSection();
+			callback.endSubSection(null);
 		}
+
+		return new ModelVisitResult(outputs);
 	}
 
 	private static BufferedImage convertImageType(final BufferedImage source, final int targetType, final Color backgroundColor) {
@@ -184,7 +192,9 @@ public final class ImageModelVisitor {
 	}
 
 	public static String replacePlaceholders(final String string, final PanelType panelType) {
-		return string.replace("{FILENAME}", PCUtils.removeFileExtension(ExporterApiContext.getApiContext().getCurrentDocument().getName()))
+		return string
+				.replace("{FILENAME}",
+						PCUtils.removeFileExtension(new File(ExporterApiContext.getApiContext().getCurrentDocument()).getName()))
 				.replace("{PANEL}", panelType.name());
 	}
 
