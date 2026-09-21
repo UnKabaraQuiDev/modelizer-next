@@ -5,14 +5,15 @@ import java.util.Objects;
 import java.util.ServiceLoader;
 import java.util.stream.Collectors;
 
-import lombok.Getter;
 import lu.kbra.model_exporter.api.ModelExporter;
+
+import lombok.Getter;
 
 public class Exporters {
 
 	@Getter
 	private static final List<ModelExporter> modelExporters;
-	
+
 	public static final String DEFAULT_FILE_PATTERN = "{FILENAME}-{PATTERN}.{EXT}";
 
 	static {

@@ -29,8 +29,9 @@ public class DimensionDeserializer extends JsonDeserializer<Dimension> {
 			return new Dimension(width.asInt(), height.asInt());
 		}
 
-		throw context
-				.weirdStringException(node.toString(), Dimension.class, "Expected '(width, height)', '[width, height]' or 'width, height' or an object with width and height");
+		throw context.weirdStringException(node.toString(),
+				Dimension.class,
+				"Expected '(width, height)', '[width, height]' or 'width, height' or an object with width and height");
 	}
 
 	private Dimension parseString(final String value, final DeserializationContext context) throws IOException {
@@ -44,7 +45,8 @@ public class DimensionDeserializer extends JsonDeserializer<Dimension> {
 		final String[] parts = input.split(",");
 
 		if (parts.length != 2) {
-			throw context.weirdStringException(value, Dimension.class, "Expected '(width, height)' or '[width, height]' or 'width, height'");
+			throw context
+					.weirdStringException(value, Dimension.class, "Expected '(width, height)' or '[width, height]' or 'width, height'");
 		}
 
 		try {

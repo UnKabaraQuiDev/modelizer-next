@@ -5,7 +5,6 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import lombok.Getter;
 import lu.kbra.model_exporter.api.ExportUpdateCallback;
 import lu.kbra.model_exporter.api.ModelVisitResult;
 import lu.kbra.model_exporter.api.ModelVisitor;
@@ -15,6 +14,8 @@ import lu.kbra.modelizer_next.domain.document.ModelDocument;
 import lu.kbra.pclib.PCUtils;
 import lu.kbra.pclib.datastructure.tuple.Pair;
 import lu.kbra.pclib.datastructure.tuple.Pairs;
+
+import lombok.Getter;
 
 @Getter
 public class JavaPclibModelVisitor implements ModelVisitor {

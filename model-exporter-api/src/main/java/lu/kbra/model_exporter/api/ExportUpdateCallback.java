@@ -5,7 +5,7 @@ public interface ExportUpdateCallback {
 	ExportUpdateCallback createSubSection(String name);
 
 	String getName();
-	
+
 	String getEndMessage();
 
 	void setProgress(float percentage);

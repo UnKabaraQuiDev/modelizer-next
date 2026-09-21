@@ -5,10 +5,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 
+import lu.kbra.modelizer_next.domain.data.PanelType;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lu.kbra.modelizer_next.domain.data.PanelType;
 
 @Data
 @NoArgsConstructor
