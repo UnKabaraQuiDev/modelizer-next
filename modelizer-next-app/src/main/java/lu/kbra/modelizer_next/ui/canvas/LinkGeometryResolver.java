@@ -10,9 +10,9 @@ import lu.kbra.modelizer_next.domain.ClassModel;
 import lu.kbra.modelizer_next.domain.CommentModel;
 import lu.kbra.modelizer_next.domain.LinkModel;
 import lu.kbra.modelizer_next.domain.data.PanelType;
-import lu.kbra.modelizer_next.layout.LayoutObjectType;
-import lu.kbra.modelizer_next.layout.LinkLayout;
-import lu.kbra.modelizer_next.layout.NodeLayout;
+import lu.kbra.modelizer_next.domain.layout.LayoutObjectType;
+import lu.kbra.modelizer_next.domain.layout.LinkLayout;
+import lu.kbra.modelizer_next.domain.layout.NodeLayout;
 import lu.kbra.modelizer_next.ui.canvas.data.AnchorSide;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.AnchorPair;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.FieldAnchor;
@@ -350,7 +350,7 @@ interface LinkGeometryResolver extends DiagramCanvasExt {
 //					? this.getCanvas().resolvePreviewTargetAnchor(this.getCanvas().linkPreviewTarget)
 //					: this.getCanvas().linkPreviewMousePoint;
 //			return this.getCanvas().resolveConceptualPreviewAnchor(source.classId(), reference);
-			return getCanvas().linkCreationState.origin();
+			return this.getCanvas().linkCreationState.origin();
 		}
 
 		final SelectedElement source = this.getCanvas().getLinkCreationSource();

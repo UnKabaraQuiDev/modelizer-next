@@ -15,7 +15,7 @@
 		<module>modelizer-next-app</module>
 		<module>modelizer-next-bootstrap</module>
 		<module>modelizer-next-datastruct</module>
-		<module>code-exporter</module>
+		<module>model-exporter</module>
 	</modules>
 
 	<properties>
@@ -25,6 +25,8 @@
 		<maven.compiler.source>${java.version}</maven.compiler.source>
 		<maven.compiler.target>${java.version}</maven.compiler.target>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<twelvemonkeys-imageio.version>3.14.0</twelvemonkeys-imageio.version>
+		<xmlgraphics-batik.version>1.19</xmlgraphics-batik.version>
 
 		<distributor>Manual build</distributor>
 		<appVersion>6</appVersion>
@@ -104,7 +106,7 @@
 			<dependency>
 				<groupId>lu.kbra</groupId>
 				<artifactId>pclib</artifactId>
-				<version>1.2.1-SNAPSHOT</version>
+				<version>1.2.1</version>
 				<scope>import</scope>
 				<type>pom</type>
 			</dependency>
@@ -132,8 +134,14 @@
 
 			<dependency>
 				<groupId>lu.kbra</groupId>
-				<artifactId>code-exporter-api</artifactId>
+				<artifactId>model-exporter-api</artifactId>
 				<version>${revision}</version>
+			</dependency>
+			<dependency>
+				<groupId>lu.kbra</groupId>
+				<artifactId>model-exporters</artifactId>
+				<version>${revision}</version>
+				<type>pom</type>
 			</dependency>
 
 			<dependency>
@@ -147,20 +155,11 @@
 				<version>1.4.9</version>
 			</dependency>
 			<dependency>
-				<groupId>org.apache.xmlgraphics</groupId>
-				<artifactId>batik-dom</artifactId>
-				<version>1.19</version>
-			</dependency>
-			<dependency>
-				<groupId>org.apache.xmlgraphics</groupId>
-				<artifactId>batik-svggen</artifactId>
-				<version>1.19</version>
-			</dependency>
-			<dependency>
 				<groupId>com.formdev</groupId>
 				<artifactId>flatlaf</artifactId>
 				<version>3.7.2</version>
 			</dependency>
+
 			<dependency>
 				<groupId>com.fasterxml.jackson.datatype</groupId>
 				<artifactId>jackson-datatype-jsr310</artifactId>
@@ -172,20 +171,47 @@
 				<version>2.22.2</version>
 			</dependency>
 			<dependency>
+				<groupId>com.fasterxml.jackson.datatype</groupId>
+				<artifactId>jackson-datatype-jdk8</artifactId>
+				<version>2.20.2</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.apache.xmlgraphics</groupId>
+				<artifactId>batik-dom</artifactId>
+				<version>${xmlgraphics-batik.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.xmlgraphics</groupId>
+				<artifactId>batik-svggen</artifactId>
+				<version>${xmlgraphics-batik.version}</version>
+			</dependency>
+			<dependency>
 				<groupId>com.twelvemonkeys.imageio</groupId>
 				<artifactId>imageio-jpeg</artifactId>
-				<version>3.14.0</version>
+				<version>${twelvemonkeys-imageio.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>com.twelvemonkeys.imageio</groupId>
 				<artifactId>imageio-webp</artifactId>
-				<version>3.14.0</version>
+				<version>${twelvemonkeys-imageio.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.twelvemonkeys.imageio</groupId>
+				<artifactId>imageio-bmp</artifactId>
+				<version>${twelvemonkeys-imageio.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.twelvemonkeys.imageio</groupId>
+				<artifactId>imageio-tiff</artifactId>
+				<version>${twelvemonkeys-imageio.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>com.twelvemonkeys.imageio</groupId>
 				<artifactId>imageio-core</artifactId>
-				<version>3.14.0</version>
+				<version>${twelvemonkeys-imageio.version}</version>
 			</dependency>
+
 			<dependency>
 				<groupId>org.projectlombok</groupId>
 				<artifactId>lombok</artifactId>

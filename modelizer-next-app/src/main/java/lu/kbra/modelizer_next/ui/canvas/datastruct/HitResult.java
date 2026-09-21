@@ -2,7 +2,7 @@ package lu.kbra.modelizer_next.ui.canvas.datastruct;
 
 import java.awt.geom.Rectangle2D;
 
-import lu.kbra.modelizer_next.layout.NodeLayout;
+import lu.kbra.modelizer_next.domain.layout.NodeLayout;
 
 /**
  * Hit-test result that identifies the element under the pointer.

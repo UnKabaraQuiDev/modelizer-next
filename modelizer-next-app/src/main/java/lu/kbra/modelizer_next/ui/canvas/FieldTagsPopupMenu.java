@@ -13,6 +13,8 @@ import lu.kbra.modelizer_next.domain.FieldTags;
 
 public class FieldTagsPopupMenu extends LivePopupMenu {
 
+	private static final long serialVersionUID = 2155488607785939774L;
+
 	private final Consumer<FieldTags> confirm;
 
 	private final JCheckBoxMenuItem primaryKey;
@@ -46,15 +48,15 @@ public class FieldTagsPopupMenu extends LivePopupMenu {
 	}
 
 	public JCheckBoxMenuItem getPrimaryKey() {
-		return primaryKey;
+		return this.primaryKey;
 	}
 
 	public JCheckBoxMenuItem getUnique() {
-		return unique;
+		return this.unique;
 	}
 
 	public JCheckBoxMenuItem getNonNull() {
-		return nonNull;
+		return this.nonNull;
 	}
 
 	public JMenuItem getActionItem() {
@@ -62,20 +64,20 @@ public class FieldTagsPopupMenu extends LivePopupMenu {
 	}
 
 	public boolean isPrimaryKey() {
-		return primaryKey.isSelected();
+		return this.primaryKey.isSelected();
 	}
 
 	public boolean isUnique() {
-		return unique.isSelected();
+		return this.unique.isSelected();
 	}
 
 	public boolean isNonNull() {
-		return nonNull.isSelected();
+		return this.nonNull.isSelected();
 	}
 
 	@Override
 	public void invokeConfirm(final ActionEvent e) {
-		this.confirm.accept(new FieldTags(isPrimaryKey(), isUnique(), isNonNull()));
+		this.confirm.accept(new FieldTags(this.isPrimaryKey(), this.isUnique(), this.isNonNull()));
 	}
 
 }

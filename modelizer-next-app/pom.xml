@@ -28,7 +28,7 @@
 		<dependencies>
 			<dependency>
 				<groupId>lu.kbra</groupId>
-				<artifactId>code-exporter</artifactId>
+				<artifactId>model-exporter</artifactId>
 				<version>${revision}</version>
 				<scope>import</scope>
 				<type>pom</type>
@@ -49,39 +49,13 @@
 
 		<dependency>
 			<groupId>lu.kbra</groupId>
-			<artifactId>code-exporter-api</artifactId>
+			<artifactId>model-exporter-api</artifactId>
 		</dependency>
 
 		<dependency>
 			<groupId>lu.kbra</groupId>
-			<artifactId>code-exporter-java-pclib</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>com.fasterxml.jackson.core</groupId>
-			<artifactId>jackson-databind</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.fasterxml.jackson.datatype</groupId>
-			<artifactId>jackson-datatype-jsr310</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.formdev</groupId>
-			<artifactId>flatlaf</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.xmlgraphics</groupId>
-			<artifactId>batik-svggen</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.xmlgraphics</groupId>
-			<artifactId>batik-dom</artifactId>
-			<exclusions>
-				<exclusion>
-					<groupId>xml-apis</groupId>
-					<artifactId>xml-apis</artifactId>
-				</exclusion>
-			</exclusions>
+			<artifactId>model-exporters</artifactId>
+			<type>pom</type>
 		</dependency>
 
 		<dependency>
@@ -98,24 +72,29 @@
 		</dependency>
 
 		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.datatype</groupId>
+			<artifactId>jackson-datatype-jsr310</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.datatype</groupId>
+			<artifactId>jackson-datatype-jdk8</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.formdev</groupId>
+			<artifactId>flatlaf</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>io.github.andrewauclair</groupId>
 			<artifactId>modern-docking-single-app</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>io.github.andrewauclair</groupId>
 			<artifactId>modern-docking-ui</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.twelvemonkeys.imageio</groupId>
-			<artifactId>imageio-core</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.twelvemonkeys.imageio</groupId>
-			<artifactId>imageio-jpeg</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.twelvemonkeys.imageio</groupId>
-			<artifactId>imageio-webp</artifactId>
 		</dependency>
 	</dependencies>
 

@@ -10,6 +10,8 @@ import javax.swing.InputMap;
 import javax.swing.JComponent;
 import javax.swing.KeyStroke;
 
+import lu.kbra.model_exporter.api.ExportContext;
+import lu.kbra.model_exporter.api.ExporterApiContext;
 import lu.kbra.modelizer_next.common.App;
 import lu.kbra.modelizer_next.common.AppConfig;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.DiagramCanvasActions;
@@ -45,6 +47,10 @@ interface DiagramCanvasActionRegistrar extends DiagramCanvasExt {
 	 * @param actions actions value used by the operation
 	 */
 	default void installDefaultKeyBindings(final DiagramCanvasActions actions) {
+		if (ExporterApiContext.getApiContext().getContext() == ExportContext.CLI) {
+			return;
+		}
+
 		final InputMap inputMap = this.getCanvas().getInputMap(JComponent.WHEN_FOCUSED);
 		final ActionMap actionMap = this.getCanvas().getActionMap();
 

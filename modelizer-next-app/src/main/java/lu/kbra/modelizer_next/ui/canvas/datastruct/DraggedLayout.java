@@ -1,6 +1,6 @@
 package lu.kbra.modelizer_next.ui.canvas.datastruct;
 
-import lu.kbra.modelizer_next.layout.NodeLayout;
+import lu.kbra.modelizer_next.domain.layout.NodeLayout;
 
 /**
  * Original node layout captured when a drag operation starts.

@@ -11,22 +11,15 @@ import java.util.LinkedHashSet;
 import java.util.Optional;
 import java.util.Set;
 
+import lu.kbra.model_exporter.api.CanvasRenderer;
 import lu.kbra.modelizer_next.domain.data.PanelType;
+import lu.kbra.modelizer_next.domain.data.ViewExportScope;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectedElement;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectedElement.SelectedType;
-import lu.kbra.modelizer_next.ui.export.ViewExportScope;
 
-/**
- * Contains export rendering helpers that paint the canvas into images and previews.
- */
-interface CanvasExportRenderer extends DiagramCanvasExt {
+interface CanvasExportRenderer extends DiagramCanvasExt, CanvasRenderer {
 
-	/**
-	 * Creates an export image on the active canvas.
-	 *
-	 * @param scope export scope to use
-	 * @return the created export image
-	 */
+	@Override
 	default BufferedImage createExportImage(final ViewExportScope scope, final Optional<Color> backgroundColor) {
 		final Dimension exportSize = this.getCanvas().getExportSize(scope);
 		final BufferedImage image = new BufferedImage(exportSize.width, exportSize.height, BufferedImage.TYPE_INT_ARGB);
@@ -45,14 +38,7 @@ interface CanvasExportRenderer extends DiagramCanvasExt {
 		return image;
 	}
 
-	/**
-	 * Creates an export preview image on the active canvas.
-	 *
-	 * @param scope     export scope to use
-	 * @param maxWidth  width value
-	 * @param maxHeight height value
-	 * @return the created export preview image
-	 */
+	@Override
 	default BufferedImage createExportPreviewImage(
 			final ViewExportScope scope,
 			final int maxWidth,
@@ -76,12 +62,7 @@ interface CanvasExportRenderer extends DiagramCanvasExt {
 		return image;
 	}
 
-	/**
-	 * Returns the export size on the active canvas.
-	 *
-	 * @param scope export scope to use
-	 * @return the export size
-	 */
+	@Override
 	default Dimension getExportSize(final ViewExportScope scope) {
 		final Graphics2D g2 = this.getCanvas().createGraphicsContext();
 		try {
@@ -91,12 +72,7 @@ interface CanvasExportRenderer extends DiagramCanvasExt {
 		}
 	}
 
-	/**
-	 * Paints the export.
-	 *
-	 * @param graphics graphics context used for drawing
-	 * @param rawScope raw scope value used by the operation
-	 */
+	@Override
 	default void paintExport(final Graphics2D graphics, final ViewExportScope rawScope) {
 		final ViewExportScope scope = rawScope == null ? ViewExportScope.VIEW : rawScope;
 		this.getCanvas().invalidateConceptualAnchorCache();

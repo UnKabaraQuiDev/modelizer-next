@@ -3,7 +3,7 @@ package lu.kbra.modelizer_next.history;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
-import lu.kbra.modelizer_next.document.ModelDocument;
+import lu.kbra.modelizer_next.domain.document.ModelDocument;
 
 /**
  * Manages the document snapshot history and exposes undo/redo navigation.

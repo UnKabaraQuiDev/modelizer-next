@@ -2,7 +2,6 @@ package lu.kbra.modelizer_next.ui.frame;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
-import java.awt.Desktop;
 import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.event.InputEvent;
@@ -20,7 +19,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
@@ -34,34 +32,34 @@ import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
-import io.github.andrewauclair.moderndocking.DockingRegion;
-import io.github.andrewauclair.moderndocking.app.Docking;
-import io.github.andrewauclair.moderndocking.app.RootDockingPanel;
-import lombok.Getter;
-import lu.kbra.code_exporter.api.CodeExporter;
-import lu.kbra.code_exporter.api.ui.ExporterOptions;
+import lu.kbra.model_exporter.api.ExportContext;
+import lu.kbra.model_exporter.api.ExporterApiContext;
+import lu.kbra.model_exporter.api.ModelExporter;
 import lu.kbra.modelizer_next.MNMain;
 import lu.kbra.modelizer_next.bootstrap.AvailableUpdate;
 import lu.kbra.modelizer_next.bootstrap.UpdateRuntime;
 import lu.kbra.modelizer_next.bootstrap.UpdateRuntimes;
+import lu.kbra.modelizer_next.cmdline.Exporters;
 import lu.kbra.modelizer_next.common.App;
-import lu.kbra.modelizer_next.document.ModelDocument;
+import lu.kbra.modelizer_next.common.ExporterOptionRef;
 import lu.kbra.modelizer_next.domain.data.PanelType;
+import lu.kbra.modelizer_next.domain.document.ModelDocument;
 import lu.kbra.modelizer_next.style.StylePalette;
 import lu.kbra.modelizer_next.style.StylePaletteService;
 import lu.kbra.modelizer_next.ui.ThemeMode;
 import lu.kbra.modelizer_next.ui.canvas.DiagramCanvas;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectionInfo;
 import lu.kbra.modelizer_next.ui.dialogs.CodeExportDialog;
-import lu.kbra.modelizer_next.ui.dialogs.ViewExportDialog;
-import lu.kbra.modelizer_next.ui.export.ViewExportRequest;
-import lu.kbra.modelizer_next.ui.export.ViewExporter;
+import lu.kbra.modelizer_next.ui.dialogs.ImageExportDialog;
 import lu.kbra.modelizer_next.ui.impl.DocumentChangeListener;
 import lu.kbra.modelizer_next.ui.impl.DocumentLoadHandler;
 import lu.kbra.pclib.PCUtils;
 import lu.kbra.pclib.datastructure.tuple.Pair;
-import lu.kbra.pclib.datastructure.tuple.Pairs;
-import lu.kbra.pclib.datastructure.tuple.Triplet;
+
+import io.github.andrewauclair.moderndocking.DockingRegion;
+import io.github.andrewauclair.moderndocking.app.Docking;
+import io.github.andrewauclair.moderndocking.app.RootDockingPanel;
+import lombok.Getter;
 
 /**
  * Main Swing window for editing Modelizer Next documents.
@@ -78,15 +76,23 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 	public static final List<Image> ICON_IMAGES;
 
 	static {
-		final Pair<List<Image>, Long> p = PCUtils.millisTime(() -> MainFrame.WINDOW_ICON_SIZES.stream()
-				.sorted(Comparator.naturalOrder())
-				.map(i -> new ImageIcon(PCUtils.readPackagedBytesFile(MainFrame.class, "/icons/icon-" + i + ".png")).getImage())
-				.toList());
-		ICON_IMAGES = p.getKey();
-//		System.out.println("Scaling icons took: " + (double) p.getValue() / 1_000 + "s");
+		if (ExporterApiContext.getApiContext().getContext() == ExportContext.GUI) {
+			final Pair<List<Image>, Long> p = PCUtils.millisTime(() -> MainFrame.WINDOW_ICON_SIZES.stream()
+					.sorted(Comparator.naturalOrder())
+					.map(i -> new ImageIcon(PCUtils.readPackagedBytesFile(MainFrame.class, "/icons/icon-" + i + ".png")).getImage())
+					.toList());
+			ICON_IMAGES = p.getKey();
+			System.out.println("Scaling icons took: " + (double) p.getValue() / 1_000 + "s");
 
-		ICON = MainFrame.ICON_IMAGES.get(MainFrame.ICON_IMAGES.size() - 1);
-		IMAGE_ICON = new ImageIcon(MainFrame.ICON);
+			ICON = MainFrame.ICON_IMAGES.get(MainFrame.ICON_IMAGES.size() - 1);
+			IMAGE_ICON = new ImageIcon(MainFrame.ICON);
+		} else {
+			ICON = null;
+			IMAGE_ICON = null;
+			ICON_IMAGES = null;
+		}
+
+		Exporters.init();
 	}
 
 	/**
@@ -155,7 +161,7 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 	JMenuItem redoMenuItem;
 
 	@Getter
-	Map<String, Pair<File, ExporterOptions>> loadedExporterOptions = new HashMap<>();
+	Map<String, ExporterOptionRef> loadedExporterOptions = new HashMap<>();
 
 	public MainFrame(final DocumentSession session) {
 		super("Modelizer Next");
@@ -510,60 +516,41 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 
 	/**
 	 * Opens the {@link ViewExportDialog}, then exports the views as specified by the user.
+	 *
+	 * @param service
 	 */
-	void exportView() {
-		final DiagramCanvas activeCanvas = this.getActiveCanvas();
-		final ViewExportRequest request = ViewExportDialog.showDialog(this,
-				this.getCanvasesByPanelType(),
-				activeCanvas == null ? PanelType.CONCEPTUAL : activeCanvas.getPanelType(),
-				this.getDefaultExportDirectory());
-
-		if (request == null) {
-			return;
-		}
-
-		try {
-			final List<Triplet<Optional<URI>, PanelType, File>> exportedFiles = ViewExporter
-					.exportViews(this.getCanvasesByPanelType(), request, this.getExportSourceFile().map(File::toURI), null);
-
-			if (exportedFiles.isEmpty()) {
-				JOptionPane.showMessageDialog(this, "Nothing was exported.", "Export", JOptionPane.WARNING_MESSAGE);
-				return;
-			}
-
-			final String message = "Exported " + exportedFiles.size() + " file" + (exportedFiles.size() > 1 ? "s" : "") + ":\n"
-					+ exportedFiles.stream().map(t -> t.getThird().getAbsolutePath()).collect(Collectors.joining("\n"));
-
-			final Object[] options = { "Show file(s)", "Close" };
-
-			final int choice = JOptionPane.showOptionDialog(null,
-					message,
-					"Export successful",
-					JOptionPane.DEFAULT_OPTION,
-					JOptionPane.INFORMATION_MESSAGE,
-					null,
-					options,
-					options[1]);
-
-			if (choice == 0) {
-				if (!Desktop.isDesktopSupported() || !Desktop.getDesktop().isSupported(java.awt.Desktop.Action.OPEN)) {
-					JOptionPane.showMessageDialog(null,
-							"Your system doesn't seem to support natively opening files :(",
-							"Error",
-							JOptionPane.ERROR_MESSAGE);
-					return;
-				}
-				Desktop.getDesktop().open(exportedFiles.size() > 1 ? request.outputDirectory() : exportedFiles.get(0).getThird());
-			}
-		} catch (final IOException ex) {
-			JOptionPane.showMessageDialog(this, "Failed to export view:\n" + ex.getMessage(), "Export error", JOptionPane.ERROR_MESSAGE);
-		}
+	public void exportImage(final ModelExporter service) {
+		final JDialog dialog = new ImageExportDialog(this,
+				service,
+				this.loadedExporterOptions.computeIfAbsent(service.getExporterId(), k -> new ExporterOptionRef(null, null)));
+		dialog.pack();
+		dialog.setVisible(true);
 	}
 
-	void exportcode(final CodeExporter service) {
+	public void exportCode(final ModelExporter service) {
 		final JDialog dialog = new CodeExportDialog(this,
 				service,
-				this.loadedExporterOptions.computeIfAbsent(service.getExporterId(), k -> Pairs.pair(null, null)).getValue());
+				this.loadedExporterOptions.computeIfAbsent(service.getExporterId(), k -> new ExporterOptionRef(null, null)));
+		dialog.pack();
+		dialog.setVisible(true);
+	}
+
+	/**
+	 * @return true if a ModelExporter was found
+	 */
+	public boolean export(final String serviceId) {
+		for (final ModelExporter service : Exporters.getModelExporters()) {
+			if (!service.getExporterId().equals(serviceId)) {
+				continue;
+			}
+
+			switch (service.getExporterType()) {
+			case IMAGE -> this.exportImage(service);
+			case CODE -> this.exportCode(service);
+			}
+			return true;
+		}
+		return false;
 	}
 
 	/**

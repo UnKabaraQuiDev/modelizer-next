@@ -13,14 +13,14 @@ import lu.kbra.modelizer_next.domain.ClassModel;
 import lu.kbra.modelizer_next.domain.CommentModel;
 import lu.kbra.modelizer_next.domain.LinkModel;
 import lu.kbra.modelizer_next.domain.data.PanelType;
-import lu.kbra.modelizer_next.layout.LayoutObjectType;
-import lu.kbra.modelizer_next.layout.LinkLayout;
-import lu.kbra.modelizer_next.layout.NodeLayout;
-import lu.kbra.modelizer_next.layout.PanelState;
+import lu.kbra.modelizer_next.domain.data.ViewExportScope;
+import lu.kbra.modelizer_next.domain.document.PanelState;
+import lu.kbra.modelizer_next.domain.layout.LayoutObjectType;
+import lu.kbra.modelizer_next.domain.layout.LinkLayout;
+import lu.kbra.modelizer_next.domain.layout.NodeLayout;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.LinkGeometry;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectedElement;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectedElement.SelectedType;
-import lu.kbra.modelizer_next.ui.export.ViewExportScope;
 
 /**
  * Contains file export actions and export scope handling.
