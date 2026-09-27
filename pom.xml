@@ -221,7 +221,7 @@
 			<dependency>
 				<groupId>org.projectlombok</groupId>
 				<artifactId>lombok</artifactId>
-				<version>1.18.46</version>
+				<version>1.18.48</version>
 				<scope>provided</scope>
 			</dependency>
 
@@ -259,7 +259,7 @@
 							<path>
 								<groupId>org.projectlombok</groupId>
 								<artifactId>lombok</artifactId>
-								<version>1.18.46</version>
+								<version>1.18.48</version>
 							</path>
 						</annotationProcessorPaths>
 					</configuration>
@@ -310,7 +310,7 @@
 				<plugin>
 					<groupId>com.diffplug.spotless</groupId>
 					<artifactId>spotless-maven-plugin</artifactId>
-					<version>3.10.1</version>
+					<version>3.10.2</version>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
@@ -959,6 +959,13 @@
 				<jpackage.type>app-image</jpackage.type>
 				<jpackage.icon>${jpackage.inputDir}/icon.icns</jpackage.icon>
 				<skipMacosPortable>false</skipMacosPortable>
+			</properties>
+		</profile>
+
+		<profile>
+			<id>standalone</id>
+			<properties>
+				<jpackage.resourceDir>${jpackage.add}/standalone</jpackage.resourceDir>
 			</properties>
 		</profile>
 
