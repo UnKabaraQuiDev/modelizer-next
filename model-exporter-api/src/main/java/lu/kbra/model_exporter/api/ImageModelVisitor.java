@@ -38,7 +38,7 @@ public final class ImageModelVisitor {
 			final String extension)
 			throws ExportFailedException {
 		final List<Path> outputs = new ArrayList<>(3);
-		callback = callback.createSubSection("Export: " + ExporterApiContext.getApiContext().getCurrentDocument() + " as " + format);
+		callback = callback.createSubSection(ExporterApiContext.getApiContext().getCurrentDocument().getPath());
 		try {
 			final Map<PanelType, ? extends CanvasRenderer> renderers = ExporterApiContext.getApiContext()
 					.getRenderers()
@@ -150,8 +150,7 @@ public final class ImageModelVisitor {
 				}
 
 				callback.setProgress(100f);
-				callback = callback.endSubSection(
-						"Exported: " + ExporterApiContext.getApiContext().getCurrentDocument() + ":" + pt + " to: " + outputFile);
+				callback = callback.endSubSection(outputFile.toString());
 				i++;
 				callback.setProgress(100f / options.getPanels().size() * i);
 			}

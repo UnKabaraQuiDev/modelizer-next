@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.EnumSet;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -37,8 +36,6 @@ import lu.kbra.modelizer_next.common.ExportSectionListener;
 import lu.kbra.modelizer_next.domain.data.PanelType;
 import lu.kbra.modelizer_next.domain.document.ModelDocument;
 import lu.kbra.modelizer_next.ui.canvas.DiagramCanvas;
-import lu.kbra.modelizer_next.ui.frame.DocumentSession;
-import lu.kbra.modelizer_next.ui.frame.MainFrame;
 import lu.kbra.modelizer_next.ui.impl.DocumentChangeListener;
 import lu.kbra.pclib.pointer.prim.IntPointer;
 
@@ -46,96 +43,6 @@ import lu.kbra.pclib.pointer.prim.IntPointer;
  * Runs document exports without opening the interactive desktop frame.
  */
 public final class CommandLineExporter {
-
-	/**
-	 * Exception raised when export aborted fails.
-	 */
-	private static final class ExportAbortedException extends IOException {
-
-		private static final long serialVersionUID = 513442251233551029L;
-
-		/**
-		 * Creates an export aborted exception instance.
-		 *
-		 * @param inputFile file to read or write
-		 */
-		private ExportAbortedException(final File inputFile) {
-			super("Export aborted for input file: " + inputFile);
-		}
-
-		private ExportAbortedException(final URI inputFile) {
-			super("Export aborted for input file: " + inputFile);
-		}
-
-	}
-
-	/**
-	 * Represents an input file document producer in the command-line export part of the application.
-	 */
-	private static final class InputFileDocumentProducer implements ModelDocumentProducer {
-
-		private final Iterator<URI> inputFiles;
-		private final ConsoleDocumentLoadHandler loadHandler;
-
-		/**
-		 * Creates an input file document producer instance.
-		 *
-		 * @param inputFiles values for input files
-		 * @param force      whether force is enabled
-		 */
-		private InputFileDocumentProducer(final List<URI> inputFiles, final boolean force) {
-			this.inputFiles = inputFiles.iterator();
-			this.loadHandler = new ConsoleDocumentLoadHandler(force);
-		}
-
-		/**
-		 * Returns the next value from this producer or iterator.
-		 *
-		 * @return an optional result when a matching value is available
-		 * @throws IOException if the operation cannot be completed
-		 */
-		@Override
-		public Optional<LoadedDocument> next() throws IOException {
-			if (!this.inputFiles.hasNext()) {
-				return Optional.empty();
-			}
-
-			final URI inputFile = this.inputFiles.next();
-			final Optional<DocumentSession> session = MainFrame.createDocument(inputFile, this.loadHandler);
-
-			if (session.isEmpty()) {
-				throw new ExportAbortedException(inputFile);
-			}
-
-			return Optional.of(new LoadedDocument(inputFile, session.get().getDocument()));
-		}
-
-	}
-
-	/**
-	 * Immutable value object for loaded document data.
-	 *
-	 * @param sourceFile file to read or write
-	 * @param document   document to read or modify
-	 */
-	private record LoadedDocument(URI sourceFile, ModelDocument document) {
-	}
-
-	/**
-	 * Defines operations for model document producer behavior.
-	 */
-	@FunctionalInterface
-	private interface ModelDocumentProducer {
-
-		/**
-		 * Returns the next value from this producer or iterator.
-		 *
-		 * @return an optional result when a matching value is available
-		 * @throws IOException if the operation cannot be completed
-		 */
-		Optional<LoadedDocument> next() throws IOException;
-
-	}
 
 	public static int run(final String[] args) {
 		System.setProperty("java.awt.headless", "true");
@@ -152,30 +59,35 @@ public final class CommandLineExporter {
 
 			final int jobCount = options.jobCount();
 			final ScheduledExecutorService executor = Executors.newScheduledThreadPool(jobCount);
-			final List<Exception> caughtException = Collections.synchronizedList(new ArrayList<>());
+			final List<Throwable> caughtException = Collections.synchronizedList(new ArrayList<>());
 
 			final ModelExporter exporter = options.exporter();
 
-			final DefaultExportUpdateCallback updateCallback = DefaultExportUpdateCallback.create(new ExportSectionListener() {
+			System.out.println("\n");
+			final ProgressRenderer renderer = new ProgressRenderer();
 
-				@Override
-				public void sectionDeleted(ExportUpdateCallback parent, ExportUpdateCallback section) {
-					System.out.println("[V] " + section.getEndMessage());
-				}
+			final DefaultExportUpdateCallback updateCallback = DefaultExportUpdateCallback
+					.create(documentProducer.getExpectedCount() + " files", new ExportSectionListener() {
 
-				@Override
-				public void sectionCreated(ExportUpdateCallback parent, ExportUpdateCallback section) {
+						@Override
+						public void sectionCreated(ExportUpdateCallback parent, ExportUpdateCallback section) {
+							renderer.created(parent, section);
+						}
 
-				}
+						@Override
+						public void progressUpdated(ExportUpdateCallback parent, ExportUpdateCallback section) {
+							renderer.updated(parent, section);
+						}
 
-				@Override
-				public void progressUpdated(ExportUpdateCallback parent, ExportUpdateCallback section) {
+						@Override
+						public void sectionDeleted(ExportUpdateCallback parent, ExportUpdateCallback section) {
+							renderer.deleted(parent, section);
+						}
 
-				}
+					});
+			updateCallback.setAggregateChildProgress(true);
+			updateCallback.setExpectedChildCount(documentProducer.getExpectedCount());
 
-			});
-
-			System.out.println();
 			switch (exporter.getExporterType()) {
 			case IMAGE -> {
 				final ImageExporterOptions config = (ImageExporterOptions) options.options();
@@ -195,7 +107,7 @@ public final class CommandLineExporter {
 									.visitDocument(doc.document(), updateCallback);
 
 							exportedFileCount.add(result.exportedFiles().size());
-						} catch (final Exception e) {
+						} catch (final Throwable e) {
 							caughtException.add(e);
 							executor.shutdownNow();
 						}
@@ -203,12 +115,15 @@ public final class CommandLineExporter {
 				}
 			}
 			case CODE -> {
+				renderer.close();
 				throw new UnsupportedOperationException();
 			}
 			}
 
 			executor.shutdown();
 			executor.awaitTermination(1, TimeUnit.HOURS);
+			renderer.close();
+			System.out.println("\n");
 
 			if (!caughtException.isEmpty()) {
 				System.err.println("Got: " + caughtException.size() + " errors.");
@@ -217,7 +132,7 @@ public final class CommandLineExporter {
 			}
 
 			if (exportedFileCount.get() == 0) {
-				System.err.println("Nothing to export.");
+				System.err.println("Exported nothing.");
 				return 3;
 			}
 

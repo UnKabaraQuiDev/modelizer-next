@@ -161,6 +161,12 @@
 			</dependency>
 
 			<dependency>
+				<groupId>org.jline</groupId>
+				<artifactId>jline-terminal</artifactId>
+				<version>4.4.6</version>
+			</dependency>
+
+			<dependency>
 				<groupId>com.fasterxml.jackson.datatype</groupId>
 				<artifactId>jackson-datatype-jsr310</artifactId>
 				<version>2.22.2</version>
@@ -359,15 +365,20 @@
 										<include>**</include>
 									</includes>
 								</filter>
-
-								<!-- Keep Batik fully (reflection + services) -->
+								<!-- Keep all Batik artifacts fully -->
 								<filter>
 									<artifact>org.apache.xmlgraphics:batik-*</artifact>
 									<includes>
 										<include>**</include>
 									</includes>
 								</filter>
-
+								<!-- Keep all TwelveMonkeys ImageIO providers fully -->
+								<filter>
+									<artifact>com.twelvemonkeys.imageio:*</artifact>
+									<includes>
+										<include>**</include>
+									</includes>
+								</filter>
 								<!-- Keep docking framework -->
 								<filter>
 									<artifact>
@@ -376,7 +387,7 @@
 										<include>**</include>
 									</includes>
 								</filter>
-
+								<!-- Remove signatures from all other dependencies -->
 								<filter>
 									<artifact>*:*</artifact>
 									<excludes>

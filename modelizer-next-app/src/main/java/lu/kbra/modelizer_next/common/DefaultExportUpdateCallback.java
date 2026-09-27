@@ -5,9 +5,10 @@ import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import lu.kbra.model_exporter.api.ExportUpdateCallback;
-
 import lombok.Getter;
+import lombok.Setter;
+import lu.kbra.model_exporter.api.ExportUpdateCallback;
+import lu.kbra.pclib.PCUtils;
 
 @Getter
 public class DefaultExportUpdateCallback implements ExportUpdateCallback {
@@ -32,13 +33,19 @@ public class DefaultExportUpdateCallback implements ExportUpdateCallback {
 	 * the tree.
 	 */
 	private volatile float progress;
+	@Setter
 	private volatile boolean aggregateChildProgress;
+	@Setter
+	private volatile int doneChildCount;
+	@Setter
+	private volatile int expectedChildCount;
 
-	/**
-	 * Creates the root/main section.
-	 */
 	public static DefaultExportUpdateCallback create(final ExportSectionListener listener) {
 		return new DefaultExportUpdateCallback(null, "main", Objects.requireNonNull(listener));
+	}
+
+	public static DefaultExportUpdateCallback create(final String name, final ExportSectionListener listener) {
+		return new DefaultExportUpdateCallback(null, name, Objects.requireNonNull(listener));
 	}
 
 	private DefaultExportUpdateCallback(final DefaultExportUpdateCallback parent, final String name, final ExportSectionListener listener) {
@@ -71,10 +78,8 @@ public class DefaultExportUpdateCallback implements ExportUpdateCallback {
 	}
 
 	@Override
-	public void setProgress(final float percentage) {
-		if (percentage < 0.0f || percentage > 100.0f) {
-			throw new IllegalArgumentException("percentage must be between 0 and 100");
-		}
+	public void setProgress(float percentage) {
+		percentage = PCUtils.clamp(0, 100, percentage);
 
 		this.ensureOpen();
 
@@ -84,7 +89,7 @@ public class DefaultExportUpdateCallback implements ExportUpdateCallback {
 	}
 
 	@Override
-	public ExportUpdateCallback endSubSection(String endMessage) {
+	public ExportUpdateCallback endSubSection(final String endMessage) {
 		/*
 		 * close() is idempotent. This prevents two threads from deleting the same section twice.
 		 */
@@ -111,6 +116,13 @@ public class DefaultExportUpdateCallback implements ExportUpdateCallback {
 		 * The callback happens after the tree has been updated.
 		 */
 		this.listener.sectionDeleted(this.parent, this);
+
+		if (parent != null) {
+			this.parent.doneChildCount++;
+		}
+		if (this.parent != null && this.parent.aggregateChildProgress && this.parent.expectedChildCount > 0) {
+			this.parent.setProgress(100 * this.parent.doneChildCount / this.parent.expectedChildCount);
+		}
 
 		return this.parent;
 	}

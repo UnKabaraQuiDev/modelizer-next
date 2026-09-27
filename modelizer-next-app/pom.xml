@@ -96,6 +96,11 @@
 			<groupId>io.github.andrewauclair</groupId>
 			<artifactId>modern-docking-ui</artifactId>
 		</dependency>
+
+		<dependency>
+			<groupId>org.jline</groupId>
+			<artifactId>jline-terminal</artifactId>
+		</dependency>
 	</dependencies>
 
 	<build>
