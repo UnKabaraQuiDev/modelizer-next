@@ -32,6 +32,10 @@
 			<groupId>lu.kbra</groupId>
 			<artifactId>pclib-datastruct</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>lu.kbra</groupId>
+			<artifactId>pclib-function</artifactId>
+		</dependency>
 	</dependencies>
 
 </project>

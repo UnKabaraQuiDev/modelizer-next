@@ -21,7 +21,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import lu.kbra.modelizer_next.MNMain;
 import lu.kbra.modelizer_next.common.App;
 import lu.kbra.modelizer_next.common.OpenedFile;
-import lu.kbra.modelizer_next.document.ModelDocument;
+import lu.kbra.modelizer_next.domain.document.ModelDocument;
 
 /**
  * Document-level actions implemented by the main frame.

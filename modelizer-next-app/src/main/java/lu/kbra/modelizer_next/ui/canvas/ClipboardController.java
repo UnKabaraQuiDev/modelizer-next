@@ -29,7 +29,8 @@ import lu.kbra.modelizer_next.domain.CommentModel;
 import lu.kbra.modelizer_next.domain.FieldModel;
 import lu.kbra.modelizer_next.domain.LinkModel;
 import lu.kbra.modelizer_next.domain.data.CommentKind;
-import lu.kbra.modelizer_next.layout.LayoutObjectType;
+import lu.kbra.modelizer_next.domain.data.ViewExportScope;
+import lu.kbra.modelizer_next.domain.layout.LayoutObjectType;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.ClipboardSnapshot;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.CopiedClass;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.CopiedComment;
@@ -37,7 +38,6 @@ import lu.kbra.modelizer_next.ui.canvas.datastruct.CopiedField;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.CopiedLink;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectedElement;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectedElement.SelectedType;
-import lu.kbra.modelizer_next.ui.export.ViewExportScope;
 
 /**
  * Contains clipboard actions for copying, cutting, duplicating, and pasting canvas selections.
@@ -49,8 +49,8 @@ interface ClipboardController extends DiagramCanvasExt {
 	String MODELIZER_CLIPBOARD_MIME_TYPE = "application/x-modelizer-next; class=java.lang.String";
 	String PNG_CLIPBOARD_MIME_TYPE = "image/png; class=java.io.InputStream";
 
-	DataFlavor MODELIZER_CLIPBOARD_FLAVOR = ClipboardController.createDataFlavor(MODELIZER_CLIPBOARD_MIME_TYPE);
-	DataFlavor PNG_IMAGE_FLAVOR = ClipboardController.createDataFlavor(PNG_CLIPBOARD_MIME_TYPE);
+	DataFlavor MODELIZER_CLIPBOARD_FLAVOR = ClipboardController.createDataFlavor(ClipboardController.MODELIZER_CLIPBOARD_MIME_TYPE);
+	DataFlavor PNG_IMAGE_FLAVOR = ClipboardController.createDataFlavor(ClipboardController.PNG_CLIPBOARD_MIME_TYPE);
 
 	/**
 	 * Copies the selection.

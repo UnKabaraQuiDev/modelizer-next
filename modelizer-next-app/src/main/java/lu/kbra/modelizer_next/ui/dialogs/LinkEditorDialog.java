@@ -25,13 +25,13 @@ import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 
-import lu.kbra.modelizer_next.document.ModelDocument;
+import lu.kbra.model_exporter.api.ColorButton;
 import lu.kbra.modelizer_next.domain.ClassModel;
 import lu.kbra.modelizer_next.domain.FieldModel;
 import lu.kbra.modelizer_next.domain.LinkModel;
 import lu.kbra.modelizer_next.domain.data.Cardinality;
 import lu.kbra.modelizer_next.domain.data.PanelType;
-import lu.kbra.modelizer_next.ui.component.ColorButton;
+import lu.kbra.modelizer_next.domain.document.ModelDocument;
 
 /**
  * Dialog for editing a relationship link and its endpoints.

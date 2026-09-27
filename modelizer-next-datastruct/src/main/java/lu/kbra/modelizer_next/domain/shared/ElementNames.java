@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonAlias;
 
 import lu.kbra.modelizer_next.domain.data.PanelType;
 
-
 /**
  * Display names for the same model element in conceptual, logical, and physical views.
  */

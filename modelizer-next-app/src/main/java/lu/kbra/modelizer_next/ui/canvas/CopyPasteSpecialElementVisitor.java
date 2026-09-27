@@ -61,10 +61,7 @@ public final class CopyPasteSpecialElementVisitor implements ElementVisitor {
 		final boolean toCopied = this.isEndpointCopied(copiedLink.toClassId(), copiedLink.toFieldId());
 		final boolean internal = fromCopied && toCopied;
 
-		if (internal && !this.data.keepInternalLinks()) {
-			return Optional.empty();
-		}
-		if (!internal && !this.data.keepOutgoingLinks()) {
+		if ((internal && !this.data.keepInternalLinks()) || (!internal && !this.data.keepOutgoingLinks())) {
 			return Optional.empty();
 		}
 

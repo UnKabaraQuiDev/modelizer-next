@@ -11,8 +11,8 @@ import javax.swing.JOptionPane;
 
 import lu.kbra.modelizer_next.common.App;
 import lu.kbra.modelizer_next.common.VersionComparator;
-import lu.kbra.modelizer_next.document.ModelDocument;
 import lu.kbra.modelizer_next.document.SwingDocumentLoadHandler;
+import lu.kbra.modelizer_next.domain.document.ModelDocument;
 import lu.kbra.modelizer_next.json.LegacyModelizerImporter;
 import lu.kbra.modelizer_next.json.ModernModelizerImporter;
 import lu.kbra.modelizer_next.json.OnlineModelizerImporter;

@@ -2,7 +2,7 @@ package lu.kbra.modelizer_next.ui.frame;
 
 import java.io.File;
 
-import lu.kbra.modelizer_next.document.ModelDocument;
+import lu.kbra.modelizer_next.domain.document.ModelDocument;
 import lu.kbra.modelizer_next.history.DocumentSnapshot;
 import lu.kbra.modelizer_next.history.UndoRedoManager;
 
@@ -92,7 +92,7 @@ public final class DocumentSession {
 	}
 
 	public void unmarkChanged() {
-		undoRedoManager.reset(document);
+		this.undoRedoManager.reset(this.document);
 		this.savedSnapshot = DocumentSnapshot.from(this.document);
 	}
 

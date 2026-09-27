@@ -109,31 +109,31 @@ public class AppConfig {
 		}
 
 		public ThemeMode getThemeMode() {
-			return themeMode;
+			return AppConfig.this.themeMode;
 		}
 
 		public String getSelectedPaletteName() {
-			return selectedPaletteName;
+			return AppConfig.this.selectedPaletteName;
 		}
 
 		public String getDefaultPaletteName() {
-			return defaultPaletteName;
+			return AppConfig.this.defaultPaletteName;
 		}
 
 		public boolean isAutoCheckUpdates() {
-			return autoCheckUpdates;
+			return AppConfig.this.autoCheckUpdates;
 		}
 
 		public String getSkippedUpdateVersion() {
-			return skippedUpdateVersion;
+			return AppConfig.this.skippedUpdateVersion;
 		}
 
 		public boolean isEmulateMiddleClick() {
-			return emulateMiddleClick;
+			return AppConfig.this.emulateMiddleClick;
 		}
 
 		public int getMaxRecentFileCount() {
-			return maxRecentFileCount;
+			return AppConfig.this.maxRecentFileCount;
 		}
 
 	}
