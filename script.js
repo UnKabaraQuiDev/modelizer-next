@@ -75,6 +75,8 @@ function setDownloadUnavailable () {
 }
 
 function updateDownloadFromMetadata () {
+  document.querySelector('#current-version').textContent =
+    downloadMetadata['releaseTag']
   if (
     !document.getElementById('osChoices') ||
     !document.getElementById('buildChoices')
@@ -120,6 +122,7 @@ function updateDownloadFromMetadata () {
     document.getElementById('downloadBtn').style.display = 'flex'
   }
   const asset = findAsset(osKey, buildKey)
+  console.log(asset);
   if (!asset) {
     console.log(`Asset not found for: ${osKey} ${buildKey}`)
     setDownloadUnavailable()
@@ -127,12 +130,11 @@ function updateDownloadFromMetadata () {
   } else {
     document.getElementById('errorMessage').style.display = 'none'
   }
-  const button = document.getElementById('downloadButton')
-  if (!button) return
+  const button = document.getElementById('downloadBtn')
+  console.log(button);
+  if (!button) return;
   button.href = asset.url
   button.textContent = 'Download selected build'
-  document.querySelector('#current-version').textContent =
-    downloadMetadata['releaseTag']
 }
 
 function selectSystemBuild () {
