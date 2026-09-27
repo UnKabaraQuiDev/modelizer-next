@@ -12,21 +12,21 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lu.kbra.model_exporter.api.ImageExporterOptions;
-import lu.kbra.model_exporter.api.MaxSize2DOwner;
+import lu.kbra.model_exporter.api.MaxSize2DiOwner;
 import lu.kbra.modelizer_next.domain.data.PanelType;
 import lu.kbra.modelizer_next.domain.data.ViewExportScope;
-import lu.kbra.modelizer_next.domain.layout.Size2D;
+import lu.kbra.modelizer_next.domain.layout.Size2Di;
 import lu.kbra.modelizer_next.utils.RelativePathSerializer;
 import lu.kbra.pclib.PCUtils;
 
 @Data
 @EqualsAndHashCode
-public class BmpImageExporterOptions implements ImageExporterOptions, MaxSize2DOwner {
+public class BmpImageExporterOptions implements ImageExporterOptions, MaxSize2DiOwner {
 
 	@JsonSerialize(using = RelativePathSerializer.class)
 	private Path outputPath = Paths.get(".");
 
-	private Size2D maxSize2D = new Size2D(0, 0);
+	private Size2Di maxSize2D = new Size2Di(0, 0);
 
 	private String nameFormat = ImageExporterOptions.DEFAULT_NAME_FORMAT;
 	private ViewExportScope scope = ViewExportScope.EVERYTHING;

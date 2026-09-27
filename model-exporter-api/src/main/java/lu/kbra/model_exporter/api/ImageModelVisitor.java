@@ -24,7 +24,7 @@ import javax.imageio.stream.ImageOutputStream;
 
 import lu.kbra.modelizer_next.domain.data.PanelType;
 import lu.kbra.modelizer_next.domain.document.ModelDocument;
-import lu.kbra.modelizer_next.domain.layout.Size2D;
+import lu.kbra.modelizer_next.domain.layout.Size2Di;
 import lu.kbra.pclib.PCUtils;
 
 public final class ImageModelVisitor {
@@ -75,7 +75,7 @@ public final class ImageModelVisitor {
 
 				// Scale down to fit within maxDimension while preserving the aspect ratio.
 				if (optionsManager.supportsTransparency()) {
-					final Size2D maxDimension = ((MaxSize2DOwner) options).getMaxSize2D();
+					final Size2Di maxDimension = ((MaxSize2DiOwner) options).getMaxSize2D();
 
 					if (maxDimension != null && maxDimension.getWidth() > 0 && maxDimension.getHeight() > 0
 							&& (image.getWidth() > maxDimension.getWidth() || image.getHeight() > maxDimension.getHeight())) {

@@ -15,13 +15,13 @@ import lu.kbra.model_exporter.api.ExporterOptions;
 import lu.kbra.model_exporter.api.ExporterType;
 import lu.kbra.model_exporter.api.ImageExporterOptions;
 import lu.kbra.model_exporter.api.ImageOptionsManager;
-import lu.kbra.model_exporter.api.MaxSize2DOwner;
+import lu.kbra.model_exporter.api.MaxSize2DiOwner;
 import lu.kbra.model_exporter.api.ModelExporter;
 import lu.kbra.model_exporter.api.TransparencyOwner;
 import lu.kbra.modelizer_next.common.ExporterOptionRef;
 import lu.kbra.modelizer_next.domain.data.PanelType;
 import lu.kbra.modelizer_next.domain.data.ViewExportScope;
-import lu.kbra.modelizer_next.domain.layout.Size2D;
+import lu.kbra.modelizer_next.domain.layout.Size2Di;
 import lu.kbra.modelizer_next.ui.component.ImageExportPanel;
 import lu.kbra.modelizer_next.ui.component.ImageSizePanel;
 import lu.kbra.modelizer_next.ui.frame.MainFrame;
@@ -96,9 +96,9 @@ public class ImageExportDialog extends ModelExportDialog {
 		options.setPanels(panels);
 
 		if (optionsManager.supportsFixedSize()) {
-			final MaxSize2DOwner own = (MaxSize2DOwner) options;
+			final MaxSize2DiOwner own = (MaxSize2DiOwner) options;
 			own.setMaxSize2D(
-					new Size2D((int) this.imageSizePanel.getSpinWidth().getValue(), (int) this.imageSizePanel.getSpinHeight().getValue()));
+					new Size2Di((int) this.imageSizePanel.getSpinWidth().getValue(), (int) this.imageSizePanel.getSpinHeight().getValue()));
 		}
 
 		return options;
@@ -125,7 +125,7 @@ public class ImageExportDialog extends ModelExportDialog {
 		this.imageExportPanel.getChckbxPhysical().setSelected(panels.contains(PanelType.PHYSICAL));
 
 		if (optionsManager.supportsFixedSize()) {
-			final Size2D maxDimension = ((MaxSize2DOwner) options).getMaxSize2D();
+			final Size2Di maxDimension = ((MaxSize2DiOwner) options).getMaxSize2D();
 			this.imageSizePanel.getSpinWidth().setValue(maxDimension.getWidth());
 			this.imageSizePanel.getSpinHeight().setValue(maxDimension.getHeight());
 		}

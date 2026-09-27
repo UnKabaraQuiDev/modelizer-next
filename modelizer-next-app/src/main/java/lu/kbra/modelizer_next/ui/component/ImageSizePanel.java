@@ -8,6 +8,7 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
+import javax.swing.SpinnerNumberModel;
 
 import lombok.Getter;
 
@@ -45,7 +46,7 @@ public class ImageSizePanel extends JPanel {
 		gbc_lblWidth.gridy = 0;
 		this.add(lblWidth1, gbc_lblWidth);
 
-		this.spinWidth = new JSpinner();
+		this.spinWidth = new JSpinner(new SpinnerNumberModel(0, 0, Integer.MAX_VALUE, 1));
 		final GridBagConstraints gbc_spinWidth = new GridBagConstraints();
 		gbc_spinWidth.fill = GridBagConstraints.HORIZONTAL;
 		gbc_spinWidth.insets = new Insets(0, 0, 5, 5);
@@ -60,7 +61,7 @@ public class ImageSizePanel extends JPanel {
 		gbc_lblHeight.gridy = 0;
 		this.add(lblHeight1, gbc_lblHeight);
 
-		this.spinHeight = new JSpinner();
+		this.spinHeight = new JSpinner(new SpinnerNumberModel(0, 0, Integer.MAX_VALUE, 1));
 		final GridBagConstraints gbc_spinHeight = new GridBagConstraints();
 		gbc_spinHeight.insets = new Insets(0, 0, 5, 0);
 		gbc_spinHeight.fill = GridBagConstraints.HORIZONTAL;
