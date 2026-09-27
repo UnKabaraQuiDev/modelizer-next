@@ -16,11 +16,11 @@
 	<name>Model Exporter Aggregate</name>
 
 	<dependencies>
-		<dependency>
+		<!-- <dependency>
 			<groupId>lu.kbra</groupId>
 			<artifactId>code-exporter-java-pclib</artifactId>
 			<version>${revision}</version>
-		</dependency>
+		</dependency> -->
 
 		<dependency>
 			<groupId>lu.kbra</groupId>
