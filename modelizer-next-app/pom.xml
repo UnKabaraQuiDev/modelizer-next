@@ -24,38 +24,40 @@
 			${user.home}/.modelizer-next/updates/${project.build.finalName}.jar</update.path>
 	</properties>
 
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>lu.kbra</groupId>
+				<artifactId>model-exporter</artifactId>
+				<version>${revision}</version>
+				<scope>import</scope>
+				<type>pom</type>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
 	<dependencies>
-		<dependency>
-			<groupId>com.fasterxml.jackson.core</groupId>
-			<artifactId>jackson-databind</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.fasterxml.jackson.datatype</groupId>
-			<artifactId>jackson-datatype-jsr310</artifactId>
-		</dependency>
 		<dependency>
 			<groupId>lu.kbra</groupId>
 			<artifactId>modelizer-next-common</artifactId>
 			<scope>${common.scope}</scope>
 		</dependency>
 		<dependency>
-			<groupId>com.formdev</groupId>
-			<artifactId>flatlaf</artifactId>
+			<groupId>lu.kbra</groupId>
+			<artifactId>modelizer-next-datastruct</artifactId>
 		</dependency>
+
 		<dependency>
-			<groupId>org.apache.xmlgraphics</groupId>
-			<artifactId>batik-svggen</artifactId>
+			<groupId>lu.kbra</groupId>
+			<artifactId>model-exporter-api</artifactId>
 		</dependency>
+
 		<dependency>
-			<groupId>org.apache.xmlgraphics</groupId>
-			<artifactId>batik-dom</artifactId>
-			<exclusions>
-				<exclusion>
-					<groupId>xml-apis</groupId>
-					<artifactId>xml-apis</artifactId>
-				</exclusion>
-			</exclusions>
+			<groupId>lu.kbra</groupId>
+			<artifactId>model-exporters</artifactId>
+			<type>pom</type>
 		</dependency>
+
 		<dependency>
 			<groupId>lu.kbra</groupId>
 			<artifactId>pclib-common</artifactId>
@@ -68,6 +70,24 @@
 			<groupId>lu.kbra</groupId>
 			<artifactId>pclib-concurrency</artifactId>
 		</dependency>
+
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.datatype</groupId>
+			<artifactId>jackson-datatype-jsr310</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.datatype</groupId>
+			<artifactId>jackson-datatype-jdk8</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.formdev</groupId>
+			<artifactId>flatlaf</artifactId>
+		</dependency>
 		<dependency>
 			<groupId>io.github.andrewauclair</groupId>
 			<artifactId>modern-docking-single-app</artifactId>
@@ -76,17 +96,10 @@
 			<groupId>io.github.andrewauclair</groupId>
 			<artifactId>modern-docking-ui</artifactId>
 		</dependency>
+
 		<dependency>
-			<groupId>com.twelvemonkeys.imageio</groupId>
-			<artifactId>imageio-core</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.twelvemonkeys.imageio</groupId>
-			<artifactId>imageio-jpeg</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.twelvemonkeys.imageio</groupId>
-			<artifactId>imageio-webp</artifactId>
+			<groupId>org.jline</groupId>
+			<artifactId>jline-terminal</artifactId>
 		</dependency>
 	</dependencies>
 

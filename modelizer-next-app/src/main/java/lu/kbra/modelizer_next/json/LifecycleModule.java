@@ -16,8 +16,8 @@ import com.fasterxml.jackson.databind.deser.std.DelegatingDeserializer;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.BeanSerializerModifier;
 
-import lu.kbra.modelizer_next.ui.impl.PostConstructOwner;
-import lu.kbra.modelizer_next.ui.impl.PreDeconstructOwner;
+import lu.kbra.modelizer_next.impl.PostConstructOwner;
+import lu.kbra.modelizer_next.impl.PreDeconstructOwner;
 
 public class LifecycleModule extends SimpleModule {
 
@@ -31,19 +31,11 @@ public class LifecycleModule extends SimpleModule {
 			public JsonSerializer<?>
 					modifySerializer(final SerializationConfig config, final BeanDescription beanDesc, final JsonSerializer<?> serializer) {
 
-				return new JsonSerializer<>() {
+				if (serializer instanceof LifecycleSerializer) {
+					return serializer;
+				}
 
-					@Override
-					public void serialize(final Object value, final JsonGenerator gen, final SerializerProvider serializers)
-							throws IOException {
-
-						if (value instanceof final PreDeconstructOwner owner) {
-							owner.preDeconstruct();
-						}
-
-						((JsonSerializer<Object>) serializer).serialize(value, gen, serializers);
-					}
-				};
+				return new LifecycleSerializer(serializer);
 			}
 		});
 
@@ -55,25 +47,58 @@ public class LifecycleModule extends SimpleModule {
 					final BeanDescription beanDesc,
 					final JsonDeserializer<?> deserializer) {
 
-				return new DelegatingDeserializer(deserializer) {
+				if (deserializer instanceof LifecycleDeserializer) {
+					return deserializer;
+				}
 
-					@Override
-					public Object deserialize(final JsonParser p, final DeserializationContext ctxt) throws IOException {
-						final Object obj = super.deserialize(p, ctxt);
-
-						if (obj instanceof final PostConstructOwner owner) {
-							owner.postConstruct();
-						}
-
-						return obj;
-					}
-
-					@Override
-					protected JsonDeserializer<?> newDelegatingInstance(final JsonDeserializer<?> d) {
-						return this;
-					}
-				};
+				return new LifecycleDeserializer(deserializer);
 			}
 		});
+	}
+
+	private static final class LifecycleSerializer extends JsonSerializer<Object> {
+
+		private final JsonSerializer<Object> delegate;
+
+		@SuppressWarnings("unchecked")
+		LifecycleSerializer(final JsonSerializer<?> delegate) {
+			this.delegate = (JsonSerializer<Object>) delegate;
+		}
+
+		@Override
+		public void serialize(final Object value, final JsonGenerator gen, final SerializerProvider serializers) throws IOException {
+			if (value instanceof final PreDeconstructOwner owner) {
+				owner.preDeconstruct();
+			}
+
+			this.delegate.serialize(value, gen, serializers);
+		}
+
+	}
+
+	private static final class LifecycleDeserializer extends DelegatingDeserializer {
+
+		private static final long serialVersionUID = 1L;
+
+		LifecycleDeserializer(final JsonDeserializer<?> delegate) {
+			super(delegate);
+		}
+
+		@Override
+		public Object deserialize(final JsonParser p, final DeserializationContext ctxt) throws IOException {
+			final Object obj = super.deserialize(p, ctxt);
+
+			if (obj instanceof final PostConstructOwner owner) {
+				owner.postConstruct();
+			}
+
+			return obj;
+		}
+
+		@Override
+		protected JsonDeserializer<?> newDelegatingInstance(final JsonDeserializer<?> d) {
+			return new LifecycleDeserializer(d);
+		}
+
 	}
 }

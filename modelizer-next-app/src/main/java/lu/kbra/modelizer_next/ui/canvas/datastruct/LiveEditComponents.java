@@ -9,8 +9,8 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
 import lu.kbra.modelizer_next.style.StylePalette;
-import lu.kbra.modelizer_next.ui.canvas.CopyPastePopupMenu;
 import lu.kbra.modelizer_next.ui.canvas.FieldTagsPopupMenu;
+import lu.kbra.modelizer_next.ui.component.CopyPastePopupMenu;
 
 /**
  * Swing components used during live editing on the canvas.

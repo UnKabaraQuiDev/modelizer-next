@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import lu.kbra.modelizer_next.domain.LinkModel;
-import lu.kbra.modelizer_next.layout.LinkLayout;
+import lu.kbra.modelizer_next.domain.layout.LinkLayout;
 import lu.kbra.modelizer_next.ui.canvas.data.AnchorSide;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.AnchorPair;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.AnchorSidePair;

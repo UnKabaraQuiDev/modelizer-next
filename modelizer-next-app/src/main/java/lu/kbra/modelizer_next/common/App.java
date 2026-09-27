@@ -11,6 +11,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 import lu.kbra.modelizer_next.MNMain;
 import lu.kbra.modelizer_next.common.AppConfig.AppConfigEditor;
+import lu.kbra.modelizer_next.domain.document.DocumentMeta;
 import lu.kbra.pclib.PCUtils;
 
 /**
@@ -122,6 +123,7 @@ public class App {
 		App.NAME = App.JSON.path("name").asText();
 		App.DESCRIPTION = App.JSON.path("description").asText();
 		App.VERSION = App.JSON.path("version").asText();
+		DocumentMeta.APP_VERSION = App.VERSION;
 		App.DISTRIBUTOR = App.JSON.path("distributor").asText();
 		App.ISSUES_URL = App.JSON.path("issues").asText();
 		App.ENTRY_POINT = App.JSON.path("entryPoint").asText();
@@ -180,15 +182,15 @@ public class App {
 	public static void editConfig(final Consumer<AppConfigEditor> configEditor) {
 		App.CONFIG.edit(configEditor);
 		try {
-			CONFIG_HOOKS.parallelStream().forEach(v -> v.accept(App.CONFIG));
-		} catch (Exception e) {
+			App.CONFIG_HOOKS.parallelStream().forEach(v -> v.accept(App.CONFIG));
+		} catch (final Exception e) {
 			e.printStackTrace();
 		}
 		App.saveConfig();
 	}
 
-	public static void addConfigHook(Consumer<AppConfig> appConfig) {
-		CONFIG_HOOKS.add(appConfig);
+	public static void addConfigHook(final Consumer<AppConfig> appConfig) {
+		App.CONFIG_HOOKS.add(appConfig);
 	}
 
 }

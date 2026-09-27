@@ -4,6 +4,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.net.URI;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Optional;
 
 import javax.swing.AbstractAction;
@@ -12,6 +15,9 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.KeyStroke;
 
+import lu.kbra.model_exporter.api.ExporterType;
+import lu.kbra.model_exporter.api.ModelExporter;
+import lu.kbra.modelizer_next.cmdline.Exporters;
 import lu.kbra.modelizer_next.common.App;
 import lu.kbra.modelizer_next.common.OpenedFile;
 
@@ -50,7 +56,44 @@ final class FileMenu extends JMenu {
 		this.add(this.createMenuItem("Save", MainFrameMenuBar.ctrl(KeyEvent.VK_S), frame::saveDocument));
 		this.add(this.createMenuItem("Save As...", MainFrameMenuBar.ctrlShift(KeyEvent.VK_S), frame::saveDocumentAs));
 		this.addSeparator();
-		this.add(this.createMenuItem("Export...", MainFrameMenuBar.ctrlShift(KeyEvent.VK_E), frame::exportView));
+		this.add(this.createExportImageItem(frame));
+		this.add(this.createExportCodeItem(frame));
+	}
+
+	private JMenuItem createExportImageItem(final MainFrame frame) {
+		final JMenu menu = new JMenu("Export image");
+
+		final List<JMenuItem> items = new ArrayList<>();
+		for (final ModelExporter service : Exporters.getModelExporters()) {
+			if (service.getExporterType() != ExporterType.IMAGE) {
+				continue;
+			}
+			final JMenuItem item = service.getUiProvider().buildMenuItem();
+			item.addActionListener(a -> frame.exportImage(service));
+			items.add(item);
+		}
+		items.sort(Comparator.comparing(JMenuItem::getText));
+		items.forEach(menu::add);
+
+		return menu;
+	}
+
+	private JMenuItem createExportCodeItem(final MainFrame frame) {
+		final JMenu menu = new JMenu("Export code");
+
+		final List<JMenuItem> items = new ArrayList<>();
+		for (final ModelExporter service : Exporters.getModelExporters()) {
+			if (service.getExporterType() != ExporterType.CODE) {
+				continue;
+			}
+			final JMenuItem item = service.getUiProvider().buildMenuItem();
+			item.addActionListener(a -> frame.exportCode(service));
+			items.add(item);
+		}
+		items.sort(Comparator.comparing(JMenuItem::getText));
+		items.forEach(menu::add);
+
+		return menu;
 	}
 
 	public void updateRecentItem() {
@@ -67,7 +110,7 @@ final class FileMenu extends JMenu {
 		clearItem.addActionListener(new AbstractAction() {
 
 			@Override
-			public void actionPerformed(ActionEvent e) {
+			public void actionPerformed(final ActionEvent e) {
 				App.editConfig(c -> c.getRecentFiles().clear());
 			}
 

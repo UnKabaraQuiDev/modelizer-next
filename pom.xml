@@ -14,6 +14,8 @@
 		<module>modelizer-next-common</module>
 		<module>modelizer-next-app</module>
 		<module>modelizer-next-bootstrap</module>
+		<module>modelizer-next-datastruct</module>
+		<module>model-exporter</module>
 	</modules>
 
 	<properties>
@@ -23,6 +25,8 @@
 		<maven.compiler.source>${java.version}</maven.compiler.source>
 		<maven.compiler.target>${java.version}</maven.compiler.target>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<twelvemonkeys-imageio.version>3.14.0</twelvemonkeys-imageio.version>
+		<xmlgraphics-batik.version>1.19</xmlgraphics-batik.version>
 
 		<distributor>Manual build</distributor>
 		<appVersion>6</appVersion>
@@ -102,7 +106,7 @@
 			<dependency>
 				<groupId>lu.kbra</groupId>
 				<artifactId>pclib</artifactId>
-				<version>1.2.0</version>
+				<version>1.2.2-SNAPSHOT</version>
 				<scope>import</scope>
 				<type>pom</type>
 			</dependency>
@@ -122,6 +126,23 @@
 				<artifactId>modelizer-next-common</artifactId>
 				<version>${revision}</version>
 			</dependency>
+			<dependency>
+				<groupId>lu.kbra</groupId>
+				<artifactId>modelizer-next-datastruct</artifactId>
+				<version>${revision}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>lu.kbra</groupId>
+				<artifactId>model-exporter-api</artifactId>
+				<version>${revision}</version>
+			</dependency>
+			<dependency>
+				<groupId>lu.kbra</groupId>
+				<artifactId>model-exporters</artifactId>
+				<version>${revision}</version>
+				<type>pom</type>
+			</dependency>
 
 			<dependency>
 				<groupId>io.github.andrewauclair</groupId>
@@ -134,20 +155,17 @@
 				<version>1.4.9</version>
 			</dependency>
 			<dependency>
-				<groupId>org.apache.xmlgraphics</groupId>
-				<artifactId>batik-dom</artifactId>
-				<version>1.19</version>
-			</dependency>
-			<dependency>
-				<groupId>org.apache.xmlgraphics</groupId>
-				<artifactId>batik-svggen</artifactId>
-				<version>1.19</version>
-			</dependency>
-			<dependency>
 				<groupId>com.formdev</groupId>
 				<artifactId>flatlaf</artifactId>
 				<version>3.7.2</version>
 			</dependency>
+
+			<dependency>
+				<groupId>org.jline</groupId>
+				<artifactId>jline-terminal</artifactId>
+				<version>4.4.6</version>
+			</dependency>
+
 			<dependency>
 				<groupId>com.fasterxml.jackson.datatype</groupId>
 				<artifactId>jackson-datatype-jsr310</artifactId>
@@ -159,25 +177,59 @@
 				<version>2.22.2</version>
 			</dependency>
 			<dependency>
-				<groupId>com.twelvemonkeys.imageio</groupId>
-				<artifactId>imageio-jpeg</artifactId>
-				<version>3.14.0</version>
+				<groupId>com.fasterxml.jackson.datatype</groupId>
+				<artifactId>jackson-datatype-jdk8</artifactId>
+				<version>2.20.2</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.apache.xmlgraphics</groupId>
+				<artifactId>batik-dom</artifactId>
+				<version>${xmlgraphics-batik.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.xmlgraphics</groupId>
+				<artifactId>batik-svggen</artifactId>
+				<version>${xmlgraphics-batik.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>com.twelvemonkeys.imageio</groupId>
-				<artifactId>imageio-webp</artifactId>
-				<version>3.14.0</version>
+				<artifactId>imageio-jpeg</artifactId>
+				<version>${twelvemonkeys-imageio.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.sejda.imageio</groupId>
+				<artifactId>webp-imageio</artifactId>
+				<version>0.1.6</version>
+			</dependency>
+			<dependency>
+				<groupId>com.twelvemonkeys.imageio</groupId>
+				<artifactId>imageio-bmp</artifactId>
+				<version>${twelvemonkeys-imageio.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.twelvemonkeys.imageio</groupId>
+				<artifactId>imageio-tiff</artifactId>
+				<version>${twelvemonkeys-imageio.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>com.twelvemonkeys.imageio</groupId>
 				<artifactId>imageio-core</artifactId>
-				<version>3.14.0</version>
+				<version>${twelvemonkeys-imageio.version}</version>
 			</dependency>
+
 			<dependency>
 				<groupId>org.projectlombok</groupId>
 				<artifactId>lombok</artifactId>
 				<version>1.18.46</version>
 				<scope>provided</scope>
+			</dependency>
+
+			<dependency>
+				<groupId>org.junit.jupiter</groupId>
+				<artifactId>junit-jupiter</artifactId>
+				<version>6.0.3</version>
+				<scope>test</scope>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
@@ -186,6 +238,11 @@
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter</artifactId>
 		</dependency>
 	</dependencies>
 
@@ -260,6 +317,11 @@
 					<artifactId>maven-antrun-plugin</artifactId>
 					<version>3.2.0</version>
 				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-surefire-plugin</artifactId>
+					<version>3.5.3</version>
+				</plugin>
 			</plugins>
 		</pluginManagement>
 
@@ -320,15 +382,29 @@
 										<include>**</include>
 									</includes>
 								</filter>
-
-								<!-- Keep Batik fully (reflection + services) -->
+								<!-- Keep all Batik artifacts fully -->
 								<filter>
 									<artifact>org.apache.xmlgraphics:batik-*</artifact>
 									<includes>
 										<include>**</include>
 									</includes>
 								</filter>
-
+								<!-- Keep all TwelveMonkeys ImageIO providers
+								fully -->
+								<filter>
+									<artifact>com.twelvemonkeys.imageio:*</artifact>
+									<includes>
+										<include>**</include>
+									</includes>
+								</filter>
+								<!-- Keep other ImageIO providers
+								fully -->
+								<filter>
+									<artifact>org.sejda.imageio:*</artifact>
+									<includes>
+										<include>**</include>
+									</includes>
+								</filter>
 								<!-- Keep docking framework -->
 								<filter>
 									<artifact>
@@ -337,7 +413,8 @@
 										<include>**</include>
 									</includes>
 								</filter>
-
+								<!-- Remove signatures from all other
+								dependencies -->
 								<filter>
 									<artifact>*:*</artifact>
 									<excludes>

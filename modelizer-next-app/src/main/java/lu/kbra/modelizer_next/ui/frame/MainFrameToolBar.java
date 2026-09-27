@@ -31,7 +31,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
 import lu.kbra.modelizer_next.domain.FieldModel;
-import lu.kbra.modelizer_next.layout.PanelType;
+import lu.kbra.modelizer_next.domain.data.PanelType;
 import lu.kbra.modelizer_next.ui.canvas.DiagramCanvas;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectedElement.SelectedType;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectionInfo;
@@ -43,7 +43,7 @@ import lu.kbra.pclib.PCUtils;
 final class MainFrameToolBar extends JToolBar {
 
 	public record ToolbarDropdownAction(String text, String actionKey, int mnemonic, String mnemonicIndex) {
-		public ToolbarDropdownAction(String text, String actionKey, int mnemonic) {
+		public ToolbarDropdownAction(final String text, final String actionKey, final int mnemonic) {
 			this(text, actionKey, mnemonic, null);
 		}
 	}
@@ -225,7 +225,7 @@ final class MainFrameToolBar extends JToolBar {
 			final JButton button = entry.getKey();
 			final BooleanSupplier enabledSupplier = entry.getValue();
 
-			button.setEnabled(Boolean.TRUE.equals(enabledSupplier.getAsBoolean()));
+			button.setEnabled(enabledSupplier.getAsBoolean());
 		}
 	}
 
@@ -591,7 +591,7 @@ final class MainFrameToolBar extends JToolBar {
 		}
 
 		this.buttonEnabledSuppliers.put(button, enabledSupplier);
-		button.setEnabled(Boolean.TRUE.equals(enabledSupplier.getAsBoolean()));
+		button.setEnabled(enabledSupplier.getAsBoolean());
 	}
 
 }

@@ -3,7 +3,7 @@ package lu.kbra.modelizer_next.common;
 import java.io.IOException;
 
 import lu.kbra.modelizer_next.MNMain;
-import lu.kbra.modelizer_next.document.ModelDocument;
+import lu.kbra.modelizer_next.domain.document.ModelDocument;
 import lu.kbra.modelizer_next.json.ModernModelizerImporter;
 import lu.kbra.pclib.PCUtils;
 
