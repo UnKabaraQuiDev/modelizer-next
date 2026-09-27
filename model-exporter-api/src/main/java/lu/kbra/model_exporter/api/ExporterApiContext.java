@@ -5,18 +5,21 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 
-import lu.kbra.modelizer_next.domain.data.PanelType;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lu.kbra.modelizer_next.domain.data.PanelType;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public final class ExporterApiContext {
 
-	private static final ThreadLocal<ExporterApiContext> API_CONTEXT = ThreadLocal.withInitial(ExporterApiContext::new);
+	private static final InheritableThreadLocal<ExporterApiContext> API_CONTEXT = new InheritableThreadLocal<>();
+
+	static {
+		ExporterApiContext.clearApiContext();
+	}
 
 	private URI currentDocument;
 	private URI currentConfig;

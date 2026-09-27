@@ -1,4 +1,4 @@
-package lu.kbra.image_exporter.png.ui;
+package lu.kbra.image_exporter.webp.ui;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -11,7 +11,7 @@ import javax.swing.JSlider;
 import lombok.Getter;
 
 @Getter
-public class PngImageUiPanel extends JPanel {
+public class WebpImageUiPanel extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 
@@ -20,7 +20,7 @@ public class PngImageUiPanel extends JPanel {
 	/**
 	 * Create the panel.
 	 */
-	public PngImageUiPanel() {
+	public WebpImageUiPanel() {
 		final GridBagLayout gridBagLayout = new GridBagLayout();
 		gridBagLayout.columnWidths = new int[] { 120, 0, 0 };
 		gridBagLayout.rowHeights = new int[] { 0, 0 };
@@ -36,7 +36,7 @@ public class PngImageUiPanel extends JPanel {
 		gbc_lblCompression.gridy = 0;
 		this.add(lblCompression, gbc_lblCompression);
 
-		this.compressionLevel = new JSlider(0, 90, 20);
+		this.compressionLevel = new JSlider(0, 100, 75);
 		final GridBagConstraints gbc_compressionLevel = new GridBagConstraints();
 		gbc_compressionLevel.fill = GridBagConstraints.HORIZONTAL;
 		gbc_compressionLevel.gridx = 1;

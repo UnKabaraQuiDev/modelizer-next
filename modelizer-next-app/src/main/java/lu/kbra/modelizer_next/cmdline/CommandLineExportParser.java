@@ -149,7 +149,7 @@ public final class CommandLineExportParser {
 			case "-b", "--batch" -> batch = true;
 			case "-h", "--help" -> {
 				CommandLineExportParser.printHelp();
-				if (args.length > i) {
+				if (args.length > i + 1) {
 					final ModelExporter me = CommandLineExportParser.parseFormat(args[i + 1]);
 					CommandLineExportParser.printOptions(args[i + 1].toLowerCase(),
 							me.getOptionsManager().getClassType(),
@@ -210,7 +210,6 @@ public final class CommandLineExportParser {
 		final List<String[]> rows = new ArrayList<>();
 
 		for (final BeanPropertyDefinition property : description.findProperties()) {
-
 			final String name = property.getName();
 			final String type = property.getPrimaryType().getRawClass().getSimpleName();
 

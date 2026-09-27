@@ -198,9 +198,9 @@
 				<version>${twelvemonkeys-imageio.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>com.twelvemonkeys.imageio</groupId>
-				<artifactId>imageio-webp</artifactId>
-				<version>${twelvemonkeys-imageio.version}</version>
+				<groupId>org.sejda.imageio</groupId>
+				<artifactId>webp-imageio</artifactId>
+				<version>0.1.6</version>
 			</dependency>
 			<dependency>
 				<groupId>com.twelvemonkeys.imageio</groupId>
@@ -224,6 +224,13 @@
 				<version>1.18.46</version>
 				<scope>provided</scope>
 			</dependency>
+
+			<dependency>
+				<groupId>org.junit.jupiter</groupId>
+				<artifactId>junit-jupiter</artifactId>
+				<version>6.0.3</version>
+				<scope>test</scope>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
 
@@ -231,6 +238,11 @@
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter</artifactId>
 		</dependency>
 	</dependencies>
 
@@ -305,6 +317,11 @@
 					<artifactId>maven-antrun-plugin</artifactId>
 					<version>3.2.0</version>
 				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-surefire-plugin</artifactId>
+					<version>3.5.3</version>
+				</plugin>
 			</plugins>
 		</pluginManagement>
 
@@ -372,9 +389,18 @@
 										<include>**</include>
 									</includes>
 								</filter>
-								<!-- Keep all TwelveMonkeys ImageIO providers fully -->
+								<!-- Keep all TwelveMonkeys ImageIO providers
+								fully -->
 								<filter>
 									<artifact>com.twelvemonkeys.imageio:*</artifact>
+									<includes>
+										<include>**</include>
+									</includes>
+								</filter>
+								<!-- Keep other ImageIO providers
+								fully -->
+								<filter>
+									<artifact>org.sejda.imageio:*</artifact>
 									<includes>
 										<include>**</include>
 									</includes>
@@ -387,7 +413,8 @@
 										<include>**</include>
 									</includes>
 								</filter>
-								<!-- Remove signatures from all other dependencies -->
+								<!-- Remove signatures from all other
+								dependencies -->
 								<filter>
 									<artifact>*:*</artifact>
 									<excludes>

@@ -2,11 +2,15 @@ package lu.kbra.image_exporter.svg;
 
 import java.awt.Color;
 import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.EnumSet;
 import java.util.Optional;
 import java.util.Set;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lu.kbra.model_exporter.api.ImageExporterOptions;
 import lu.kbra.model_exporter.api.TransparencyOwner;
 import lu.kbra.modelizer_next.domain.data.PanelType;
@@ -14,21 +18,18 @@ import lu.kbra.modelizer_next.domain.data.ViewExportScope;
 import lu.kbra.modelizer_next.utils.RelativePathSerializer;
 import lu.kbra.pclib.PCUtils;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-
 @Data
 @EqualsAndHashCode
 public class SvgImageExporterOptions implements ImageExporterOptions, TransparencyOwner {
 
 	@JsonSerialize(using = RelativePathSerializer.class)
-	private Path outputPath;
+	private Path outputPath = Paths.get(".");
 
-	private String nameFormat;
-	private ViewExportScope scope;
-	private Set<PanelType> panels;
+	private String nameFormat = ImageExporterOptions.DEFAULT_NAME_FORMAT;
+	private ViewExportScope scope = ViewExportScope.EVERYTHING;
+	private Set<PanelType> panels = EnumSet.allOf(PanelType.class);
 
-	private Optional<Color> backgroundColor;
+	private Optional<Color> backgroundColor = Optional.empty();
 
 	private boolean transparentBackground = true;
 

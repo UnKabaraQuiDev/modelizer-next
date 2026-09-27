@@ -1,5 +1,6 @@
 package lu.kbra.image_exporter.png;
 
+import lombok.Getter;
 import lu.kbra.model_exporter.api.ExportFailedException;
 import lu.kbra.model_exporter.api.ExportUpdateCallback;
 import lu.kbra.model_exporter.api.ImageExporterOptions;
@@ -8,8 +9,6 @@ import lu.kbra.model_exporter.api.ImageOptionsManager;
 import lu.kbra.model_exporter.api.ModelVisitResult;
 import lu.kbra.model_exporter.api.ModelVisitor;
 import lu.kbra.modelizer_next.domain.document.ModelDocument;
-
-import lombok.Getter;
 
 @Getter
 public class PngImageModelVisitor implements ModelVisitor {

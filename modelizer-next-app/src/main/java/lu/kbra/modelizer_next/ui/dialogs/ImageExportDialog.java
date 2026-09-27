@@ -15,12 +15,13 @@ import lu.kbra.model_exporter.api.ExporterOptions;
 import lu.kbra.model_exporter.api.ExporterType;
 import lu.kbra.model_exporter.api.ImageExporterOptions;
 import lu.kbra.model_exporter.api.ImageOptionsManager;
-import lu.kbra.model_exporter.api.MaxDimensionOwner;
+import lu.kbra.model_exporter.api.MaxSize2DOwner;
 import lu.kbra.model_exporter.api.ModelExporter;
 import lu.kbra.model_exporter.api.TransparencyOwner;
 import lu.kbra.modelizer_next.common.ExporterOptionRef;
 import lu.kbra.modelizer_next.domain.data.PanelType;
 import lu.kbra.modelizer_next.domain.data.ViewExportScope;
+import lu.kbra.modelizer_next.domain.layout.Size2D;
 import lu.kbra.modelizer_next.ui.component.ImageExportPanel;
 import lu.kbra.modelizer_next.ui.component.ImageSizePanel;
 import lu.kbra.modelizer_next.ui.frame.MainFrame;
@@ -95,9 +96,9 @@ public class ImageExportDialog extends ModelExportDialog {
 		options.setPanels(panels);
 
 		if (optionsManager.supportsFixedSize()) {
-			final MaxDimensionOwner own = (MaxDimensionOwner) options;
-			own.setMaxDimension(new Dimension((int) this.imageSizePanel.getSpinWidth().getValue(),
-					(int) this.imageSizePanel.getSpinHeight().getValue()));
+			final MaxSize2DOwner own = (MaxSize2DOwner) options;
+			own.setMaxSize2D(
+					new Size2D((int) this.imageSizePanel.getSpinWidth().getValue(), (int) this.imageSizePanel.getSpinHeight().getValue()));
 		}
 
 		return options;
@@ -124,9 +125,9 @@ public class ImageExportDialog extends ModelExportDialog {
 		this.imageExportPanel.getChckbxPhysical().setSelected(panels.contains(PanelType.PHYSICAL));
 
 		if (optionsManager.supportsFixedSize()) {
-			final Dimension maxDimension = ((MaxDimensionOwner) options).getMaxDimension();
-			this.imageSizePanel.getSpinWidth().setValue(maxDimension.width);
-			this.imageSizePanel.getSpinHeight().setValue(maxDimension.height);
+			final Size2D maxDimension = ((MaxSize2DOwner) options).getMaxSize2D();
+			this.imageSizePanel.getSpinWidth().setValue(maxDimension.getWidth());
+			this.imageSizePanel.getSpinHeight().setValue(maxDimension.getHeight());
 		}
 
 		if (optionsManager.supportsTransparency()) {

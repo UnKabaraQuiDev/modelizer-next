@@ -16,8 +16,8 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>com.twelvemonkeys.imageio</groupId>
-			<artifactId>imageio-webp</artifactId>
+			<groupId>org.sejda.imageio</groupId>
+			<artifactId>webp-imageio</artifactId>
 		</dependency>
 	</dependencies>
 

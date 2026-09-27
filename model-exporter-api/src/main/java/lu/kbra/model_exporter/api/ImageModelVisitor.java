@@ -1,7 +1,6 @@
 package lu.kbra.model_exporter.api;
 
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
@@ -25,6 +24,7 @@ import javax.imageio.stream.ImageOutputStream;
 
 import lu.kbra.modelizer_next.domain.data.PanelType;
 import lu.kbra.modelizer_next.domain.document.ModelDocument;
+import lu.kbra.modelizer_next.domain.layout.Size2D;
 import lu.kbra.pclib.PCUtils;
 
 public final class ImageModelVisitor {
@@ -75,13 +75,13 @@ public final class ImageModelVisitor {
 
 				// Scale down to fit within maxDimension while preserving the aspect ratio.
 				if (optionsManager.supportsTransparency()) {
-					final Dimension maxDimension = ((MaxDimensionOwner) options).getMaxDimension();
+					final Size2D maxDimension = ((MaxSize2DOwner) options).getMaxSize2D();
 
-					if (maxDimension != null && maxDimension.width > 0 && maxDimension.height > 0
-							&& (image.getWidth() > maxDimension.width || image.getHeight() > maxDimension.height)) {
+					if (maxDimension != null && maxDimension.getWidth() > 0 && maxDimension.getHeight() > 0
+							&& (image.getWidth() > maxDimension.getWidth() || image.getHeight() > maxDimension.getHeight())) {
 
-						final double scale = Math.min((double) maxDimension.width / image.getWidth(),
-								(double) maxDimension.height / image.getHeight());
+						final double scale = Math.min((double) maxDimension.getWidth() / image.getWidth(),
+								(double) maxDimension.getHeight() / image.getHeight());
 
 						final int width = Math.max(1, (int) Math.round(image.getWidth() * scale));
 						final int height = Math.max(1, (int) Math.round(image.getHeight() * scale));
@@ -136,11 +136,11 @@ public final class ImageModelVisitor {
 						param.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
 
 						// PNG compression level: 0 = none, 9 = maximum.
-						final int compressionLevel = Math.max(0, Math.min(9, ((CompressionOwner) options).getCompressionLevel()));
+						final int compressionLevel = ((CompressionOwner) options).getCompressionLevel();
 
 						// ImageIO's PNG writer treats compressionQuality inversely:
 						// 1.0 = least compression, 0.0 = maximum compression.
-						param.setCompressionQuality(1.0f - compressionLevel / 9.0f);
+						param.setCompressionQuality(1.0f - compressionLevel / 100f);
 					}
 
 					if (optionsManager.getImageType() != image.getType()) {

@@ -1,5 +1,6 @@
 package lu.kbra.image_exporter.webp;
 
+import lombok.Getter;
 import lu.kbra.image_exporter.webp.ui.WebpImageUiProvider;
 import lu.kbra.model_exporter.api.ExporterOptions;
 import lu.kbra.model_exporter.api.ExporterType;
@@ -7,8 +8,6 @@ import lu.kbra.model_exporter.api.ImageModelExporter;
 import lu.kbra.model_exporter.api.ImageOptionsManager;
 import lu.kbra.model_exporter.api.ModelVisitor;
 import lu.kbra.model_exporter.api.UiProvider;
-
-import lombok.Getter;
 
 @Getter
 public class WebpImageExporter implements ImageModelExporter {
