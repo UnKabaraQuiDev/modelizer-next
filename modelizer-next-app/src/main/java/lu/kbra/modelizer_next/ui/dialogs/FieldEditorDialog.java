@@ -24,8 +24,9 @@ import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 
+import lu.kbra.model_exporter.api.ColorButton;
 import lu.kbra.modelizer_next.domain.FieldModel;
-import lu.kbra.modelizer_next.ui.component.ColorButton;
+import lu.kbra.modelizer_next.domain.TagsOwner;
 
 /**
  * Dialog for editing a class field or table column.
@@ -52,6 +53,8 @@ public final class FieldEditorDialog {
 			boolean primaryKey,
 			boolean unique,
 			boolean notNull,
+			boolean autoIncrement,
+			boolean generated,
 			Color textColor,
 			Color backgroundColor,
 			int moveDelta,
@@ -87,9 +90,11 @@ public final class FieldEditorDialog {
 
 		final JCheckBox technicalOnlyBox = new JCheckBox("Logical/Physical only", fieldModel.isTechnicalOnly());
 
-		final JCheckBox primaryKeyBox = new JCheckBox("PK", fieldModel.isPrimaryKey());
-		final JCheckBox uniqueBox = new JCheckBox("UQ", fieldModel.isUnique());
-		final JCheckBox notNullBox = new JCheckBox("NN", fieldModel.isNonNull());
+		final JCheckBox primaryKeyBox = new JCheckBox(TagsOwner.PRIMARY_KEY_FLAG, fieldModel.isPrimaryKey());
+		final JCheckBox uniqueBox = new JCheckBox(TagsOwner.UNIQUE_FLAG, fieldModel.isUnique());
+		final JCheckBox notNullBox = new JCheckBox(TagsOwner.NOT_NULL_FLAG, fieldModel.isNonNull());
+		final JCheckBox autoIncrementBox = new JCheckBox(TagsOwner.AUTO_INCREMENT_FLAG, fieldModel.isAutoIncrement());
+		final JCheckBox generatedBox = new JCheckBox(TagsOwner.GENERATED_FLAG, fieldModel.isGenerated());
 
 		final ColorButton textColorButton = new ColorButton("Text color", fieldModel.getTextColor());
 		final ColorButton backgroundColorButton = new ColorButton("Background color", fieldModel.getBackgroundColor());
@@ -104,10 +109,12 @@ public final class FieldEditorDialog {
 		form.add(FieldEditorDialog.row("Type", sqlTypeBox));
 		form.add(FieldEditorDialog.row("Visibility", technicalOnlyBox));
 
-		final JPanel flagsRow = new JPanel(new GridLayout(1, 3, 8, 0));
+		final JPanel flagsRow = new JPanel(new GridLayout(2, 3, 8, 0));
 		flagsRow.add(primaryKeyBox);
 		flagsRow.add(uniqueBox);
 		flagsRow.add(notNullBox);
+		flagsRow.add(autoIncrementBox);
+		flagsRow.add(generatedBox);
 		form.add(FieldEditorDialog.row("Flags", flagsRow));
 
 		final JPanel colorRow = new JPanel(new GridLayout(1, 2, 8, 0));
@@ -127,6 +134,8 @@ public final class FieldEditorDialog {
 					primaryKeyBox.isSelected(),
 					uniqueBox.isSelected(),
 					notNullBox.isSelected(),
+					autoIncrementBox.isSelected(),
+					generatedBox.isSelected(),
 					textColorButton.getSelectedColor(),
 					backgroundColorButton.getSelectedColor(),
 					0,
@@ -141,6 +150,8 @@ public final class FieldEditorDialog {
 					primaryKeyBox,
 					uniqueBox,
 					notNullBox,
+					autoIncrementBox,
+					generatedBox,
 					textColorButton,
 					backgroundColorButton,
 					sqlTypeBox,
@@ -156,6 +167,8 @@ public final class FieldEditorDialog {
 					primaryKeyBox,
 					uniqueBox,
 					notNullBox,
+					autoIncrementBox,
+					generatedBox,
 					textColorButton,
 					backgroundColorButton,
 					sqlTypeBox,
@@ -211,6 +224,8 @@ public final class FieldEditorDialog {
 			final JCheckBox primaryKeyBox,
 			final JCheckBox uniqueBox,
 			final JCheckBox notNullBox,
+			final JCheckBox autoIncrementBox,
+			final JCheckBox generatedBox,
 			final ColorButton textColorButton,
 			final ColorButton backgroundColorButton,
 			final JComboBox<String> typeField,
@@ -220,6 +235,8 @@ public final class FieldEditorDialog {
 		fieldModel.setPrimaryKey(primaryKeyBox.isSelected());
 		fieldModel.setUnique(uniqueBox.isSelected());
 		fieldModel.setNonNull(notNullBox.isSelected());
+		fieldModel.setAutoIncrement(autoIncrementBox.isSelected());
+		fieldModel.setGenerated(generatedBox.isSelected());
 		fieldModel.setTextColor(textColorButton.getSelectedColor());
 		fieldModel.setBackgroundColor(backgroundColorButton.getSelectedColor());
 		fieldModel.setType(typeField.getSelectedItem() == null ? null : typeField.getSelectedItem().toString().trim());

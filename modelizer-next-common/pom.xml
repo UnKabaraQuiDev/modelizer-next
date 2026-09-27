@@ -11,6 +11,8 @@
 	</parent>
 
 	<artifactId>modelizer-next-common</artifactId>
+	
+	<name>Modelizer Next Common</name>
 
 	<dependencies>
 		<dependency>

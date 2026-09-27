@@ -31,15 +31,15 @@ import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 
-import lu.kbra.modelizer_next.document.ModelDocument;
+import lu.kbra.model_exporter.api.ColorButton;
 import lu.kbra.modelizer_next.domain.ClassModel;
 import lu.kbra.modelizer_next.domain.CommentBinding;
 import lu.kbra.modelizer_next.domain.CommentModel;
 import lu.kbra.modelizer_next.domain.LinkModel;
 import lu.kbra.modelizer_next.domain.data.BoundTargetType;
 import lu.kbra.modelizer_next.domain.data.CommentKind;
-import lu.kbra.modelizer_next.layout.PanelType;
-import lu.kbra.modelizer_next.ui.component.ColorButton;
+import lu.kbra.modelizer_next.domain.data.PanelType;
+import lu.kbra.modelizer_next.domain.document.ModelDocument;
 
 /**
  * Dialog for editing a comment, its type, and optional binding.

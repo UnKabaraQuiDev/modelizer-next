@@ -9,7 +9,7 @@ import lu.kbra.modelizer_next.domain.LinkModel;
 import lu.kbra.modelizer_next.domain.data.BoundTargetType;
 import lu.kbra.modelizer_next.domain.data.Cardinality;
 import lu.kbra.modelizer_next.domain.data.CommentKind;
-import lu.kbra.modelizer_next.layout.PanelType;
+import lu.kbra.modelizer_next.domain.data.PanelType;
 import lu.kbra.modelizer_next.ui.canvas.datastruct.SelectedElement;
 import lu.kbra.modelizer_next.ui.dialogs.ClassEditorDialog;
 import lu.kbra.modelizer_next.ui.dialogs.CommentEditorDialog;

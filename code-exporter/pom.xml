@@ -1,0 +1,29 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>lu.kbra</groupId>
+		<artifactId>model-exporter</artifactId>
+		<version>${revision}</version>
+		<relativePath>../model-exporter/</relativePath>
+	</parent>
+
+	<artifactId>code-exporter</artifactId>
+	<packaging>pom</packaging>
+
+	<name>Code Exporter Parent</name>
+
+	<modules>
+		<module>../code-exporter-java</module>
+	</modules>
+
+	<dependencies>
+		<dependency>
+			<groupId>lu.kbra</groupId>
+			<artifactId>model-exporter-api</artifactId>
+		</dependency>
+	</dependencies>
+
+</project>
