@@ -5,7 +5,6 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -20,7 +19,6 @@ import lu.kbra.model_exporter.api.CanvasRenderer;
 import lu.kbra.model_exporter.api.ExportFailedException;
 import lu.kbra.model_exporter.api.ExportUpdateCallback;
 import lu.kbra.model_exporter.api.ExporterApiContext;
-import lu.kbra.model_exporter.api.ImageModelVisitor;
 import lu.kbra.model_exporter.api.ModelVisitResult;
 import lu.kbra.model_exporter.api.ModelVisitor;
 import lu.kbra.modelizer_next.domain.data.PanelType;
@@ -64,19 +62,7 @@ public class SvgImageModelVisitor implements ModelVisitor {
 
 				canvas.paintExport(svgGraphics, this.options.getScope());
 
-				final File outputFile = new File(
-						ImageModelVisitor
-								.ensureExtension(
-										ImageModelVisitor
-												.replacePlaceholders(
-														(this.options.getOutputPath().isAbsolute() ? this.options.getOutputPath()
-																: Paths.get(ExporterApiContext.getApiContext().getCurrentDocument())
-																		.getParent())
-																.resolve(this.options.getNameFormat())
-																.toString(),
-														"svg",
-														pt),
-										"svg"));
+				final File outputFile = ModelVisitor.getPath(options.getOutputPath(), options.getNameFormat(), "svg", pt).toFile();
 
 				try (FileWriter writer = new FileWriter(outputFile)) {
 					svgGraphics.stream(writer, true);

@@ -8,6 +8,8 @@ public interface TagsOwner {
 	String NOT_NULL_FLAG = "NN";
 	String PRIMARY_KEY_FLAG = "PK";
 	String UNIQUE_FLAG = "UQ";
+	String AUTO_INCREMENT_FLAG = "AI";
+	String GENERATED_FLAG = "GT";
 
 	FieldTags getTags();
 
@@ -25,6 +27,14 @@ public interface TagsOwner {
 		return this.getTags().isUnique();
 	}
 
+	default boolean isAutoIncrement() {
+		return this.getTags().isAutoIncrement();
+	}
+
+	default boolean isGenerated() {
+		return this.getTags().isGenerated();
+	}
+
 	default void setPrimaryKey(final boolean primaryKey) {
 		this.getTags().setPrimaryKey(primaryKey);
 	}
@@ -37,11 +47,14 @@ public interface TagsOwner {
 		this.getTags().setUnique(unique);
 	}
 
-	/**
-	 * Returns the flags.
-	 *
-	 * @return the flags
-	 */
+	default void setAutoIncrement(final boolean autoIncrement) {
+		this.getTags().setAutoIncrement(autoIncrement);
+	}
+
+	default void setGenerated(final boolean generated) {
+		this.getTags().setGenerated(generated);
+	}
+
 	default List<String> getFlags() {
 		final List<String> ll = new ArrayList<>();
 		if (this.isPrimaryKey()) {
@@ -53,16 +66,17 @@ public interface TagsOwner {
 		if (this.isUnique()) {
 			ll.add(TagsOwner.UNIQUE_FLAG);
 		}
+		if (this.isAutoIncrement()) {
+			ll.add(TagsOwner.AUTO_INCREMENT_FLAG);
+		}
+		if (this.isGenerated()) {
+			ll.add(TagsOwner.GENERATED_FLAG);
+		}
 		return ll;
 	}
 
-	/**
-	 * Checks whether this object has a flags.
-	 *
-	 * @return {@code true} if flags exists; otherwise {@code false}
-	 */
 	default boolean hasFlags() {
-		return this.isPrimaryKey() || this.isNonNull() || this.isUnique();
+		return this.isPrimaryKey() || this.isNonNull() || this.isUnique() || this.isAutoIncrement() || isGenerated();
 	}
 
 }

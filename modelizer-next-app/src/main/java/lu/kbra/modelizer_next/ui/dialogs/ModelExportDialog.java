@@ -63,7 +63,7 @@ public abstract class ModelExportDialog extends JDialog {
 							t -> null)
 					: null;
 			if (this.options == null) {
-				this.options = this.parsePanelOptions();
+				this.options = service.getOptionsManager().blankOptions();
 			}
 			ref.setOptions(this.options);
 			this.original = this.options.clone();

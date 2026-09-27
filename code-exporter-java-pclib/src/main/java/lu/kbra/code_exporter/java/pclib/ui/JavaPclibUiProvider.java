@@ -1,6 +1,7 @@
 package lu.kbra.code_exporter.java.pclib.ui;
 
 import java.nio.file.Paths;
+import java.util.ArrayList;
 
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
@@ -36,7 +37,7 @@ public class JavaPclibUiProvider implements UiProvider {
 
 		options.setDataPackage(optionPanel.getDataClassesPackage().getText());
 		options.setTablePackage(optionPanel.getTableClassesPackage().getText());
-		options.setSpringDeatabaseBean(optionPanel.getSpringDatabaseBean().getText());
+		options.setSpringDatabaseBean(optionPanel.getSpringDatabaseBean().getText());
 		options.setDbms(optionPanel.getComboBoxDbms().getSelectedItem().toString());
 
 		options.setSplitBySchema("PostgreSQL".equals(options.getDbms()) && optionPanel.getChckbxSplitBySchema().isSelected());
@@ -47,9 +48,12 @@ public class JavaPclibUiProvider implements UiProvider {
 		options.setUseSpring(optionPanel.getChckbxUseSpring().isSelected());
 		options.setFixNamingConvention(optionPanel.getChckbxCorrectNaming().isSelected());
 		options.setKeepSimpleNames(optionPanel.getChckbxKeepSimpleNames().isSelected());
+		options.setUseLombok(optionPanel.getChckbxUseLombok().isSelected());
 
 		options.setDataPath(Paths.get(optionPanel.getTxtDataPath().getText()));
 		options.setTablePath(Paths.get(optionPanel.getTxtTablePath().getText()));
+
+		options.setTypes(new ArrayList<>(optionPanel.getTypesPanel().getData()));
 
 		return options;
 	}
@@ -67,7 +71,7 @@ public class JavaPclibUiProvider implements UiProvider {
 
 		optionPanel.getDataClassesPackage().setText(pclibOptions.getDataPackage());
 		optionPanel.getTableClassesPackage().setText(pclibOptions.getTablePackage());
-		optionPanel.getSpringDatabaseBean().setText(pclibOptions.getSpringDeatabaseBean());
+		optionPanel.getSpringDatabaseBean().setText(pclibOptions.getSpringDatabaseBean());
 		optionPanel.getComboBoxDbms().setSelectedItem(pclibOptions.getDbms());
 
 		optionPanel.getChckbxSplitBySchema().setSelected(pclibOptions.isSplitBySchema());
@@ -77,9 +81,13 @@ public class JavaPclibUiProvider implements UiProvider {
 		optionPanel.getChckbxMergeFiles().setSelected(pclibOptions.isMergeFiles());
 		optionPanel.getChckbxUseSpring().setSelected(pclibOptions.isUseSpring());
 		optionPanel.getChckbxKeepSimpleNames().setSelected(pclibOptions.isKeepSimpleNames());
+		optionPanel.getChckbxUseLombok().setSelected(pclibOptions.isUseLombok());
+		optionPanel.getChckbxCorrectNaming().setSelected(pclibOptions.isFixNamingConvention());
 
 		optionPanel.getTxtDataPath().setText(pclibOptions.getDataPath() == null ? "" : pclibOptions.getDataPath().toString());
 		optionPanel.getTxtTablePath().setText(pclibOptions.getTablePath() == null ? "" : pclibOptions.getTablePath().toString());
+
+		optionPanel.getTypesPanel().rebuild(pclibOptions.getTypes());
 	}
 
 }

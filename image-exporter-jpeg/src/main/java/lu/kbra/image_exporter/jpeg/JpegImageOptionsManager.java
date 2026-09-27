@@ -9,24 +9,6 @@ import lu.kbra.model_exporter.api.ImageOptionsManager;
 public class JpegImageOptionsManager implements ImageOptionsManager {
 
 	@Override
-	@Deprecated
-	public void relativizePaths(final ExporterOptions options, final Path documentPath) {
-		if (!(options instanceof final JpegImageExporterOptions pngOptions)) {
-			throw new IllegalArgumentException(
-					"Options type not supported (" + (options == null ? "null" : options.getClass().getName()) + ").");
-		}
-
-		if (pngOptions.getOutputPath() == null) {
-			return;
-		}
-
-		final Path outputPath = pngOptions.getOutputPath();
-		if (outputPath.isAbsolute()) {
-			pngOptions.setOutputPath(documentPath.relativize(outputPath));
-		}
-	}
-
-	@Override
 	public boolean supportsTransparency() {
 		return false;
 	}

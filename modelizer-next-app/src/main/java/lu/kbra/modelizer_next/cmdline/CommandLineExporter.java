@@ -28,7 +28,7 @@ import java.util.stream.Stream;
 import lu.kbra.model_exporter.api.ExportContext;
 import lu.kbra.model_exporter.api.ExportUpdateCallback;
 import lu.kbra.model_exporter.api.ExporterApiContext;
-import lu.kbra.model_exporter.api.ImageExporterOptions;
+import lu.kbra.model_exporter.api.ExporterOptions;
 import lu.kbra.model_exporter.api.ModelExporter;
 import lu.kbra.model_exporter.api.ModelVisitResult;
 import lu.kbra.modelizer_next.common.DefaultExportUpdateCallback;
@@ -69,36 +69,29 @@ public final class CommandLineExporter {
 			updateCallback.setAggregateChildProgress(true);
 			updateCallback.setExpectedChildCount(documentProducer.getExpectedCount());
 
-			switch (exporter.getExporterType()) {
-			case IMAGE -> {
-				final ImageExporterOptions config = (ImageExporterOptions) options.options();
+			final ExporterOptions config = (ExporterOptions) options.options();
 
-				Optional<LoadedDocument> loadedDocument;
-				while ((loadedDocument = documentProducer.next()).isPresent()) {
-					final LoadedDocument doc = loadedDocument.get();
-					executor.submit(() -> {
-						try {
-							ExporterApiContext.clearApiContext();
-							ExporterApiContext.getApiContext().setContext(ExportContext.CLI);
-							ExporterApiContext.getApiContext().setCurrentConfig(options.configFile());
-							ExporterApiContext.getApiContext().setCurrentDocument(doc.sourceFile());
-							ExporterApiContext.getApiContext().setRenderers(pt -> CommandLineExporter.createCanvases(doc.document(), pt));
+			Optional<LoadedDocument> loadedDocument;
+			while ((loadedDocument = documentProducer.next()).isPresent()) {
+				final LoadedDocument doc = loadedDocument.get();
+				executor.submit(() -> {
+					try {
+						ExporterApiContext.clearApiContext();
+						ExporterApiContext.getApiContext().setContext(ExportContext.CLI);
+						ExporterApiContext.getApiContext().setCurrentConfig(options.configFile());
+						ExporterApiContext.getApiContext().setCurrentDocument(doc.sourceFile());
+						ExporterApiContext.getApiContext()
+								.setOutputDirectory(options.outputDirectory() != null ? options.outputDirectory().toPath() : null);
+						ExporterApiContext.getApiContext().setRenderers(pt -> CommandLineExporter.createCanvases(doc.document(), pt));
 
-							final ModelVisitResult result = exporter.buildModelVisitor(config)
-									.visitDocument(doc.document(), updateCallback);
+						final ModelVisitResult result = exporter.buildModelVisitor(config).visitDocument(doc.document(), updateCallback);
 
-							exportedFileCount.add(result.exportedFiles().size());
-						} catch (final Throwable e) {
-							caughtException.add(e);
-							executor.shutdownNow();
-						}
-					});
-				}
-			}
-			case CODE -> {
-				renderer.close();
-				throw new UnsupportedOperationException();
-			}
+						exportedFileCount.add(result.exportedFiles().size());
+					} catch (final Throwable e) {
+						caughtException.add(e);
+						executor.shutdownNow();
+					}
+				});
 			}
 
 			executor.shutdown();
@@ -117,7 +110,7 @@ public final class CommandLineExporter {
 				return 3;
 			}
 
-			System.out.println("Exported " + exportedFileCount.get() + " images.");
+			System.out.println("Exported " + exportedFileCount.get() + " files.");
 
 			return 0;
 		} catch (final CommandLineExportParser.HelpRequestedException ex) {

@@ -16,6 +16,7 @@
 	<name>Code Exporter Java Parent</name>
 
 	<modules>
+		<module>../code-exporter-java-common</module>
 		<module>../code-exporter-java-pclib</module>
 	</modules>
 
@@ -44,10 +45,10 @@
 			<groupId>com.squareup</groupId>
 			<artifactId>javapoet</artifactId>
 		</dependency>
-		<dependency>
+		<!-- <dependency>
 			<groupId>com.github.javaparser</groupId>
 			<artifactId>javaparser-core</artifactId>
-		</dependency>
+		</dependency> -->
 	</dependencies>
 
 </project>

@@ -123,7 +123,7 @@ public final class CommandLineExportParser {
 	public static CommandLineExportOptions parse(final String[] args) throws IOException {
 		String inputFile = null;
 		ModelExporter exporter = null;
-		File outputDirectory = new File(".");
+		File outputDirectory = null;
 		URI configFile = null;
 		boolean force = false;
 		boolean multiple = false;
@@ -174,7 +174,7 @@ public final class CommandLineExportParser {
 			throw new MissingArgumentException("Input file does not exist: " + inputFile);
 		}
 
-		if (!outputDirectory.exists() && !outputDirectory.mkdirs()) {
+		if (outputDirectory != null && !outputDirectory.exists() && !outputDirectory.mkdirs()) {
 			throw new MissingArgumentException("Could not create output directory: " + outputDirectory);
 		}
 

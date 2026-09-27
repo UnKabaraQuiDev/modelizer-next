@@ -9,7 +9,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -113,19 +112,7 @@ public final class ImageModelVisitor {
 
 				final ImageWriter writer = writers.next();
 
-				final Path outputFile = Paths
-						.get(ImageModelVisitor
-								.ensureExtension(
-										ImageModelVisitor
-												.replacePlaceholders(
-														(options.getOutputPath().isAbsolute() ? options.getOutputPath()
-																: Paths.get(ExporterApiContext.getApiContext().getCurrentDocument())
-																		.getParent())
-																.resolve(options.getNameFormat())
-																.toString(),
-														extension,
-														pt),
-										extension));
+				final Path outputFile = ModelVisitor.getPath(options.getOutputPath(), options.getNameFormat(), extension, pt);
 
 				try (OutputStream os = Files.newOutputStream(outputFile); ImageOutputStream ios = ImageIO.createImageOutputStream(os)) {
 					writer.setOutput(ios);
@@ -187,18 +174,6 @@ public final class ImageModelVisitor {
 		}
 
 		return target;
-	}
-
-	public static String ensureExtension(final String string, final String ext) {
-		return string.endsWith("." + ext) ? string : string + "." + ext;
-	}
-
-	public static String replacePlaceholders(final String filename, final String extension, final PanelType panelType) {
-		return filename
-				.replace("{FILENAME}",
-						PCUtils.removeFileExtension(new File(ExporterApiContext.getApiContext().getCurrentDocument()).getName()))
-				.replace("{PANEL}", panelType.name())
-				.replace("{EXT}", extension);
 	}
 
 }

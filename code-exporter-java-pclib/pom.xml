@@ -18,7 +18,19 @@
 		<dependency>
 			<groupId>lu.kbra</groupId>
 			<artifactId>pclib-db-core</artifactId>
-			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>lu.kbra</groupId>
+			<artifactId>pclib-db-spring</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>lu.kbra</groupId>
+			<artifactId>code-exporter-java-common</artifactId>
+			<version>${revision}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.json</groupId>
+			<artifactId>json</artifactId>
 		</dependency>
 	</dependencies>
 

@@ -12,10 +12,10 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-import lu.kbra.model_exporter.api.UiProvider;
-
 import lombok.Getter;
 import lombok.Setter;
+import lu.kbra.code_exporter.java.common.JavaTypesUiPanel;
+import lu.kbra.model_exporter.api.UiProvider;
 
 @Getter
 @Setter
@@ -38,6 +38,8 @@ public class JavaPclibUiPanel extends JPanel {
 	private final JTextField springDatabaseBean;
 	private final JLabel lblDbms;
 	private final JComboBox<String> comboBoxDbms;
+	private final JavaTypesUiPanel typesPanel;
+	private final JCheckBox chckbxUseLombok;
 
 	/**
 	 * Create the panel.
@@ -45,9 +47,9 @@ public class JavaPclibUiPanel extends JPanel {
 	public JavaPclibUiPanel() {
 		final GridBagLayout gridBagLayout = new GridBagLayout();
 		gridBagLayout.columnWidths = new int[] { 0, 0, 0, 0, 0 };
-		gridBagLayout.rowHeights = new int[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-		gridBagLayout.columnWeights = new double[] { 0.0, 1.0, 1.0, 0.0, Double.MIN_VALUE };
-		gridBagLayout.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE };
+		gridBagLayout.rowHeights = new int[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+		gridBagLayout.columnWeights = new double[] { 1.0, 1.0, 1.0, 0.0, Double.MIN_VALUE };
+		gridBagLayout.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, Double.MIN_VALUE };
 		this.setLayout(gridBagLayout);
 
 		final JLabel lblDataClassesPath = new JLabel("Data classes path");
@@ -139,6 +141,13 @@ public class JavaPclibUiPanel extends JPanel {
 		gbc_tableClassesPackage.gridy = 3;
 		this.add(this.tableClassesPackage, gbc_tableClassesPackage);
 		this.tableClassesPackage.setColumns(10);
+		
+				this.chckbxKeepSimpleNames = new JCheckBox("Keep simple names");
+				final GridBagConstraints gbc_chckbxKeepSimpleNames = new GridBagConstraints();
+				gbc_chckbxKeepSimpleNames.insets = new Insets(0, 0, 5, 5);
+				gbc_chckbxKeepSimpleNames.gridx = 0;
+				gbc_chckbxKeepSimpleNames.gridy = 4;
+				this.add(this.chckbxKeepSimpleNames, gbc_chckbxKeepSimpleNames);
 
 		this.chckbxExportDataClasses = new JCheckBox("Export data classes");
 		this.chckbxExportDataClasses.setSelected(true);
@@ -156,6 +165,26 @@ public class JavaPclibUiPanel extends JPanel {
 		gbc_chckbxExportTableClasses.gridy = 4;
 		this.add(this.chckbxExportTableClasses, gbc_chckbxExportTableClasses);
 
+		this.springDatabaseBean = new JTextField();
+		this.springDatabaseBean.setEnabled(false);
+		final GridBagConstraints gbc_textField = new GridBagConstraints();
+		gbc_textField.gridwidth = 2;
+		gbc_textField.insets = new Insets(0, 0, 5, 5);
+		gbc_textField.fill = GridBagConstraints.HORIZONTAL;
+		gbc_textField.gridx = 1;
+		gbc_textField.gridy = 8;
+		this.add(this.springDatabaseBean, gbc_textField);
+		this.springDatabaseBean.setColumns(10);
+	
+		this.chckbxUseSpring = new JCheckBox("Use Spring");
+		chckbxUseSpring.setSelected(true);
+		final GridBagConstraints gbc_chckbxUseSpring = new GridBagConstraints();
+		gbc_chckbxUseSpring.insets = new Insets(0, 0, 5, 5);
+		gbc_chckbxUseSpring.gridx = 0;
+		gbc_chckbxUseSpring.gridy = 5;
+		this.add(this.chckbxUseSpring, gbc_chckbxUseSpring);
+				this.chckbxUseSpring.addActionListener(a -> this.springDatabaseBean.setEnabled(this.chckbxUseSpring.isSelected()));
+
 		this.chckbxSplitBySchema = new JCheckBox("Split by schema");
 		this.chckbxSplitBySchema.setEnabled(false);
 		final GridBagConstraints gbc_chckbxSplitBySchema = new GridBagConstraints();
@@ -171,6 +200,14 @@ public class JavaPclibUiPanel extends JPanel {
 		gbc_chckbxOverwriteFiles.gridx = 2;
 		gbc_chckbxOverwriteFiles.gridy = 5;
 		this.add(this.chckbxOverwriteFiles, gbc_chckbxOverwriteFiles);
+		
+		chckbxUseLombok = new JCheckBox("Use Lombok");
+		chckbxUseLombok.setSelected(true);
+		GridBagConstraints gbc_chckbxUseLombok = new GridBagConstraints();
+		gbc_chckbxUseLombok.insets = new Insets(0, 0, 5, 5);
+		gbc_chckbxUseLombok.gridx = 0;
+		gbc_chckbxUseLombok.gridy = 6;
+		add(chckbxUseLombok, gbc_chckbxUseLombok);
 
 		this.chckbxCorrectNaming = new JCheckBox("Correct naming");
 		this.chckbxCorrectNaming.setToolTipText("first_example -> FirstExampleData/FirstExampleTable");
@@ -189,20 +226,6 @@ public class JavaPclibUiPanel extends JPanel {
 		gbc_chckbxMergeFiles.gridy = 6;
 		this.add(this.chckbxMergeFiles, gbc_chckbxMergeFiles);
 
-		this.chckbxUseSpring = new JCheckBox("Use Spring");
-		final GridBagConstraints gbc_chckbxUseSpring = new GridBagConstraints();
-		gbc_chckbxUseSpring.insets = new Insets(0, 0, 5, 5);
-		gbc_chckbxUseSpring.gridx = 1;
-		gbc_chckbxUseSpring.gridy = 7;
-		this.add(this.chckbxUseSpring, gbc_chckbxUseSpring);
-
-		this.chckbxKeepSimpleNames = new JCheckBox("Keep simple names");
-		final GridBagConstraints gbc_chckbxKeepSimpleNames = new GridBagConstraints();
-		gbc_chckbxKeepSimpleNames.insets = new Insets(0, 0, 5, 5);
-		gbc_chckbxKeepSimpleNames.gridx = 2;
-		gbc_chckbxKeepSimpleNames.gridy = 7;
-		this.add(this.chckbxKeepSimpleNames, gbc_chckbxKeepSimpleNames);
-
 		final JLabel lblDatabaseBeanName = new JLabel("Database bean name");
 		final GridBagConstraints gbc_lblDatabaseBeanName = new GridBagConstraints();
 		gbc_lblDatabaseBeanName.insets = new Insets(0, 0, 5, 5);
@@ -211,21 +234,10 @@ public class JavaPclibUiPanel extends JPanel {
 		gbc_lblDatabaseBeanName.gridy = 8;
 		this.add(lblDatabaseBeanName, gbc_lblDatabaseBeanName);
 
-		this.springDatabaseBean = new JTextField();
-		this.springDatabaseBean.setEnabled(false);
-		final GridBagConstraints gbc_textField = new GridBagConstraints();
-		gbc_textField.gridwidth = 2;
-		gbc_textField.insets = new Insets(0, 0, 5, 5);
-		gbc_textField.fill = GridBagConstraints.HORIZONTAL;
-		gbc_textField.gridx = 1;
-		gbc_textField.gridy = 8;
-		this.add(this.springDatabaseBean, gbc_textField);
-		this.springDatabaseBean.setColumns(10);
-
 		this.lblDbms = new JLabel("DBMS");
 		final GridBagConstraints gbc_lblDbms = new GridBagConstraints();
 		gbc_lblDbms.anchor = GridBagConstraints.EAST;
-		gbc_lblDbms.insets = new Insets(0, 0, 0, 5);
+		gbc_lblDbms.insets = new Insets(0, 0, 5, 5);
 		gbc_lblDbms.gridx = 0;
 		gbc_lblDbms.gridy = 9;
 		this.add(this.lblDbms, gbc_lblDbms);
@@ -234,13 +246,26 @@ public class JavaPclibUiPanel extends JPanel {
 		this.comboBoxDbms.setEditable(true);
 		this.comboBoxDbms.setModel(new DefaultComboBoxModel(new String[] { "MySQL", "SQLite", "PostgreSQL" }));
 		final GridBagConstraints gbc_comboBoxDbms = new GridBagConstraints();
-		gbc_comboBoxDbms.insets = new Insets(0, 0, 0, 5);
+		gbc_comboBoxDbms.insets = new Insets(0, 0, 5, 5);
 		gbc_comboBoxDbms.fill = GridBagConstraints.HORIZONTAL;
 		gbc_comboBoxDbms.gridx = 1;
 		gbc_comboBoxDbms.gridy = 9;
 		this.add(this.comboBoxDbms, gbc_comboBoxDbms);
 
-		this.chckbxUseSpring.addActionListener(a -> this.springDatabaseBean.setEnabled(this.chckbxUseSpring.isSelected()));
+		final JLabel lblTypes = new JLabel("Types");
+		GridBagConstraints gbc_lblTypes = new GridBagConstraints();
+		gbc_lblTypes.insets = new Insets(0, 0, 5, 5);
+		gbc_lblTypes.gridx = 0;
+		gbc_lblTypes.gridy = 10;
+		add(lblTypes, gbc_lblTypes);
+
+		this.typesPanel = new JavaTypesUiPanel();
+		final GridBagConstraints gbc_panel = new GridBagConstraints();
+		gbc_panel.gridwidth = 4;
+		gbc_panel.fill = GridBagConstraints.BOTH;
+		gbc_panel.gridx = 0;
+		gbc_panel.gridy = 11;
+		this.add(this.typesPanel, gbc_panel);
 		btnSelectDataPath.addActionListener(e -> UiProvider.selectDir(this, this.txtDataPath));
 		btnSelectTablePath.addActionListener(e -> UiProvider.selectDir(this, this.txtTablePath));
 		this.comboBoxDbms.addActionListener(

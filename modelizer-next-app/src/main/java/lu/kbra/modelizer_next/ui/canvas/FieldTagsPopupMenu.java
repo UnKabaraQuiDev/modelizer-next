@@ -9,8 +9,10 @@ import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenuItem;
 import javax.swing.border.LineBorder;
 
+import lombok.Getter;
 import lu.kbra.modelizer_next.domain.FieldTags;
 
+@Getter
 public class FieldTagsPopupMenu extends LivePopupMenu {
 
 	private static final long serialVersionUID = 2155488607785939774L;
@@ -20,6 +22,8 @@ public class FieldTagsPopupMenu extends LivePopupMenu {
 	private final JCheckBoxMenuItem primaryKey;
 	private final JCheckBoxMenuItem unique;
 	private final JCheckBoxMenuItem nonNull;
+	private final JCheckBoxMenuItem autoIncrement;
+	private final JCheckBoxMenuItem generated;
 	private final JMenuItem actionItem;
 
 	public FieldTagsPopupMenu(final Consumer<FieldTags> confirm) {
@@ -31,6 +35,8 @@ public class FieldTagsPopupMenu extends LivePopupMenu {
 		this.primaryKey = new JCheckBoxMenuItem("Primary key", false);
 		this.unique = new JCheckBoxMenuItem("Unique", false);
 		this.nonNull = new JCheckBoxMenuItem("Non null", true);
+		this.autoIncrement = new JCheckBoxMenuItem("Auto Increment", false);
+		this.generated = new JCheckBoxMenuItem("Generated", false);
 
 		this.actionItem = new JMenuItem("Apply");
 		this.actionItem.addActionListener(this::invokeConfirm);
@@ -38,6 +44,8 @@ public class FieldTagsPopupMenu extends LivePopupMenu {
 		super.add(this.primaryKey);
 		super.add(this.unique);
 		super.add(this.nonNull);
+		super.add(this.autoIncrement);
+		super.add(this.generated);
 		super.add(this.actionItem);
 	}
 
@@ -45,22 +53,8 @@ public class FieldTagsPopupMenu extends LivePopupMenu {
 		this.primaryKey.setSelected(data.isPrimaryKey());
 		this.unique.setSelected(data.isUnique());
 		this.nonNull.setSelected(data.isNonNull());
-	}
-
-	public JCheckBoxMenuItem getPrimaryKey() {
-		return this.primaryKey;
-	}
-
-	public JCheckBoxMenuItem getUnique() {
-		return this.unique;
-	}
-
-	public JCheckBoxMenuItem getNonNull() {
-		return this.nonNull;
-	}
-
-	public JMenuItem getActionItem() {
-		return this.actionItem;
+		this.autoIncrement.setSelected(data.isAutoIncrement());
+		this.generated.setSelected(data.isGenerated());
 	}
 
 	public boolean isPrimaryKey() {
@@ -75,9 +69,18 @@ public class FieldTagsPopupMenu extends LivePopupMenu {
 		return this.nonNull.isSelected();
 	}
 
+	public boolean isAutoIncrement() {
+		return this.autoIncrement.isSelected();
+	}
+
+	public boolean isGenerated() {
+		return this.generated.isSelected();
+	}
+
 	@Override
 	public void invokeConfirm(final ActionEvent e) {
-		this.confirm.accept(new FieldTags(this.isPrimaryKey(), this.isUnique(), this.isNonNull()));
+		this.confirm
+				.accept(new FieldTags(this.isPrimaryKey(), this.isUnique(), this.isNonNull(), this.isAutoIncrement(), this.isGenerated()));
 	}
 
 }

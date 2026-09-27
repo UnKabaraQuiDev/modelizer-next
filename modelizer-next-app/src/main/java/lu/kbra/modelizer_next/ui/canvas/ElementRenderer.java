@@ -638,9 +638,17 @@ public interface ElementRenderer extends DiagramCanvasExt {
 				if (fieldModel.isUnique()) {
 					g2.drawString(TagsOwner.UNIQUE_FLAG, x, y);
 				}
-				x += this.getCanvas().stringWidth(DiagramCanvas.BODY_FONT, TagsOwner.NOT_NULL_FLAG) + DiagramCanvas.TEXT_PADDING;
+				x += this.getCanvas().stringWidth(DiagramCanvas.BODY_FONT, TagsOwner.UNIQUE_FLAG) + DiagramCanvas.TEXT_PADDING;
 				if (fieldModel.isNonNull()) {
 					g2.drawString(TagsOwner.NOT_NULL_FLAG, x, y);
+				}
+				x += this.getCanvas().stringWidth(DiagramCanvas.BODY_FONT, TagsOwner.NOT_NULL_FLAG) + DiagramCanvas.TEXT_PADDING;
+				if (fieldModel.isAutoIncrement()) {
+					g2.drawString(TagsOwner.AUTO_INCREMENT_FLAG, x, y);
+				}
+				x += this.getCanvas().stringWidth(DiagramCanvas.BODY_FONT, TagsOwner.AUTO_INCREMENT_FLAG) + DiagramCanvas.TEXT_PADDING;
+				if (fieldModel.isGenerated()) {
+					g2.drawString(TagsOwner.GENERATED_FLAG, x, y);
 				}
 			}
 		}
@@ -673,10 +681,12 @@ public interface ElementRenderer extends DiagramCanvasExt {
 	 */
 	default Triplet<Double, Double, Double> resolveClassColumWidths(final List<FieldModel> visibleFields) {
 		double maxStringWidth = 0;
-		final double maxFlagWidth = DiagramCanvas.TEXT_PADDING * 2
+		final double maxFlagWidth = DiagramCanvas.TEXT_PADDING * 4
 				+ this.getCanvas().stringWidth(DiagramCanvas.BODY_FONT, TagsOwner.PRIMARY_KEY_FLAG)
 				+ this.getCanvas().stringWidth(DiagramCanvas.BODY_FONT, TagsOwner.NOT_NULL_FLAG)
-				+ this.getCanvas().stringWidth(DiagramCanvas.BODY_FONT, TagsOwner.UNIQUE_FLAG);
+				+ this.getCanvas().stringWidth(DiagramCanvas.BODY_FONT, TagsOwner.UNIQUE_FLAG)
+				+ this.getCanvas().stringWidth(DiagramCanvas.BODY_FONT, TagsOwner.AUTO_INCREMENT_FLAG)
+				+ this.getCanvas().stringWidth(DiagramCanvas.BODY_FONT, TagsOwner.GENERATED_FLAG);
 		boolean hasFlags = false;
 		double maxTypeWidth = 0;
 
@@ -697,10 +707,12 @@ public interface ElementRenderer extends DiagramCanvasExt {
 	 */
 	default Pair<Triplet<Double, Double, Double>, Pair<Boolean, Boolean>> resolveClassFieldProps(final List<FieldModel> visibleFields) {
 		double maxStringWidth = 0;
-		final double maxFlagWidth = DiagramCanvas.TEXT_PADDING * 2
+		final double maxFlagWidth = DiagramCanvas.TEXT_PADDING * 4
 				+ this.getCanvas().stringWidth(DiagramCanvas.BODY_FONT, TagsOwner.PRIMARY_KEY_FLAG)
 				+ this.getCanvas().stringWidth(DiagramCanvas.BODY_FONT, TagsOwner.NOT_NULL_FLAG)
-				+ this.getCanvas().stringWidth(DiagramCanvas.BODY_FONT, TagsOwner.UNIQUE_FLAG);
+				+ this.getCanvas().stringWidth(DiagramCanvas.BODY_FONT, TagsOwner.UNIQUE_FLAG)
+				+ this.getCanvas().stringWidth(DiagramCanvas.BODY_FONT, TagsOwner.AUTO_INCREMENT_FLAG)
+				+ this.getCanvas().stringWidth(DiagramCanvas.BODY_FONT, TagsOwner.GENERATED_FLAG);
 		boolean hasFlags = false;
 		boolean hasType = false;
 		double maxTypeWidth = 0;
