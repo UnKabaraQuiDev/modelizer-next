@@ -9,6 +9,7 @@ import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -32,6 +33,10 @@ import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
+import io.github.andrewauclair.moderndocking.DockingRegion;
+import io.github.andrewauclair.moderndocking.app.Docking;
+import io.github.andrewauclair.moderndocking.app.RootDockingPanel;
+import lombok.Getter;
 import lu.kbra.model_exporter.api.ExportContext;
 import lu.kbra.model_exporter.api.ExporterApiContext;
 import lu.kbra.model_exporter.api.ModelExporter;
@@ -56,11 +61,6 @@ import lu.kbra.modelizer_next.ui.impl.DocumentLoadHandler;
 import lu.kbra.pclib.PCUtils;
 import lu.kbra.pclib.datastructure.tuple.Pair;
 
-import io.github.andrewauclair.moderndocking.DockingRegion;
-import io.github.andrewauclair.moderndocking.app.Docking;
-import io.github.andrewauclair.moderndocking.app.RootDockingPanel;
-import lombok.Getter;
-
 /**
  * Main Swing window for editing Modelizer Next documents.
  */
@@ -77,12 +77,12 @@ public class MainFrame extends JFrame implements MainFrameDocumentController, Ma
 
 	static {
 		if (ExporterApiContext.getApiContext().getContext() == ExportContext.GUI) {
-			final Pair<List<Image>, Long> p = PCUtils.millisTime(() -> MainFrame.WINDOW_ICON_SIZES.stream()
+			final Pair<List<Image>, Duration> p = PCUtils.millisTime(() -> MainFrame.WINDOW_ICON_SIZES.stream()
 					.sorted(Comparator.naturalOrder())
 					.map(i -> new ImageIcon(PCUtils.readPackagedBytesFile(MainFrame.class, "/icons/icon-" + i + ".png")).getImage())
 					.toList());
 			ICON_IMAGES = p.getKey();
-			System.out.println("Scaling icons took: " + (double) p.getValue() / 1_000 + "s");
+			System.out.println("Scaling icons took: " + (double) p.getValue().toMillis() / 1000 + "s");
 
 			ICON = MainFrame.ICON_IMAGES.get(MainFrame.ICON_IMAGES.size() - 1);
 			IMAGE_ICON = new ImageIcon(MainFrame.ICON);

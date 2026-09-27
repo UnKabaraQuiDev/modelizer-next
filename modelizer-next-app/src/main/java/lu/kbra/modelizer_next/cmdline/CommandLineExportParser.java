@@ -5,16 +5,23 @@ import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Collectors;
 
+import com.fasterxml.jackson.databind.BeanDescription;
+import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.introspect.BeanPropertyDefinition;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import lu.kbra.model_exporter.api.ExporterOptions;
 import lu.kbra.model_exporter.api.ModelExporter;
 import lu.kbra.model_exporter.api.OptionsManager;
 import lu.kbra.modelizer_next.MNMain;
+import lu.kbra.pclib.PCUtils;
 
 /**
  * Parses and validates command-line arguments for unattended exports.
@@ -142,6 +149,12 @@ public final class CommandLineExportParser {
 			case "-b", "--batch" -> batch = true;
 			case "-h", "--help" -> {
 				CommandLineExportParser.printHelp();
+				if (args.length > i) {
+					final ModelExporter me = CommandLineExportParser.parseFormat(args[i + 1]);
+					CommandLineExportParser.printOptions(args[i + 1].toLowerCase(),
+							me.getOptionsManager().getClassType(),
+							me.getOptionsManager().blankOptions());
+				}
 				throw new HelpRequestedException();
 			}
 			case "--" -> index = i;
@@ -187,6 +200,41 @@ public final class CommandLineExportParser {
 				batch);
 	}
 
+	public static void printOptions(final String exporter, final Class<?> optionsClass, final Object options) {
+		final ObjectMapper mapper = MNMain.OBJECT_MAPPER;
+		final JavaType javaType = mapper.getTypeFactory().constructType(optionsClass);
+		final BeanDescription description = mapper.getSerializationConfig().introspect(javaType);
+
+		final JsonNode optionsNode = mapper.valueToTree(options);
+
+		final List<String[]> rows = new ArrayList<>();
+
+		for (final BeanPropertyDefinition property : description.findProperties()) {
+
+			final String name = property.getName();
+			final String type = property.getPrimaryType().getRawClass().getSimpleName();
+
+			final JsonNode value = optionsNode.get(name);
+			final String defaultValue = value == null ? "null" : value.toString();
+
+			rows.add(new String[] { name, type, defaultValue });
+		}
+
+		int nameWidth = "Name".length();
+		int typeWidth = "Type".length();
+		int defaultWidth = "Default".length();
+
+		for (final String[] row : rows) {
+			nameWidth = Math.max(nameWidth, row[0].length());
+			typeWidth = Math.max(typeWidth, row[1].length());
+			defaultWidth = Math.max(defaultWidth, row[2].length());
+		}
+
+		System.out.println("Available options for: " + exporter);
+		final String[] header = { "Name", "Type", "Default" };
+		System.out.print(PCUtils.formatTable(header, rows.toArray(String[][]::new)));
+	}
+
 	private static ExporterOptions loadConfig(final URI configFile, final String[] args, final int index, final OptionsManager exporter)
 			throws IOException {
 		final ObjectNode configNode = MNMain.OBJECT_MAPPER.createObjectNode();
@@ -208,8 +256,6 @@ public final class CommandLineExportParser {
 		}
 
 		final ExporterOptions config;
-
-		System.out.println(configNode);
 
 		if (configNode.isEmpty()) {
 			config = exporter.blankOptions();
@@ -238,13 +284,14 @@ public final class CommandLineExportParser {
 				  -c, --config <file>        Export configuratio file
 				  -o, --out <directory>      Output directory, default: current directory
 				  -f, --force                Continue on legacy/newer-version warnings
-				  -h, --help                 Print this help
+				  -h, --help [<exporter>]    Print this help or configuration options for the selected exporter
 				  -m, --multiple             Multiple input files, separated by commas "path1,path2,path3..."
 				  -w, --wildcard             Enable wildcard support for input files, supports: *, **, ?
 				  -j, --jobs <count>         Dispatch multiple threads to speed up the export process
 				  -b, --batch                Disables interactive mode, the output won't contains ANSI control characters
 
 				Examples:
+				  modelizer-next -h png
 				  modelizer-next -e *.mn -w -t png
 				  modelizer-next -e oneFile.mn -t png -c png-export.mnie -- panels=c,l
 				  modelizer-next -e *.mn -w -t svg -- backgroundColor=#aabbcc

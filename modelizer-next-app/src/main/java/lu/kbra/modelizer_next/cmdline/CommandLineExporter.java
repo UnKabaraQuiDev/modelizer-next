@@ -51,7 +51,6 @@ public final class CommandLineExporter {
 			Exporters.init();
 
 			final CommandLineExportOptions options = CommandLineExportParser.parse(args);
-			System.out.println(options.options());
 			final List<URI> inputFiles = CommandLineExporter.resolveInputFiles(options.inputFile(), options.multiple(), options.wildcard());
 			final ModelDocumentProducer documentProducer = new InputFileDocumentProducer(inputFiles, options.force());
 
@@ -65,8 +64,8 @@ public final class CommandLineExporter {
 			System.out.println("\n");
 			final ProgressRenderer renderer = options.batch() ? new BatchProgressRenderer() : new InteractiveProgressRenderer();
 
-			final ExportUpdateCallback updateCallback = DefaultExportUpdateCallback
-					.create(documentProducer.getExpectedCount() + " file(s)", renderer);
+			final ExportUpdateCallback updateCallback = DefaultExportUpdateCallback.create(documentProducer.getExpectedCount() + " file(s)",
+					renderer);
 			updateCallback.setAggregateChildProgress(true);
 			updateCallback.setExpectedChildCount(documentProducer.getExpectedCount());
 
