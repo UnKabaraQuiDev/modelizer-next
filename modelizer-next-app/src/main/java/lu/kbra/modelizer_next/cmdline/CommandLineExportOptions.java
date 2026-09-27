@@ -15,6 +15,7 @@ public record CommandLineExportOptions(
 		boolean wildcard,
 		int jobCount,
 		ExporterOptions options,
-		URI configFile) {
+		URI configFile,
+		boolean batch) {
 
 }

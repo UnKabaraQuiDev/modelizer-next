@@ -28,10 +28,6 @@ public class DefaultExportUpdateCallback implements ExportUpdateCallback {
 
 	private final AtomicBoolean closed = new AtomicBoolean(false);
 
-	/*
-	 * Volatile because these values may be read/written by different threads without needing to lock
-	 * the tree.
-	 */
 	private volatile float progress;
 	@Setter
 	private volatile boolean aggregateChildProgress;
@@ -40,11 +36,11 @@ public class DefaultExportUpdateCallback implements ExportUpdateCallback {
 	@Setter
 	private volatile int expectedChildCount;
 
-	public static DefaultExportUpdateCallback create(final ExportSectionListener listener) {
+	public static ExportUpdateCallback create(final ExportSectionListener listener) {
 		return new DefaultExportUpdateCallback(null, "main", Objects.requireNonNull(listener));
 	}
 
-	public static DefaultExportUpdateCallback create(final String name, final ExportSectionListener listener) {
+	public static ExportUpdateCallback create(final String name, final ExportSectionListener listener) {
 		return new DefaultExportUpdateCallback(null, name, Objects.requireNonNull(listener));
 	}
 
@@ -127,7 +123,7 @@ public class DefaultExportUpdateCallback implements ExportUpdateCallback {
 		return this.parent;
 	}
 
-	private void removeChild(final DefaultExportUpdateCallback child) {
+	private void removeChild(final ExportUpdateCallback child) {
 		synchronized (this.childrenLock) {
 			this.children.remove(child);
 		}

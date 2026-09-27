@@ -8,8 +8,12 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import lu.kbra.model_exporter.api.ExporterOptions;
 import lu.kbra.model_exporter.api.ModelExporter;
+import lu.kbra.model_exporter.api.OptionsManager;
 import lu.kbra.modelizer_next.MNMain;
 
 /**
@@ -118,6 +122,7 @@ public final class CommandLineExportParser {
 		boolean multiple = false;
 		boolean wildcard = false;
 		int jobCount = 1;
+		boolean batch = false;
 
 		int index = -1;
 		for (int i = 0; i < args.length && index == -1; i++) {
@@ -134,6 +139,7 @@ public final class CommandLineExportParser {
 			case "-m", "--multiple" -> multiple = true;
 			case "-w", "--wildcard" -> wildcard = true;
 			case "-j", "--jobs" -> jobCount = Integer.parseInt(CommandLineExportParser.requireValue(args, ++i, arg));
+			case "-b", "--batch" -> batch = true;
 			case "-h", "--help" -> {
 				CommandLineExportParser.printHelp();
 				throw new HelpRequestedException();
@@ -167,19 +173,55 @@ public final class CommandLineExportParser {
 			throw new IllegalArgumentException("Job count cannot be zero or negative.");
 		}
 
-		final ExporterOptions config;
-		if (configFile != null && index > -1) {
-			throw new IllegalArgumentException("Cannot specify --config and manual -- inline options.");
-		} else if (configFile != null) {
-			config = MNMain.OBJECT_MAPPER.readValue(new File(configFile), exporter.getOptionsManager().getClassType());
-		} else if (index > -1) {
-			config = ArgsMapper
-					.parse(Arrays.copyOfRange(args, index, args.length), exporter.getOptionsManager().getClassType(), MNMain.OBJECT_MAPPER);
-		} else {
-			config = exporter.getOptionsManager().blankOptions();
+		final ExporterOptions config = CommandLineExportParser.loadConfig(configFile, args, index, exporter.getOptionsManager());
+
+		return new CommandLineExportOptions(inputFile,
+				exporter,
+				outputDirectory,
+				force,
+				multiple,
+				wildcard,
+				jobCount,
+				config,
+				configFile,
+				batch);
+	}
+
+	private static ExporterOptions loadConfig(final URI configFile, final String[] args, final int index, final OptionsManager exporter)
+			throws IOException {
+		final ObjectNode configNode = MNMain.OBJECT_MAPPER.createObjectNode();
+
+		if (configFile != null) {
+			final JsonNode fileNode = MNMain.OBJECT_MAPPER.readTree(new File(configFile));
+
+			if (!fileNode.isObject()) {
+				throw new IllegalArgumentException("Config file must contain a JSON object.");
+			}
+
+			configNode.setAll((ObjectNode) fileNode);
 		}
 
-		return new CommandLineExportOptions(inputFile, exporter, outputDirectory, force, multiple, wildcard, jobCount, config, configFile);
+		if (index > -1) {
+			final ObjectNode argsNode = ArgsMapper.parseNode(Arrays.copyOfRange(args, index + 1, args.length), MNMain.OBJECT_MAPPER);
+
+			configNode.setAll(argsNode);
+		}
+
+		final ExporterOptions config;
+
+		System.out.println(configNode);
+
+		if (configNode.isEmpty()) {
+			config = exporter.blankOptions();
+		} else {
+			try {
+				config = MNMain.OBJECT_MAPPER.treeToValue(configNode, exporter.getClassType());
+			} catch (final Exception e) {
+				throw new IllegalArgumentException("Could not convert options to " + exporter.getClassType().getSimpleName(), e);
+			}
+		}
+
+		return config;
 	}
 
 	/**
@@ -200,6 +242,7 @@ public final class CommandLineExportParser {
 				  -m, --multiple             Multiple input files, separated by commas "path1,path2,path3..."
 				  -w, --wildcard             Enable wildcard support for input files, supports: *, **, ?
 				  -j, --jobs <count>         Dispatch multiple threads to speed up the export process
+				  -b, --batch                Disables interactive mode, the output won't contains ANSI control characters
 
 				Examples:
 				  modelizer-next -e *.mn -w -t png

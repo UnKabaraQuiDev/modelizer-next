@@ -19,6 +19,16 @@ public interface ExportUpdateCallback {
 
 	ExportUpdateCallback getParent();
 
+	int getExpectedChildCount();
+
+	int getDoneChildCount();
+
+	boolean isAggregateChildProgress();
+
+	void setExpectedChildCount(int expectedChildCount);
+
+	void setAggregateChildProgress(boolean aggregateChildProgress);
+
 	/**
 	 * @return parent == 0
 	 */

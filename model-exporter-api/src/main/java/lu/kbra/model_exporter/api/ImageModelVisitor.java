@@ -39,12 +39,13 @@ public final class ImageModelVisitor {
 			throws ExportFailedException {
 		final List<Path> outputs = new ArrayList<>(3);
 		callback = callback.createSubSection(ExporterApiContext.getApiContext().getCurrentDocument().getPath());
+		callback.setExpectedChildCount(options.getPanels().size());
+		callback.setAggregateChildProgress(true);
 		try {
 			final Map<PanelType, ? extends CanvasRenderer> renderers = ExporterApiContext.getApiContext()
 					.getRenderers()
 					.apply(options.getPanels());
 
-			int i = 0;
 			for (final PanelType pt : options.getPanels()) {
 				callback = callback.createSubSection(pt.name());
 				callback.setProgress(0);
@@ -116,10 +117,14 @@ public final class ImageModelVisitor {
 						.get(ImageModelVisitor
 								.ensureExtension(
 										ImageModelVisitor
-												.replacePlaceholders((options.getOutputPath().isAbsolute() ? options.getOutputPath()
-														: Paths.get(ExporterApiContext.getApiContext().getCurrentDocument()).getParent())
-														.resolve(options.getNameFormat())
-														.toString(), pt),
+												.replacePlaceholders(
+														(options.getOutputPath().isAbsolute() ? options.getOutputPath()
+																: Paths.get(ExporterApiContext.getApiContext().getCurrentDocument())
+																		.getParent())
+																.resolve(options.getNameFormat())
+																.toString(),
+														extension,
+														pt),
 										extension));
 
 				try (OutputStream os = Files.newOutputStream(outputFile); ImageOutputStream ios = ImageIO.createImageOutputStream(os)) {
@@ -151,8 +156,6 @@ public final class ImageModelVisitor {
 
 				callback.setProgress(100f);
 				callback = callback.endSubSection(outputFile.toString());
-				i++;
-				callback.setProgress(100f / options.getPanels().size() * i);
 			}
 			callback.setProgress(100f);
 		} catch (final IOException e) {
@@ -190,11 +193,12 @@ public final class ImageModelVisitor {
 		return string.endsWith("." + ext) ? string : string + "." + ext;
 	}
 
-	public static String replacePlaceholders(final String string, final PanelType panelType) {
-		return string
+	public static String replacePlaceholders(final String filename, final String extension, final PanelType panelType) {
+		return filename
 				.replace("{FILENAME}",
 						PCUtils.removeFileExtension(new File(ExporterApiContext.getApiContext().getCurrentDocument()).getName()))
-				.replace("{PANEL}", panelType.name());
+				.replace("{PANEL}", panelType.name())
+				.replace("{EXT}", extension);
 	}
 
 }

@@ -10,6 +10,14 @@ public final class ArgsMapper {
 	}
 
 	public static <T> T parse(final String[] args, final Class<T> targetClass, final ObjectMapper mapper) {
+		try {
+			return mapper.treeToValue(parseNode(args, mapper), targetClass);
+		} catch (final Exception e) {
+			throw new IllegalArgumentException("Could not convert arguments to " + targetClass.getSimpleName(), e);
+		}
+	}
+
+	public static ObjectNode parseNode(String[] args, ObjectMapper mapper) {
 		final ObjectNode root = mapper.createObjectNode();
 
 		for (String arg : args) {
@@ -29,11 +37,7 @@ public final class ArgsMapper {
 			ArgsMapper.setNestedValue(root, path, value, mapper);
 		}
 
-		try {
-			return mapper.treeToValue(root, targetClass);
-		} catch (final Exception e) {
-			throw new IllegalArgumentException("Could not convert arguments to " + targetClass.getSimpleName(), e);
-		}
+		return root;
 	}
 
 	private static void setNestedValue(final ObjectNode root, final String path, final String value, final ObjectMapper mapper) {

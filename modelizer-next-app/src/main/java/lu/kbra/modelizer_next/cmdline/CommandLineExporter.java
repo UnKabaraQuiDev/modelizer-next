@@ -32,7 +32,6 @@ import lu.kbra.model_exporter.api.ImageExporterOptions;
 import lu.kbra.model_exporter.api.ModelExporter;
 import lu.kbra.model_exporter.api.ModelVisitResult;
 import lu.kbra.modelizer_next.common.DefaultExportUpdateCallback;
-import lu.kbra.modelizer_next.common.ExportSectionListener;
 import lu.kbra.modelizer_next.domain.data.PanelType;
 import lu.kbra.modelizer_next.domain.document.ModelDocument;
 import lu.kbra.modelizer_next.ui.canvas.DiagramCanvas;
@@ -52,39 +51,22 @@ public final class CommandLineExporter {
 			Exporters.init();
 
 			final CommandLineExportOptions options = CommandLineExportParser.parse(args);
+			System.out.println(options.options());
 			final List<URI> inputFiles = CommandLineExporter.resolveInputFiles(options.inputFile(), options.multiple(), options.wildcard());
 			final ModelDocumentProducer documentProducer = new InputFileDocumentProducer(inputFiles, options.force());
 
 			final IntPointer exportedFileCount = new IntPointer(0);
 
-			final int jobCount = options.jobCount();
-			final ScheduledExecutorService executor = Executors.newScheduledThreadPool(jobCount);
+			final ScheduledExecutorService executor = Executors.newScheduledThreadPool(options.jobCount());
 			final List<Throwable> caughtException = Collections.synchronizedList(new ArrayList<>());
 
 			final ModelExporter exporter = options.exporter();
 
 			System.out.println("\n");
-			final ProgressRenderer renderer = new ProgressRenderer();
+			final ProgressRenderer renderer = options.batch() ? new BatchProgressRenderer() : new InteractiveProgressRenderer();
 
-			final DefaultExportUpdateCallback updateCallback = DefaultExportUpdateCallback
-					.create(documentProducer.getExpectedCount() + " files", new ExportSectionListener() {
-
-						@Override
-						public void sectionCreated(ExportUpdateCallback parent, ExportUpdateCallback section) {
-							renderer.created(parent, section);
-						}
-
-						@Override
-						public void progressUpdated(ExportUpdateCallback parent, ExportUpdateCallback section) {
-							renderer.updated(parent, section);
-						}
-
-						@Override
-						public void sectionDeleted(ExportUpdateCallback parent, ExportUpdateCallback section) {
-							renderer.deleted(parent, section);
-						}
-
-					});
+			final ExportUpdateCallback updateCallback = DefaultExportUpdateCallback
+					.create(documentProducer.getExpectedCount() + " file(s)", renderer);
 			updateCallback.setAggregateChildProgress(true);
 			updateCallback.setExpectedChildCount(documentProducer.getExpectedCount());
 
