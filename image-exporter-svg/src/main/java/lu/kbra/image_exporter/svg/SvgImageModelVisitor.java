@@ -40,7 +40,8 @@ public class SvgImageModelVisitor implements ModelVisitor {
 	@Override
 	public ModelVisitResult visitDocument(final ModelDocument file, ExportUpdateCallback callback) throws ExportFailedException {
 		final List<Path> outputFiles = new ArrayList<>(3);
-		callback = callback.createSubSection(ExporterApiContext.getApiContext().getCurrentDocument().getPath());
+		callback = callback.createSubSection(ExporterApiContext.getApiContext().getCurrentDocument() == null ? "Unnamed"
+				: ExporterApiContext.getApiContext().getCurrentDocument().getPath());
 		callback.setExpectedChildCount(options.getPanels().size());
 		callback.setAggregateChildProgress(true);
 		try {
@@ -63,6 +64,7 @@ public class SvgImageModelVisitor implements ModelVisitor {
 				canvas.paintExport(svgGraphics, this.options.getScope());
 
 				final File outputFile = ModelVisitor.getPath(options.getOutputPath(), options.getNameFormat(), "svg", pt).toFile();
+				outputFile.getParentFile().mkdirs();
 
 				try (FileWriter writer = new FileWriter(outputFile)) {
 					svgGraphics.stream(writer, true);

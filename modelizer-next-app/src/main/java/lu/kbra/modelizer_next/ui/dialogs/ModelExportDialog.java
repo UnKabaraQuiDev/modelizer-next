@@ -6,8 +6,10 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.Objects;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -15,23 +17,25 @@ import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JTextArea;
 import javax.swing.SwingWorker;
 import javax.swing.WindowConstants;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import lombok.Getter;
 import lu.kbra.model_exporter.api.ExportContext;
 import lu.kbra.model_exporter.api.ExportUpdateCallback;
 import lu.kbra.model_exporter.api.ExporterApiContext;
 import lu.kbra.model_exporter.api.ExporterOptions;
 import lu.kbra.model_exporter.api.ModelExporter;
+import lu.kbra.model_exporter.api.ModelVisitResult;
 import lu.kbra.model_exporter.api.SimpleExporterOptions;
 import lu.kbra.modelizer_next.MNMain;
+import lu.kbra.modelizer_next.common.App;
 import lu.kbra.modelizer_next.common.DefaultExportUpdateCallback;
 import lu.kbra.modelizer_next.common.ExporterOptionRef;
 import lu.kbra.modelizer_next.ui.frame.MainFrame;
 import lu.kbra.pclib.PCUtils;
-
-import lombok.Getter;
 
 @Getter
 public abstract class ModelExportDialog extends JDialog {
@@ -66,7 +70,6 @@ public abstract class ModelExportDialog extends JDialog {
 				this.options = service.getOptionsManager().blankOptions();
 			}
 			ref.setOptions(this.options);
-			this.original = this.options.clone();
 		}
 
 		final JPanel contentPane = new JPanel(new BorderLayout());
@@ -80,8 +83,11 @@ public abstract class ModelExportDialog extends JDialog {
 		if (this.contentPanel == null) {
 			throw new IllegalStateException("Cannot have no options. (" + service.getExporterId() + ")");
 		}
-		this.restorePanelOption(this.options);
 		this.getContentPane().add(this.contentPanel, BorderLayout.CENTER);
+
+		this.restorePanelOption(this.options);
+		this.options = this.parsePanelOptions();
+		this.original = this.options.clone();
 
 		final JPanel leftPanel = new JPanel();
 		panel.add(leftPanel, BorderLayout.WEST);
@@ -324,6 +330,8 @@ public abstract class ModelExportDialog extends JDialog {
 
 		final SwingWorker<Void, Void> worker = new SwingWorker<>() {
 
+			ModelVisitResult result;
+
 			@Override
 			protected Void doInBackground() throws Exception {
 				ExporterApiContext.clearApiContext();
@@ -335,8 +343,11 @@ public abstract class ModelExportDialog extends JDialog {
 						.setCurrentDocument(ModelExportDialog.this.mainFrame.getSession().getCurrentFile() == null ? null
 								: ModelExportDialog.this.mainFrame.getSession().getCurrentFile().toURI());
 				ExporterApiContext.getApiContext().setRenderers(pts -> ModelExportDialog.this.mainFrame.getCanvasesByPanelType());
+				if (ModelExportDialog.this.mainFrame.getSession().getCurrentFile() == null) {
+					ExporterApiContext.getApiContext().setOutputDirectory(App.getDocumentsDir());
+				}
 
-				ModelExportDialog.this.service.buildModelVisitor(ModelExportDialog.this.parsePanelOptions())
+				result = ModelExportDialog.this.service.buildModelVisitor(ModelExportDialog.this.parsePanelOptions())
 						.visitDocument(ModelExportDialog.this.mainFrame.getSession().getDocument(), callback);
 
 				return null;
@@ -346,12 +357,14 @@ public abstract class ModelExportDialog extends JDialog {
 			protected void done() {
 				try {
 					this.get();
+					JOptionPane.showMessageDialog(null,
+							"Exported files to:\n" + result.exportedFiles().stream().map(Path::toString).collect(Collectors.joining("\n")),
+							"Export completed",
+							JOptionPane.INFORMATION_MESSAGE);
 				} catch (final InterruptedException e) {
 					Thread.currentThread().interrupt();
 				} catch (final ExecutionException e) {
-					final Throwable cause = e.getCause();
-
-					cause.printStackTrace();
+					JOptionPane.showMessageDialog(null, new JTextArea(PCUtils.toString(e)), "Export failed", JOptionPane.ERROR_MESSAGE);
 				} finally {
 					progressDialog.dispose();
 				}

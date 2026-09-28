@@ -2,6 +2,9 @@ package lu.kbra.modelizer_next.common;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -20,7 +23,9 @@ import lu.kbra.pclib.PCUtils;
 public class App {
 
 	private static final String OVERRIDE_APP_DIR_PROPERTY = App.class.getSimpleName() + ".override_app_dir";
-	private static final String APP_FOLDER_NAME = "modelizer-next";
+	private static final String APP_DIR_NAME = "modelizer-next";
+	private static final String OVERRIDE_DOC_DIR_PROPERTY = App.class.getSimpleName() + ".override_doc_dir";
+	private static final String DOC_DIR_NAME = "modelizer-next";
 
 	public static JsonNode JSON;
 
@@ -69,18 +74,51 @@ public class App {
 		if (os.contains("win")) {
 			final String appData = System.getenv("APPDATA");
 			if (appData != null && !appData.isBlank()) {
-				return new File(appData, App.APP_FOLDER_NAME);
+				return new File(appData, App.APP_DIR_NAME);
 			}
 		} else if (os.contains("mac")) {
-			return new File(home, "Library/Application Support/" + App.APP_FOLDER_NAME);
+			return new File(home, "Library/Application Support/" + App.APP_DIR_NAME);
 		}
 
 		final String xdgConfigHome = System.getenv("XDG_CONFIG_HOME");
 		if (xdgConfigHome != null && !xdgConfigHome.isBlank()) {
-			return new File(xdgConfigHome, App.APP_FOLDER_NAME);
+			return new File(xdgConfigHome, App.APP_DIR_NAME);
 		}
 
-		return new File(home, ".config/" + App.APP_FOLDER_NAME);
+		return new File(home, ".config/" + App.APP_DIR_NAME);
+	}
+
+	public static Path getDocumentsDir() {
+		final String override = System.getProperty(App.OVERRIDE_DOC_DIR_PROPERTY);
+		if (override != null) {
+			return Paths.get(override);
+		}
+
+		final String home = System.getProperty("user.home");
+		final String os = System.getProperty("os.name").toLowerCase();
+
+		if (os.contains("win") || os.contains("mac")) {
+			return Paths.get(home, "Documents", App.DOC_DIR_NAME);
+		}
+
+		// Linux / Unix
+		final Path config = Paths.get(home, ".config", "user-dirs.dirs");
+
+		if (Files.isRegularFile(config)) {
+			try {
+				for (final String line : Files.readAllLines(config)) {
+					if (line.startsWith("XDG_DOCUMENTS_DIR=")) {
+						final String value = line.substring("XDG_DOCUMENTS_DIR=".length()).replace("\"", "").replace("$HOME", home);
+
+						return Paths.get(value, App.DOC_DIR_NAME);
+					}
+				}
+			} catch (final IOException ignored) {
+			}
+		}
+
+		// Fallback
+		return Paths.get(home, "Documents", App.DOC_DIR_NAME);
 	}
 
 	/**

@@ -4,7 +4,6 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
@@ -24,7 +23,6 @@ import javax.imageio.stream.ImageOutputStream;
 import lu.kbra.modelizer_next.domain.data.PanelType;
 import lu.kbra.modelizer_next.domain.document.ModelDocument;
 import lu.kbra.modelizer_next.domain.layout.Size2Di;
-import lu.kbra.pclib.PCUtils;
 
 public final class ImageModelVisitor {
 
@@ -37,7 +35,8 @@ public final class ImageModelVisitor {
 			final String extension)
 			throws ExportFailedException {
 		final List<Path> outputs = new ArrayList<>(3);
-		callback = callback.createSubSection(ExporterApiContext.getApiContext().getCurrentDocument().getPath());
+		callback = callback.createSubSection(ExporterApiContext.getApiContext().getCurrentDocument() == null ? "Unnamed"
+				: ExporterApiContext.getApiContext().getCurrentDocument().getPath());
 		callback.setExpectedChildCount(options.getPanels().size());
 		callback.setAggregateChildProgress(true);
 		try {
@@ -113,6 +112,7 @@ public final class ImageModelVisitor {
 				final ImageWriter writer = writers.next();
 
 				final Path outputFile = ModelVisitor.getPath(options.getOutputPath(), options.getNameFormat(), extension, pt);
+				outputFile.getParent().toFile().mkdirs();
 
 				try (OutputStream os = Files.newOutputStream(outputFile); ImageOutputStream ios = ImageIO.createImageOutputStream(os)) {
 					writer.setOutput(ios);

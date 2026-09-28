@@ -26,7 +26,8 @@ public interface ModelVisitor {
 	static String replacePlaceholders(final String filename, final String extension, final PanelType panelType) {
 		return filename
 				.replace("{FILENAME}",
-						PCUtils.removeFileExtension(new File(ExporterApiContext.getApiContext().getCurrentDocument()).getName()))
+						ExporterApiContext.getApiContext().getCurrentDocument() == null ? "Unnamed"
+								: PCUtils.removeFileExtension(new File(ExporterApiContext.getApiContext().getCurrentDocument()).getName()))
 				.replace("{PANEL}", panelType == null ? "" : panelType.name())
 				.replace("{EXT}", extension);
 	}
