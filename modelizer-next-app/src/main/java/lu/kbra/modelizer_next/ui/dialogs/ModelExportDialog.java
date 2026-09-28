@@ -124,6 +124,7 @@ public abstract class ModelExportDialog extends JDialog {
 
 		});
 		btnExport.addActionListener(this::export);
+		super.setLocationRelativeTo(mainFrame);
 	}
 
 	protected ExporterOptions parsePanelOptions() {
