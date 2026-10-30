@@ -26,7 +26,7 @@
 		<maven.compiler.target>${java.version}</maven.compiler.target>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<twelvemonkeys-imageio.version>3.15.3</twelvemonkeys-imageio.version>
-		<xmlgraphics-batik.version>1.19</xmlgraphics-batik.version>
+		<xmlgraphics-batik.version>1.20</xmlgraphics-batik.version>
 
 		<distributor>Manual build</distributor>
 		<appVersion>6</appVersion>
